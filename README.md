@@ -24,5 +24,6 @@
   - [ElasticSearch](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/ElasticSearch)
   - [Kibana](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Kibana)
   - [Beats](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Beats)
+  - [Logstash](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Logstash)
 - [Git](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Git)
 
