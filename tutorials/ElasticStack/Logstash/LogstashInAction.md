@@ -14,7 +14,15 @@
 
 ## 1、安装
 
-### 1.1、下载
+## 1.1、安装依赖
+
+## 1、 安装依赖
+
+请确保安装了JDK1.8，安装方式参考： [JDK1.8安装参考](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
+
+打开后搜索 **安装JDK** 即可。
+
+### 1.2、下载
 
 官网： <https://www.elastic.co/>
 
@@ -24,23 +32,76 @@
 [emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/logstash/logstash-5.6.11.tar.gz
 ```
 
-### 1.2、创建安装目录
+### 1.3、创建安装目录
 
 ```shell
 [emon@emon ~]$ mkdir /usr/local/Logstash
 ```
 
-### 1.3、解压安装
+### 1.4、解压安装
 
 ```shell
-
+[emon@emon ~]$ tar -zxvf /usr/local/src/logstash-5.6.11.tar.gz -C /usr/local/Logstash/
 ```
 
-### 1.4、创建软连接
+### 1.5、创建软连接
 
 ```shell
-
+[emon@emon ~]$ ln -s /usr/local/Logstash/logstash-5.6.11/ /usr/local/logstash
 ```
+
+## 1.6、准备一个`logstash.conf`配置文件
+
+```shell
+[emon@emon logstash]$ vim nginx_logstash.conf
+```
+
+```json
+input {
+  stdin { }
+}
+
+filter {
+  grok {
+    match => {
+      "message" => '%{IPORHOST:remote_ip} - %{DATA:user_name} \[%{HTTPDATE:time}\] "%{WORD:request_action} %{DATA:reques} HTTP/%{NUMBER:http_version}" %{NUMBER:response} %{NUMBER:bytes} "%{DATA:referrer}" "%{DATA:agent}"'
+    }
+  }
+
+  date {
+    match => [ "time", "dd/MM/YYYY:HH:mm:ss Z" ]
+    locale => en
+  }
+
+  geoip {
+    source => "remote_ip"
+    target => "geoip"
+  }
+
+  useragent {
+    source => "agent"
+    target => "user_agent"
+  }
+}
+
+output {
+  stdout {
+    codec => rubydebug
+  }
+}
+```
+
+## 1.7、测试
+
+```shell
+[emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/logstash/bin/logstash -f /usr/local/logstash/nginx_logstash.conf 
+```
+
+
+
+
+
+
 
 
 
