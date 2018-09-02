@@ -194,5 +194,162 @@ http://192.168.8.116:7200/_cluster/stats
 
 
 
+# 四、概念
+
+### 4.1、常用术语
+
+- Document 文档数据
+- Index 索引
+- Type 索引中的数据类型
+- Field 字段，文档的属性
+- Query DSL 查询语法
+
+
+
+### 4.2、Elasticsearch CRUD
+
+- Create 创建文档
+
+请求：
+
+```
+POST /accounts/person/1
+{
+  "name": "John",
+  "lastname": "Doe",
+  "job_description": "Systems administrator and Linux specialit"
+}
+```
+
+应答：
+
+```json
+{
+  "_index": "accounts",
+  "_type": "person",
+  "_id": "1",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "created": true
+}
+```
+
+ - Read 读取文档
+
+请求：
+
+```
+GET /accounts/persion/1
+```
+
+应答：
+
+```json
+{
+  "_index": "accounts",
+  "_type": "person",
+  "_id": "1",
+  "_version": 1,
+  "found": true,
+  "_source": {
+    "name": "John",
+    "lastname": "Doe",
+    "job_description": "Systems administrator and Linux specialit"
+  }
+}
+```
+
+- Update 更新文档
+
+请求：
+
+```
+POST /accounts/person/1/_update
+{
+  "doc": {
+    "job_description": "Systems administrator and Linux specialist"
+  }
+}
+```
+
+应答：
+
+```json
+{
+  "_index": "accounts",
+  "_type": "person",
+  "_id": "1",
+  "_version": 2,
+  "result": "updated",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  }
+}
+```
+
+
+
+- Delete 删除文档
+
+请求：
+
+```
+DELETE /accounts/person/1
+```
+
+应答：
+
+```json
+{
+  "found": true,
+  "_index": "accounts",
+  "_type": "person",
+  "_id": "1",
+  "_version": 4,
+  "result": "deleted",
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  }
+}
+```
+
+
+
+### 4.3、Elasticsearch Query
+
+- Query String
+
+```
+GET accounts/person/_search?q=John
+```
+
+- Query DSL
+
+```json
+GET accounts/person/_search
+{
+  "query": {
+    "term": {
+      "name": {
+        "value": "John"
+      }
+    }
+  }
+}
+```
+
+
+
+
+
 
 
