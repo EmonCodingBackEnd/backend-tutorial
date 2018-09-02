@@ -75,7 +75,7 @@ output.console:
 
 
 
-### 1.1、处理流程
+### 1.2、处理流程
 
 - 处理流程
   - 输入 Input
@@ -144,7 +144,7 @@ processors:
     fields: ["inner"]
 ```
 
-### 1.2、Filebeat+Elasticsearch Ingest Node
+### 1.3、Filebeat+Elasticsearch Ingest Node
 
 - Filebeat 缺乏数据转换能力的
 - Elasticsearch Ingest Node
@@ -152,7 +152,7 @@ processors:
   - 在数据写入es前对数据进行处理
   - pipeline api
 
-### 1.3、Filebeat Module 简介
+### 1.4、Filebeat Module 简介
 
 - 对于社区常见需求进行配置封装增加易用性
   - Nginx
@@ -166,10 +166,26 @@ processors:
 
 
 
-## 1.4、Filebeat收集nginx log
+## 1.5、Filebeat收集nginx log
 
 - 通过stdin收集日志
 - 通过console输出结果
+
+
+
+## 2、Packetbeat简介
+
+- 实时抓取网络包
+- 自动解析应用层协议
+  - ICMP（v4 and v6）
+  - DNS
+  - HTTP
+  - MySQL
+  - Redis
+  - ......
+- Wireshark
+
+## 2.1、Packetbeat解析http协议
 
 
 
