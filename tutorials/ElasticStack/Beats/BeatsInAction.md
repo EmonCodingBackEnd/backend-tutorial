@@ -12,4 +12,10 @@
   - Packetbeat 网络数据
   - Winlogbeat Windows数据
   - Heartbeat 健康检查
-  - 
+
+## 1、Filebeat简介
+
+- 处理流程
+  - 输入 Input
+  - 处理 Filter
+  - 输出 Output
