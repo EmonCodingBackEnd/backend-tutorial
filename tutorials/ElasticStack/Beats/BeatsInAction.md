@@ -15,6 +15,68 @@
 
 ## 1、Filebeat简介
 
+### 1.1、安装
+
+1. 下载
+
+官网： <https://www.elastic.co/>
+
+下载地址页： <https://www.elastic.co/downloads>
+
+```shell
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.11-linux-x86_64.tar.gz
+```
+
+2. 创建安装目录
+
+```shell
+[emon@emon ~]$ mkdir /usr/local/Filebeat
+```
+
+3. 解压安装
+
+```shell
+[emon@emon ~]$ tar -zxvf /usr/local/src/filebeat-5.6.11-linux-x86_64.tar.gz -C /usr/local/Filebeat/
+```
+
+4. 创建软连接
+
+```shell
+[emon@emon ~]$ ln -s /usr/local/Filebeat/filebeat-5.6.11-linux-x86_64/ /usr/local/filebeat
+```
+
+5. 配置`filebeat.yml`
+
+备份：
+
+```shell
+[emon@emon ~]$ cp -a /usr/local/filebeat/filebeat.yml /usr/local/filebeat/filebeat.yml.bak 
+```
+
+编辑：
+
+```shell
+[emon@emon ~]$ vim /usr/local/filebeat/filebeat.yml
+```
+
+```yaml
+# 保留内容
+filebeat.prospectors:
+- input_type: stdin
+output.console:
+  pretty: true
+```
+
+6. 测试
+
+```shell
+[emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/filebeat/filebeat -e -c /usr/local/filebeat/filebeat.yml
+```
+
+
+
+### 1.1、处理流程
+
 - 处理流程
   - 输入 Input
   - 处理 Filter
@@ -82,7 +144,7 @@ processors:
     fields: ["inner"]
 ```
 
-## 2、Filebeat+Elasticsearch Ingest Node
+### 1.2、Filebeat+Elasticsearch Ingest Node
 
 - Filebeat 缺乏数据转换能力的
 - Elasticsearch Ingest Node
@@ -90,7 +152,7 @@ processors:
   - 在数据写入es前对数据进行处理
   - pipeline api
 
-## 3、Filebeat Module 简介
+### 1.3、Filebeat Module 简介
 
 - 对于社区常见需求进行配置封装增加易用性
   - Nginx
@@ -100,3 +162,15 @@ processors:
   - filebeat.yml配置
   - ingest node pipeline配置
   - Kibana dashboard
+- 最佳实践参考
+
+
+
+## 1.4、Filebeat收集nginx log
+
+- 通过stdin收集日志
+- 通过console输出结果
+
+
+
+## 
