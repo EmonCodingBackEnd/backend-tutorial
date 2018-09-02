@@ -166,7 +166,7 @@ processors:
 
 
 
-## 1.5、Filebeat收集nginx log
+### 1.5、Filebeat收集nginx log
 
 - 通过stdin收集日志
 - 通过console输出结果
@@ -185,7 +185,87 @@ processors:
   - ......
 - Wireshark
 
-## 2.1、Packetbeat解析http协议
+### 2.1、安装
+
+1. 下载
+
+官网： <https://www.elastic.co/>
+
+下载地址页： <https://www.elastic.co/downloads>
+
+```shell
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.6.11-linux-x86_64.tar.gz
+```
+
+2. 创建安装目录
+
+```shell
+[emon@emon ~]$ mkdir /usr/local/Packetbeat
+```
+
+3. 解压安装
+
+```shell
+[emon@emon ~]$ tar -zxvf /usr/local/src/packetbeat-5.6.11-linux-x86_64.tar.gz -C /usr/local/Packetbeat/
+```
+
+4. 创建软连接
+
+```shell
+[emon@emon ~]$ ln -s /usr/local/Packetbeat/packetbeat-5.6.11-linux-x86_64/ /usr/local/packetbeat
+```
+
+5. 配置`packetbeat.yml`
+
+复制一份，进行调整：
+
+```shell
+[emon@emon ~]$ grep -v "#" /usr/local/packetbeat/packetbeat.yml > /usr/local/packetbeat/es.yml
+[emon@emon ~]$ vim /usr/local/packetbeat/es.yml 
+```
+
+内容如下：
+
+```shell
+packetbeat.interfaces.device: ens33
+packetbeat.protocols.http:
+  ports: [9200]
+  send_request: true
+  include_body_for: ["application/json", "x-www-form-urlencoded"]
+output.console:
+  pretty: true
+```
+
+6. 测试
+
+```shell
+[emon@emon ~]$ sudo /usr/local/packetbeat/packetbeat -e -c /usr/local/packetbeat/es.yml -strict.perms=false
+```
+
+然后在网页访问Elasticsearch： http://192.168.8.116:9200/
+
+
+
+### 2.2、Packetbeat解析http协议
+
+- 解析elasticsearch http请求
+
+```yaml
+packetbeat.interfaces.device: lo0
+packetbeat.protocols.http: ports: [9200]
+send_request: true
+include_body_for: ["application/json","x-www-form-urlencoded"]
+output.console:
+  pretty: true
+```
+
+- 运行
+
+```
+sudo ./packetbeat -e -c es.yml -strict.perms=false
+```
+
+
 
 
 
