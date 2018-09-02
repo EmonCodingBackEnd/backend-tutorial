@@ -171,6 +171,27 @@ http://192.168.8.116:9200
 
 
 
+- 参数修改的第二种方式
+  - bin/elasticsearch -Ehttp.port=19200
+
+
+
+# 三、本地启动集群的方式
+
+通过调整参数，启动集群：
+
+```shell
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ehttp.port=8200 -Epath.data=node2
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ehttp.port=7200 -Epath.data=node3
+```
+
+查看：
+
+http://192.168.8.116:8200/_cat/nodes?v
+
+http://192.168.8.116:7200/_cluster/stats
+
 
 
 
