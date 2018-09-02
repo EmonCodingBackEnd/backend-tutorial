@@ -19,3 +19,5 @@
   - 输入 Input
   - 处理 Filter
   - 输出 Output
+
+![Beats入门](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/ElasticStack/Beats/images/20180902193823.png)
