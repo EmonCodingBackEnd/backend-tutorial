@@ -133,5 +133,45 @@ http://192.168.8.116:9200
 
 
 
+# 二、配置说明
+
+- 配置文件位于`/usr/local/elasticsearch/config`目录中
+  - `elasticsearch.yml` es的相关配置
+  - `jvm.options` jvm的相关参数
+  - `log4j2.properties` 日志相关配置
+
+## 1、JVM配置
+
+### 1.1、配置堆内存大小
+
+默认的2g调整为512m
+
+```
+# -Xms2g
+# -Xmx2g
+-Xms512m
+-Xmx512m
+```
+
+## 2、es配置
+
+- `elasticsearch.yml`关键配置说明
+  - `cluster.name` 集群名称，以此作为是否统一集群的判断条件
+  - `node.name` 节点名称，以此作为集群中不同节点的区分条件
+  - `network.host/http.port` 网络地址和断开，用于http和transport服务使用
+  - `path.data` 数据存储地址
+  - `path.log` 日志存储地址
+
+
+
+- Development与Production模式说明
+  - 以transport的地址是否绑定在localhost为判断标准 network.host
+  - Development模式下在启动时会以warning的方式提示配置检查异常
+  - Production模式下在启动时会以error的方式提示配置检查异常并退出
+
+
+
+
+
 
 
