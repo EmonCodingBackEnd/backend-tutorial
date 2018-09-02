@@ -10,7 +10,7 @@
 
 ### 1.1、安装要求
 
-​	安装Docker的基本要求如下：
+	安装Docker的基本要求如下：
 
 - Dockr只支持64位的CPU架构的计算机，目前不支持32位CPU
 - 建议系统的Linux内核版本为3.10及以上
@@ -19,9 +19,9 @@
 
 ### 1.2、CentOS环境下安装Docker
 
-​	Docker目前只能运行在64位平台上，并且要求内核版本不低于3.10，实际上内核版本越新越好，过低的内核版本容易造成功能不稳定。
+	Docker目前只能运行在64位平台上，并且要求内核版本不低于3.10，实际上内核版本越新越好，过低的内核版本容易造成功能不稳定。
 
-​	用户可以通过如下命令检查自己的内核版本详细信息：
+	用户可以通过如下命令检查自己的内核版本详细信息：
 
 ```shell
 [emon@emon ~]$ uname -a
@@ -30,7 +30,7 @@ Linux emon 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64 x86_
 Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) #1 SMP Fri Apr 20 16:44:24 UTC 2018
 ```
 
-​	Docker目前支持CentOS6.5及以后的版本，推荐使用CentOS7系统。
+	Docker目前支持CentOS6.5及以后的版本，推荐使用CentOS7系统。
 
 ```shell
 [emon@emon ~]$ sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
@@ -49,26 +49,26 @@ gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 ```
 
-​	上面配置了yum库，检查当前的可用仓库，可以得到如下结果：
+	上面配置了yum库，检查当前的可用仓库，可以得到如下结果：
 
 ```shell
 [emon@emon ~]$ yum repolist all|grep dockerrepo
 dockerrepo/7                Docker Repository                        启用:   110
 ```
 
-​	安装：
+	安装：
 
 ```shell
 [emon@emon ~]$ sudo yum install -y docker-engine
 ```
 
-​	升级：
+	升级：
 
 ```shell
 [emon@emon ~]$ sudo yum check-update docker-engine
 ```
 
-​	启动：
+	启动：
 
 ```shel
 [emon@emon ~]$ sudo systemctl start docker
@@ -131,13 +131,13 @@ dockerrepo/7                Docker Repository                        启用:   1
 
 ### 2.1、推荐通过配置sudo的方式：
 
-​	不推荐docker服务启动后，修改/var/run/docker.sock文件所属组为dockerroot，然后为某个user添加附加组dockerroot方式，使得docker命令在user登录后可以执行。
+	不推荐docker服务启动后，修改/var/run/docker.sock文件所属组为dockerroot，然后为某个user添加附加组dockerroot方式，使得docker命令在user登录后可以执行。
 
 ```shell
 [emon@emon ~]$ sudo visudo
 ```
 
-​	找到`## Allow root to run any commands anywhere`这样的标识，在下方配置：
+	找到`## Allow root to run any commands anywhere`这样的标识，在下方配置：
 
 ```shell
 # 备注：如果已经赋予了ALL的操作权限，就没必要配置如下了
@@ -148,20 +148,20 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 
 ### 2.2、配置alias
 
-​	配置永久的alias：
+	配置永久的alias：
 
 ```shell
 [emon@emon ~]$ vim .bashrc
 alias docker="sudo /usr/bin/docker"
 ```
 
-​	使之生效：
+	使之生效：
 
 ```shell
 [emon@emon ~]$ source .bashrc
 ```
 
-​	使用示例：
+	使用示例：
 
 ```shell
 [emon@emon ~]$ docker images
@@ -294,17 +294,17 @@ Server:
 | --no-trunc=true\|false  | 对输出结果中太长的部分是否进行截断，如镜像的ID信息，默认为是 |
 | -q, --quiet=true\|false | 仅输出ID信息，默认为否                                       |
 
-​	其中，对输出结果进行控制的选项如-f, --filter=[]、--no-trunc=true|false、-q, --quiet=true|false等，对大部分子命令都支持。
+	其中，对输出结果进行控制的选项如-f, --filter=[]、--no-trunc=true|false、-q, --quiet=true|false等，对大部分子命令都支持。
 
 ## 3、为镜像添加标签Tag
 
-​	为了方便在后续工作中使用特定镜像，还可以使用`docker tag`命令来为本地镜像任意添加新的标签。
+	为了方便在后续工作中使用特定镜像，还可以使用`docker tag`命令来为本地镜像任意添加新的标签。
 
 ```shell
 [emon@emon ~]$ docker tag hub.c.163.com/public/ubuntu:14.04 163_ubuntu:14.04
 ```
 
-​	之后，用户就可以直接使用 163_ubuntu:14.04 来表示这个镜像了。 
+	之后，用户就可以直接使用 163_ubuntu:14.04 来表示这个镜像了。 
 
 ## 4、使用`inspect`命令查看详细信息
 
@@ -314,7 +314,7 @@ Server:
 
 ## 5、搜寻镜像
 
-​	使用docker search命令可以搜索远端仓库中共享的镜像，默认搜索官方仓库中的镜像。支持的参数主要包括：
+	使用docker search命令可以搜索远端仓库中共享的镜像，默认搜索官方仓库中的镜像。支持的参数主要包括：
 
 | 参数名称                          | 参数作用                                                     |
 | --------------------------------- | ------------------------------------------------------------ |
@@ -342,11 +342,11 @@ Server:
 [emon@emon ~]$ docker rmi 2fe5c4bba1f9
 ```
 
-​	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。
+	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。
 
 ## 7、创建镜像
 
-​	创建镜像的方法主要有三种：基于已有镜像的容器创建、基于本地模板导入、基于Dockerfile创建。
+	创建镜像的方法主要有三种：基于已有镜像的容器创建、基于本地模板导入、基于Dockerfile创建。
 
 ### 7.1、基于已有镜像的容器创建
 
@@ -448,13 +448,13 @@ root@fe1aa9bd8460:/# exit
 [emon@emon ~]$ docker push rushing/test:0.0.1
 ```
 
-![上传结果](https://github.com/emoncoding/linux-tutorial/blob/develop/src/main/resources/images/docker/2018080801.png)
+![上传结果](.\images\2018080801.png)
 
 
 
 # 四、容器
 
-​	简单来说，容器是镜像的一个运行实例。所不同的是，镜像是静态的只读文件，而容器带有运行时需要的
+	简单来说，容器是镜像的一个运行实例。所不同的是，镜像是静态的只读文件，而容器带有运行时需要的
 可写层。如果认为虚拟机是模拟运行的一整套操作系统（包括内核、应用运行态环境和其他系统环境）和跑在上面的应用，那么Docker容器就是独立运行的一个（或一组）应用，以及它们必需的运行环境。
 
 ## 1、查看容器
