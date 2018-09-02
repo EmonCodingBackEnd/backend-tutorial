@@ -448,7 +448,7 @@ root@fe1aa9bd8460:/# exit
 [emon@emon ~]$ docker push rushing/test:0.0.1
 ```
 
-![上传结果](.\images\2018080801.png)
+![上传结果](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Docker/images/2018080801.png)
 
 
 
