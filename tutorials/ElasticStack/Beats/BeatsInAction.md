@@ -47,20 +47,18 @@
 
 5. 配置`filebeat.yml`
 
-备份：
+复制一份，进行调整：
 
 ```shell
-[emon@emon ~]$ cp -a /usr/local/filebeat/filebeat.yml /usr/local/filebeat/filebeat.yml.bak 
+[emon@emon ~]$ grep -v "#" /usr/local/filebeat/filebeat.yml > /usr/local/filebeat/nginx.yml
+# 设置为只能拥有者可写，否则会报错
+[emon@emon ~]$ chmod go-w /usr/local/filebeat/nginx.yml 
+[emon@emon ~]$ vim /usr/local/filebeat/nginx.yml 
 ```
 
-编辑：
-
-```shell
-[emon@emon ~]$ vim /usr/local/filebeat/filebeat.yml
-```
+内容如下：
 
 ```yaml
-# 保留内容
 filebeat.prospectors:
 - input_type: stdin
 output.console:
@@ -70,7 +68,7 @@ output.console:
 6. 测试
 
 ```shell
-[emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/filebeat/filebeat -e -c /usr/local/filebeat/filebeat.yml
+[emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/filebeat/filebeat -e -c /usr/local/filebeat/nginx.yml 
 ```
 
 
