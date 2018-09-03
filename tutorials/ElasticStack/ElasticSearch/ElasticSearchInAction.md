@@ -172,7 +172,7 @@ http://192.168.8.116:9200
 
 
 - 参数修改的第二种方式
-  - bin/elasticsearch -Ehttp.port=19200
+  - bin/elasticsearch -Ecluster.name=<cluster_name> -Ehttp.port=19200
 
 
 

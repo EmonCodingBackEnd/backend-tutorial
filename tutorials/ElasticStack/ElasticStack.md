@@ -14,10 +14,11 @@
 
   - Product Cluster
     - Elasticsearch http://192.168.8.116:9200
+      - /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=sniff_search
     - Kibana http://192.168.8.116:5601
   - Monitoring Cluster
     - Elasticsearch http://192.168.8.116:8200
-      - bin/elasticsearch -Ecluster.name=sniff_search -Ehttp.port=8200 -Epath.data=sniff_search
+      - /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=sniff_search -Ehttp.port=8200 -Epath.data=sniff_search
     - Kibana http://192.168.8.116:8601
       - bin/kibana -e http://192.168.8.116:8200 -p 8601
 
