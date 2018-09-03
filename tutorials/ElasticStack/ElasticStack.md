@@ -20,7 +20,7 @@
     - Elasticsearch http://192.168.8.116:8200
       - /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=sniff_search -Ehttp.port=8200 -Epath.data=sniff_search
     - Kibana http://192.168.8.116:8601
-      - bin/kibana -e http://192.168.8.116:8200 -p 8601
+      - /usr/local/kibana/bin/kibana -e http://192.168.8.116:8200 -p 8601
 
   - Production与Monitoring不能是一个集群，否则会进入抓包死循环
 
