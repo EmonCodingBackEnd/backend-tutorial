@@ -17,7 +17,7 @@
     - Kibana http://192.168.8.116:5601
   - Monitoring Cluster
     - Elasticsearch http://192.168.8.116:8200
-      - bin/elasticsearch -Ecluster.name=sniff_search -Ehttp.port=8200 -Epath.diff=sniff
+      - bin/elasticsearch -Ecluster.name=sniff_search -Ehttp.port=8200 -Epath.data=sniff_search
     - Kibana http://192.168.8.116:8601
       - bin/kibana -e http://192.168.8.116:8200 -p 8601
 
@@ -47,6 +47,18 @@ output {
   }
 }
 ```
+
+- 方案之packetbeat
+
+```
+packetbeat.interfaces.device: ens33
+backetbeat.protocols.http: ports: [9200]
+send_request: true
+include_body_for: ["application/json", "x-www-form-urlencoded"]
+output.logstash: hosts: ["192.168.8.5044]
+```
+
+
 
 
 
