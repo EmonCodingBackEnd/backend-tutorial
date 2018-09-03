@@ -14,9 +14,7 @@
 
 ## 1、安装
 
-## 1.1、安装依赖
-
-## 1、 安装依赖
+### 1.1、安装依赖
 
 请确保安装了JDK1.8，安装方式参考： [JDK1.8安装参考](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
 
@@ -50,7 +48,7 @@
 [emon@emon ~]$ ln -s /usr/local/Logstash/logstash-5.6.11/ /usr/local/logstash
 ```
 
-## 1.6、准备一个`logstash.conf`配置文件
+### 1.6、准备一个`logstash.conf`配置文件
 
 ```shell
 [emon@emon logstash]$ vim nginx_logstash.conf
@@ -91,7 +89,7 @@ output {
 }
 ```
 
-## 1.7、测试
+### 1.7、测试
 
 ```shell
 [emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/logstash/bin/logstash -f /usr/local/logstash/nginx_logstash.conf 
@@ -161,4 +159,24 @@ output {stdout{codec => rubydebug}}
 }
 ```
 
-#### 2.2.2、
+
+
+
+
+
+
+# 二、配置说明
+
+## 1、JVM配置
+
+### 1.1、配置堆内存大小
+
+默认的1g调整为256m
+
+```
+#-Xms1g
+#-Xmx1g
+-Xms256m
+-Xmx256m
+```
+
