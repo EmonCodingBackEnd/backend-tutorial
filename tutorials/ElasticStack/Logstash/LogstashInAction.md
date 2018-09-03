@@ -56,7 +56,7 @@
 [emon@emon logstash]$ vim nginx_logstash.conf
 ```
 
-```json
+```
 input {
   stdin { }
 }
