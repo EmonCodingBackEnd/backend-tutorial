@@ -48,7 +48,17 @@
 [emon@emon ~]$ ln -s /usr/local/Logstash/logstash-5.6.11/ /usr/local/logstash
 ```
 
-### 1.6、准备一个`logstash.conf`配置文件
+### 1.6、配置`logstash.yml`文件
+
+```shell
+[emon@emon ~]$ vim /usr/local/logstash/config/logstash.yml 
+```
+
+```
+http.host: "0.0.0.0"
+```
+
+### 1.7、准备一个`logstash.conf`配置文件
 
 ```shell
 [emon@emon logstash]$ vim nginx_logstash.conf
@@ -89,7 +99,7 @@ output {
 }
 ```
 
-### 1.7、测试
+### 1.8、测试
 
 ```shell
 [emon@emon ~]$ head -n 2 /usr/local/nginx/logs/access.log | /usr/local/logstash/bin/logstash -f /usr/local/logstash/nginx_logstash.conf 
