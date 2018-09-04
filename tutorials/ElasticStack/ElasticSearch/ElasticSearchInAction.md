@@ -4,15 +4,17 @@
 
 [TOC]
 
-# 一、安装与运行
+# 一、安装、配置与运行
 
-## 1、 安装依赖
+## 1、安装与运行
+
+### 1.1、 安装依赖
 
 请确保安装了JDK1.8，安装方式参考： [JDK1.8安装参考](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
 
 打开后搜索 **安装JDK** 即可。
 
-## 2、下载
+### 1.2、下载
 
 官网： https://www.elastic.co/
 
@@ -22,25 +24,25 @@
 [emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.tar.gz
 ```
 
-## 3、创建安装目录
+### 1.3、创建安装目录
 
 ```shell
 [emon@emon ~]$ mkdir /usr/local/Elasticsearch
 ```
 
-## 4、解压安装
+### 1.4、解压安装
 
 ```shell
 [emon@emon ~]$ tar -zxvf /usr/local/src/elasticsearch-6.4.0.tar.gz -C /usr/local/Elasticsearch/
 ```
 
-## 5、创建软连接
+### 1.5、创建软连接
 
 ```shell
 [emon@emon ~]$ ln -s /usr/local/Elasticsearch/elasticsearch-6.4.0/ /usr/local/elasticsearch
 ```
 
-## 6、配置`elasticsearch.yml`文件
+### 1.6、配置`elasticsearch.yml`文件
 
 ```shell
 [emon@emon ~]$ vim /usr/local/elasticsearch/config/elasticsearch.yml 
@@ -50,9 +52,9 @@
 network.host: 0.0.0.0
 ```
 
-## 7、解决启动问题
+### 1.7、解决启动问题
 
-### 7.1、问题一
+#### 1.7.1、问题一
 
 - 问题描述
 
@@ -74,7 +76,7 @@ emon             hard    nofile          65536
 
 **需要重新登录emon用户生效**
 
-### 7.1、问题二
+#### 1.7.2、问题二
 
 - 问题描述
 
@@ -101,13 +103,13 @@ vm.max_map_count=655360
 [emon@emon ~]$ sudo sysctl -p
 ```
 
-## 8、启动
+### 1.8、启动
 
 ```shell
 [emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch
 ```
 
-## 9、访问
+### 1.9、访问
 
 http://192.168.8.116:9200
 
@@ -133,16 +135,16 @@ http://192.168.8.116:9200
 
 
 
-# 二、配置说明
+## 2、配置说明
 
 - 配置文件位于`/usr/local/elasticsearch/config`目录中
   - `elasticsearch.yml` es的相关配置
   - `jvm.options` jvm的相关参数
   - `log4j2.properties` 日志相关配置
 
-## 1、JVM配置
+### 2.1、JVM配置
 
-### 1.1、配置堆内存大小
+#### 2.1.1、配置堆内存大小
 
 默认的2g调整为256m
 
@@ -153,7 +155,7 @@ http://192.168.8.116:9200
 -Xmx256m
 ```
 
-## 2、es配置
+### 2.2、es配置
 
 - `elasticsearch.yml`关键配置说明
   - `cluster.name` 集群名称，以此作为是否统一集群的判断条件
@@ -175,6 +177,20 @@ http://192.168.8.116:9200
   - bin/elasticsearch -Ecluster.name=<cluster_name> -Ehttp.port=19200
 
 
+
+# 二、风格
+
+## 1、RESTFul API
+
+### 1.1、API基本格式
+
+```http://<ip>:<port>/<索引>/<类型>/<文档id>
+http://<ip>:<port>/<索引>/<类型>/<文档id>
+```
+
+### 1.2、常用HTTP动词
+
+GET/PUT/POST/DELETE
 
 # 三、本地启动集群的方式
 
@@ -198,11 +214,13 @@ http://192.168.8.116:7200/_cluster/stats
 
 ### 4.1、常用术语
 
-- Document 文档数据
-- Index 索引
-- Type 索引中的数据类型
+- Document 文档数据，是可以被索引的基本数据单位=>相当于一条表的记录
+- Index 索引，含有相同属性的文档集合=>相当于数据库
+- Type 索引中的数据类型，可以定义一个或多个类型，文档必须属于一个类型=>相当于数据表
 - Field 字段，文档的属性
 - Query DSL 查询语法
+- 分片 每个索引都有多个分片，每个分片是一个Lucene索引
+- 备份 拷贝一个分片，就完成了分片的备份
 
 
 
@@ -346,6 +364,54 @@ GET accounts/person/_search
   }
 }
 ```
+
+
+
+# 六、插件
+
+创建目录，保存插件：
+
+```shell
+[emon@emon ~]$ mkdir /usr/local/Elasticsearch/ThirdPlugins
+```
+
+安装bzip2的解压工具：
+
+```shell
+[emon@emon ~]$ sudo yum install -y bzip2
+```
+
+
+
+## 1、elasticsearch-head
+
+1. 运行
+
+```shell
+[emon@emon ~]$ cd /usr/local/Elasticsearch/ThirdPlugins/
+[emon@emon ThirdPlugins]$ git clone git@github.com:mobz/elasticsearch-head.git
+[emon@emon ThirdPlugins]$ cd elasticsearch-head/
+[emon@emon elasticsearch-head]$ npm install
+[emon@emon elasticsearch-head]$ npm run start
+```
+
+2. 配置 Elasticsearch 跨域访问
+
+```shell
+[emon@emon ~]$ vim /usr/local/elasticsearch/config/elasticsearch.yml 
+```
+
+```shell
+# 追加
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+3. 访问测试
+
+http://192.168.8.116:9100/
+
+
 
 
 
