@@ -11,9 +11,9 @@ git-tutorial
 
 # 一、Git简介
 
-​	一个可以管理和追踪软件代码或其他类似内容的不同版本的工具，通常称为：版本控制系统（VCS），或者源代码管理器（SCM），或者修订控制系统（RCS）。
+	一个可以管理和追踪软件代码或其他类似内容的不同版本的工具，通常称为：版本控制系统（VCS），或者源代码管理器（SCM），或者修订控制系统（RCS）。
 
-​	全局信息追踪器：Global Information Tracker：Git
+	全局信息追踪器：Global Information Tracker：Git
 
 ## 1.1 安装Git之后，使用之前需要进行的Git配置
 
@@ -628,6 +628,12 @@ git diff HEAD
 git checkout -- <file name>
 ```
 
+- 如何只回退某一个文件到指定<commit id>
+
+```shell
+git checkout <commit id> <absolute_file_path>
+```
+
 - 已经使用`git add`添加到仓库的文件，想要使得他回退到`git add`之前
 
 ```shell
@@ -761,7 +767,7 @@ git bisect log
 
 ## 8.1 git flow的工作流程
 
-​	当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。
+	当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。
 
 ![git-flow.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow.png)
 
