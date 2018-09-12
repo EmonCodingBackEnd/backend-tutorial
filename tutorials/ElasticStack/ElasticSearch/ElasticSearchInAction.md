@@ -4,6 +4,8 @@
 
 [TOC]
 
+[临时：ES配置文件详解](https://www.cnblogs.com/sunxucool/p/3799190.html)
+
 # 一、安装、配置与运行
 
 ## 1、安装与运行
@@ -194,7 +196,7 @@ GET/PUT/POST/DELETE
 
 # 三、本地启动集群的方式
 
-通过调整参数，启动集群：
+## 1、通过调整启动参数，配置集群
 
 ```shell
 [emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=emon -Enode.name=master
@@ -202,17 +204,132 @@ GET/PUT/POST/DELETE
 [emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=emon -Enode.name=slave2 -Ehttp.port=7200 -Epath.data=slave2nodes -Ediscovery.zen.ping.unicast.hosts="0.0.0.0:9300"
 ```
 
-查看：
+验证集群：
 
 http://192.168.8.116:8200/_cat/nodes?v
 
 http://192.168.8.116:7200/_cluster/stats
 
+## 2、通过调整配置文件，配置集群
 
+### 2.1、配置主节点
+
+- 配置`elasticsearch.yml`
+
+```shell
+[emon@emon ~]$ vim /usr/local/elasticsearch/config/elasticsearch.yml
+```
+
+```yaml
+cluster.name: emon
+node.name: master
+# 表示该节点具有成为master的权利，但不一定就是master
+node.master: true
+network.host: 0.0.0.0
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+- 配置`jvm.options`
+
+```
+[emon@emon ~]$ vim /usr/local/elasticsearch/config/jvm.options 
+```
+
+```shell
+#-Xms2g
+#-Xmx2g
+-Xms256m
+-Xmx256m
+```
+
+- 启动
+
+```shell
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch
+```
+
+### 2.2、配置从节点之一
+
+- 配置`elasticsearch.yml`
+
+```shell
+[emon@emon ~]$ cp -r /usr/local/elasticsearch/ /usr/local/Elasticsearch/elasticsearch-5.6.11-slave1
+[emon@emon ~]$ ln -s /usr/local/Elasticsearch/elasticsearch-5.6.11-slave1/ /usr/local/elasticsearch-slave1
+[emon@emon ~]$ vim /usr/local/elasticsearch-slave1/config/elasticsearch.yml 
+```
+
+```yaml
+cluster.name: emon
+node.name: slave1
+network.host: 0.0.0.0
+http.port: 8200
+discovery.zen.ping.unicast.hosts: ["0.0.0.0"]
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+- 配置`jvm.options`
+
+```shell
+[emon@emon ~]$ vim /usr/local/elasticsearch-slave1/config/jvm.options 
+```
+
+```shell
+#-Xms2g
+#-Xmx2g
+-Xms256m
+-Xmx256m
+```
+
+- 启动
+
+```shell
+[emon@emon ~]$ /usr/local/elasticsearch-slave1/bin/elasticsearch
+```
+
+### 2.3、配置从节点之二
+
+- 配置`elasticsearch.yml`
+
+```shell
+[emon@emon ~]$ cp -r /usr/local/elasticsearch/ /usr/local/Elasticsearch/elasticsearch-5.6.11-slave1
+[emon@emon ~]$ ln -s /usr/local/Elasticsearch/elasticsearch-5.6.11-slave2/ /usr/local/elasticsearch-slave2
+[emon@emon ~]$ vim /usr/local/elasticsearch-slave2/config/elasticsearch.yml 
+```
+
+```yaml
+cluster.name: emon
+node.name: slave2
+network.host: 0.0.0.0
+http.port: 7200
+discovery.zen.ping.unicast.hosts: ["0.0.0.0"]
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+- 配置`jvm.options`
+
+```shell
+[emon@emon ~]$ vim /usr/local/elasticsearch-slave2/config/jvm.options 
+```
+
+```shell
+#-Xms2g
+#-Xmx2g
+-Xms256m
+-Xmx256m
+```
+
+- 启动
+
+```shell
+[emon@emon ~]$ /usr/local/elasticsearch-slave2/bin/elasticsearch
+```
 
 # 四、概念
 
-### 4.1、常用术语
+### 1、常用术语
 
 - Document 文档数据，是可以被索引的基本数据单位=>相当于一条表的记录
 - Index 索引，含有相同属性的文档集合=>相当于数据库
@@ -224,7 +341,7 @@ http://192.168.8.116:7200/_cluster/stats
 
 
 
-### 4.2、Elasticsearch CRUD
+### 2、Elasticsearch CRUD
 
 - Create 创建文档
 
@@ -342,7 +459,7 @@ DELETE /accounts/person/1
 
 
 
-### 4.3、Elasticsearch Query
+### 3、Elasticsearch Query
 
 - Query String
 
