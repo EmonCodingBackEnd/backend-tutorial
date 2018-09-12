@@ -70,7 +70,7 @@ network.host: 0.0.0.0
 [emon@emon ~]$ sudo vim /etc/security/limits.conf
 ```
 
-```shell
+```
 # 配置内容，其中emon是启动elasticsearch的用户，如果不确定是什么用户，也可以替换为*表示所有
 emon             soft    nofile          1024
 emon             hard    nofile          65536
@@ -232,11 +232,11 @@ http.cors.allow-origin: "*"
 
 - 配置`jvm.options`
 
-```
+```shell
 [emon@emon ~]$ vim /usr/local/elasticsearch/config/jvm.options 
 ```
 
-```shell
+```
 #-Xms2g
 #-Xmx2g
 -Xms256m
