@@ -12,7 +12,7 @@ git-tutorial
 # 一、Git简介
 
 	一个可以管理和追踪软件代码或其他类似内容的不同版本的工具，通常称为：版本控制系统（VCS），或者源代码管理器（SCM），或者修订控制系统（RCS）。
-
+	
 	全局信息追踪器：Global Information Tracker：Git
 
 ## 1.1 安装Git之后，使用之前需要进行的Git配置
@@ -527,6 +527,16 @@ git push origin --tags
 ```shell
 git config --global user.name "[username]"
 git config --global user.email "[useremail]"
+```
+
+- 设置禁止CRLF的自动转换
+
+windows中的换行符为CRLF，而在linux下的换行符为LF，所以在执行add.时出现提示：
+
+**warning: LF will be replaced by CRLF in .editorconfig.**
+
+```shell
+git config --global core.autocrlf false // 禁用自动转换
 ```
 
 - 提高命令输出的可读性
