@@ -3053,14 +3053,14 @@ Now using node v8.11.2 (npm v5.6.0)
 
 4. nvm常用命令
 
-| 命令                             | 说明                                 | 示例                      |
-| -------------------------------- | ------------------------------------ | ------------------------- |
-| nvm ls                           | 本地查看                             |                           |
-| nvm use [--silent] <version>     | 切换版本，支持模糊匹配               | nvm use 6                 |
-| nvm current                      | 查看当前版本                         |                           |
-| npm list -g --depth 0            | 查看安装过的全局软件，其中-g表示全局 |                           |
-| nvm ls-remote                    | 查看远程版本                         |                           |
-| nvm alias default <version_name> | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
+| 命令                           | 说明                                 | 示例                      |
+| ------------------------------ | ------------------------------------ | ------------------------- |
+| nvm ls                         | 本地查看                             |                           |
+| nvm use [--silent] `<version>` | 切换版本，支持模糊匹配               | nvm use 6                 |
+| nvm current                    | 查看当前版本                         |                           |
+| npm list -g --depth 0          | 查看安装过的全局软件，其中-g表示全局 |                           |
+| nvm ls-remote                  | 查看远程版本                         |                           |
+| nvm alias default `<version>`  | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
 
 ### 11.2、安装PM2
 
@@ -3224,7 +3224,7 @@ success
 ### 11.4、安装GraphicsMagick
 
 	ImageMagick是一个免费的创建、编辑、合成图片的软件。它可以读取、转换、写入多种格式的图片。图片切割、颜色替换、各种效果的应用，图片的旋转、组合，文本，直线，多边形，椭圆，曲线，附加到图片伸展旋转。其全部源码开放，可以自由使用，复制，修改，发布。它遵守GPL许可协议。它可以运行于大多数的操作系统。最为重要的是，ImageMagick的大多数功能的使用都来源于命令行工具。
-
+	
 	GraphicsMagick是从 ImageMagick 5.5.2 分支出来的，但是现在他变得更稳定和优秀，GM更小更容易安装、GM更有效率、GM的手册非常丰富GraphicsMagick的命令与ImageMagick基本是一样的。
 
 1. 依赖检查与安装
