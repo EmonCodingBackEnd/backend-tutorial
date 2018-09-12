@@ -3060,7 +3060,7 @@ Now using node v8.11.2 (npm v5.6.0)
 | nvm current                    | 查看当前版本                         |                           |
 | npm list -g --depth 0          | 查看安装过的全局软件，其中-g表示全局 |                           |
 | nvm ls-remote                  | 查看远程版本                         |                           |
-| nvm alias default \`<version\> | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
+| nvm alias default \<version\>  | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
 
 ### 11.2、安装PM2
 
