@@ -1480,7 +1480,7 @@ conf  html  logs  sbin
 
 的环境变量，就会导致`sudo: nginx: command not found`。
 
-​	所以，采用软连接的方式：
+	所以，采用软连接的方式：
 
 ```bash
 [emon@emon ~]$ sudo ln -s /usr/local/nginx/sbin/nginx /usr/sbin/nginx
@@ -1973,7 +1973,7 @@ success
 
 ### 8.2、安装MySQL8.0版本
 
-​	MySQL8.0版本基于MySQL5.7版本的安装，且与MySQL5.7不同时使用，所以：
+	MySQL8.0版本基于MySQL5.7版本的安装，且与MySQL5.7不同时使用，所以：
 
 - 目录`/usr/local/MySQL`已存在【共享】
 - `mysql`用户已存在【共享】
@@ -2974,11 +2974,11 @@ WantedBy=multi-user.target
 
 NVM管理不同版本的node与npm：
 
-​	nvm是NodeJS的多版本管理工具，有点类似管理Ruby的rvm，如果是需要管理Windows下的node，官方推荐是使用nvmw或nvm-windows。
+	nvm是NodeJS的多版本管理工具，有点类似管理Ruby的rvm，如果是需要管理Windows下的node，官方推荐是使用nvmw或nvm-windows。
 
 卸载已经安装的全局node/npm：
 
-​	在官网下载的node安装包，运行后会自动安装在全局目录，其中node命令在`/usr/bin/node`，npm命令在全局`node_modules`目录中，具体路径为`/usr/[lib|lib64]/node_modules/npm。
+	在官网下载的node安装包，运行后会自动安装在全局目录，其中node命令在`/usr/bin/node`，npm命令在全局`node_modules`目录中，具体路径为`/usr/[lib|lib64]/node_modules/npm。
 
 安装nvm之后最好先删除已安装的node和全局node模块。
 
@@ -3053,17 +3053,18 @@ Now using node v8.11.2 (npm v5.6.0)
 
 4. nvm常用命令
 
-| 命令                         | 说明                                 | 示例      |
-| ---------------------------- | ------------------------------------ | --------- |
-| nvm ls                       | 本地查看                             |           |
-| nvm use [--silent] <version> | 切换版本，支持模糊匹配               | nvm use 6 |
-| nvm current                  | 查看当前版本                         |           |
-| npm list -g --depth 0        | 查看安装过的全局软件，其中-g表示全局 |           |
-| nvm ls-remote                | 查看远程版本                         |           |
+| 命令                             | 说明                                 | 示例                      |
+| -------------------------------- | ------------------------------------ | ------------------------- |
+| nvm ls                           | 本地查看                             |                           |
+| nvm use [--silent] <version>     | 切换版本，支持模糊匹配               | nvm use 6                 |
+| nvm current                      | 查看当前版本                         |                           |
+| npm list -g --depth 0            | 查看安装过的全局软件，其中-g表示全局 |                           |
+| nvm ls-remote                    | 查看远程版本                         |                           |
+| nvm alias default <version_name> | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
 
 ### 11.2、安装PM2
 
-​	PM2是node进程管理工具，可以利用它来简化很多node应用管理的繁琐任务，如性能监控、自动重启、负载均衡等等，而且使用非常的简单。
+	PM2是node进程管理工具，可以利用它来简化很多node应用管理的繁琐任务，如性能监控、自动重启、负载均衡等等，而且使用非常的简单。
 
 官网： http://pm2.keymetrics.io/
 
@@ -3222,9 +3223,9 @@ success
 
 ### 11.4、安装GraphicsMagick
 
-​	ImageMagick是一个免费的创建、编辑、合成图片的软件。它可以读取、转换、写入多种格式的图片。图片切割、颜色替换、各种效果的应用，图片的旋转、组合，文本，直线，多边形，椭圆，曲线，附加到图片伸展旋转。其全部源码开放，可以自由使用，复制，修改，发布。它遵守GPL许可协议。它可以运行于大多数的操作系统。最为重要的是，ImageMagick的大多数功能的使用都来源于命令行工具。
+	ImageMagick是一个免费的创建、编辑、合成图片的软件。它可以读取、转换、写入多种格式的图片。图片切割、颜色替换、各种效果的应用，图片的旋转、组合，文本，直线，多边形，椭圆，曲线，附加到图片伸展旋转。其全部源码开放，可以自由使用，复制，修改，发布。它遵守GPL许可协议。它可以运行于大多数的操作系统。最为重要的是，ImageMagick的大多数功能的使用都来源于命令行工具。
 
-​	GraphicsMagick是从 ImageMagick 5.5.2 分支出来的，但是现在他变得更稳定和优秀，GM更小更容易安装、GM更有效率、GM的手册非常丰富GraphicsMagick的命令与ImageMagick基本是一样的。
+	GraphicsMagick是从 ImageMagick 5.5.2 分支出来的，但是现在他变得更稳定和优秀，GM更小更容易安装、GM更有效率、GM的手册非常丰富GraphicsMagick的命令与ImageMagick基本是一样的。
 
 1. 依赖检查与安装
 
