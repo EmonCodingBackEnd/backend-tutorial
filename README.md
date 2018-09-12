@@ -21,7 +21,7 @@
 - [Docker](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Docker)
 - [RabbitMQ](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/RabbitMQ)
 - [ElasticStack](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack)
-  - [ElasticSearch](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/ElasticSearch)
+  - [Elasticsearch](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Elasticsearch)
   - [Kibana](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Kibana)
   - [Beats](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Beats)
   - [Logstash](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/ElasticStack/Logstash)
