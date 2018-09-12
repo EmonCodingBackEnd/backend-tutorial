@@ -135,8 +135,6 @@ http://192.168.8.116:9200
 }
 ```
 
-
-
 ## 2、配置说明
 
 - 配置文件位于`/usr/local/elasticsearch/config`目录中
@@ -166,44 +164,15 @@ http://192.168.8.116:9200
   - `path.data` 数据存储地址
   - `path.log` 日志存储地址
 
-
-
 - Development与Production模式说明
   - 以transport的地址是否绑定在localhost为判断标准 network.host
   - Development模式下在启动时会以warning的方式提示配置检查异常
   - Production模式下在启动时会以error的方式提示配置检查异常并退出
 
-
-
 - 参数修改的第二种方式
   - bin/elasticsearch -Ecluster.name=<cluster_name> -Ehttp.port=19200
 
-
-
-# 二、风格
-
-## 1、RESTFul API
-
-### 1.1、API基本格式
-
-```http://<ip>:<port>/<索引>/<类型>/<文档id>
-http://<ip>:<port>/<索引>/<类型>/<文档id>
-```
-
-### 1.2、常用HTTP动词
-
-GET/PUT/POST/DELETE
-
-## 2、索引创建
-
-- 非结构化创建
-- 结构化创建
-
-
-
-
-
-# 三、本地启动集群的方式
+# 二、本地启动集群的方式
 
 ## 1、通过调整启动参数，配置集群
 
@@ -336,7 +305,7 @@ http.cors.allow-origin: "*"
 [emon@emon ~]$ /usr/local/elasticsearch-slave2/bin/elasticsearch
 ```
 
-# 四、概念
+# 三、概念
 
 ### 1、常用术语
 
@@ -347,8 +316,6 @@ http.cors.allow-origin: "*"
 - Query DSL 查询语法
 - 分片 每个索引都有多个分片，每个分片是一个Lucene索引
 - 备份 拷贝一个分片，就完成了分片的备份
-
-
 
 ### 2、Elasticsearch CRUD
 
@@ -438,8 +405,6 @@ POST /accounts/person/1/_update
 }
 ```
 
-
-
 - Delete 删除文档
 
 请求：
@@ -466,8 +431,6 @@ DELETE /accounts/person/1
 }
 ```
 
-
-
 ### 3、Elasticsearch Query
 
 - Query String
@@ -491,6 +454,27 @@ GET accounts/person/_search
 }
 ```
 
+# 四、风格
+
+## 1、RESTFul API
+
+### 1.1、API基本格式
+
+```http://<ip>:<port>/<索引>/<类型>/<文档id>
+http://<ip>:<port>/<索引>/<类型>/<文档id>
+```
+
+### 1.2、常用HTTP动词
+
+GET/PUT/POST/DELETE
+
+## 2、索引创建
+
+- 非结构化创建
+- 结构化创建
+
+
+
 
 
 # 六、插件
@@ -506,8 +490,6 @@ GET accounts/person/_search
 ```shell
 [emon@emon ~]$ sudo yum install -y bzip2
 ```
-
-
 
 ## 1、elasticsearch-head
 
