@@ -113,7 +113,7 @@ vm.max_map_count=655360
 
 http://192.168.8.116:9200
 
-```json
+```
 {
     name: "lcbwrZv",
     cluster_name: "elasticsearch",
@@ -197,9 +197,9 @@ GET/PUT/POST/DELETE
 通过调整参数，启动集群：
 
 ```shell
-[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch
-[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ehttp.port=8200 -Epath.data=node2
-[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ehttp.port=7200 -Epath.data=node3
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=emon -Enode.name=master
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=emon -Enode.name=slave1 -Ehttp.port=8200 -Epath.data=slave1nodes -Ediscovery.zen.ping.unicast.hosts="0.0.0.0:9300"
+[emon@emon ~]$ /usr/local/elasticsearch/bin/elasticsearch -Ecluster.name=emon -Enode.name=slave2 -Ehttp.port=7200 -Epath.data=slave2nodes -Ediscovery.zen.ping.unicast.hosts="0.0.0.0:9300"
 ```
 
 查看：
