@@ -18,8 +18,10 @@ function getTiming() {
 echo -e "\e[1;44m\e[1;36m====================================================================================================\e[0m"
 echo -e "\e[1;44m\e[1;33m您输入的路径为 $*\e[0m"
 echo -e "\e[1;44m\e[1;36m====================================================================================================\e[0m"
-FAILURE_ARY=()
+FAILURE_ARY=() # 失败的信息记录
 FAILURE_TIMES=0 # 全局变量，表示更新是否成功，如果失败，表示失败的次数
+TOTAL_PROJECT_COUNT=0 # 更新的总项目数量
+TOTAL_BRANCH_COUNT=0 # 更新的总分支数量
 WORKSPACE_END="WORKSPACE_END"
 global_start_time=`date +'%Y-%m-%d %H:%M:%S'`
 for WORKSPACE in `echo $* $WORKSPACE_END|sed -n 's/ /\n/gp'|sed '/^$/d'`
@@ -42,12 +44,13 @@ do
 		global_end_time=`date +'%Y-%m-%d %H:%M:%S'`
 		global_start_seconds=$(date --date="$global_start_time" +%s);
 		global_end_seconds=$(date --date="$global_end_time" +%s);
-		echo -e "\e[1;34m脚本[\e[1;32m$0\e[1;34m]执行结束，总花费时间："$((global_end_seconds - global_start_seconds))"s\e[0m"
+		echo -e "\e[1;34m脚本[\e[1;32m$0\e[1;34m]执行结束，总花费时间："$((global_end_seconds - global_start_seconds))"s，项目数量：[\e[1;32m$TOTAL_PROJECT_COUNT\e[1;34m]，分支数量：[\e[1;32m$TOTAL_BRANCH_COUNT\e[1;34m]\e[0m"
 		exit 0
 	else
 		echo -e "\e[1;36m遍历目录 $WORKSPACE\e[0m"
 		for PROJECT in `find ${WORKSPACE} -name ".git"`
 		do
+			let TOTAL_PROJECT_COUNT++
 			start_time=`date +'%Y-%m-%d %H:%M:%S'`
 			CURRENT_PROJECT=`echo $PROJECT|sed 's/.git$//'`
 			if [[ $CURRENT_PROJECT =~ "node_module" ]]; then
@@ -64,6 +67,7 @@ do
 			echo -e "\e[1;35m==================================================\e[0m"
 			for BRANCH in `git branch -r|grep -v "HEAD"|sed 's/origin\///'`
 			do
+				let TOTAL_BRANCH_COUNT++
 				echo -e "\e[1;35m切换到分支 [\e[1;32m$BRANCH\e[1;35m] 进行更新...\e[0m"
 				git checkout $BRANCH
 				if [ $? -ne 0 ]; then
