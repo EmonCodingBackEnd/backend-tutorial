@@ -13,16 +13,21 @@ do
 		for PROJECT in `find ${WORKSPACE} -name ".git"`
 		do
 			CURRENT_PROJECT=`echo $PROJECT|sed 's/.git$//'`
+			if [[ $CURRENT_PROJECT =~ "node_module" ]]; then
+				echo -e "\e[1;44m\e[1;31m跳过目录 $CURRENT_PROJECT\e[0m"
+				continue
+			fi
+
 			cd $CURRENT_PROJECT
 			CURRENT_BRANCH=`git branch -l|grep "*"|sed 's/* //'`
-			echo -en "\e[1;31m\n当前项目路径=[`pwd`] 当前分支=[$CURRENT_BRANCH]\e[0m"
+			echo -en "\e[1;31m\n当前项目路径=[\e[1;32m`pwd`\e[1;31m] 当前分支=[\e[1;32m$CURRENT_BRANCH\e[1;31m]\e[0m\n"
 			echo -e "\e[1;34m当前项目分支列表:\e[0m"
 			echo -e "\e[1;35m==================================================\e[0m"
 			git branch -a
 			echo -e "\e[1;35m==================================================\e[0m"
 			for BRANCH in `git branch -r|grep -v "HEAD"|sed 's/origin\///'`
 			do
-				echo -e "\e[1;35m切换到分支 $BRANCH 进行更新...\e[0m"
+				echo -e "\e[1;35m切换到分支 \e[1;32m$BRANCH\e[0m 进行更新...\e[0m"
 				git checkout $BRANCH
 				git pull
 			done
