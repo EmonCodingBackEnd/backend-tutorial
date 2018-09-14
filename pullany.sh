@@ -13,7 +13,7 @@ do
 			echo -e "\e[1;31m>>>>>>>>>>>>>>>>>>>更新错误发生[\e[1;5;32m  `printf "%-3s" $FAILURE_TIMES`\e[0;1;31m]次<<<<<<<<<<<<<<<<<<<\e[0m"
 			for (( i=1; i<=${#FAILURE_ARY[@]}; i++))
 			do
-		     		echo -e "\e[1;31m`printf "%-3s" $i、`${FAILURE_ARY[i-1]}\e[0m"
+		     		echo -e "\e[1;31m`printf "%-5s" $i、`${FAILURE_ARY[i-1]}\e[0m"
 			done
 			echo -e "\e[1;31m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
 		else
