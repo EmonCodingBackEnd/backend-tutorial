@@ -1,10 +1,27 @@
 #!/bin/bash
+
+# define function
+# arg1=start,arg2=end,format:%s.%N
+function getTiming() {
+        start=$1
+        end=$2
+
+        start_s=$(echo $start | cut -d '.' -f 1)
+        start_ns=$(echo $start | cut -d '.' -f 2)
+        end_s=$(echo $end| cut -d '.' -f 1)
+        end_ns=$(echo $end | cut -d '.' -f 2)
+
+        time=$((( 10#$end_s - 10#$start_s ) * 1000 + ( 10#$end_ns / 1000000 - 10#$start_ns / 1000000 )))
+        echo "$time ms"
+}
+
 echo -e "\e[1;44m\e[1;36m====================================================================================================\e[0m"
 echo -e "\e[1;44m\e[1;33m您输入的路径为 $*\e[0m"
 echo -e "\e[1;44m\e[1;36m====================================================================================================\e[0m"
 FAILURE_ARY=()
 FAILURE_TIMES=0 # 全局变量，表示更新是否成功，如果失败，表示失败的次数
 WORKSPACE_END="WORKSPACE_END"
+global_start_time=`date +'%Y-%m-%d %H:%M:%S'`
 for WORKSPACE in `echo $* $WORKSPACE_END|sed -n 's/ /\n/gp'|sed '/^$/d'`
 do
 	if [ $WORKSPACE = $WORKSPACE_END ]; then
@@ -21,11 +38,17 @@ do
 			echo -e "\e[1;32m>>>>>>>>>>>>>>>>>>更新完成,开始快乐的工作吧!<<<<<<<<<<<<<<<<<<\e[0m"
 			echo -e "\e[1;32m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
 		fi
+
+		global_end_time=`date +'%Y-%m-%d %H:%M:%S'`
+		global_start_seconds=$(date --date="$global_start_time" +%s);
+		global_end_seconds=$(date --date="$global_end_time" +%s);
+		echo -e "\e[1;34m脚本[\e[1;32m$0\e[1;34m]执行结束，总花费时间："$((global_end_seconds - global_start_seconds))"s\e[0m"
 		exit 0
 	else
 		echo -e "\e[1;36m遍历目录 $WORKSPACE\e[0m"
 		for PROJECT in `find ${WORKSPACE} -name ".git"`
 		do
+			start_time=`date +'%Y-%m-%d %H:%M:%S'`
 			CURRENT_PROJECT=`echo $PROJECT|sed 's/.git$//'`
 			if [[ $CURRENT_PROJECT =~ "node_module" ]]; then
 				echo -e "\e[1;44m\e[1;31m跳过目录 $CURRENT_PROJECT\e[0m"
@@ -59,6 +82,11 @@ do
 			done
 			echo -e "\e[1;35m复原分支=[$CURRENT_BRANCH]\e[0m"
 			git checkout $CURRENT_BRANCH
+
+			end_time=`date +'%Y-%m-%d %H:%M:%S'`
+			start_seconds=$(date --date="$start_time" +%s);
+			end_seconds=$(date --date="$end_time" +%s);
+			echo -e "\e[1;34m更新项目[\e[1;32m$CURRENT_PROJECT\e[1;34m]结束，花费时间："$((end_seconds - start_seconds))"s\e[0m"
 		done
 	fi
 done
