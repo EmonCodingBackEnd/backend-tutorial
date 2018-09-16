@@ -12,7 +12,19 @@
 | XXXLearning.md   | 学习     | LinuxLearning         |
 | UnderstantingXXX | 深入理解 | UnderstandingLinux.md |
 
+# Demo与Example和Sample的区别
 
+## Demo
+
+是一种演示：给客户观看的，注重演示效果，而淡化代码实现
+
+## Example
+
+是一种示例：在培训时，用于传授经验、技巧等的佐证，可参考学习使用
+
+## Sample
+
+是一种样品：在实现度上高于Demo和Example，可以理解为试用品
 
 # 目录
 
