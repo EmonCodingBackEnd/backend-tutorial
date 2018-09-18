@@ -407,25 +407,37 @@ git checkout -
 git merge --no-ff feature/x
 ```
 
-- 删除分支
+- 删除本地分支
 
 ```shell
 git branch -d <branchname>
 ```
 
-- 删除分支，覆盖Git的安全检查
+- 删除本地分支，覆盖Git的安全检查
 
 ```shell
 git branch -D <branchname>
 ```
 
-- 删除远程分支
+- 删除本地的远程分支
+
+```shell
+git branch -d -r origin/<branchname>
+```
+
+- 删除本地的远程分支，覆盖Git的安全检查
+
+```shell
+git branch -D -r origin/<branchname>
+```
+
+- 删除远程Git服务器上的分支
 
 ```shell
 # 删除远端的<branchname>分支
 git push origin :<branchname>
 # 等同于
-git push origin --delete develop
+git push origin --delete <branchname>
 ```
 
 - 合并分支的另一种方式
@@ -459,7 +471,32 @@ git log master..develop
 git log --left-right master...develop
 ```
 
+## 1、聊一聊`git remote prune origin`
 
+在你经常使用的命令当中有一个`git branch  -a`用来查看所有的分支，包括本地和远程的。但是时间长了你会发现有些分支在远程其实早就被删除了，但是在你本地依然可以看见这些被删除的分支。
+
+你可以使用命令`git remote show origin`来查看有关于origin的一些信息，包括分支是否tracking。
+
+如果看到如下信息，表明远程分支已经被删除了。
+
+```
+  Remote branches:
+	......
+    refs/remotes/origin/develop stale (use 'git remote prune' to remove)
+    ......
+```
+
+提示你可以通过`git remote prune <name>`移除该分支。作用是刷新本地仓库与远程仓库，保持改动的同步。
+
+执行后，这个在远程删除的分支，在你`本地仓库的远程分支`也会被删除，可通过`git branch -a`查看。
+
+但不会删除对应的`本地分支`，还需要`git branch -d <branchname>`删除。
+
+说明：
+
+- 本地分支，`git branch`看到的分支
+- 本地的远程分支，`git branch -r`看到的分支
+- 远程分支，表示远程分支的实体
 
 # 六、Git标签
 
