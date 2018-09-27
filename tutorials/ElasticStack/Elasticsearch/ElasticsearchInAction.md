@@ -271,7 +271,7 @@ http.cors.allow-origin: "*"
 - 配置`elasticsearch.yml`
 
 ```shell
-[emon@emon ~]$ cp -r /usr/local/elasticsearch/ /usr/local/Elasticsearch/elasticsearch-5.6.11-slave1
+[emon@emon ~]$ cp -r /usr/local/elasticsearch/ /usr/local/Elasticsearch/elasticsearch-5.6.11-slave2
 [emon@emon ~]$ ln -s /usr/local/Elasticsearch/elasticsearch-5.6.11-slave2/ /usr/local/elasticsearch-slave2
 [emon@emon ~]$ vim /usr/local/elasticsearch-slave2/config/elasticsearch.yml 
 ```
