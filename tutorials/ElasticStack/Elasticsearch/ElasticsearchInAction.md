@@ -940,9 +940,20 @@ http.cors.allow-origin: "*"
 
 http://192.168.8.116:9100/
 
+## 2、cerebro插件
 
+1. 运行
 
+```
+[emon@emon ~]$ wget -cP /usr/local/src https://github.com/lmenezes/cerebro/releases/download/v0.8.1/cerebro-0.8.1.tgz
+[emon@emon ~]$ tar -zxvf /usr/local/src/cerebro-0.8.1.tgz -C /usr/local/Elasticsearch/ThirdPlugins/
+[emon@emon ~]$ ln -s /usr/local/Elasticsearch/ThirdPlugins/cerebro-0.8.1/ /usr/local/Elasticsearch/cerebro
+[emon@emon ~]$ /usr/local/Elasticsearch/cerebro/bin/cerebro
+```
 
+2. 访问测试
+
+http://192.168.8.116:9000
 
 
 
