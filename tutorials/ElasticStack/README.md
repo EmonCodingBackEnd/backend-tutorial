@@ -14,11 +14,12 @@
 | Logstash      | /usr/local/ElasticStack/Logstash      | /usr/local/logstash |
 | Kibina        | /usr/local/ElasticStack/Kibina        | /usr/local/kibina   |
 | Beats         | /usr/local/ElasticStack/Beats         | /usr/local/beats    |
+| 插件          | /usr/local/ElasticStack/ThirdPlugins  | /usr/local/*        |
 
 创建所有目录：
 
 ```
-[emon@emon ~]$ mkdir -pv /usr/local/ElasticStack/{Elasticsearch,Logstash,Kibana,Beats}
+[emon@emon ~]$ mkdir -pv /usr/local/ElasticStack/{Elasticsearch,Logstash,Kibana,Beats,ThirdPlugins}
 ```
 
 ## 2、依赖准备
@@ -254,7 +255,7 @@ startsecs=10                    ; 启动10秒后没有异常退出，就表示�
 autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
 startretries=3                  ; 启动失败自动重试次数，默认是3
 user=emon                       ; 用哪个用户启动进程，默认是root
-priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+priority=71                     ; 进程启动优先级，默认999，值小的优先启动
 redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
@@ -331,7 +332,7 @@ startsecs=10                    ; 启动10秒后没有异常退出，就表示�
 autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
 startretries=3                  ; 启动失败自动重试次数，默认是3
 user=emon                       ; 用哪个用户启动进程，默认是root
-priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+priority=72                     ; 进程启动优先级，默认999，值小的优先启动
 redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
@@ -369,11 +370,141 @@ priority=999
 
 ### 1.5、es配套插件
 
+#### 1.5.1、elasticsearch-head
+
+1. 依赖安装
+
+安装bzip2的解压工具：
+
+```shell
+[emon@emon ~]$ sudo yum install -y bzip2
+```
+
+该插件连接es，需要配置es的`elasticsearch.yml`追加如下：
+
+```
+# 追加
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+
+2. 下载安装与运行
+
+```shell
+[emon@emon ~]$ cd /usr/local/ElasticStack/ThirdPlugins/
+[emon@emon ThirdPlugins]$ git clone git@github.com:mobz/elasticsearch-head.git
+[emon@emon ThirdPlugins]$ cd elasticsearch-head/
+[emon@emon elasticsearch-head]$ npm install
+[emon@emon elasticsearch-head]$ npm start
+```
+
+3. 访问测试
+
+http://192.168.3.116.9100
+
+#### 1.5.2、cerebro插件
+
+1. 下载安装与运行
+
+```shell
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/lmenezes/cerebro/releases/download/v0.8.1/cerebro-0.8.1.tgz
+[emon@emon ~]$ tar -zxvf /usr/local/src/cerebro-0.8.1.tgz -C /usr/local/ElasticStack/ThirdPlugins/
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/ThirdPlugins/cerebro-0.8.1/ /usr/local/cerebro
+[emon@emon ~]$ /usr/local/cerebro/bin/cerebro
+```
+
+2. 访问测试
+
+http://192.168.3.116:9000
+
+3. 配置启动
+
+```shell
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/cerebro.ini
+```
+
+```ini
+[program:cerebro]
+command=/usr/local/cerebro/bin/cerebro
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/etc/supervisor/supervisor.d/cerebro.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+```shell
+[emon@emon ~]$ sudo supervisorctl update
+[emon@emon ~]$ sudo supervisorctl start cerebro
+```
+
 ## 2、Logstash
 
-## 3、Kibina
+## 3、Kibana
 
+1. 下载
 
+```shell
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/kibana/kibana-6.4.1-linux-x86_64.tar.gz
+```
+
+2. 解压安装
+
+```shell
+[emon@emon ~]$ tar -zxvf /usr/local/src/kibana-6.4.1-linux-x86_64.tar.gz -C /usr/local/ElasticStack/Kibana/
+```
+
+3. 创建软连接
+
+```shell
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Kibana/kibana-6.4.1-linux-x86_64/ /usr/local/kibana
+```
+
+4. 配置`kibana.yml`文件
+
+```shell
+[emon@emon ~]$ vim /usr/local/kibana/config/kibana.yml 
+```
+
+```yaml
+server.host: 0.0.0.0
+```
+
+5. 配置启动
+
+```shell
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/kibana.ini
+```
+
+```ini
+[program:kibana]
+command=/usr/local/kibana/bin/kibana
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+stdout_logfile=/etc/supervisor/supervisor.d/kibana.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目>录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+```shell
+[emon@emon ~]$ sudo supervisorctl update
+[emon@emon ~]$ sudo supervisorctl start kibana
+```
 
 ## 4、Beats
 
