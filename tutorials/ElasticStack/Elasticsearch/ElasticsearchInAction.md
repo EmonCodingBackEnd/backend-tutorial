@@ -23,13 +23,13 @@
 下载地址页： https://www.elastic.co/downloads
 
 ```shell
-[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.0.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.1.tar.gz
 ```
 
 ### 1.3、创建安装目录
 
 ```shell
-[emon@emon ~]$ mkdir /usr/local/Elasticsearch
+[emon@emon ~]$ mkdir -pv /usr/local/ElasticStack/{Elasticsearch,Logstash,Kibana,Beats}
 ```
 
 ### 1.4、解压安装
