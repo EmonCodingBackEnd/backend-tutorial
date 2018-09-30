@@ -30,94 +30,42 @@ Linux emon 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64 x86_
 Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) #1 SMP Fri Apr 20 16:44:24 UTC 2018
 ```
 
-	Docker目前支持CentOS6.5及以后的版本，推荐使用CentOS7系统。
-
-```shell
-[emon@emon ~]$ sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-```
-
-	上面配置了yum库，检查当前的可用仓库，可以得到如下结果：
-
-```shell
-[emon@emon ~]$ yum repolist all|grep dockerrepo
-dockerrepo/7                Docker Repository                        启用:   110
-```
-
-	安装：
-
-```shell
-[emon@emon ~]$ sudo yum install -y docker-engine
-```
-
-	升级：
-
-```shell
-[emon@emon ~]$ sudo yum check-update docker-engine
-```
-
-	启动：
-
-```shel
-[emon@emon ~]$ sudo systemctl start docker
-```
-
-### 1.3、删除旧版并安装新版
-
-1. 卸载旧版本
-
-```shell
-[emon@emon ~]$ sudo yum remove docker docker-common docker-selinux docker-engine
-```
-
-2. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
+1. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
 
 ```shell
 [emon@emon ~]$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
-3. 设置yum源
+2. 设置yum源
 
 ```shell
 [emon@emon ~]$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
 
-4. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
+3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
 
 ```shell
 [emon@emon ~]$ yum list docker-ce --showduplicates |sort -r
 ```
 
-5. 安装docker
+4. 安装docker
 
 ```shell
 [emon@emon ~]$ sudo yum install -y docker-ce-17.12.0.ce
 ```
 
-6. 启动
+5. 启动
 
 ```shell
 [emon@emon ~]$ sudo systemctl start docker
 ```
 
-7. 验证安装
+6. 验证安装
 
 ```shell
 [emon@emon ~]$ docker version
 [emon@emon ~]$ docker info
 ```
-
-
-
-
-
-
 
 
 
