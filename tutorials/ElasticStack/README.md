@@ -12,7 +12,7 @@
 | ------------- | ------------------------------------- | ------------------- |
 | Elasticsearch | /usr/local/ElasticStack/Elasticsearch | /usr/local/es*      |
 | Logstash      | /usr/local/ElasticStack/Logstash      | /usr/local/logstash |
-| Kibina        | /usr/local/ElasticStack/Kibina        | /usr/local/kibina   |
+| kibana        | /usr/local/ElasticStack/kibana        | /usr/local/kibana   |
 | Beats         | /usr/local/ElasticStack/Beats         | /usr/local/beats    |
 | 插件          | /usr/local/ElasticStack/ThirdPlugins  | /usr/local/*        |
 
