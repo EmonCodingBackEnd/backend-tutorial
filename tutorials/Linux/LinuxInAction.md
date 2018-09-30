@@ -179,6 +179,8 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 [root@emon ~]# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 ```
 
+【备注】如果提示无法解析`mirrors.aliyun.com`，应该是当前会话的DNS属于内网IP，只需要再增加`8.8.8.8`这个DNS即可。
+
 3. 生成缓存
 
 ```bash
