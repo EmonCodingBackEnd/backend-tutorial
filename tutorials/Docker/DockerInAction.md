@@ -20,7 +20,7 @@
 ### 1.2、CentOS环境下安装Docker
 
 	Docker目前只能运行在64位平台上，并且要求内核版本不低于3.10，实际上内核版本越新越好，过低的内核版本容易造成功能不稳定。
-
+	
 	用户可以通过如下命令检查自己的内核版本详细信息：
 
 ```shell
@@ -41,12 +41,6 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
 ```
 
 	上面配置了yum库，检查当前的可用仓库，可以得到如下结果：
