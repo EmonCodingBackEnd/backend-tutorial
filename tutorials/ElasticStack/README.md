@@ -448,6 +448,104 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ## 2、Logstash
 
+1. 下载
+
+```shell
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/logstash/logstash-6.4.1.tar.gz
+```
+
+2. 解压安装
+
+```shell
+[emon@emon ~]$ tar -zxvf /usr/local/src/logstash-6.4.1.tar.gz -C /usr/local/ElasticStack/Logstash/
+```
+
+3. 创建软连接
+
+```shell
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Logstash/logstash-6.4.1/ /usr/local/logstash
+```
+
+4. 配置
+
+- 配置`logstash.yml`文件
+
+```shell
+# 打开文件并追加
+[emon@emon ~]$ vim /usr/local/logstash/config/logstash.yml 
+```
+
+```shell
+http.host: "0.0.0.0"
+```
+
+- 配置`jvm.options`
+
+```shell
+# 打开文件并追加
+[emon@emon ~]$ vim /usr/local/logstash/config/jvm.options 
+```
+
+```
+#-Xms1g
+#-Xmx1g
+-Xms256m
+-Xmx256m
+```
+
+5. 准备一个`logstash.conf`配置文件
+
+```
+等待补充
+```
+
+```
+input {
+  stdin { }
+}
+
+filter {
+  grok {
+    match => {
+      "message" => '%{IPORHOST:remote_ip} - %{DATA:user_name} \[%{HTTPDATE:time}\] "%{WORD:request_action} %{DATA:reques} HTTP/%{NUMBER:http_version}" %{NUMBER:response} %{NUMBER:bytes} "%{DATA:referrer}" "%{DATA:agent}"'
+    }
+  }
+
+  date {
+    match => [ "time", "dd/MM/YYYY:HH:mm:ss Z" ]
+    locale => en
+  }
+
+  geoip {
+    source => "remote_ip"
+    target => "geoip"
+  }
+
+  useragent {
+    source => "agent"
+    target => "user_agent"
+  }
+}
+
+output {
+  stdout {
+    codec => rubydebug
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 3、Kibana
 
 1. 下载
