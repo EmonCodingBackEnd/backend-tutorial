@@ -499,51 +499,6 @@ http.host: "0.0.0.0"
 等待补充
 ```
 
-```
-input {
-  stdin { }
-}
-
-filter {
-  grok {
-    match => {
-      "message" => '%{IPORHOST:remote_ip} - %{DATA:user_name} \[%{HTTPDATE:time}\] "%{WORD:request_action} %{DATA:reques} HTTP/%{NUMBER:http_version}" %{NUMBER:response} %{NUMBER:bytes} "%{DATA:referrer}" "%{DATA:agent}"'
-    }
-  }
-
-  date {
-    match => [ "time", "dd/MM/YYYY:HH:mm:ss Z" ]
-    locale => en
-  }
-
-  geoip {
-    source => "remote_ip"
-    target => "geoip"
-  }
-
-  useragent {
-    source => "agent"
-    target => "user_agent"
-  }
-}
-
-output {
-  stdout {
-    codec => rubydebug
-  }
-}
-```
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## 3、Kibana
