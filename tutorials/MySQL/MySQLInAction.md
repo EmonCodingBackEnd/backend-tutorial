@@ -238,23 +238,175 @@
 
 
 
-# 二、电商项目用户模块
+# 二、MySQL5.7配置文件`my.cnf`设置
 
-## 1、用户模块设计
+```
+[client]
+port = 3306
+socket = /usr/local/mysql/run/mysql.sock
 
-完成用户注册和登录验证
+[mysqld]
+# MySQL服务的唯一编号 每个MySQL服务ID需唯一
+server-id = 1
+# 服务端口号 默认3306
+port = 3306
+# MySQL安装根目录
+basedir = /usr/local/mysql
+# MySQL数据文件所在位置
+datadir = /usr/local/mysql/data
+# 临时目录 比如load data infile会用到
+tmpdir = /tmp
+# 设置socket文件所在目录
+socket = /usr/local/mysql/run/mysql.sock
+# 主要用于MyISAM存储引擎，如果多台服务器连接一个数据库则建议注释下面内容
+skip-external-locking
+# 只能用IP地址查看客户端的登录，不用主机名
+skip_name_resolve = 1
+# 事务隔离级别，默认为可重复读，MySQL默认可重复读级别
+transaction_isolation = READ-COMMITTED
 
-## 2、商品模块
+# 数据库默认字符集，主流字符集支持一些特殊表情符号（特殊表情符号占用4个字节）
+character-set-server = utf8mb4
+# 数据库字符集对应一些排序等规则，注意要和character-set-server对应
+collation-server = utf8mb4_unicode_ci
+# 设置client链接MySQL时的字符集，防止乱码
+init_connect='SET NAMES utf8mb4'
 
-前后台商品管理和浏览
+# 是否对sql语句大小写敏感，1表示不敏感
+lower_case_table_names=1
 
-## 3、订单模块
+# SQL数据包发送的大小，如果有BLOB对象建议修改成1G
+max_allowed_packet = 512M
+# 最大连接数
+max_connections = 2048
+# 最大错误连接数
+max_connect_errors = 100
+# 增加每个进程的可打开文件数量
+open_files_limit = 65535
 
-订单及购物车的生成和管理
+# TIMESTAMP如果没有显示声明NOT NULL，是否允许NULL值
+explicit_defaults_for_timestamp = OFF
 
-## 4、仓配模块
+# MySQL连接闲置超过一定时间后（单位：秒）将会被强制关闭
+# MySQL默认的wait_timeout值为8个小时，interactive_timeout参数需要同时配置才能生效
+interactive_timeout = 28800
+wait_timeout = 1800
 
-仓库库存和物流的管理
+# 内部内存临时表的最大值，比如大数据量的group by,order by时可能用到临时表，超过了这个值将写入磁盘，系统IO压力增大
+tmp_table_size = 32M
+max_heap_table_size = 32M
+
+# 禁用MySQL的缓存查询结果集功能，后期根据业务情况测试决定是否开启，大部分情况下关闭下面两项
+query_cache_type = 0
+query_cache_size = 0
+#========日志设置========
+# 数据库错误日志文件
+log-error = /usr/local/mysql/log/mysql_error.log
+
+# 慢查询sql日志设置
+slow_query_log = 1
+slow_query_log_file = /usr/local/mysql/log/mysql_slow_query.log
+# 慢查询执行的秒数，必须达到此值可悲记录
+long_query_time = 5
+# 检索的行数北徐达到此值才可被记为慢查询
+min_examined_row_limit = 100
+
+# 检查未使用到索引的sql
+log_queries_not_using_indexes = 1
+# 针对log_queries_not_using_indexes开启后，记录慢sql的频次、每分钟记录的条数
+log_throttle_queries_not_using_indexes = 5
+
+# 作为从库时生效，从库复制中如果有慢sql也将被记录
+log_slow_slave_statements = 1
+
+#========主从复制设置========
+# 开启MySQL binlog功能
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+# binlog记录内容的方式，记录被操作的每一行
+binlog_format = ROW
+# 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
+binlog_row_image = minimal
+
+# 作为从库时生效，想进行级联复制，则需要此参数
+log_slave_updates
+# 作为从库时生效，中继日志relay-log可以自我修复
+relay_log_recovery = 1
+# 作为从库时生效，主从复制时忽略的错误
+slave_skip_errors = ddl_exist_errors
+```
+
+# 三、MySQL执行计划(explain)分析
+
+## 1、慢查询日志
+
+- 如何配置
+
+```
+# 启用MySQL慢查询日志
+slow_query_log = 1
+slow_query_log_file = /usr/local/mysql/log/mysql_slow_query.log
+# 慢查询执行的秒数，必须达到此值可悲记录
+long_query_time = 5
+# 检查未使用到索引的sql
+log_queries_not_using_indexes = 1
+```
+
+- 如何分析
+
+```shell
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqldumpslow /data/mysql/log/mysql_slow_query.log
+```
 
 
+
+# 四、MySQL数据库备份和恢复
+
+对于任何数据库来说，备份都是非常重要的
+
+数据库的主从复制不能取代备份的作用
+
+- 逻辑备份和物理备份
+  - 逻辑备份的结果为SQL语句，适合于所有存储引擎
+  - 物理备份是对数据库目录的拷贝，对于内存表只备份结构
+- 全量备份和增量备份
+  - 全量备份是对整个数据库的一个完整备份
+  - 增量备份是在上次全量或增量备份基础上，对于更改数据进行的备份
+  - mysqldump不支持增量备份
+
+## 1、使用`mysqldump`进行备份
+
+- 常用语法
+
+```shell
+# 备份表
+mysqldump [OPTIONS] database [tables]
+# 备份多个数据库
+mysqldump [OPTIONS] --databases [OPTIONS] DB1 [DB2 DB3...]
+# 备份示例下的所有数据库
+mysqldump [OPTIONS] --all-databases [OPTIONS]
+```
+
+- 常用参数
+
+```shell
+# 查询帮助
+[emon@emon ~]$ mysqldump --help
+```
+
+```shell
+-u, --user=name
+-p, --password[=name]
+```
+
+执行mysqldump命令的用户需要有如下权限：
+
+`SELECT`,`RELOAD`,`LOCK TABLES`,`REPLICATION CLIENT`,`SHOW VIEW`,`PROCESS`
+
+
+
+
+
+
+
+# 五、高性能高可用MySQL架构变迁
 
