@@ -238,7 +238,9 @@
 
 
 
-# 二、MySQL5.7配置文件`my.cnf`设置
+# 二、MySQL5.7配置文件
+
+## 1、`my.cnf`常规配置项
 
 ```
 [client]
@@ -333,6 +335,61 @@ log_slave_updates
 relay_log_recovery = 1
 # 作为从库时生效，主从复制时忽略的错误
 slave_skip_errors = ddl_exist_errors
+# 值为null，表示限制mysqld不允许导入导出；值为/tmp/，限制mysqld的导入导出只能发生在/tmp/目录下；值为'',不对mysqld的导入导出限制；且注意该参数无法通过set global命令修改。
+secure_file_priv = ''
+```
+
+## 2、设置变量
+
+### 2.1、设置全局变量
+
+- 修改配置文件并重启MySQL【不推荐】
+
+```shell
+[emon@emon ~]$ vim /data/mysql/etc/my.cnf 
+[emon@emon ~]$ sudo systemctl restart mysqld
+```
+
+- 在命令行里通过SET来设置，然后再修改参数文件
+
+1. 命令行里设置
+
+```mysql
+mysql> set global long_query_time = 5;
+或者
+mysql> set @@global.long_query_time = 5;
+```
+
+2. 查看是否生效
+
+```mysql
+mysql> show global variables like 'long_query_time';
+```
+
+**如果查询时使用的是show variables的话, 会发现设置并没有生效, 除非重新登录再查看. 这是因为使用show variables的话就等同于使用show session variables, 查询的是会话变量, 只有使用show global variables查询的才是全局变量. 如果仅仅想修改会话变量的话, 可以使用类似set long_query_time=5;或者set session long_query_time=5;这样的语法. **
+
+3. 修改配置文件
+
+当前只是修改正在运行的MySQL实例配置，下次重启MySQL又会回到默认值，所以记得修改配置文件
+
+```shell
+[emon@emon ~]$ vim /data/mysql/etc/my.cnf 
+```
+
+### 2.2、设置会话变量
+
+如果要修改会话变量值，可以指定`session`或者`@@session`或者`@@`或者`local`或者`@@local`，或者什么都不使用。
+
+1. 设置
+
+```mysql
+mysql> set long_query_time = 1;
+```
+
+2. 查看
+
+```mysql
+mysql> show variables like 'long_query_time';
 ```
 
 # 三、MySQL执行计划(explain)分析
@@ -396,15 +453,166 @@ mysqldump [OPTIONS] --all-databases [OPTIONS]
 ```shell
 -u, --user=name
 -p, --password[=name]
+# 对于事务型存储引擎Innodb，可以使用如下保证数据库在备份时是一致的
+--single-transaction
+# 对于非事务型，可以使用如下锁定一个数据库的表
+-l, --lock-tables
+# 锁定实例下所有表
+-x, --lock-all-tables
+
+--master-data=[1/2]
+# 存储过程
+-R, --routines
+# 触发器
+--triggers
+# 事件
+-E, --events
+# 对数据库中大文本存储为十六进制
+--hex-blob
+# 生成两个文件，一个存储表结构，一个存储表数据
+--tab=path
+# 指定过滤条件(仅用于单表导出)
+-w, --where='过滤条件'
 ```
 
 执行mysqldump命令的用户需要有如下权限：
 
-`SELECT`,`RELOAD`,`LOCK TABLES`,`REPLICATION CLIENT`,`SHOW VIEW`,`PROCESS`
+`SELECT`,`RELOAD`,`LOCK TABLES`,`REPLICATION CLIENT`,`SHOW VIEW`,`event`,`PROCESS`
 
+- 建立备份账号
 
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+mysql> create user 'springboot'@'%' identified by 'SpringBoot@123';
+mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'springboot'@'%' with grant option;
+```
 
+备注：如果要导出单张表数据，需要系统的file权限，还需要授权`file`。
 
+- 备份整个数据库
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events selldb > selldb.sql
+```
+
+- 备份一个数据库的表结构，不含数据
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events -d selldb > selldb_schema.sql
+```
+
+- 备份一张表
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events selldb order_detail > order_detail.sql
+```
+
+- 备份一张表的表结构，不含数据
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events -d selldb order_detail > order_detail_schema.sql
+```
+
+- 备份实例下的所有数据库
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events --all-databases > springboot.sql
+```
+
+- 表结构与表数据分开文件的备份
+
+注意，先调整目录`/tmp/selldb`具有如下权限：可见目录所属用户不是关键，写权限才是关键
+
+```shell
+[emon@emon ~]$ ll -d /tmp/selldb/
+drwxrwxrwx. 2 emon emon 252 10月  5 08:18 /tmp/selldb/
+```
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events --tab="/tmp/selldb" selldb
+```
+
+- 使用where备份
+
+```shell
+mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --where "order_status=1" selldb order_master > order_master_status_1.sql
+```
+
+## 2、使用`mysql`命令导入
+
+- 非`mysql`命令行下
+
+```shell
+mysql -uspringboot -pSpringBoot@123 <dbname> < <backup.sql>
+```
+
+- `mysql`命令行下
+
+```mysql
+mysql> use selldb;
+mysql> source path_name(比如： /home/emon/backup/mysql/selldb_20180704_01.sql)
+```
+
+- 针对`--tab`的备份导入
+
+  - 导入表结构
+
+  ```mysql
+  source XXX.sql
+  ```
+
+  - 导入表数据
+
+  ```mysql
+  load data infile 'XXX.txt'
+  ```
+
+### 3、备份脚本
+
+1. 编写脚本
+
+```
+[emon@emon ~]$ vim bin/backup.sh 
+```
+
+```shell
+#!/bin/bash
+########Basic parameters########
+DAY=`date +%Y%m%d`
+Environment=$(/sbin/ifconfig|grep "inet "|grep -v "127.0.0.1"|grep -v "172.17.0.1"|awk '{print $2}')
+USER="springboot"
+PASSWD="SpringBoot@123"
+HostPort="3306"
+MYSQLBASE="/usr/local/mysql"
+DATADIR="$HOME/backup/mysql/${DAY}"
+MYSQL=`/usr/bin/which mysql`
+MYSQLDUMP=`/usr/bin/which mysqldump`
+mkdir -p ${DATADIR}
+
+Dump() {
+    ${MYSQLDUMP} --master-data=2 --single-transaction --routines --triggers --events -u${USER} -p${PASSWD} -P${HostPort} ${database} > ${DATADIR}/${Environment}-${database}.sql
+    cd ${DATADIR}
+gzip ${Environment}-${database}.sql
+}
+
+for db in `echo "select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'sys', 'performance_schema')" | ${MYSQL} -u${USER} -p${PASSWD} --skip-column-names`
+do
+    database=${db}
+    Dump
+done
+```
+
+2. 赋予可执行的权限
+
+```shell
+[emon@emon ~]$ chmod u+x bin/backup.sh 
+```
+
+3. 执行备份
+
+```shell
+[emon@emon ~]$ ./bin/backup.sh 
+```
 
 
 
