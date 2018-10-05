@@ -483,8 +483,8 @@ mysqldump [OPTIONS] --all-databases [OPTIONS]
 
 ```shell
 [emon@emon ~]$ mysql -uroot -proot123
-mysql> create user 'springboot'@'%' identified by 'SpringBoot@123';
-mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'springboot'@'%' with grant option;
+mysql> create user 'backup'@'localhost' identified by 'Backup@123';
+mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'backup'@'localhost' with grant option;
 ```
 
 备注：如果要导出单张表数据，需要系统的file权限，还需要授权`file`。
@@ -492,7 +492,7 @@ mysql> grant select,reload,lock tables,replication client,show view,event,proces
 - 备份整个数据库
 
 ```shell
-mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --routines --triggers --events selldb > selldb.sql
+mysqldump -ubackup -pBackup@123 --master-data=2 --single-transaction --routines --triggers --events selldb > selldb.sql
 ```
 
 - 备份一个数据库的表结构，不含数据
@@ -567,12 +567,12 @@ mysql> source path_name(比如： /home/emon/backup/mysql/selldb_20180704_01.sql
   load data infile 'XXX.txt'
   ```
 
-### 3、备份脚本
+## 3、备份脚本
 
 1. 编写脚本
 
 ```
-[emon@emon ~]$ vim bin/backup.sh 
+[emon@emon ~]$ vim ~/bin/backup.sh 
 ```
 
 ```shell
@@ -580,11 +580,11 @@ mysql> source path_name(比如： /home/emon/backup/mysql/selldb_20180704_01.sql
 ########Basic parameters########
 DAY=`date +%Y%m%d`
 Environment=$(/sbin/ifconfig|grep "inet "|grep -v "127.0.0.1"|grep -v "172.17.0.1"|awk '{print $2}')
-USER="springboot"
-PASSWD="SpringBoot@123"
+USER="backup"
+PASSWD="Backup@123"
 HostPort="3306"
 MYSQLBASE="/usr/local/mysql"
-DATADIR="$HOME/backup/mysql/${DAY}"
+DATADIR="$HOME/backup/db_backup/${DAY}"
 MYSQL=`/usr/bin/which mysql`
 MYSQLDUMP=`/usr/bin/which mysqldump`
 mkdir -p ${DATADIR}
@@ -605,13 +605,33 @@ done
 2. 赋予可执行的权限
 
 ```shell
-[emon@emon ~]$ chmod u+x bin/backup.sh 
+[emon@emon ~]$ chmod u+x ~/bin/backup.sh 
 ```
 
 3. 执行备份
 
 ```shell
-[emon@emon ~]$ ./bin/backup.sh 
+[emon@emon ~]$ ~/bin/backup.sh 
+```
+
+## 4、如何进行指定时间点的恢复
+
+- 先决条件
+  - 具有指定时间点前的一个全备
+  - 具有自上次全备后到指定时间点的所有二进制日志
+
+## 5、实时二进制备份
+
+创建具有特殊权限的用户：
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+mysql> create user 'repl'@'localhost' identified by 'Repl@123';
+mysql> grant replication slave on *.* to 'repl'@'localhost' with grant option;
+```
+
+```shell
+mysqlbinlog --raw --read-from-remote-server --stop-never --host localhost --port 3306 -urepl -pRepl@123 二进制日志名
 ```
 
 
