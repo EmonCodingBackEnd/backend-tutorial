@@ -805,7 +805,10 @@ systemctl start mysqld
 [emon@emon ~]$ sudo systemctl start mysqld
 ```
 
+## 3、MySQL备份计划
 
+- 每天凌晨对数据库进行一次全备
+- 实时对二进制日志进行远程备份
 
 # 五、高性能高可用MySQL架构变迁
 
