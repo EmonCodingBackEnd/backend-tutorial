@@ -430,7 +430,9 @@ log_queries_not_using_indexes = 1
   - 增量备份是在上次全量或增量备份基础上，对于更改数据进行的备份
   - mysqldump不支持增量备份
 
-## 1、使用`mysqldump`进行备份
+## 1、逻辑备份
+
+### 1.1、使用`mysqldump`进行备份
 
 - 常用语法
 
@@ -538,7 +540,7 @@ mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --r
 mysqldump -uspringboot -pSpringBoot@123 --master-data=2 --single-transaction --where "order_status=1" selldb order_master > order_master_status_1.sql
 ```
 
-## 2、使用`mysql`命令导入
+### 1.2、使用`mysql`命令导入
 
 - 非`mysql`命令行下
 
@@ -567,7 +569,7 @@ mysql> source path_name(比如： /home/emon/backup/mysql/selldb_20180704_01.sql
   load data infile 'XXX.txt'
   ```
 
-## 3、备份脚本
+### 1.3、备份脚本
 
 1. 编写脚本
 
@@ -614,13 +616,13 @@ done
 [emon@emon ~]$ ~/bin/backup.sh 
 ```
 
-## 4、如何进行指定时间点的恢复
+### 1.4、如何进行指定时间点的恢复
 
 - 先决条件
   - 具有指定时间点前的一个全备
   - 具有自上次全备后到指定时间点的所有二进制日志
 
-## 5、实时二进制备份
+### 1.5、使用`mysqlbinlog`进行实时二进制备份
 
 创建具有特殊权限的用户：
 
@@ -630,8 +632,177 @@ mysql> create user 'repl'@'%' identified by 'Repl@123';
 mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
 ```
 
+- 实时二进制日志备份
+
 ```shell
-mysqlbinlog --raw --read-from-remote-server --stop-never --host localhost --port 3306 -urepl -pRepl@123 二进制日志名
+[emon@emon ~]$ mkdir ~/backup/binlog_backup/
+[emon@emon ~]$ cd ~/backup/binlog_backup/
+[emon@emon binlog_backup]$ mysqlbinlog --raw --read-from-remote-server --stop-never --host localhost --port 3306 -urepl -pRepl@123 mysql-bin.000003
+```
+
+## 2、物理备份
+
+### 2.1、Percona XtraBackup介绍
+
+Percona XtraBackup 用于在线备份innodb存储引擎的表，是一个开源的在线热备份工具。
+
+下载地址： https://www.percona.com/downloads/
+
+官方文档介绍使用yum安装XtraBackup： https://www.percona.com/doc/percona-xtrabackup/LATEST/installation/yum_repo.html 【推荐】
+
+#### 2.1.1、安装
+
+1. 安装Percona repository
+
+```shell
+[emon@emon ~]$ sudo yum install http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm
+[emon@emon ~]$ ls /etc/yum.repos.d/percona*
+/etc/yum.repos.d/percona-release.repo
+```
+
+2. 测试repository
+
+```shell
+[emon@emon ~]$ yum list | grep percona
+```
+
+3. 安装软件包
+
+```shell
+[emon@emon ~]$ sudo yum install -y percona-xtrabackup-24
+```
+
+>警告：为了安装Percona XtraBackup`libev`需要先安装。
+
+4. 校验安装结果
+
+```shell
+[emon@emon ~]$ ls /usr/bin/*backup*
+/usr/bin/db_hotbackup  /usr/bin/innobackupex  /usr/bin/xtrabackup
+```
+
+> 其中db_hotbackup不是XtraBackup命令脚本
+
+#### 2.1.2、卸载
+
+```shell
+yum remove percona-xtrabackup
+```
+
+### 2.2、利用`xtrabackup`进行全量备份
+
+- 自动生成时间戳目录
+
+```shell
+[emon@emon ~]$ sudo innobackupex --user=backup --password=Backup@123 --socket=/usr/local/mysql/run/mysql.sock --parallel=2 ~/backup/db_backup
+```
+
+> 注意，是通过root用户备份的，如果要查看等操作，需要su root切换为root权限进行操作。
+
+- 指定目录不使用自动的时间戳目录
+
+```shell
+[emon@emon ~]$ sudo innobackupex --user=backup --password=Backup@123 --socket=/usr/local/mysql/run/mysql.sock --parallel=2 ~/backup/db_backup/20181005 --no-timestamp
+```
+
+### 2.3、利用`xtrabackup`进行全备的恢复
+
+1. 第一步
+
+```shell
+[emon@emon db_backup]$ sudo innobackupex --apply-log ~/backup/db_backup/20181005/
+```
+
+2. 第二步，迁移
+
+```shell
+# 停止MySQL服务器并备份MySQL数据目录
+systemctl stop mysqld
+mv <MySQL数据目录> <MySQL数据目录.bak>
+# 拷贝全面目录到原MySQL数据目录并修改目录所有者
+cp -ra <全备目录> <MySQL数据目录>
+chown mysql:mysql <MySQL数据目录>
+# 第六步
+systemctl start mysqld
+```
+
+### 2.4、利用`xtrabackup`进行增量备份
+
+1. 第一步：全备
+
+```shell
+[emon@emon ~]$ sudo innobackupex --user=backup --password=Backup@123 --socket=/usr/local/mysql/run/mysql.sock ~/backup/db_backup
+```
+
+2. 第二步：在数据库变动后，基于上次的全量备份，进行增量备份
+
+```shell
+[emon@emon ~]$ sudo innobackupex --user=backup --password=Backup@123 --socket=/usr/local/mysql/run/mysql.sock --incremental ~/backup/db_backup/ --incremental-basedir=/home/emon/backup/db_backup/2018-10-05_18-15-41/
+```
+
+3. 第三步：再次变动数据库，然后基于上次的增量备份，进行增量备份
+
+```shell
+[emon@emon ~]$ sudo innobackupex --user=backup --password=Backup@123 --socket=/usr/local/mysql/run/mysql.sock --incremental ~/backup/db_backup/ --incremental-basedir=/home/emon/backup/db_backup/2018-10-05_18-16-05/
+```
+
+### 2.5、利用`xtrabackup`进行增量恢复
+
+流程介绍：
+
+```shell
+# 第一步
+sudo innobackupex --apply-log --redo-only <全备目录>
+# 第二步
+sudo innobackupex --apply-log --redo-only <全备目录> --incremental-dir=<第一次增量目录>
+# 第三步
+sudo innobackupex --apply-log <全备目录>
+# 第四步：停止MySQL服务器并备份MySQL数据目录
+systemctl stop mysqld
+mv <MySQL数据目录> <MySQL数据目录.bak>
+# 第五步：拷贝全面目录到原MySQL数据目录并修改目录所有者
+cp -ra <全备目录> <MySQL数据目录>
+chown mysql:mysql <MySQL数据目录>
+# 第六步
+systemctl start mysqld
+```
+
+1. 第一步
+
+```shell
+[emon@emon ~]$ sudo innobackupex --apply-log --redo-only /home/emon/backup/db_backup/2018-10-05_18-15-41/
+```
+
+2. 第二步
+
+```shell
+[emon@emon ~]$ sudo innobackupex --apply-log --redo-only /home/emon/backup/db_backup/2018-10-05_18-15-41/ --incremental-dir=/home/emon/backup/db_backup/2018-10-05_18-16-05/
+```
+
+3. 第三步
+
+```shell
+[emon@emon ~]$ sudo innobackupex --apply-log /home/emon/backup/db_backup/2018-10-05_18-15-41/
+```
+
+4. 第四步
+
+```shell
+[emon@emon ~]$ sudo systemctl stop mysqld
+[emon@emon ~]$ sudo mv /data/mysql/data/ /data/mysql/data.20181005.bak
+```
+
+5. 第五步
+
+```shell
+[emon@emon ~]$ sudo cp -ra /home/emon/backup/db_backup/2018-10-05_18-15-41/ /data/mysql/data
+[emon@emon ~]$ sudo chown mysql:mysql /data/mysql/data
+```
+
+6. 第六步
+
+```shell
+[emon@emon ~]$ sudo systemctl start mysqld
 ```
 
 
