@@ -483,8 +483,8 @@ mysqldump [OPTIONS] --all-databases [OPTIONS]
 
 ```shell
 [emon@emon ~]$ mysql -uroot -proot123
-mysql> create user 'backup'@'localhost' identified by 'Backup@123';
-mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'backup'@'localhost' with grant option;
+mysql> create user 'backup'@'%' identified by 'Backup@123';
+mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'backup'@'%' with grant option;
 ```
 
 备注：如果要导出单张表数据，需要系统的file权限，还需要授权`file`。
@@ -626,8 +626,8 @@ done
 
 ```shell
 [emon@emon ~]$ mysql -uroot -proot123
-mysql> create user 'repl'@'localhost' identified by 'Repl@123';
-mysql> grant replication slave on *.* to 'repl'@'localhost' with grant option;
+mysql> create user 'repl'@'%' identified by 'Repl@123';
+mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
 ```
 
 ```shell
