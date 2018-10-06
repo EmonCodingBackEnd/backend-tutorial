@@ -812,3 +812,151 @@ systemctl start mysqld
 
 # 五、高性能高可用MySQL架构变迁
 
+## 1、MySQL主从复制配置
+
+### 1.1、流程介绍：
+
+1. 主库将变更写入主库的`binlog`中
+2. 从库的IO进程读取主库的`binlog`内容存储到Relay Log日志中
+   1. 二进制日志点
+   2. GTID（MySQL>=5.7推荐使用）
+3. 从库的SQL进程读取Relay Log日志中内容在从库中重放
+
+### 1.2、配置步骤
+
+#### 1.2.1、配置主从数据库服务器参数
+
+- Master服务器
+
+```shell
+[emon@emon ~]$ vim /usr/local/mysql/etc/my.cnf 
+```
+
+```
+server_id = 116
+
+# BINARY LOGGING #
+log_bin = /usr/local/mysql/binlogs/mysql-bin
+max_binlog_size = 1000M
+binlog_format = row
+expire_logs_days = 7
+sync_binlog = 1
+```
+
+> 为了避免重启，可以使用set global方式使配置的值生效
+
+- Slave服务器
+
+```shell
+[emon@emon ~]$ vim /usr/local/mysql/etc/my.cnf 
+```
+
+```shell
+server-id=166
+
+# Replice #
+relay_log = /usr/local/mysql/binlogs/relay-bin
+read_only = on
+# super_read_only = on
+# skip_slave_start = on
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+> 如果是MySQL5.7，需要删掉/usr/local/mysql/data/auto.cnf，并重启，确保主从的UUID不一样
+
+#### 1.2.2、在MASTER服务器上建立复制账号
+
+- Master服务器
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> create user 'repl'@'%' identified by 'Repl@123';
+mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
+```
+
+#### 1.2.3、备份Master服务器上的数据并初始化Slave服务器数据
+
+>建议主从数据库服务器采用相同的MySQL版本
+>
+>建议使用全库备份的方式初始化Slave数据
+
+- Master服务器
+
+```shell
+[emon@emon ~]$ mkdir -p backup/db_backup
+[emon@emon ~]$ mysqldump -uroot -proot123 --single-transaction --master-data --triggers --routines --all-databases > ~/backup/db_backup/all.sql
+# 确保166机器上emon用户下有~/backup/db_backup目录
+[emon@emon ~]$ scp ~/backup/db_backup/all.sql emon@192.168.3.166:~/backup/db_backup/
+```
+
+- Slave服务器
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 < ~/backup/db_backup/all.sql 
+```
+
+####  1.2.4、启动基于日志点的复制链路
+
+- Slave服务器
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000004', MASTER_LOG_POS=27756;
+mysql> start slave;
+# 检查启动状态
+mysql> show slave status \G
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/all.sql`
+
+#### 1.2.5、验证主从配置效果
+
+- Master服务器
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> create t1(id int);
+mysql> insert into t1 values(1);
+mysql> select * from t1;
++------+
+| id   |
++------+
+|    1 |
++------+
+1 row in set (0.00 sec)
+```
+
+- Slave服务器
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> select * from t1;
++------+
+| id   |
++------+
+|    1 |
++------+
+1 row in set (0.00 sec)
+```
+
+## 2、启动基于GTID的复制链路
+
+GTID：也就是全局事务ID
+
