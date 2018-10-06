@@ -820,17 +820,13 @@ systemctl start mysqld
 
 ![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
 
-## 2、MySQL主主备份配置
+## 2、MySQL主主复制配置（双机热备）
+
+主主复制中，为了方便描述，这里设定两台主机分别为MasterA和MasterB。
 
 
 
 ## 1、MySQL主从复制配置
-
-### 1.1、流程介绍：
-
-1. 主库将变更写入主库的`binlog`中
-2. 从库的IO进程读取主库的`binlog`内容存储到Relay Log日志中
-3. 从库的SQL进程读取Relay Log日志中内容在从库中重放
 
 ### 1.2、配置步骤
 

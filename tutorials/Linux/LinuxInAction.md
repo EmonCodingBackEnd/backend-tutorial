@@ -1722,7 +1722,6 @@ innodb_flush_log_at_trx_commit = 0
 key_buffer_size = 64M
 
 log-error = /usr/local/mysql/log/mysql_error.log
-log-bin = /usr/local/mysql/binlogs/mysql-bin
 slow_query_log = 1
 slow_query_log_file = /usr/local/mysql/log/mysql_slow_query.log
 long_query_time = 5
@@ -1732,6 +1731,8 @@ max_heap_table_size = 32M
 query_cache_type = 0
 query_cache_size = 0
 
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
 server-id=1
 ```
 
