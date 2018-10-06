@@ -818,6 +818,8 @@ systemctl start mysqld
 2. 从服务器的`I/O线程`使用主服务器上的专用账号登录到主服务器中读取该`Binary log`并写入到自己本地的`Relay log`中继日志文件中
 3. 从服务器的`SQL线程`会根据中继日志中的内容执行SQL语句。
 
+![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
+
 ## 2、MySQL主主备份配置
 
 
