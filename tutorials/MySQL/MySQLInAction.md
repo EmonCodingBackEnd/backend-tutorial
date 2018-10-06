@@ -908,11 +908,11 @@ mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
 ```
 
 ```mysql
-mysql> change master to
-    -> master_host='192.168.3.116',
+mysql> change master to master_host='192.168.3.116',
     -> master_user='repl',
     -> master_password='Repl@123',
-    -> MASTER_LOG_FILE='mysql-bin.000004', MASTER_LOG_POS=27756;
+    -> MASTER_LOG_FILE='mysql-bin.000004',
+    -> MASTER_LOG_POS=27756;
 mysql> start slave;
 # 检查启动状态
 mysql> show slave status \G
@@ -958,5 +958,351 @@ mysql> select * from t1;
 
 ## 2、启动基于GTID的复制链路
 
-GTID：也就是全局事务ID
+- 什么是GTID（Global transaction identifiers）：
+
+MySQL-5.6.2开始支持，MySQL-5.6.10后完善，GTID分成两个部分，一部分是服务的UUID，UUID保存在MySQL数据目录的`auto.cnf`文件中，这是一个非常重要的文件，不能删除，这一部分是不会改变的。另一部分是事务ID，随着事务的增加，值依次递增。
+
+- 要使用GTID，需要在主从服务器配置文件中同时加入如下配置：
+
+```shell
+gtid_mode = on
+enforce_gtid_consistency = on
+log_slave_updates = on
+```
+
+- 命令调整
+
+```shell
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> master_auto_position = 1;
+```
+
+- GTID复制的限制
+  - 无法再使用`create table ... select`建立
+  - 无法在事务中使用`create temporary table`建立临时表
+  - 无法使用关联更新同时更新事务表和非事务表
+
+## 3、高可用keepalived实例
+
+- 虚拟IP（vip）：
+
+就是一个未分配给真实主机的IP，也就是说对外提供服务器的主机除了有一个真实IP外还有一个虚拟IP。
+
+### 3.1、主主复制的配置
+
+基于主从调整为主主复制：
+
+- Master服务器
+
+  - `my.cnf`
+
+  ```shell
+  auto_increment_increment = 2
+  auto_increment_offset = 1
+  ```
+
+  - MySQL命令行
+
+  ```mysql
+  mysql> set global auto_increment_increment = 2
+  mysql> set global auto_increment_offset = 1
+  ```
+
+- Slave服务器
+
+  - `my.cnf`
+
+  ```shell
+  auto_increment_increment = 2
+  auto_increment_offset = 2
+  ```
+
+  - MySQL命令行
+
+  ```mysql
+  mysql> set global auto_increment_increment = 2
+  mysql> set global auto_increment_offset = 2
+  ```
+
+- Master服务器
+
+  - MySQL命令行
+
+  ```shell
+  mysql> change master to master_host='192.168.3.166',
+      -> master_user='repl',
+      -> master_password='Repl@123',
+      -> master_log_file='mysql-bin.000006',
+      -> master_log_pos=795770;
+  mysql> start slave;
+  mysql> show slave status \G
+  ```
+
+  > 其中`master_log_file`和`master_log_pos`来自于slave服务器通过`mysql> show master status \G`得到的值
+
+  **问题：**使用命令`show slave status \G`后发现如下：
+
+  ```mysql
+  Slave_IO_Running: Connecting
+  Slave_SQL_Running: Yes
+  ```
+
+  能出现`Connection`的原因不外乎三种：
+
+  1. 网络不通
+  2. 密码不对
+  3. pos不正确
+
+  经过排查，发现`change master`命令用到的用户名和密码是在之前的master上创建，并同步到slave上的，直接在slave使用无法生效，经过在slave的MySQL命令行执行`mysql> flush privileges;`即可。
+
+  此时master无需做调整，再次`show slave status \G`查看发现一切正常了。
+
+### 3.2、安装配置keepalived
+
+- Master服务器
+
+  - 安装
+
+  ```shell
+  [emon@emon ~]$ sudo yum install -y keepalived
+  ```
+
+  - 配置
+
+  1. 备份
+
+  ```shell
+  [emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+  ```
+
+  2. 配置
+
+  ```shell
+  [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
+  ```
+
+  ```shell
+  ! Configuration File for keepalived
+  global_defs {
+      router_id mysql_ha
+  }
+  vrrp_script check_run {
+      script "/etc/keepalived/check_mysql.sh"
+      interval 2
+  }
+  
+  vrrp_instance VI_1 {
+      state BACKUP
+      interface ens33
+      virtual_router_id 200
+      priority 100
+      advert_int 1
+      authentication {
+          auth_type PASS
+          auth_pass 1111
+      }
+      track_script {
+          check_run
+      }
+      virtual_ipaddress {
+          192.168.3.188/24
+      }
+  }
+  ```
+
+  3. 检查脚本
+
+  ```shell
+  [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
+  ```
+
+  ```shell
+  #!/bin/bash
+  MYSQL=/usr/local/mysql/bin/mysql
+  MYSQL_HOST=localhost
+  MYSQL_USER=root
+  MYSQL_PASSWORD=root123
+  CHECK_TIME=3
+  #MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
+  MYSQL_OK=1
+  function check_mysql_helth() {
+      $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
+      if [ $? = 0 ]; then
+          MYSQL_OK=1
+      else
+          MYSQL_OK=0
+      fi
+      return $MYSQL_OK
+  }
+  while [ $CHECK_TIME -ne 0 ]
+  do
+      let "CHECK_TIME -= 1"
+      check_mysql_helth
+  
+      echo $MYSQL_OK
+      if [ $MYSQL_OK = 1 ]; then
+          CHECK_TIME=0
+          exit 0
+      fi
+      if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
+          pkill keepalived
+          exit 1
+      fi
+  done
+  ```
+
+  调整执行权限：
+
+  ```shell
+  [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
+  ```
+
+- Slave服务器
+
+  - 安装
+
+  ```shell
+  [emon@emon ~]$ sudo yum install -y keepalived
+  ```
+
+  - 配置
+
+  1. 备份
+
+  ```shell
+  [emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+  ```
+
+  2. 配置
+
+  ```shell
+  [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
+  ```
+
+  ```shell
+  ! Configuration File for keepalived
+  global_defs {
+      router_id mysql_ha
+  }
+  vrrp_script check_run {
+      script "/etc/keepalived/check_mysql.sh"
+      interval 2
+  }
+  
+  vrrp_instance VI_1 {
+      state BACKUP
+      interface ens33
+      virtual_router_id 200
+      priority 100
+      advert_int 1
+      authentication {
+          auth_type PASS
+          auth_pass 1111
+      }
+      track_script {
+          check_run
+      }
+      virtual_ipaddress {
+          192.168.3.188/24
+      }
+  }
+  ```
+
+  3. 检查脚本
+
+  ```shell
+  [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
+  ```
+
+  ```shell
+  #!/bin/bash
+  MYSQL=/usr/local/mysql/bin/mysql
+  MYSQL_HOST=localhost
+  MYSQL_USER=root
+  MYSQL_PASSWORD=root123
+  CHECK_TIME=3
+  #MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
+  MYSQL_OK=1
+  function check_mysql_helth() {
+      $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
+      if [ $? = 0 ]; then
+          MYSQL_OK=1
+      else
+          MYSQL_OK=0
+      fi
+      return $MYSQL_OK
+  }
+  while [ $CHECK_TIME -ne 0 ]
+  do
+      let "CHECK_TIME -= 1"
+      check_mysql_helth
+  
+      echo $MYSQL_OK
+      if [ $MYSQL_OK = 1 ]; then
+          CHECK_TIME=0
+          exit 0
+      fi
+      if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
+          pkill keepalived
+          exit 1
+      fi
+  done
+  ```
+
+  调整执行权限：
+
+  ```shell
+  [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
+  ```
+
+### 3.3、启动keepalived
+
+- Master服务器
+
+```shell
+[emon@emon ~]$ sudo systemctl start keepalived
+```
+
+- Slave服务器
+
+```shell
+[emon@emon ~]$ sudo systemctl start keepalived
+```
+
+- 校验
+
+在Master或者Slave上
+
+```shell
+[emon@emon ~]$ ip addr|grep 188
+    inet 192.168.3.188/24 scope global secondary ens33
+```
+
+
+
+## 4、MySQL数据库读写分离
+
+读负载和写负载是两个不同的问题
+
+1. 写操作只能在Master数据库上执行
+2. 读操作既可以在Master库上执行，也可以在Slave库上执行
+
+相对于写负载，解决读负载相对容易
+
+**进行读写分离，主服务器主要执行写操作**
+
+**读操作的压力平均分摊到不同的SLAVE服务器上**
+
+**增加前端缓存服务器如Redis，Memcache等**
+
+**推荐使用Redis缓存服务器，代替Memcache服务器**
+
+**Redis优点：可持久化，可主从复制，可集群等等**
+
+
+
+
 
