@@ -1855,7 +1855,7 @@ PrivateTmp=false
 13. 初始化mysql服务程序
 
 ```bash
-[emon@emon local]$ mysql_secure_installation 
+[emon@emon local]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
 
 Securing the MySQL server deployment.
 
