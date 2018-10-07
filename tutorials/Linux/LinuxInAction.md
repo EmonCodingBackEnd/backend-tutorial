@@ -1740,7 +1740,7 @@ server-id=1
 9. 初始化数据库
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
 
 在日志文件里会提示一个临时密码，记录这个密码：
@@ -1753,7 +1753,7 @@ server-id=1
 10. 生成SSL
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
 Generating a 2048 bit RSA private key
 ..................+++
 ................................................................+++
