@@ -832,6 +832,12 @@ systemctl start mysqld
 | master2 | /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64-master2 | /data/MySQL/mysql5.7.22-master2 | /usr/local/mysql-master2 |
 | slave1  | /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64-slave1  | /data/MySQL/mysql5.7.22-slave1  | /usr/local/mysql-slave1  |
 
+| 实例    | systemctl启动文件                              |
+| ------- | ---------------------------------------------- |
+| master1 | /usr/lib/systemd/system/mysqld.service         |
+| master2 | /usr/lib/systemd/system/mysqld-master2.service |
+| slave1  | /usr/lib/systemd/system/mysqld-slave1.service  |
+
 
 
 ## 2、MySQL主从备份原理
@@ -847,6 +853,190 @@ systemctl start mysqld
 主主复制中，为了方便描述，这里设定两台主机分别为master1和master2。
 
 ### 3.1、配置master1-master2主从复制
+
+1. 在`master1`创建专用备份账号
+
+- master1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql/run/mysql.sock
+mysql> create user 'repl'@'%' identified by 'Repl@123';
+mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
+```
+
+2. 开启`master1`的`Binary log`配置
+
+- master1
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
+```
+
+```
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
+server-id=1
+
+read_only = 0
+#binlog_do_db = test
+binlog_ignore_db = mysql
+binlog_ignore_db = information_schema
+binlog_ignore_db = performance_schema
+auto_increment_increment = 2
+auto_increment_offset = 1
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+3. 备份`master1`服务器上的数据
+
+- 查看`master1`中的数据库
+
+```shell
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| selldb             |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+```
+
+- 锁定数据库
+
+```shell
+mysql> use selldb;
+mysql> flush tables with read lock;
+```
+
+- 备份
+
+```shell
+[emon@emon ~]$ mkdir -p backup/db_backup
+[emon@emon ~]$ mysqldump -uroot -proot123 -S /usr/local/mysql/run/mysql.sock --master-data --single-transaction --routines --triggers --events --all-databases > ~/backup/db_backup/master1_all.sql
+```
+
+- 解除锁定
+
+```shell
+mysql> unlock tables;
+```
+
+4. 开启`master2`的配置
+
+- master2
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql-master2/etc/my.cnf 
+```
+
+```
+log-bin = /usr/local/mysql-master2/binlogs/mysql-bin
+binlog_format = mixed
+server-id=2
+
+#replicate_do_db = test
+replicate_ignore_db = mysql
+replicate_ignore_db = information_schema
+replicate_ignore_db = performance_schema
+relay_log = mysql-relay-bin
+log_slave_updates = on
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+5. 初始化`master2`
+
+- master2
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-master2/run/mysql.sock < ~/backup/db_backup/master1_all.sql 
+```
+
+6. 启动基于日志点的复制链路
+
+- master2
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-master2/run/mysql.sock 
+```
+
+```mysql
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_port=3306,
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000006',
+    -> MASTER_LOG_POS=613;
+mysql> start slave;
+mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.3.116
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000007
+          Read_Master_Log_Pos: 154
+               Relay_Log_File: mysql-relay-bin.000003
+                Relay_Log_Pos: 367
+        Relay_Master_Log_File: mysql-bin.000007
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: mysql,information_schema,performance_schema
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+......
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/master1_all.sql`
+
+可能的问题：`start slave`引发的错误描述：
+
+```
+ERROR 1872 (HY000): Slave failed to initialize relay log info structure from the repository
+```
+
+处理方式： `reset slave`->`change master to  ......`->`start slave`
+
+
+
+7. 验证
+
+- master1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql/run/mysql.sock
+mysql> use selldb;
+mysql> create table t1(id int);
+mysql> insert into t1 values(1);
+```
+
+- master2
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-master2/run/mysql.sock 
+mysql> use selldb;
+mysql> select * from t1;
++------+
+| id   |
++------+
+|    1 |
++------+
+1 row in set (0.00 sec)
+```
+
+
+
+
 
 
 
