@@ -1930,13 +1930,13 @@ All done!
 14. 测试
 
 ```bash
-[emon@emon ~]$ mysqladmin version -uroot -p
+[emon@emon ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 ```
 
 查看变量：
 
 ```bash
-[emon@emon ~]$ mysqladmin variables -uroot -p|wc -l
+[emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
 510
 ```
 
