@@ -2230,7 +2230,7 @@ Threads: 2  Questions: 14  Slow queries: 0  Opens: 139  Flush tables: 2  Open ta
 登录：
 
 ```bash
-[emon@emon ~]$ mysql -uroot -p
+[emon@emon ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysql> select user,host from mysql.user;
 +------------------+-----------+
 | user             | host      |
