@@ -1943,7 +1943,7 @@ All done!
 登录：
 
 ```bash
-[emon@emon ~]$ mysql -uroot -p
+[emon@emon ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysql> select user,host from mysql.user;
 +---------------+-----------+
 | user          | host      |
@@ -2063,6 +2063,7 @@ socket = /usr/local/mysql/run/mysql.sock
 port = 3306
 socket = /usr/local/mysql/run/mysql.sock
 pid_file = /usr/local/mysql/run/mysql.pid
+basedir = /usr/local/mysql
 datadir = /usr/local/mysql/data
 default_storage_engine = InnoDB
 max_allowed_packet = 512M
@@ -2084,7 +2085,6 @@ innodb_flush_log_at_trx_commit = 0
 key_buffer_size = 64M
 
 log-error = /usr/local/mysql/log/mysql_error.log
-log-bin = /usr/local/mysql/binlogs/mysql-bin
 slow_query_log = 1
 slow_query_log_file = /usr/local/mysql/log/mysql_slow_query.log
 long_query_time = 5
@@ -2095,13 +2095,15 @@ max_heap_table_size = 32M
 # query_cache_type = 0
 # query_cache_size = 0
 
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
 server-id=1
 ```
 
 6. 初始化数据库
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
 
 在日志文件里会提示一个临时密码，记录这个密码： 
@@ -2114,7 +2116,7 @@ server-id=1
 7. 生成SSL【未提示输出信息，记录】
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
 ```
 
 8. 启动mysql
@@ -2126,7 +2128,7 @@ server-id=1
 9. 初始化mysql服务程序
 
 ```bash
-[emon@emon ~]$ mysql_secure_installation 
+[emon@emon ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
 
 Securing the MySQL server deployment.
 
@@ -2201,7 +2203,7 @@ All done!
 10. 测试
 
 ```bash
-[emon@emon ~]$ mysqladmin version -uroot -p
+[emon@emon ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysqladmin  Ver 8.0.11 for linux-glibc2.12 on x86_64 (MySQL Community Server - GPL)
 Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
 
@@ -2221,7 +2223,7 @@ Threads: 2  Questions: 14  Slow queries: 0  Opens: 139  Flush tables: 2  Open ta
 查看变量： 
 
 ```bash
-[emon@emon ~]$ mysqladmin variables -uroot -p|wc -l
+[emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
 542
 ```
 
