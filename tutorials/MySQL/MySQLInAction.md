@@ -812,7 +812,29 @@ systemctl start mysqld
 
 # 五、高性能高可用MySQL架构变迁
 
-## 1、MySQL主从备份原理
+## 1、环境准备
+
+在一台机器上，通过修改端口号，参照安装3个MySQL实例：
+
+参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
+
+安装规划如下：
+
+| 实例    | 端口 | 用户名 | 密码    |
+| ------- | ---- | ------ | ------- |
+| master1 | 3306 | root   | root123 |
+| master2 | 3307 | root   | root123 |
+| slave1  | 3308 | root   | root123 |
+
+| 实例    | 安装目录                                                     | 数据目录                        | 软连接                   |
+| ------- | ------------------------------------------------------------ | ------------------------------- | ------------------------ |
+| master1 | /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64         | /data/MySQL/mysql5.7.22         | /usr/local/mysql         |
+| master2 | /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64-master2 | /data/MySQL/mysql5.7.22-master2 | /usr/local/mysql-master2 |
+| slave1  | /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64-slave1  | /data/MySQL/mysql5.7.22-slave1  | /usr/local/mysql-slave1  |
+
+
+
+## 2、MySQL主从备份原理
 
 1. 主服务器数据库的每次操作都会记录在`Binary log`二进制日志文件中
 2. 从服务器的`I/O线程`使用主服务器上的专用账号登录到主服务器中读取该`Binary log`并写入到自己本地的`Relay log`中继日志文件中
@@ -820,9 +842,11 @@ systemctl start mysqld
 
 ![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
 
-## 2、MySQL主主复制配置（双机热备）
+## 3、MySQL主主复制配置（双机热备）
 
-主主复制中，为了方便描述，这里设定两台主机分别为MasterA和MasterB。
+主主复制中，为了方便描述，这里设定两台主机分别为master1和master2。
+
+### 3.1、配置master1-master2主从复制
 
 
 

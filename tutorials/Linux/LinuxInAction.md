@@ -1701,6 +1701,7 @@ socket = /usr/local/mysql/run/mysql.sock
 port = 3306
 socket = /usr/local/mysql/run/mysql.sock
 pid_file = /usr/local/mysql/run/mysql.pid
+basedir = /usr/local/mysql
 datadir = /usr/local/mysql/data
 default_storage_engine = InnoDB
 max_allowed_packet = 512M
