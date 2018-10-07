@@ -1740,8 +1740,10 @@ server-id=1
 9. 初始化数据库
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql --basedir=/usr/local/mysql/ --datadir=/usr/local/mysql/data/
 ```
+
+说明： 其中`--defaults-file=/usr/local/mysql/etc/my.cnf`对于一个MySQL实例来讲，可以忽略；但对于多个实例需要指定才可以。
 
 在日志文件里会提示一个临时密码，记录这个密码：
 
