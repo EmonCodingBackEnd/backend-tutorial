@@ -941,12 +941,19 @@ log-bin = /usr/local/mysql-master2/binlogs/mysql-bin
 binlog_format = mixed
 server-id=2
 
+read_only = 0
 #replicate_do_db = test
 replicate_ignore_db = mysql
 replicate_ignore_db = information_schema
 replicate_ignore_db = performance_schema
-relay_log = mysql-relay-bin
+relay_log = /usr/local/mysql-master2/binlogs/mysql-relay-bin
 log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
 ```
 
 如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
