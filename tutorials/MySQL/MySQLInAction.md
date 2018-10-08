@@ -1221,7 +1221,9 @@ mysql> select * from mtm;
 
 > 注意观察自增主键与最终数据记录数
 
-### 3.4、加入`keepalived`实现双机热备的动态切换
+##
+
+## 4、加入`keepalived`实现双机热备的动态切换
 
 [keepalived介绍](https://www.cnblogs.com/clsn/p/8052649.html)
 
@@ -1245,7 +1247,16 @@ mysql> select * from mtm;
 
 ```
 
+- 防火墙
 
+如果`firewalld`启动了，需要放行`244.0.0.18`这个组播地址上的vrrp协议。
+
+```shell
+firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT
+firewall-cmd --reload
+```
+
+> 其中ens33是网卡名称
 
 
 
