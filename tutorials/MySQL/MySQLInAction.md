@@ -1221,6 +1221,32 @@ mysql> select * from mtm;
 
 > 注意观察自增主键与最终数据记录数
 
+### 3.4、加入`keepalived`实现双机热备的动态切换
+
+[keepalived介绍](https://www.cnblogs.com/clsn/p/8052649.html)
+
+1. 安装
+
+```shell
+[emon@emon ~]$ sudo yum install -y keepalived
+```
+
+2. 配置
+
+- 备份`keepalived.conf`
+
+```shell
+[emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+```
+
+- master1
+
+```shell
+
+```
+
+
+
 
 
 ## 2、启动基于GTID的复制链路
