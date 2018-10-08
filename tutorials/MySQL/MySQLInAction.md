@@ -873,16 +873,17 @@ mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
 [emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
 ```
 
-```
+```shell
 log-bin = /usr/local/mysql/binlogs/mysql-bin
 binlog_format = mixed
 server-id=1
 
 read_only = 0
 #binlog_do_db = test
-binlog_ignore_db = mysql
 binlog_ignore_db = information_schema
+binlog_ignore_db = mysql
 binlog_ignore_db = performance_schema
+binlog_ignore_db = sys
 auto_increment_increment = 2
 auto_increment_offset = 1
 ```
@@ -936,16 +937,16 @@ mysql> unlock tables;
 [emon@emon ~]$ sudo vim /usr/local/mysql-master2/etc/my.cnf 
 ```
 
-```
+```shell
 log-bin = /usr/local/mysql-master2/binlogs/mysql-bin
 binlog_format = mixed
 server-id=2
 
-read_only = 0
 #replicate_do_db = test
-replicate_ignore_db = mysql
 replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
 replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
 relay_log = /usr/local/mysql-master2/binlogs/mysql-relay-bin
 log_slave_updates = on
 #这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
@@ -1014,8 +1015,6 @@ ERROR 1872 (HY000): Slave failed to initialize relay log info structure from the
 
 处理方式： `reset slave`->`change master to  ......`->`start slave`
 
-
-
 7. 验证
 
 - master1
@@ -1041,147 +1040,188 @@ mysql> select * from t1;
 1 row in set (0.00 sec)
 ```
 
+### 3.2、配置master2-master1主从复制（升级为主主复制）
 
+1. 在`master2`创建专用备份账号
 
+由于导出`master1`数据库时，是实例下的所有数据库（mysql和selldb），并已经初始化到`master2`，所以这里只需要通过`flush privileges`刷新生效，即可在`master2`拥有专用备份账号。
 
-
-
-
-## 1、MySQL主从复制配置
-
-### 1.2、配置步骤
-
-#### 1.2.1、配置主从数据库服务器参数
-
-- Master服务器
+- master2
 
 ```shell
-[emon@emon ~]$ vim /usr/local/mysql/etc/my.cnf 
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-master2/run/mysql.sock
+mysql> flush privileges;
 ```
 
-```
-server_id = 116
+2. 开启`master2`的`Binary log`配置
 
-# BINARY LOGGING #
-log_bin = /usr/local/mysql/binlogs/mysql-bin
-max_binlog_size = 1000M
-binlog_format = row
-expire_logs_days = 7
-sync_binlog = 1
-```
-
-> 为了避免重启，可以使用set global方式使配置的值生效
-
-- Slave服务器
+- master2
 
 ```shell
-[emon@emon ~]$ vim /usr/local/mysql/etc/my.cnf 
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql-master2/etc/my.cnf 
 ```
 
 ```shell
-server-id=166
 
-# Replice #
-relay_log = /usr/local/mysql/binlogs/relay-bin
-read_only = on
-# super_read_only = on
-# skip_slave_start = on
+read_only = 0
+#binlog_do_db = test
+binlog_ignore_db = mysql
+binlog_ignore_db = information_schema
+binlog_ignore_db = performance_schema
+auto_increment_increment = 2
+auto_increment_offset = 2
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+3. 我们不需要导出`master2`的数据了，因为它导入了`master1`作为初始化数据。
+
+这里，只需要记录它的`show master status \G`日志状态即可。
+
+- master2
+
+```shell
+mysql> show master status \G
+*************************** 1. row ***************************
+             File: mysql-bin.000004
+         Position: 154
+     Binlog_Do_DB: 
+ Binlog_Ignore_DB: mysql,information_schema,performance_schema
+Executed_Gtid_Set: 
+1 row in set (0.01 sec)
+```
+
+4. 开启`master1`的中继配置
+
+- master1
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
+```
+
+```shell
+
+#replicate_do_db = test
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = /usr/local/mysql/binlogs/mysql-relay-bin
+log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
 master_info_repository = TABLE
 relay_log_info_repository = TABLE
 ```
 
-> 如果是MySQL5.7，需要删掉/usr/local/mysql/data/auto.cnf，并重启，确保主从的UUID不一样
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
 
-#### 1.2.2、在MASTER服务器上建立复制账号
+5. 启动基于日志点的复制链路
 
-- Master服务器
+- master1
 
 ```shell
-[emon@emon ~]$ mysql -uroot -proot123
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql/run/mysql.sock
 ```
 
 ```mysql
-mysql> create user 'repl'@'%' identified by 'Repl@123';
-mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
-```
-
-#### 1.2.3、备份Master服务器上的数据并初始化Slave服务器数据
-
->建议主从数据库服务器采用相同的MySQL版本
->
->建议使用全库备份的方式初始化Slave数据
-
-- Master服务器
-
-```shell
-[emon@emon ~]$ mkdir -p backup/db_backup
-[emon@emon ~]$ mysqldump -uroot -proot123 --single-transaction --master-data --triggers --routines --all-databases > ~/backup/db_backup/all.sql
-# 确保166机器上emon用户下有~/backup/db_backup目录
-[emon@emon ~]$ scp ~/backup/db_backup/all.sql emon@192.168.3.166:~/backup/db_backup/
-```
-
-- Slave服务器
-
-```shell
-[emon@emon ~]$ mysql -uroot -proot123 < ~/backup/db_backup/all.sql 
-```
-
-####  1.2.4、启动基于日志点的复制链路
-
-- Slave服务器
-
-```shell
-[emon@emon ~]$ mysql -uroot -proot123
-```
-
-```mysql
-mysql> change master to master_host='192.168.3.116',
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_port=3307,
     -> master_user='repl',
     -> master_password='Repl@123',
     -> MASTER_LOG_FILE='mysql-bin.000004',
-    -> MASTER_LOG_POS=27756;
+    -> MASTER_LOG_POS=154;
 mysql> start slave;
-# 检查启动状态
 mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.3.116
+                  Master_User: repl
+                  Master_Port: 3307
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000004
+          Read_Master_Log_Pos: 154
+               Relay_Log_File: mysql-relay-bin.000002
+                Relay_Log_Pos: 320
+        Relay_Master_Log_File: mysql-bin.000004
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: information_schema,mysql,performance_schema,sys
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table:
+......
 ```
 
-> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/all.sql`
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`master2`上的`show master status \G`
 
-#### 1.2.5、验证主从配置效果
+### 3.3、验证master1-master2的主主复制
 
-- Master服务器
+1. 在`master1`创建测试表并插入数据
 
 ```shell
-[emon@emon ~]$ mysql -uroot -proot123
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql/run/mysql.sock
 ```
 
 ```mysql
-mysql> create t1(id int);
-mysql> insert into t1 values(1);
-mysql> select * from t1;
-+------+
-| id   |
-+------+
-|    1 |
-+------+
-1 row in set (0.00 sec)
+mysql> use selldb;
+mysql> create table mtm(id int not null auto_increment, version int not null, primary key (id));
+mysql> insert into mtm(version) values(1);
+mysql> insert into mtm(version) values(2);
 ```
 
-- Slave服务器
+2. 在`master2`上插入数据
 
 ```shell
-[emon@emon ~]$ mysql -uroot -proot123
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-master2/run/mysql.sock
 ```
 
 ```mysql
-mysql> select * from t1;
-+------+
-| id   |
-+------+
-|    1 |
-+------+
-1 row in set (0.00 sec)
+mysql> use selldb;
+mysql> insert into mtm(version) values(1);
+mysql> insert into mtm(version) values(2);
 ```
+
+3. 分别在`master1`和`master2`上查询
+
+- master1
+
+```mysql
+mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
++----+---------+
+4 rows in set (0.01 sec)
+```
+
+- master2
+
+```mysql
+mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
++----+---------+
+4 rows in set (0.00 sec)
+```
+
+> 注意观察自增主键与最终数据记录数
+
+
 
 ## 2、启动基于GTID的复制链路
 
