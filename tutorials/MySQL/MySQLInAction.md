@@ -812,13 +812,23 @@ systemctl start mysqld
 
 # 五、高性能高可用MySQL架构变迁
 
-## 1、环境准备
+## 1、MySQL主从备份原理
 
-在一台机器上，通过修改端口号，参照安装3个MySQL实例：
+1. 主服务器数据库的每次操作都会记录在`Binary log`二进制日志文件中
+2. 从服务器的`I/O线程`使用主服务器上的专用账号登录到主服务器中读取该`Binary log`并写入到自己本地的`Relay log`中继日志文件中
+3. 从服务器的`SQL线程`会根据中继日志中的内容执行SQL语句。
 
-参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
+![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
 
-安装规划如下：
+## 2、MySQL单机版主主复制与主从复制
+
+**单机版是没有双击热备的**
+
+单机版MySQL多实例安装规划：
+
+> 在一台机器上，通过修改端口号，参照安装3个MySQL实例：
+>
+> 参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
 
 | 实例    | 端口 | 用户名 | 密码    |
 | ------- | ---- | ------ | ------- |
@@ -838,21 +848,11 @@ systemctl start mysqld
 | master2 | /usr/lib/systemd/system/mysqld-master2.service |
 | slave1  | /usr/lib/systemd/system/mysqld-slave1.service  |
 
-
-
-## 2、MySQL主从备份原理
-
-1. 主服务器数据库的每次操作都会记录在`Binary log`二进制日志文件中
-2. 从服务器的`I/O线程`使用主服务器上的专用账号登录到主服务器中读取该`Binary log`并写入到自己本地的`Relay log`中继日志文件中
-3. 从服务器的`SQL线程`会根据中继日志中的内容执行SQL语句。
-
-![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
-
-## 3、MySQL主主复制配置（双机热备）
+### 2.1、主主复制配置
 
 主主复制中，为了方便描述，这里设定两台主机分别为master1和master2。
 
-### 3.1、配置master1-master2主从复制
+#### 2.1.1、第一步：配置master1->master2主从复制
 
 1. 在`master1`创建专用备份账号
 
@@ -1040,7 +1040,7 @@ mysql> select * from t1;
 1 row in set (0.00 sec)
 ```
 
-### 3.2、配置master2-master1主从复制（升级为主主复制）
+#### 2.1.2、第二部：配置master2->master1主从复制（升级为主主复制）
 
 1. 在`master2`创建专用备份账号
 
@@ -1160,7 +1160,7 @@ mysql> show slave status \G
 
 > 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`master2`上的`show master status \G`
 
-### 3.3、验证master1-master2的主主复制
+#### 2.1.3、验证master1-master2的主主复制
 
 1. 在`master1`创建测试表并插入数据
 
@@ -1221,7 +1221,9 @@ mysql> select * from mtm;
 
 > 注意观察自增主键与最终数据记录数
 
-##
+### 2.2、主从复制配置
+
+
 
 ## 4、加入`keepalived`实现双机热备的动态切换
 
