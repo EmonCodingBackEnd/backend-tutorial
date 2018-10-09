@@ -1741,6 +1741,227 @@ mysql> select * from mtm;
 
 > 注意观察自增主键与最终数据记录数
 
+#### 3.1.4、加入`keepalived`实现主主复制的双机热备
+
+[keepalived介绍](https://www.cnblogs.com/clsn/p/8052649.html)
+
+1. 安装
+
+- **master1**
+
+```shell
+[emon@emon ~]$ sudo yum install -y keepalived
+```
+
+- **master2**
+
+```shell
+[emon@emon ~]$ sudo yum install -y keepalived
+```
+
+2. 备份
+
+- **master1**
+
+```shell
+[emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+```
+
+- **master2**
+
+```shell
+[emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+```
+
+3. 防火墙
+
+如果`firewalld`启动了，需要放行`244.0.0.18`这个组播地址上的vrrp协议。
+
+- **master1**
+
+```shell
+[emon@emon ~]$ sudo firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT
+[emon@emon ~]$ sudo firewall-cmd --reload
+```
+
+- **master2**
+
+```shell
+[emon@emon ~]$ sudo firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT
+[emon@emon ~]$ sudo firewall-cmd --reload
+```
+
+> 其中ens33是网卡名称
+
+4. 配置`keepalived.conf`
+
+- **master1**
+
+```shell
+[emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
+```
+
+```shell
+! Configuration File for keepalived
+global_defs {
+    router_id mysql_ha_master1
+}
+vrrp_script check_run {
+    script "/etc/keepalived/check_mysql.sh"
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    track_script {
+        check_run
+    }
+    virtual_ipaddress {
+        192.168.3.188/24
+    }
+}
+```
+
+```shell
+[emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
+```
+
+```shell
+#!/bin/bash
+MYSQL=/usr/local/mysql/bin/mysql
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=root123
+CHECK_TIME=3
+#MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
+MYSQL_OK=1
+function check_mysql_helth() {
+    $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
+    if [ $? = 0 ]; then
+        MYSQL_OK=1
+    else
+        MYSQL_OK=0
+    fi
+    return $MYSQL_OK
+}
+while [ $CHECK_TIME -ne 0 ]
+do
+    let "CHECK_TIME -= 1"
+    check_mysql_helth
+
+    echo $MYSQL_OK
+    if [ $MYSQL_OK = 1 ]; then
+        CHECK_TIME=0
+        exit 0
+    fi
+    if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
+        pkill keepalived
+        exit 1
+    fi
+done
+```
+
+调整执行权限：
+
+```shell
+[emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
+```
+
+
+
+- **master2**
+
+```shell
+[emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
+```
+
+```shell
+! Configuration File for keepalived
+global_defs {
+    router_id mysql_ha_master2
+}
+vrrp_script check_run {
+    script "/etc/keepalived/check_mysql.sh"
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    track_script {
+        check_run
+    }
+    virtual_ipaddress {
+        192.168.3.188/24
+    }
+}
+```
+
+```shell
+[emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
+```
+
+```shell
+#!/bin/bash
+MYSQL=/usr/local/mysql/bin/mysql
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=root123
+CHECK_TIME=3
+#MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
+MYSQL_OK=1
+function check_mysql_helth() {
+    $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
+    if [ $? = 0 ]; then
+        MYSQL_OK=1
+    else
+        MYSQL_OK=0
+    fi
+    return $MYSQL_OK
+}
+while [ $CHECK_TIME -ne 0 ]
+do
+    let "CHECK_TIME -= 1"
+    check_mysql_helth
+
+    echo $MYSQL_OK
+    if [ $MYSQL_OK = 1 ]; then
+        CHECK_TIME=0
+        exit 0
+    fi
+    if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
+        pkill keepalived
+        exit 1
+    fi
+done
+```
+
+调整执行权限：
+
+
+  
+
+```shell
+[emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
+```
+
+
+
 ### 3.2、主从复制
 
 使用master1实例和slave1实例作为主从复制的两方。
