@@ -828,7 +828,7 @@ systemctl start mysqld
 
 > 在一台机器上，通过修改端口号，参照安装3个MySQL实例：
 >
-> 参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
+> 安装参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
 
 | 实例    | 端口 | 用户名 | 密码    |
 | ------- | ---- | ------ | ------- |
@@ -1361,6 +1361,78 @@ mysql> select * from mtm;
 |  7 |       3 |
 +----+---------+
 ```
+
+## 3、MySQL多机版主主复制与主从复制（主主可双击热备）
+
+**多机版可以为主主复制加入`keepalived`双机热备**
+
+> 安装参考地址： [安装MySQL5.7版本](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md)
+
+| 实例角色 | IP            | 端口 | 虚拟IP（VIP） |
+| -------- | ------------- | ---- | ------------- |
+| master1  | 192.168.3.116 | 3306 | 192.168.3.188 |
+| master2  | 192.168.3.166 | 3306 | 192.168.3.188 |
+| slave1   | 192.168.3.167 | 3306 | 不参与虚拟IP  |
+
+### 3.1、主主复制配置
+
+#### 3.1.1、第一步：配置master1->master2主从复制
+
+1. 在`master1`创建专用备份账号
+
+- **master1**
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+mysql> create user 'repl'@'%' identified by 'Repl@123';
+mysql> grant replication slave on *.* to 'repl'@'%' with grant option;
+```
+
+2. 开启`master1`的`Binary log`配置
+
+- **master1**
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
+```
+
+```mysql
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
+server-id=1
+
+read_only = 0
+#binlog_do_db = test
+binlog_ignore_db = information_schema
+binlog_ignore_db = mysql
+binlog_ignore_db = performance_schema
+binlog_ignore_db = sys
+auto_increment_increment = 2
+auto_increment_offset = 1
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+3. 备份`master1`服务器上的数据
+
+- 查看**master1**中的数据库
+
+```mysql
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| selldb             |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+```
+
+- 锁定**master1**中的数据库
 
 
 
