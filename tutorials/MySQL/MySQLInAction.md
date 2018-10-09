@@ -1432,7 +1432,377 @@ mysql> show databases;
 5 rows in set (0.00 sec)
 ```
 
-- 锁定**master1**中的数据库
+- 锁定**master1**中的所有数据库
+
+```mysql
+mysql> flush tables with read lock;
+```
+
+- 备份**master1**实例下所有数据库
+
+```shell
+[emon@emon ~]$ mkdir -p backup/db_backup
+[emon@emon ~]$ mysqldump -uroot -proot123 --master-data --single-transaction --routines --triggers --events --all-databases > ~/backup/db_backup/master1_all.sql
+```
+
+- 解除**master1**的锁定
+
+```mysql
+mysql> unlock tables;
+```
+
+4. 开启`master2`的`Relay log`配置
+
+- **master2**
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
+```
+
+```shell
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
+server-id=2
+
+#replicate_do_db = test
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = /usr/local/mysql/binlogs/mysql-relay-bin
+log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+> 如果master2是从master1复制的，需要删除UUID文件auto.cnf，并重启使之重新生成，否则会导致`Slave_IO_Running: No`
+>
+> [emon@emon ~]$ sudo rm -rf /usr/local/mysql/data/auto.cnf 
+>
+> [emon@emon ~]$ sudo systemctl start mysqld
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+5. 初始化`master2`
+
+- **master2**
+
+```shell
+[emon@emon ~]$ mkdir -p backup/db_backup
+[emon@emon ~]$ scp emon@192.168.3.116:backup/db_backup/master1_all.sql ~/backup/db_backup/
+[emon@emon ~]$ mysql -uroot -proot123 < ~/backup/db_backup/master1_all.sql
+```
+
+6. 在`master2`启动基于日志点的复制链路
+
+- **master2**
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_port=3306,
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000006',
+    -> MASTER_LOG_POS=154;
+mysql> start slave;
+mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.3.116
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000006
+          Read_Master_Log_Pos: 154
+               Relay_Log_File: mysql-relay-bin.000003
+                Relay_Log_Pos: 320
+        Relay_Master_Log_File: mysql-bin.000006
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: information_schema,mysql,performance_schema,sys
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+......
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/master1_all.sql`
+
+可能的问题：`start slave`引发的错误描述：
+
+```
+ERROR 1872 (HY000): Slave failed to initialize relay log info structure from the repository
+```
+
+处理方式： `reset slave`->`change master to ......`->`start slave`
+
+7. 验证
+
+- **master1**
+
+```mysql
+mysql> use selldb;
+mysql> create table t1(id int);
+mysql> insert into t1 values(1);
+```
+
+- **master2**
+
+```mysql
+mysql> use selldb;
+mysql> select * from t1;
++------+
+| id   |
++------+
+|    1 |
++------+
+1 row in set (0.00 sec)
+```
+
+#### 3.1.2、第二步：配置master2->master1主从复制（升级为主主复制）
+
+1. 在`master2`创建专用备份账号
+
+由于导出`master1`数据库时，是实例下的所有数据库（mysql和selldb），并已经初始化到`master2`，所以这里只需要通过`flush privileges`刷新生效，即可在`master2`拥有专用备份账号。
+
+- **master2**
+
+```mysql
+mysql> flush privileges;
+```
+
+2. 开启`master2`的`Binary log`配置
+
+- **master2**
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+```
+
+```shell
+
+read_only = 0
+#binlog_do_db = test
+binlog_ignore_db = mysql
+binlog_ignore_db = information_schema
+binlog_ignore_db = performance_schema
+auto_increment_increment = 2
+auto_increment_offset = 2
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+3. 我们不需要导出`master2`的数据了，因为它导入了`master1`作为初始化数据。
+
+这里，只需要记录它的`show master status \G`日志状态即可。
+
+- **master2**
+
+```mysql
+mysql> show master status \G
+*************************** 1. row ***************************
+             File: mysql-bin.000008
+         Position: 154
+     Binlog_Do_DB: 
+ Binlog_Ignore_DB: mysql,information_schema,performance_schema
+Executed_Gtid_Set: 
+1 row in set (0.00 sec)
+```
+
+4. 开启`master1`的`Relay log`配置
+
+- **master1**
+
+```shell
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+```
+
+```mysql
+
+#replicate_do_db = test
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = /usr/local/mysql/binlogs/mysql-relay-bin
+log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+5. 在`master1`启动基于日志点的复制链路
+
+- **master1**
+
+```mysql
+mysql> change master to
+    -> master_host='192.168.3.166',
+    -> master_port=3306,
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000008',
+    -> MASTER_LOG_POS=154;
+mysql> start slave;
+mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.3.166
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000008
+          Read_Master_Log_Pos: 154
+               Relay_Log_File: mysql-relay-bin.000002
+                Relay_Log_Pos: 320
+        Relay_Master_Log_File: mysql-bin.000008
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: information_schema,mysql,performance_schema,sys
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+......
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`master2`上的`show master status \G`
+
+#### 3.1.3、验证master1-master2的主主复制
+
+1. 在`master1`创建测试表并插入数据
+
+- **master1**
+
+```mysql
+mysql> use selldb;
+mysql> create table mtm(id int not null auto_increment, version int not null, primary key (id));
+mysql> insert into mtm(version) values(1);
+mysql> insert into mtm(version) values(2);
+```
+
+2. 在`master2`上插入数据
+
+- **master2**
+
+```mysql
+mysql> use selldb;
+mysql> insert into mtm(version) values(1);
+mysql> insert into mtm(version) values(2);
+```
+
+3. 分别在`master1`和`master2`上查询
+
+- **master1**
+
+```mysql
+mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
++----+---------+
+4 rows in set (0.00 sec)
+```
+
+- **master2**
+
+```mysql
+mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
++----+---------+
+4 rows in set (0.00 sec)
+```
+
+> 注意观察自增主键与最终数据记录数
+
+### 3.2、主从复制
+
+使用master1实例和slave1实例作为主从复制的两方。
+
+1. 在`master1`创建专用备份账号
+
+*参考主主复制*
+
+2. 开启`master1`的`Binary log`配置
+
+*参考主主复制*
+
+3. 备份`master1`服务器上的数据
+
+*参考主主复制*
+
+4. 开启`slave1`的配置
+
+- **slave1**
+
+```mysql
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf 
+```
+
+```shell
+
+# 在从服务器上禁止任何用户写入任何数据
+read_only = 1
+#super_read_only = 1
+#replicate_do_db = test
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = /usr/local/mysql/binlogs/mysql-relay-bin
+log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+> 如果slave1是从master1复制的，需要删除UUID文件auto.cnf，并重启使之重新生成，否则会导致`Slave_IO_Running: No`
+>
+> [emon@emon ~]$ sudo rm -rf /usr/local/mysql/data/auto.cnf 
+>
+> [emon@emon ~]$ sudo systemctl start mysqld
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+5. 初始化`slave1`
+
+- **slave1**
+
+```shell
+[emon@emon ~]$ mkdir -p backup/db_backup
+[emon@emon ~]$ scp emon@192.168.3.116:backup/db_backup/master1_all.sql ~/backup/db_backup/
+[emon@emon ~]$ mysql -uroot -proot123 < ~/backup/db_backup/master1_all.sql
+```
 
 
 
