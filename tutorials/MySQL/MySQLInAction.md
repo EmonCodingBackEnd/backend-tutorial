@@ -850,7 +850,7 @@ systemctl start mysqld
 
 ### 2.1、主主复制配置
 
-主主复制中，为了方便描述，这里设定两台主机分别为master1和master2。
+使用master1实例和master2实例作为主主复制的两方。
 
 #### 2.1.1、第一步：配置master1->master2主从复制
 
@@ -1222,6 +1222,145 @@ mysql> select * from mtm;
 > 注意观察自增主键与最终数据记录数
 
 ### 2.2、主从复制配置
+
+使用master1实例和slave1实例作为主从复制的两方。
+
+1. 在`master1`创建专用备份账号
+
+*参考主主复制*
+
+2. 开启`master1`的`Binary log`配置
+
+*参考主主复制*
+
+3. 备份`master1`服务器上的数据
+
+*参考主主复制*
+
+4. 开启`slave1`的配置
+
+- slave1
+
+```
+# 打开文件追加如下内容
+[emon@emon ~]$ sudo vim /usr/local/mysql-slave1/etc/my.cnf 
+```
+
+```shell
+log-bin = /usr/local/mysql-slave1/binlogs/mysql-bin
+binlog_format = mixed
+server-id=3
+
+# 在从服务器上禁止任何用户写入任何数据
+read_only = 1
+super_read_only = 1
+#replicate_do_db = test
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = /usr/local/mysql-slave1/binlogs/mysql-relay-bin
+log_slave_updates = on
+#这两个是启用relaylog的自动修复功能，避免由于网络之类的外因造成日志损坏，主从停止
+#relay_log_purge = 1
+#relay_log_recovery = 1
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+如果可以重启，重启使参数生效即可；如果不能重启，通过`set global`设置生效即可。
+
+5. 初始化`slave1`
+
+- slave1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-slave1/run/mysql.sock < ~/backup/db_backup/master1_all.sql 
+```
+
+6. 启动基于日志点的复制链路
+
+- slave1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-slave1/run/mysql.sock
+```
+
+```mysql
+mysql> change master to
+    -> master_host='192.168.3.116',
+    -> master_port=3306,
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000006',
+    -> MASTER_LOG_POS=154;
+mysql> start slave;
+mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.18.1.116
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000007
+          Read_Master_Log_Pos: 1722
+               Relay_Log_File: mysql-relay-bin.000003
+                Relay_Log_Pos: 1935
+        Relay_Master_Log_File: mysql-bin.000007
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: information_schema,mysql,performance_schema,sys
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+......
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/master1_all.sql`
+
+7. 验证
+
+- master1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql/run/mysql.sock
+```
+
+```mysql
+mysql> use selldb;
+mysql> insert into mtm(version) values(3);
+mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
+|  7 |       3 |
++----+---------+
+```
+
+- slave1
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123 -S /usr/local/mysql-slave1/run/mysql.sock
+```
+
+```mysql
+ mysql> use selldb;
+ mysql> select * from mtm;
++----+---------+
+| id | version |
++----+---------+
+|  1 |       1 |
+|  3 |       2 |
+|  4 |       1 |
+|  6 |       2 |
+|  7 |       3 |
++----+---------+
+```
 
 
 
