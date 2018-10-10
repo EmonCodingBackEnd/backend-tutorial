@@ -2204,55 +2204,21 @@ mysql> show slave status \G
 
 
 
-## 2、启动基于GTID的复制链路
-
-- 什么是GTID（Global transaction identifiers）：
-
-MySQL-5.6.2开始支持，MySQL-5.6.10后完善，GTID分成两个部分，一部分是服务的UUID，UUID保存在MySQL数据目录的`auto.cnf`文件中，这是一个非常重要的文件，不能删除，这一部分是不会改变的。另一部分是事务ID，随着事务的增加，值依次递增。
-
-- 要使用GTID，需要在主从服务器配置文件中同时加入如下配置：
-
-```shell
-gtid_mode = on
-enforce_gtid_consistency = on
-log_slave_updates = on
-```
-
-- 命令调整
-
-```shell
-mysql> change master to
-    -> master_host='192.168.3.116',
-    -> master_user='repl',
-    -> master_password='Repl@123',
-    -> master_auto_position = 1;
-```
-
-- GTID复制的限制
-  - 无法再使用`create table ... select`建立
-  - 无法在事务中使用`create temporary table`建立临时表
-  - 无法使用关联更新同时更新事务表和非事务表
-
-
-
 ## 4、MySQL数据库读写分离
 
-读负载和写负载是两个不同的问题
+- `master1`、`master2`上安装LVS
 
-1. 写操作只能在Master数据库上执行
-2. 读操作既可以在Master库上执行，也可以在Slave库上执行
+```shell
+[emon@emon ~]$ sudo yum install -y ipvsadm
+```
 
-相对于写负载，解决读负载相对容易
+- `master1`、`master2`、`slave1`上加载ipvs模块
 
-**进行读写分离，主服务器主要执行写操作**
+```shell
+[emon@emon ~]$ modprobe ip_vs
+```
 
-**读操作的压力平均分摊到不同的SLAVE服务器上**
 
-**增加前端缓存服务器如Redis，Memcache等**
-
-**推荐使用Redis缓存服务器，代替Memcache服务器**
-
-**Redis优点：可持久化，可主从复制，可集群等等**
 
 
 
