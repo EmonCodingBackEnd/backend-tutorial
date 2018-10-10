@@ -1502,13 +1502,25 @@ relay_log_info_repository = TABLE
 
 - **master2**
 
+为了更大的灵活性，这里采用`master_host`**域名**而不是**IP**的方式，首先配置**域名**如下：
+
+```shell
+[emon@emon ~]$ sudo vim /etc/hosts
+```
+
+```shell
+192.168.3.116 master1
+```
+
+如果`master_host`的IP地址变更了，不需要`stop slave`->`change master to master_host=XXX`->`start slave`的方式，只需要更改域名配置即可，稍等片刻（大约1分钟），复制链路会自动生效。
+
 ```shell
 [emon@emon ~]$ mysql -uroot -proot123
 ```
 
 ```mysql
 mysql> change master to
-    -> master_host='192.168.3.116',
+    -> master_host='master1',
     -> master_port=3306,
     -> master_user='repl',
     -> master_password='Repl@123',
@@ -1652,9 +1664,21 @@ relay_log_info_repository = TABLE
 
 - **master1**
 
+为了更大的灵活性，这里采用`master_host`**域名**而不是**IP**的方式，首先配置**域名**如下：
+
+```shell
+[emon@emon ~]$ sudo vim /etc/hosts
+```
+
+```shell
+192.168.3.166 master2
+```
+
+如果`master_host`的IP地址变更了，不需要`stop slave`->`change master to master_host=XXX`->`start slave`的方式，只需要更改域名配置即可，稍等片刻（大约1分钟），复制链路会自动生效。
+
 ```mysql
 mysql> change master to
-    -> master_host='192.168.3.166',
+    -> master_host='master2',
     -> master_port=3306,
     -> master_user='repl',
     -> master_password='Repl@123',
@@ -1954,7 +1978,7 @@ done
 调整执行权限：
 
 
-  
+
 
 ```shell
 [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
