@@ -1821,6 +1821,8 @@ mysql> select * from mtm;
 
 - **master1**
 
+`keepalived.conf`配置：
+
 ```shell
 [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
 ```
@@ -1853,6 +1855,8 @@ vrrp_instance VI_1 {
     }
 }
 ```
+
+`check_mysql.sh`测试脚本：
 
 ```shell
 [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
@@ -1899,9 +1903,19 @@ done
 [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
 ```
 
+**备注：上述mysql执行有问题，待解决，目前用如下脚本内容替代**
 
+```shell
+#!/bin/bash
+RESULT=$(netstat -an|grep "LISTEN"|grep "3306"|wc -l)
+if [ $RESULT -eq 0 ]; then
+    pkill keepalived
+fi
+```
 
 - **master2**
+
+`keepalived.conf`配置：
 
 ```shell
 [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
@@ -1936,6 +1950,8 @@ vrrp_instance VI_1 {
 }
 ```
 
+`check_mysql.sh`测试脚本：
+
 ```shell
 [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
 ```
@@ -1978,29 +1994,63 @@ done
 调整执行权限：
 
 
-
-
 ```shell
 [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
 ```
 
+**备注：上述mysql执行有问题，待解决，目前用如下脚本内容替代**
 
+```shell
+#!/bin/bash
+RESULT=$(netstat -an|grep "LISTEN"|grep "3306"|wc -l)
+if [ $RESULT -eq 0 ]; then
+    pkill keepalived
+fi
+```
 
-### 3.2、主从复制
+> 可以通过`/var/log/messages`查看keepalived日志，通过命令`ps -ef|grep keep`查看进程信息
+
+5. 启动
+
+- **master1**
+
+```shell
+[emon@emon ~]$ sudo systemctl start keepalived
+```
+
+> 如果MySQL不可用，则keepalived会停止，VIP会漂移到master2；再次启动MySQL并启动keepalived，则VIP会被强占回来
+
+- **master2**
+
+```shell
+[emon@emon ~]$ sudo systemctl start keepalived
+```
+
+> 如果master1不可用，则VIP会漂移到master2；但master1再次可用时，VIP会再次漂移到master1
+
+6. 测试
+
+通过`ip addr`命令查看VIP是在`master1`还是`master2`。
+
+```shell
+[emon@emon ~]$ ip addr
+```
+
+### 3.2、主从复制配置
 
 使用master1实例和slave1实例作为主从复制的两方。
 
 1. 在`master1`创建专用备份账号
 
-*参考主主复制*
+*参考主主复制，已配置，忽略*
 
 2. 开启`master1`的`Binary log`配置
 
-*参考主主复制*
+*参考主主复制*，已配置，忽略
 
 3. 备份`master1`服务器上的数据
 
-*参考主主复制*
+*参考主主复制，已配置，忽略*
 
 4. 开启`slave1`的配置
 
@@ -2049,42 +2099,108 @@ relay_log_info_repository = TABLE
 [emon@emon ~]$ mysql -uroot -proot123 < ~/backup/db_backup/master1_all.sql
 ```
 
+6. 启动基于日志点的复制链路
 
+- **slave1**
 
-## 4、加入`keepalived`实现双机热备的动态切换
-
-[keepalived介绍](https://www.cnblogs.com/clsn/p/8052649.html)
-
-1. 安装
-
-```shell
-[emon@emon ~]$ sudo yum install -y keepalived
-```
-
-2. 配置
-
-- 备份`keepalived.conf`
-
-```shell
-[emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
-```
-
-- master1
-
-```shell
+为了更大的灵活性，这里采用`master_host`**域名**而不是**IP**的方式，首先配置**域名**如下：
 
 ```
-
-- 防火墙
-
-如果`firewalld`启动了，需要放行`244.0.0.18`这个组播地址上的vrrp协议。
-
-```shell
-firewall-cmd --direct --permanent --add-rule ipv4 filter INPUT 0 --in-interface ens33 --destination 224.0.0.18 --protocol vrrp -j ACCEPT
-firewall-cmd --reload
+[emon@emon ~]$ sudo vim /etc/hosts
+192.168.3.188 master
 ```
 
-> 其中ens33是网卡名称
+如果`master_host`的IP地址变更了，不需要`stop slave`->`change master to master_host=XXX`->`start slave`的方式，只需要更改域名配置即可，稍等片刻（大约1分钟），复制链路会自动生效。
+
+```shell
+[emon@emon ~]$ mysql -uroot -proot123
+```
+
+```mysql
+mysql> change master to
+    -> master_host='master',
+    -> master_port=3306,
+    -> master_user='repl',
+    -> master_password='Repl@123',
+    -> MASTER_LOG_FILE='mysql-bin.000007',
+    -> MASTER_LOG_POS=154;
+mysql> start slave;
+mysql> show slave status \G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: master
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000020
+          Read_Master_Log_Pos: 154
+               Relay_Log_File: mysql-relay-bin.000015
+                Relay_Log_Pos: 367
+        Relay_Master_Log_File: mysql-bin.000020
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: information_schema,mysql,performance_schema,sys
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+......
+```
+
+> 其中MASTER_LOG_FILE和MASTER_LOG_POS的内容来自`~/backup/db_backup/master1_all.sql`
+
+7. 验证
+
+- 验证主从复制
+
+  - **master(VIP所在主机，可能是`master1`或`master2`)**
+
+  ```mysql
+  mysql> use selldb;
+  mysql> insert into t1 values(2);
+  ```
+
+  - **slave1**
+
+  ```mysql
+  mysql> user selldb;
+  mysql> select * from t1;
+  +------+
+  | id   |
+  +------+
+  |    1 |
+  |    2 |
+  +------+
+  2 rows in set (0.00 sec)
+  ```
+
+- 验证双机热备
+
+  - 停止目前VIP所在机器的MySQL服务
+
+  ```shell
+  [emon@emon ~]$ sudo systemctl stop mysqld
+  ```
+
+  - 到VIP漂移到的主机上
+
+  ```shell
+  mysql> use selldb;
+  mysql> insert into t1 values(3);
+  ```
+
+  - **slave1**
+
+  ```mysql
+  mysql> select * from t1;
+  +------+
+  | id   |
+  +------+
+  |    1 |
+  |    2 |
+  |    3 |
+  +------+
+  3 rows in set (0.01 sec)
+  ```
 
 
 
@@ -2116,302 +2232,6 @@ mysql> change master to
   - 无法再使用`create table ... select`建立
   - 无法在事务中使用`create temporary table`建立临时表
   - 无法使用关联更新同时更新事务表和非事务表
-
-## 3、高可用keepalived实例
-
-- 虚拟IP（vip）：
-
-就是一个未分配给真实主机的IP，也就是说对外提供服务器的主机除了有一个真实IP外还有一个虚拟IP。
-
-### 3.1、主主复制的配置
-
-基于主从调整为主主复制：
-
-- Master服务器
-
-  - `my.cnf`
-
-  ```shell
-  auto_increment_increment = 2
-  auto_increment_offset = 1
-  ```
-
-  - MySQL命令行
-
-  ```mysql
-  mysql> set global auto_increment_increment = 2
-  mysql> set global auto_increment_offset = 1
-  ```
-
-- Slave服务器
-
-  - `my.cnf`
-
-  ```shell
-  auto_increment_increment = 2
-  auto_increment_offset = 2
-  ```
-
-  - MySQL命令行
-
-  ```mysql
-  mysql> set global auto_increment_increment = 2
-  mysql> set global auto_increment_offset = 2
-  ```
-
-- Master服务器
-
-  - MySQL命令行
-
-  ```shell
-  mysql> change master to master_host='192.168.3.166',
-      -> master_user='repl',
-      -> master_password='Repl@123',
-      -> master_log_file='mysql-bin.000006',
-      -> master_log_pos=795770;
-  mysql> start slave;
-  mysql> show slave status \G
-  ```
-
-  > 其中`master_log_file`和`master_log_pos`来自于slave服务器通过`mysql> show master status \G`得到的值
-
-  **问题：**使用命令`show slave status \G`后发现如下：
-
-  ```mysql
-  Slave_IO_Running: Connecting
-  Slave_SQL_Running: Yes
-  ```
-
-  能出现`Connection`的原因不外乎三种：
-
-  1. 网络不通
-  2. 密码不对
-  3. pos不正确
-
-  经过排查，发现`change master`命令用到的用户名和密码是在之前的master上创建，并同步到slave上的，直接在slave使用无法生效，经过在slave的MySQL命令行执行`mysql> flush privileges;`即可。
-
-  此时master无需做调整，再次`show slave status \G`查看发现一切正常了。
-
-### 3.2、安装配置keepalived
-
-- Master服务器
-
-  - 安装
-
-  ```shell
-  [emon@emon ~]$ sudo yum install -y keepalived
-  ```
-
-  - 配置
-
-  1. 备份
-
-  ```shell
-  [emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
-  ```
-
-  2. 配置
-
-  ```shell
-  [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
-  ```
-
-  ```shell
-  ! Configuration File for keepalived
-  global_defs {
-      router_id mysql_ha
-  }
-  vrrp_script check_run {
-      script "/etc/keepalived/check_mysql.sh"
-      interval 2
-  }
-  
-  vrrp_instance VI_1 {
-      state BACKUP
-      interface ens33
-      virtual_router_id 200
-      priority 100
-      advert_int 1
-      authentication {
-          auth_type PASS
-          auth_pass 1111
-      }
-      track_script {
-          check_run
-      }
-      virtual_ipaddress {
-          192.168.3.188/24
-      }
-  }
-  ```
-
-  3. 检查脚本
-
-  ```shell
-  [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
-  ```
-
-  ```shell
-  #!/bin/bash
-  MYSQL=/usr/local/mysql/bin/mysql
-  MYSQL_HOST=localhost
-  MYSQL_USER=root
-  MYSQL_PASSWORD=root123
-  CHECK_TIME=3
-  #MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
-  MYSQL_OK=1
-  function check_mysql_helth() {
-      $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
-      if [ $? = 0 ]; then
-          MYSQL_OK=1
-      else
-          MYSQL_OK=0
-      fi
-      return $MYSQL_OK
-  }
-  while [ $CHECK_TIME -ne 0 ]
-  do
-      let "CHECK_TIME -= 1"
-      check_mysql_helth
-  
-      echo $MYSQL_OK
-      if [ $MYSQL_OK = 1 ]; then
-          CHECK_TIME=0
-          exit 0
-      fi
-      if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
-          pkill keepalived
-          exit 1
-      fi
-  done
-  ```
-
-  调整执行权限：
-
-  ```shell
-  [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
-  ```
-
-- Slave服务器
-
-  - 安装
-
-  ```shell
-  [emon@emon ~]$ sudo yum install -y keepalived
-  ```
-
-  - 配置
-
-  1. 备份
-
-  ```shell
-  [emon@emon ~]$ sudo mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
-  ```
-
-  2. 配置
-
-  ```shell
-  [emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf 
-  ```
-
-  ```shell
-  ! Configuration File for keepalived
-  global_defs {
-      router_id mysql_ha
-  }
-  vrrp_script check_run {
-      script "/etc/keepalived/check_mysql.sh"
-      interval 2
-  }
-  
-  vrrp_instance VI_1 {
-      state BACKUP
-      interface ens33
-      virtual_router_id 200
-      priority 100
-      advert_int 1
-      authentication {
-          auth_type PASS
-          auth_pass 1111
-      }
-      track_script {
-          check_run
-      }
-      virtual_ipaddress {
-          192.168.3.188/24
-      }
-  }
-  ```
-
-  3. 检查脚本
-
-  ```shell
-  [emon@emon ~]$ sudo vim /etc/keepalived/check_mysql.sh
-  ```
-
-  ```shell
-  #!/bin/bash
-  MYSQL=/usr/local/mysql/bin/mysql
-  MYSQL_HOST=localhost
-  MYSQL_USER=root
-  MYSQL_PASSWORD=root123
-  CHECK_TIME=3
-  #MySQL is working MYSQL_OK is 1, MySQL down MYSQL_OK is 0
-  MYSQL_OK=1
-  function check_mysql_helth() {
-      $MYSQL -h$MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD -e "select @@version;" > /dev/null 2>&1
-      if [ $? = 0 ]; then
-          MYSQL_OK=1
-      else
-          MYSQL_OK=0
-      fi
-      return $MYSQL_OK
-  }
-  while [ $CHECK_TIME -ne 0 ]
-  do
-      let "CHECK_TIME -= 1"
-      check_mysql_helth
-  
-      echo $MYSQL_OK
-      if [ $MYSQL_OK = 1 ]; then
-          CHECK_TIME=0
-          exit 0
-      fi
-      if [ $MYSQL_OK -eq 0 ] && [ $CHECK_TIME -eq 0 ]; then
-          pkill keepalived
-          exit 1
-      fi
-  done
-  ```
-
-  调整执行权限：
-
-  ```shell
-  [emon@emon ~]$ sudo chmod a+x /etc/keepalived/check_mysql.sh 
-  ```
-
-### 3.3、启动keepalived
-
-- Master服务器
-
-```shell
-[emon@emon ~]$ sudo systemctl start keepalived
-```
-
-- Slave服务器
-
-```shell
-[emon@emon ~]$ sudo systemctl start keepalived
-```
-
-- 校验
-
-在Master或者Slave上
-
-```shell
-[emon@emon ~]$ ip addr|grep 188
-    inet 192.168.3.188/24 scope global secondary ens33
-```
 
 
 
