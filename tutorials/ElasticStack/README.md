@@ -272,7 +272,7 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 4. 访问
 
-http://192.168.3.116:8200
+http://192.168.3.116:9201
 
 ### 1.3、配置【二从之二】
 
@@ -349,7 +349,7 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 4. 访问
 
-http://192.168.3.116:7200
+http://192.168.3.116:9202
 
 ### 1.4、配置es启动组
 
@@ -558,6 +558,12 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl update
 [emon@emon ~]$ sudo supervisorctl start kibana
 ```
+
+6. 访问
+
+http://192.168.3.116:5601
+
+
 
 ## 4、Beats
 
