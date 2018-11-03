@@ -3878,7 +3878,7 @@ repl_backlog_histlen:33521
 
 #### 12.1.4、配置【三哨兵】
 
-##### 12.1.4.1【三哨兵】之一
+##### 12.1.4.1、【三哨兵】之一
 
 1. 配置【三哨兵】的配置文件
 
@@ -3894,7 +3894,7 @@ port 26379
 # 工作目录【修改】
 dir /usr/local/redis/redis_rdb
 # 哨兵监控的主数据库，名称可以自定义，地址与端口注意【修改】
-sentinel monitor mymaster 0.0.0.0 6379 2
+sentinel monitor mymaster 192.168.3.116 6379 2
 # 【新增】
 sentinel auth-pass mymaster `[密码]`
 # 【新增】
@@ -3929,6 +3929,24 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl start redis-sentinel
 ```
 
+【警告】
+
+```
+# 启动日志碰到警告
+WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+```
+
+【解决】
+
+```shell
+# 第一步：打开`/etc/sysctl.conf`文件
+[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+# 第二步：追加如下内容
+net.core.somaxconn=1024
+# 第三步：使之生效
+[emon@emon ~]$ sudo sysctl -p
+```
+
 
 
 【拷贝`sentinel.conf`，复制出2份，文件名分别为`sentinel-slave.conf`和`sentinel-slave2.conf`，并配置如下：】
@@ -3950,7 +3968,7 @@ port 26389
 # 工作目录【修改】
 dir /usr/local/redis/redis_rdb
 # 哨兵监控的主数据库，名称可以自定义，地址与端口注意【修改】
-sentinel monitor mymaster 0.0.0.0 6379 2
+sentinel monitor mymaster 192.168.3.116 6379 2
 # 【新增】
 sentinel auth-pass mymaster `[密码]`
 # 【新增】
@@ -4002,7 +4020,7 @@ port 26399
 # 工作目录【修改】
 dir /usr/local/redis/redis_rdb
 # 哨兵监控的主数据库，名称可以自定义，地址与端口注意【修改】
-sentinel monitor mymaster 0.0.0.0 6379 2
+sentinel monitor mymaster 192.168.3.116 6379 2
 # 【新增】
 sentinel auth-pass mymaster `[密码]`
 # 【新增】
