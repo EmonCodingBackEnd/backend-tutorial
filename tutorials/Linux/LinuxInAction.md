@@ -2854,7 +2854,7 @@ success
 
 执行supervisord命令，将会启动supervisord进程，同时我们在配置文件中设置的进程也会相应启动。
 
-> ##### 使用默认的配置文件启动 /etc/supervisor/supervisor.conf
+> ##### 使用默认的配置文件启动 /etc/supervisor/supervisord.conf
 >
 > supervisord
 > ##### 明确指定配置文件
