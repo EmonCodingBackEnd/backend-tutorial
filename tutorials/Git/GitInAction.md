@@ -306,8 +306,12 @@ git checkout <filename>
 
 ```shell
 # 保存当前修改，回退到修改之前，此时git diff HEAD查看工作区与暂存区以及最新提交的比较结果无差别
-# 如果不带save -a message，只暂存原有文件之上的修改，不会包含新增文件
-git stash [save [-a] [<message>]]
+# save -u message，暂存未被.gitignore忽略的文件，包含修改过的、未被追踪【推荐】
+# save -a message，暂存所有文件，包含修改过的、未被追踪的以及.gitignore忽略掉的【强烈不推荐】
+git stash [save [-u|-a] [<message>]]
+# 如果是 save -a message，在恢复暂存会出现 Could not restore untracked files from stash entry 的错误，此时如何解决？
+# 第一步： git clean -fdx 清理掉本地 .gitignore 忽略掉的文件
+# 第二部：git stash pop stash@{id} 恢复即可
 ```
 
 - 显示已暂存列表
