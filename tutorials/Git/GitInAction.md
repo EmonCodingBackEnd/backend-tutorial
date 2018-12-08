@@ -536,6 +536,30 @@ git push origin v1.0.0
 git push origin --tags
 ```
 
+- 删除本地标签
+
+```bash
+git tag -d <版本号>
+```
+
+- 删除远程仓库的标签
+
+```
+git push origin --delete <版本号>
+```
+
+- 查看标签
+
+```
+git tag
+```
+
+- 查看符合条件的标签
+
+```
+git tag -l <过滤条件，输入部分标签名>
+```
+
 
 
 # 七、其他
