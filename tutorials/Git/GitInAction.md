@@ -310,6 +310,8 @@ git status -s
 git status --ignored
 ```
 
+![](assets/20181212153845.png)
+
 
 
 ## 4.4 文件还原与暂存
