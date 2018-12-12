@@ -215,12 +215,20 @@ git commit -m "<message>"
 git commit -am "<message>"
 ```
 
-- 修改上一条提交信息
+- 修改上一条提交信息，未push的commit
 
 ```shell
 # 该命令打开提交信息编辑窗口，你可以修改提交信息；--no-edit标记会修复提交但不会打开提交信息编辑窗口。
 git commit --amend [--no-edit]
 ```
+
+- 修改历史多次提交注释，未push的commit
+
+```bash
+
+```
+
+
 
 - 提交远程仓库
 
