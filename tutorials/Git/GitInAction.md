@@ -404,11 +404,23 @@ git checkout -b feature/x
 git checkout - 
 ```
 
-- 合并分支
+- 快速合并分支`fast-forward`
+
+```bash
+git merge <otherbranchname>
+```
+
+- 合并分支`--no-ff`
 
 ```shell
 # 合并分支，并保留日志
-git merge --no-ff feature/x
+git merge --no-ff <otherbranchname>
+```
+
+- 合并分支，多次commit压缩为一次`--squash`
+
+```bash
+git merge --squash <otherbranchname>
 ```
 
 - 删除本地分支
