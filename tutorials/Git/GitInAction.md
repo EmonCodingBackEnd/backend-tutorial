@@ -224,11 +224,23 @@ git commit --amend [--no-edit]
 
 - 修改历史多次提交注释，未push的commit
 
-```bash
+  - 第一步，X表示最近几条commit日志
 
-```
+  ```bash
+  git rebase -i HEAD~X
+  ```
 
+  - 第二步，
 
+  ```bash
+  git commit --amend
+  ```
+
+  - 第三步，
+
+  ```bash
+  git rebase --continue
+  ```
 
 - 提交远程仓库
 
