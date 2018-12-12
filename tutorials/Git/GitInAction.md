@@ -287,7 +287,9 @@ git rebase --continue
 
 - 继续执行第二步的操作，直至完成所有注释的调整，并在最后一次`git rebase --continue`退出。
 
+【备注】细心点可以看到我选择了已经push到远程的commit进行了注释调整，这样会导致修改注释后无法push到远程。
 
+**所以不建议对已经push到远程的commit进行修改。非要修改，需要`git push -f <remote> <branchname>`强制push，但非常不推荐。**
 
 ## 4.2 合并更新
 
