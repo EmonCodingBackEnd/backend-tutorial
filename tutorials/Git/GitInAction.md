@@ -140,7 +140,7 @@ user.email=liming20110711@163.com
 
    以GitHub为例，创建如图所示：
 
-   ![new-repository-1.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/new-repository-1.png)
+   ![new-repository-1.png](images/new-repository-1.png)
 
    获得仓库地址：`git@github.com:Rushing0711/emonnote.git`
 
@@ -160,7 +160,7 @@ user.email=liming20110711@163.com
 
    以GitHub为例，创建如图所示：
 
-   ![new-repository-2.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/new-repository-2.png)
+   ![new-repository-2.png](images/new-repository-2.png)
 
    获得仓库地址：`git@github.com:Rushing0711/emonnote.git`
 
@@ -215,13 +215,6 @@ git commit -m "<message>"
 git commit -am "<message>"
 ```
 
-- 修改上一条提交信息，未push的commit
-
-```shell
-# 该命令打开提交信息编辑窗口，你可以修改提交信息；--no-edit标记会修复提交但不会打开提交信息编辑窗口。
-git commit --amend [--no-edit]
-```
-
 - 修改历史多次提交注释，未push的commit
 
   - 第一步，X表示最近几条commit日志
@@ -229,6 +222,8 @@ git commit --amend [--no-edit]
   ```bash
   git rebase -i HEAD~X
   ```
+
+
 
   - 第二步，
 
@@ -247,6 +242,50 @@ git commit --amend [--no-edit]
 ```shell
 git push <远程主机名> <本地主机名>:<远程分支名>
 ```
+
+###  4.1.1 修改上一条commit注释（未push到远程)
+
+- 修改上一条提交信息，未push的commit
+
+```bash
+# 该命令打开提交信息编辑窗口，你可以修改提交信息；--no-edit标记会修复提交但不会打开提交信息编辑窗口。
+git commit --amend [--no-edit]
+```
+
+### 4.1.2 修改上X条commit注释（未push到远程)
+
+- 第一步，X表示最近X条commit日志
+
+![20181212153845.png](images/20181212153845.png)
+
+```bash
+git rebase -i HEAD~X
+```
+
+![20181212153949.png](images/20181212153949.png)
+
+![20181212153959.png](images/20181212153959.png)
+
+可以很明显的看到，`pick`了最近4次的commit日志，挑选其中的2次commit日志作为调整目标。
+
+**`pick`窗口关闭后，进入rebase模式，显示1/4，表示命令执行时选择了4次commit注释，目前可以修改最早期的一个**
+
+![20181212154009.png](images/20181212154009.png)
+
+- 第二步，修改当前状态下上一条commit注释
+
+```bash
+# 调出注释修改窗口，修改注释
+git commit --amend
+# 调用continue编辑下一个edit
+git rebase --continue
+```
+
+![20181212154620.png](images/20181212154620.png)
+
+**可以看到，`git commit --amend`命令执行完毕后，当前状态下上一条commit已被修改；`git rebase --continue`命令执行完毕后，显示3/4；这是由于我们选择了4条commit中的2条进行edit，修改一条后，跳过中间的pick，到最近的edit。**
+
+- 继续执行第二步的操作，直至完成所有注释的调整，并在最后一次`git rebase --continue`退出。
 
 
 
@@ -309,8 +348,6 @@ git status -s
 ```shell
 git status --ignored
 ```
-
-![](assets/20181212153845.png)
 
 
 
@@ -886,7 +923,7 @@ git bisect log
 
 	当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。
 
-![git-flow.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow.png)
+![git-flow.png](images/git-flow.png)
 
 ### 8.1.1 流程分支解析
 
@@ -900,7 +937,7 @@ git bisect log
 
 #### master分支：
 
-![git-flow-master.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow-master.png)
+![git-flow-master.png](images/git-flow-master.png)
 
 - Git主分支的名字，默认叫做`master`。该分支是自动建立，版本库初始化后，默认就是在主分支。
 
@@ -923,7 +960,7 @@ git push -u origin develop
 
 #### feature分支：
 
-![git-flow-feature.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow-feature.png)
+![git-flow-feature.png](images/git-flow-feature.png)
 
 - `feature`分支基于`develop`分支创建。
 - `feature`分支完成后，必须合并到`develop`分支，合并后一般会删除`feature`分支，但也可以保留。
@@ -955,7 +992,7 @@ git push origin --delete feature/x
 
 #### release分支：
 
-![git-flow-release.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow-release.png)
+![git-flow-release.png](images/git-flow-release.png)
 
 - `release`分支基于`develop`分支创建。
 - 正式版发布之前（即合并到`master`分支之前），我们需要一个预发布的版本进行测试，就是`release`了。
@@ -995,7 +1032,7 @@ git push --tags
 
 #### hotfix分支：
 
-![git-flow-hotfix.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow-hotfix.png)
+![git-flow-hotfix.png](images/git-flow-hotfix.png)
 
 - `hotfix`分支基于`master`分支创建。
 - 创建一个热修复分支，命名规则： hotfix-* 或者 hotfix/* 
@@ -1187,7 +1224,7 @@ git flow hotfix finish 1.0.1
 
 ### 8.2.3 git flow命令合集
 
-![git-flow-commands.png](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Git/images/git-flow-commands.png)
+![git-flow-commands.png](images/git-flow-commands.png)
 
 # 九、GitHub Flow——以部署为中心的开发模式
 
