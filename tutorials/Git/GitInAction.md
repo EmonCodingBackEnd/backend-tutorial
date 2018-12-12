@@ -758,6 +758,14 @@ git reflog
 git reset <commit id>
 ```
 
+- 回退后强制提交到远程分支
+
+```bash
+git push -f <remote> <branchname>
+```
+
+
+
 ## 7.7 设置忽略文件
 
 Git管理的项目，可以在仓库中添加`.gitignore`文件，配置需要忽略管理的文件或者目录。
