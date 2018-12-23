@@ -136,9 +136,18 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/li
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
+使之生效：
 
+```bash
+[emon@emon ~]$ source /etc/profile
+```
 
+7. 校验
 
-
-
+```bash
+[emon@emon ~]$ java -version
+java version "1.8.0_191"
+Java(TM) SE Runtime Environment (build 1.8.0_191-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode)
+```
 
