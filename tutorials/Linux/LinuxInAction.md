@@ -535,7 +535,7 @@ pam_service_name=vsftpd
 userlist_enable=YES
 tcp_wrappers=YES
 
-# 虚拟用户创建文档的umask值
+# 虚拟用户创建文档的umask值【新增】
 anon_umask=022
 # 是否启用虚拟用户，默认值为NO。【新增】
 guest_enable=YES
