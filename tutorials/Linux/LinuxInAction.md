@@ -295,7 +295,7 @@ drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 
 6. 配置环境变量
 
-在`/etc/profile.d`目录创建`.sh`文件：
+在`/etc/profile.d`目录创建`jdk.sh`文件：
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/jdk.sh
