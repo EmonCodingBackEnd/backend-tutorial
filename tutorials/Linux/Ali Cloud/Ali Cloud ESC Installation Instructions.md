@@ -821,6 +821,177 @@ root@127.0.0.1's password:
 vsftpd.csr                                                                 100% 1045     1.0KB/s   00:00    
 ```
 
+4. 在CA主机上签署证书
+
+```bash
+[root@emon ~]# cd /tmp/
+[root@emon tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 365
+Using configuration from /etc/pki/tls/openssl.cnf
+Check that the request matches the signature
+Signature ok
+Certificate Details:
+        Serial Number: 1 (0x1)
+        Validity
+            Not Before: Dec 25 08:04:52 2018 GMT
+            Not After : Dec 25 08:04:52 2019 GMT
+        Subject:
+            countryName               = CN
+            stateOrProvinceName       = ZheJiang
+            organizationName          = HangZhou emon Technologies,Inc.
+            organizationalUnitName    = IT emon
+            commonName                = *.emon.vip
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                9B:16:1C:39:1E:79:FE:6E:E0:6B:2E:24:D0:40:E3:54:A1:19:EC:43
+            X509v3 Authority Key Identifier: 
+                keyid:E4:FA:EF:7B:7B:E5:81:BE:64:CD:F3:7F:F3:D0:72:2C:A1:2E:DD:64
+
+Certificate is to be certified until Dec 25 08:04:52 2019 GMT (365 days)
+Sign the certificate? [y/n]:y
+
+
+1 out of 1 certificate requests certified, commit? [y/n]y
+Write out database with 1 new entries
+Data Base Updated
+```
+
+5. 查看所签署的证书信息
+
+- 方法一
+
+```bash
+[root@emon tmp]# cat /etc/pki/CA/index.txt
+V	191225080452Z		01	unknown	/C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip
+```
+
+`V` ： 表示已经签署的
+
+`01` ： 表示证书序列号
+
+`/C=CN/ST=ZheJiang/O=......`： 表示主题信息
+
+- 方法二
+
+```bash
+[root@emon tmp]# openssl x509 -in /etc/pki/CA/certs/vsftpd.crt -noout -serial -subject
+serial=01
+subject= /C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip
+```
+
+`serial`： 序列号
+
+`subject` ： 主题信息
+
+6. 将CA签署机构的.crt证书发送给服务器
+
+```bash
+[root@emon tmp]# scp /etc/pki/CA/certs/vsftpd.crt root@127.0.0.1:/etc/vsftpd/ssl/
+root@127.0.0.1's password: 
+vsftpd.crt                                                                 100% 5843     5.7KB/s   00:00    
+```
+
+7. 删除服务器和CA主机上签署前的`*.csr`文件，确保安全
+
+CA主机：
+
+```bash
+[root@emon tmp]# rm -rf /tmp/vsftpd.csr 
+```
+
+vsftpd主机：
+
+```bash
+[emon@emon ssl]$ sudo rm -rf /etc/vsftpd/ssl/vsftpd.csr 
+```
+
+8. 配置`vsftpd.conf`
+
+```bash
+# 私有CA证书:证书文件
+rsa_cert_file=/etc/vsftpd/ssl/vsftpd.crt
+# 私有CA证书:RSA私钥文件
+rsa_private_key_file=/etc/vsftpd/ssl/vsftpd.key
+```
+
+### 3.3、方式三：使用公信CA签名证书
+
+其实，方式二已经讲解了如何向CA申请证书，只不过那个是私有CA而已。
+
+步骤如下：
+
+1. 用到证书的服务器生成私钥
+2. 生成证书签署请求
+3. 将请求通过可靠方式发送给CA主机
+
+## 4、 安装sftp服务器
+
+sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp没有单独的守护进程，它必须使用sshd守护进程（默认端口号是22）来完成相应的连接和答复操作。
+
+1. sftp用户和sftp用户组的规划
+
+| 用户      | 所属分组   | 宿主目录                                   |
+| --------- | ---------- | ------------------------------------------ |
+| sftpadmin | sftpadmin  | /fileserver/sftproot/sftpadmin/sftpadmin   |
+| sftpuser1 | sftpnormal | /fileserver/sftproot/sftpnormal/sftpuser1  |
+| sftpuser2 | sftpnormal | /fileserver/sftproot/sftpnormal//sftpuser2 |
+
+- 敲黑板，划重点：
+  - `/sftpadmin`和/`sftpnormal`及上级目录的属主必须是root，否则Chroot会拒绝连接。
+  - `/sftpadmin` 目录规划了高级组的用户组目录；属主是root，属组是sftpadmin。
+  - `/sftpnormal` 目录规划了普通组的用户组目录；属主是root，属组是sftpnormal。
+  - `/sftpadmin` 和`/sftpnormal`的子目录对应sftp用户；属主与属组归具体用户所有。
+
+2. 创建用户组
+
+```bash
+[emon@emon ~]$ sudo groupadd sftpadmin
+[emon@emon ~]$ sudo groupadd sftpnormal
+```
+
+3. 创建用户
+
+创建用户所需目录：
+
+```bash
+[emon@emon ~]$ sudo mkdir -p /fileserver/sftproot/{sftpadmin,sftpnormal}
+```
+
+创建sftp用户：
+
+```bash
+[emon@emon ~]$ sudo useradd -g sftpadmin -d /fileserver/sftproot/sftpadmin/sftpadmin -s /sbin/nologin -c "Sftp User" sftpadmin
+[emon@emon ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser1 -s /sbin/nologin -c "Sftp User" sftpuser1
+[emon@emon ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser2 -s /sbin/nologin -c "Sftp User" sftpuser2
+```
+
+设置密码：
+
+```
+[emon@emon ~]$ sudo passwd sftpadmin
+[emon@emon ~]$ sudo passwd sftpuser1
+[emon@emon ~]$ sudo passwd sftpuser2
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
