@@ -1177,14 +1177,16 @@ An optional company name []:
 
 3. 将请求通过可靠方式发送给CA主机
 
-> [emon@emon ssl]$ sudo scp /etc/vsftpd/ssl/vsftpd.csr root@127.0.0.1:/tmp/
-> The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
-> ECDSA key fingerprint is SHA256:Z9evxGkdmtBGu8pEB1oRNAiy3N32cEbJUL9uK71UTMo.
-> ECDSA key fingerprint is MD5:f0:62:1e:0b:64:61:31:df:f5:46:79:2a:de:45:47:b2.
-> Are you sure you want to continue connecting (yes/no)? yes
-> Warning: Permanently added '127.0.0.1' (ECDSA) to the list of known hosts.
-> root@127.0.0.1's password: 
-> vsftpd.csr                                                                                           100% 1045   829.5KB/s   00:00    
+```bash
+[emon@emon ssl]$ sudo scp /etc/vsftpd/ssl/vsftpd.csr root@127.0.0.1:/tmp/
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:Z9evxGkdmtBGu8pEB1oRNAiy3N32cEbJUL9uK71UTMo.
+ECDSA key fingerprint is MD5:f0:62:1e:0b:64:61:31:df:f5:46:79:2a🇩🇪45:47:b2.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '127.0.0.1' (ECDSA) to the list of known hosts.
+root@127.0.0.1's password: 
+vsftpd.csr                                                                                           100% 1045   829.5KB/s   00:00    
+```
 
 4. 在CA主机上签署证书
 

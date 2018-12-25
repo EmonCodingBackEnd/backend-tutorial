@@ -487,6 +487,362 @@ Available Packages
 openssl.x86_64                   1:1.0.2k-16.el7                        base  
 ```
 
+### 3.1、方式一：使用自签名证书
+
+1. 切换目录
+
+```bash
+[emon@emon ~]$ cd /etc/ssl/certs/
+[emon@emon certs]$ ls
+ca-bundle.crt  ca-bundle.trust.crt  make-dummy-cert  Makefile  renew-dummy-cert
+```
+
+2. 生成RSA私钥和自签名证书
+
+```bash
+[emon@emon certs]$ sudo openssl req -newkey rsa:2048 -nodes -keyout rsa_private.key -x509 -days 365 -out cert.crt
+[sudo] password for emon: 
+Generating a 2048 bit RSA private key
+..........+++
+....+++
+writing new private key to 'rsa_private.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:ZheJiang
+Locality Name (eg, city) [Default City]:HangZhou
+Organization Name (eg, company) [Default Company Ltd]:HangZhou emon Technologies,Inc.
+Organizational Unit Name (eg, section) []:IT emon
+Common Name (eg, your name or your server's hostname) []:*.emon.vip
+Email Address []:
+```
+
+3. 查看生成的RSA私钥和自签名证书
+
+```bash
+[emon@emon certs]$ ls
+ca-bundle.crt  ca-bundle.trust.crt  cert.crt  make-dummy-cert  Makefile  renew-dummy-cert  rsa_private.key
+```
+
+4. 配置`vsftpd.conf`
+
+```bash
+[emon@emon certs]$ sudo vim /etc/vsftpd/vsftpd.conf
+```
+
+```bash
+# ssl config
+# 是否使用ssl
+ssl_enable=YES
+# 是否允许匿名用户使用ssl
+allow_anon_ssl=NO
+# 强制本地用户登录使用ssl
+force_local_logins_ssl=YES
+# 强制本地用户数据使用ssl传输
+force_local_data_ssl=YES
+# 强制匿名/虚拟用户登录使用ssl
+force_anon_logins_ssl=YES
+# 强制匿名/虚拟用户数据使用ssl传输
+force_anon_data_ssl=YES
+# 允许 TLS v1 协议连接
+ssl_tlsv1=YES
+# 允许 SSL v2 协议连接
+ssl_sslv2=YES
+# 开启sslv3
+ssl_sslv3=YES
+
+# 是否启用隐式SSL功能，不建议开启，而且默认是关闭的
+implicit_ssl=NO
+# 隐式ftp端口设置，如果不设置，默认还是21，但是当客户端以隐式SSL连接时，默认会使用990端口，导致连接失败！！！
+# listen_port=990
+# 输出SSL相关的日志信息
+# debug_ssl=YES
+# Disable SSL session reuse(required by WinSCP)
+require_ssl_reuse=NO
+# Select which SSL ciphers vsftpd will allow for encrypted SSL connections（required by FileZilla）
+ssl_ciphers=HIGH
+# 自签证书：证书文件
+rsa_cert_file=/etc/ssl/certs/cert.crt
+# 自签证书：RSA私钥文件
+rsa_private_key_file=/etc/ssl/certs/rsa_private.key
+```
+
+ssl有显式`explicit`和隐式`implicit`之分：
+
+- 显式配置
+
+```
+implicit_ssl=NO
+```
+
+- 隐式配置
+
+```
+implicit_ssl=YES
+listen_port=990
+```
+
+5. 重启vsftpd服务
+
+```bash
+[emon@emon certs]$ sudo systemctl restart vsftpd
+```
+
+6. 校验
+
+对于ftps的校验，无法使用ftp命令校验了：
+
+```bash
+[emon@emon certs]$ ftp 127.0.0.1
+Connected to 127.0.0.1 (127.0.0.1).
+220 Welcome to emon FTP service.
+Name (127.0.0.1:emon): ftp
+530 Anonymous sessions must use encryption.
+Login failed.
+421 Service not available, remote server has closed connection
+ftp> 
+```
+
+**需要安装lftp校验**
+
+如果是显式`explicit` 的ftps，还可以使用lftp测试：
+
+- 安装lftp
+
+```bash
+[emon@emon certs]$ sudo yum install -y lftp
+[emon@emon certs]$ lftp ftp@127.0.0.1:21
+Password: 
+lftp ftp@127.0.0.1:~> ls          
+ls: Fatal error: Certificate verification: Not trusted
+lftp ftp@127.0.0.1:~> 
+```
+
+- 编辑`/etc/lftp.conf`
+
+打开文件后，在最后一行追加如下内容：
+
+```bash
+[emon@emon certs]$ sudo vim /etc/lftp.conf 
+```
+
+```bash
+# 个人配置
+set ssl:verify-certificate no
+```
+
+再次校验：
+
+```bash
+[emon@emon certs]$ lftp ftp@127.0.0.1:21
+Password: 
+lftp ftp@127.0.0.1:~> ls          
+-rw-r--r--    1 1001     1001         1006 Dec 23 20:06 index.html
+drwxr-xr-x    2 1001     1001         4096 Dec 23 20:15 test
+lftp ftp@127.0.0.1:/> 
+```
+
+如果是隐式的ftps，lftp就无法校验了，除非lftp是` compiled with OpenSSL (configure --with-openssl)`：
+
+```bash
+[emon@emon certs]$ lftp ftp@127.0.0.1:990
+Password: 
+lftp ftp@127.0.0.1:~> ls
+`ls' at 0 [FEAT negotiation...]
+```
+
+怎么办呢？ **推荐使用Windows操作系统的FlashFXP软件验证。**
+
+### 3.2、方式二：使用私有CA签名证书
+
+私有CA签名证书的使用与自签名证书一样的，这里不再赘述，主要讲解如何生成私有CA签名证书。
+
+#### 相关知识点
+
+> - 证书签发机构CA
+>
+>   - 公共信任CA
+>
+>     大范围维护大量证书企业使用OpenCA（对openssl进行了二次封装，更加方便使用）
+>
+>   - 私有CA
+>
+>     小范围测试使用openssl
+>
+> - openssl配置文件
+>
+>   > /etc/pki/tls/openssl.cnf
+
+#### 3.2.1、创建私有证书签发机构CA步骤
+
+在确定配置为CA的服务器主机上生成一个自签证书，并为CA提供所需要的目录及文件。在真正的通信过程中CA服务器主机不需要网络参与，只需要参与到签名中，不需要提供服务。
+
+1. 生成私钥
+
+因为在默认配置文件中CA自己的私钥配置在`/etc/pki/CA/private/cakey.pem`，所以指定目录和文件名要和配置文件一致。
+
+```bash
+[emon@emon certs]$ sudo bash -c "umask 077;openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096"
+[sudo] password for emon: 
+Generating RSA private key, 4096 bit long modulus
+..............................................................................................................................................................................................++
+...++
+e is 65537 (0x10001)
+[emon@emon certs]$ sudo ls -l /etc/pki/CA/private/cakey.pem
+-rw-------. 1 root root 3247 Dec 25 14:07 /etc/pki/CA/private/cakey.pem
+```
+
+2. 生成CA自签证书
+
+```bash
+[emon@emon certs]$ sudo openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3655
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:ZheJiang
+Locality Name (eg, city) [Default City]:HangZhou
+Organization Name (eg, company) [Default Company Ltd]:HangZhou emon Technologies,Inc.
+Organizational Unit Name (eg, section) []:IT emon
+Common Name (eg, your name or your server's hostname) []:*.emon.vip
+Email Address []:
+```
+
+命令解释：
+
+- `/etc/pki/CA/cacert.pem` : CA自签证书默认位置
+- `-new` : 生成新证书签署请求
+- `-x509` ： 生成自签格式证书，专用于创建私有CA时
+- `-key` ： 生成请求时用到的私有文件路径
+- `-out` ： 生成的请求文件路径，如果自签操作将直接生成签署过的证书
+- `-days` ： 证书的有效时长，单位是day
+
+注意：
+
+- `-key /etc/pki/CA/private/cakey.pem` 指明的是私钥的位置，只是因为此处会自动抽取出私钥中的公钥。
+- req只能发起签署请求，需要加-x509参数实现自己发出请求，自己签署。非自签无需此参数。
+
+1. 为CA提供所需的目录及文件
+
+当不存在时需要创建签发证书、吊销证书、新证书目录
+
+```bash
+[emon@emon certs]$ sudo mkdir -pv /etc/pki/CA/{certs,crl,newcerts}
+```
+
+创建证书序列号文件、证书索引文件
+
+```bash
+[emon@emon certs]$ sudo touch /etc/pki/CA/{serial,index.txt}
+```
+
+第一次创建的时候需要给予证书序列号
+
+```bash
+[emon@emon certs]$ echo 01 | sudo tee /etc/pki/CA/serial
+01
+```
+
+#### 3.2.2、OpenSSL：服务申请证书签署实现SSL安全通信
+
+要用到证书进行安全通信的服务器，需要向CA请求签署证书，需要签署的服务无需和CA证书签署机构主机在同一台服务器上。
+
+1. 用到证书的服务器生成私钥
+
+生成vsftpd服务的私钥创建时候无需在`/etc/pki/CA/private`目录创建，该目录仅在创建CA主机时需要的。
+
+```bash
+[emon@emon certs]$ sudo mkdir /etc/vsftpd/ssl
+[emon@emon certs]$ cd /etc/vsftpd/ssl/
+[emon@emon ssl]$ sudo bash -c "umask 077; openssl genrsa -out /etc/vsftpd/ssl/vsftpd.key 2048"
+[sudo] password for emon: 
+Generating RSA private key, 2048 bit long modulus
+....................+++
+......+++
+e is 65537 (0x10001)
+```
+
+2. 生成证书签署请求
+
+```bash
+[emon@emon ssl]$ sudo openssl req -new -key /etc/vsftpd/ssl/vsftpd.key -out /etc/vsftpd/ssl/vsftpd.csr -days 365
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:ZheJiang
+Locality Name (eg, city) [Default City]:HangZhou
+Organization Name (eg, company) [Default Company Ltd]:HangZhou emon Technologies,Inc.
+Organizational Unit Name (eg, section) []:IT emon
+Common Name (eg, your name or your server's hostname) []:*.emon.vip
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+```
+
+命令解释：
+
+- `*.csr` ： 表示证书签署请求文件
+- 要保证和签署机构CA签署机构信息一致
+
+生成签名请求时，有两项额外的信息需要填写：
+
+| 字段                     | 说明           | 示例     |
+| ------------------------ | -------------- | -------- |
+| A challenge password     | 高强度的密码   | 无需填写 |
+| An optional company name | 可选的公司名称 | 无需填写 |
+
+3. 将请求通过可靠方式发送给CA主机
+
+```bash
+[emon@emon ssl]$ sudo scp /etc/vsftpd/ssl/vsftpd.csr root@127.0.0.1:/tmp/
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ECDSA key fingerprint is f6:d2:07:f7:60:71:5f:30:2c:e3:21:b6:bc:ab:6a:a2.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '127.0.0.1' (ECDSA) to the list of known hosts.
+root@127.0.0.1's password: 
+vsftpd.csr                                                                 100% 1045     1.0KB/s   00:00    
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
