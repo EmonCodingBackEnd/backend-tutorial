@@ -1191,7 +1191,7 @@ vsftpd.csr                                                                      
 4. 在CA主机上签署证书
 
 ```bash
-[emon@emon ssl]$ cd /tmp/
+[root@emon ~]# cd /tmp/
 [root@emon tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 365
 Using configuration from /etc/pki/tls/openssl.cnf
 Check that the request matches the signature
