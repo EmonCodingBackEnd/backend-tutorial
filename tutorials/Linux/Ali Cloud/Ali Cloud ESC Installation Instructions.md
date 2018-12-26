@@ -971,7 +971,7 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 
 设置密码：
 
-```
+```bash
 [emon@emon ~]$ sudo passwd sftpadmin
 [emon@emon ~]$ sudo passwd sftpuser1
 [emon@emon ~]$ sudo passwd sftpuser2
@@ -1009,7 +1009,7 @@ drwx------. 2 sftpuser2 sftpnormal 4096 Dec 25 17:09 sftpuser2
 
 在文件末尾追加sftp的配置
 
-```
+```bash
 # 个人配置
 Subsystem   sftp    internal-sftp
 Match Group sftpadmin
@@ -1024,7 +1024,7 @@ Match Group sftpnormal
 
 5. 重启`sshd`
 
-```
+```bash
 [emon@emon ~]$ sudo systemctl restart sshd
 ```
 
@@ -1049,11 +1049,188 @@ test
 sftp> 
 ```
 
+## 5、安装Nginx
 
+1. 下载
 
+下载页： <http://nginx.org/en/download.html>
 
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ http://nginx.org/download/nginx-1.14.2.tar.gz
+```
 
+2. 依赖检查与安装
 
+```bash
+[emon@emon ~]$ yum list gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
+[emon@emon ~]$ sudo yum -y install gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
+```
+
+3. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Nginx
+```
+
+4. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/nginx-1.14.2.tar.gz -C /usr/local/Nginx/
+```
+
+5. 执行配置脚本，并编译安装
+
+- 切换目录并执行配置脚本生成Makefile
+
+```bash
+[emon@emon ~]$ cd /usr/local/Nginx/nginx-1.14.2/
+[emon@emon nginx-1.14.2]$ ./configure --prefix=/usr/local/Nginx/nginx1.14.2/ --with-http_ssl_module
+```
+
+命令解释： `--with-http_ssl_module`指定编译时支持ssl，为Nginx代理时https准备。
+
+- 编译
+
+```bash
+[emon@emon nginx-1.14.2]$ make
+```
+
+- 安装
+
+```bash
+[emon@emon nginx-1.14.2]$ make install
+[emon@emon nginx-1.14.2]$ cd 
+[emon@emon ~]$ ls /usr/local/Nginx/nginx1.14.2/
+conf  html  logs  sbin
+```
+
+6. 备份主配置文件`nginx.conf`
+
+```bash
+[emon@emon ~]$ cp -a /usr/local/Nginx/nginx1.14.2/conf/nginx.conf /usr/local/Nginx/nginx1.14.2/conf/nginx.conf.bak
+```
+
+7. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Nginx/nginx1.14.2/ /usr/local/nginx
+```
+
+8. 配置环境变量【特殊】
+
+由于nginx启动的是1024以下的端口，需要root权限，而sudo又不能引用`/etc/profile`和`~/.bash_rc`配置
+
+的环境变量，就会导致`sudo: nginx: command not found`。
+
+所以，采用软连接的方式：
+
+```bash
+[emon@emon ~]$ sudo ln -s /usr/local/nginx/sbin/nginx /usr/sbin/nginx
+```
+
+9. 校验
+
+```bash
+[emon@emon ~]$ nginx -V
+nginx version: nginx/1.14.2
+built by gcc 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC) 
+built with OpenSSL 1.0.2k-fips  26 Jan 2017
+TLS SNI support enabled
+configure arguments: --prefix=/usr/local/Nginx/nginx1.14.2/ --with-http_ssl_module
+[emon@emon ~]$ nginx -v
+nginx version: nginx/1.14.2
+```
+
+10. 配置`nginx.conf`
+
+```
+[emon@emon ~]$ vim /usr/local/nginx/conf/nginx.conf
+```
+
+打开文件，找到`HTTPS server`上一行，大约95行，添加如下内容：
+
+```
+    include vhost/*.conf;
+```
+
+创建文件夹`vhost` ：
+
+```
+[emon@emon ~]$ mkdir /usr/local/nginx/conf/vhost
+```
+
+创建一个虚拟主机，映射到ftp服务器目录（与ftp提供的服务无关，是Nginx代理的访问方式）：
+
+```bash
+[emon@emon ~]$ vim /usr/local/nginx/conf/vhost/file.empn.vip.conf
+```
+
+```bash
+server {
+    listen 80;
+    autoindex on;
+    server_name 39.107.97.197;
+    access_log /usr/local/nginx/logs/access.log combined;
+    index index.html index.htm index.jsp index.php;
+    #error_page 404 /404.html;
+    if ( $query_string ~* ".*[\;'\<\>].*" ){
+        return 404;
+    }
+
+    location / {
+        root /fileserver/ftproot;
+        add_header Access-Control-Allow-Origin *;
+    }
+}
+```
+
+11. 测试、启动、重新加载、停止
+
+- 测试
+
+`-t` Nginx服务器配置文件是否有语法错误，可以与`-c`一起使用，使输出内容更详细，这对查找配置文件中错误语法很有帮助。
+
+```bash
+[emon@emon ~]$ sudo nginx -t -c /usr/local/nginx/conf/nginx.conf
+[sudo] password for emon: 
+nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok
+nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ sudo nginx
+```
+
+- 重新加载
+
+```bash
+[emon@emon ~]$ sudo nginx -s reload
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ sudo nginx -s quit
+```
+
+12. 开放端口
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+success
+[emon@emon ~]$ sudo firewall-cmd --reload
+success
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+61001-62000/tcp 80/tcp 20-21/tcp
+```
+
+13. 访问
+
+http://39.107.97.197
+
+## 6、安装MySQL
 
 
 

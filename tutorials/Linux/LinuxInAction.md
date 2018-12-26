@@ -1446,7 +1446,7 @@ sftp>
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon nginx-1.14.0]$ cd /usr/local/Nginx/nginx-1.14.0/
+[emon@emon ~]$ cd /usr/local/Nginx/nginx-1.14.0/
 [emon@emon nginx-1.14.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.14.0 --with-http_ssl_module
 ```
 
@@ -1485,7 +1485,7 @@ conf  html  logs  sbin
 
 的环境变量，就会导致`sudo: nginx: command not found`。
 
-	所以，采用软连接的方式：
+所以，采用软连接的方式：
 
 ```bash
 [emon@emon ~]$ sudo ln -s /usr/local/nginx/sbin/nginx /usr/sbin/nginx
