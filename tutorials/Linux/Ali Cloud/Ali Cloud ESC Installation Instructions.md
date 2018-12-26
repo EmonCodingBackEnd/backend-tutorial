@@ -1232,6 +1232,102 @@ http://39.107.97.197
 
 ## 6、安装MySQL
 
+1. 检查是否安装
+
+```
+[emon@emon ~]$ rpm -qa|grep mysql
+```
+
+2. 下载
+
+下载页地址： <https://dev.mysql.com/downloads/mysql/>
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-8.0.13-linux-glibc2.12-x86_64.tar.xz
+```
+
+3. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/MySQL
+```
+
+4. 解压安装
+
+```bash
+[emon@emon ~]$ tar -Jxvf /usr/local/src/mysql-8.0.13-linux-glibc2.12-x86_64.tar.xz -C /usr/local/MySQL/
+```
+
+5. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.13-linux-glibc2.12-x86_64/ /usr/local/mysql
+```
+
+6. 配置环境变量
+
+在`/etc/profile.d`目录创建`mysql.sh`文件：
+
+```
+[emon@emon ~]$ sudo vim /etc/profile.d/mysql.sh
+export PATH=/usr/local/mysql/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+7. 数据库目录规划
+
+```bash
+# 多版本安装
+[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql8.0.13
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.13/ /data/mysql
+```
+
+| 文件说明                      | 软连接位置                                | 实际存储位置                  |
+| ----------------------------- | ----------------------------------------- | ----------------------------- |
+| 数据datadir                   | /usr/local/mysql/data                     | /data/mysql/data              |
+| 二进制日志log-bin             | /usr/local/mysql/binlogs/mysql-bin        | /data/mysql/binlogs/mysql-bin |
+| 错误日志log-error             | /usr/local/mysql/log/mysql_error.log      | /data/mysql/log               |
+| 慢查询日志slow_query_log_file | /usr/local/mysql/log/mysql_slow_query.log | /data/mysql/log               |
+| 参考文件my.cnf                | /usr/local/mysql/etc/my.cnf               | /data/mysql/etc               |
+| 套接字socket文件              | /usr/local/mysql/run/mysql.sock           | /data/mysql/run               |
+| pid文件                       | /usr/local/mysql/run/mysql.pid            | /data/mysql/run               |
+
+备注：考虑到数据和二进制日志比较大，需要软链接：
+
+```bash
+[emon@emon ~]$ sudo mkdir -p /data/mysql/{data,binlogs,log,etc,run}
+[emon@emon ~]$ sudo ln -s /data/mysql/data /usr/local/mysql/data
+[emon@emon ~]$ sudo ln -s /data/mysql/binlogs /usr/local/mysql/binlogs
+[emon@emon ~]$ sudo ln -s /data/mysql/log /usr/local/mysql/log
+[emon@emon ~]$ sudo ln -s /data/mysql/etc /usr/local/mysql/etc
+[emon@emon ~]$ sudo ln -s /data/mysql/run /usr/local/mysql/run
+```
+
+创建mysql用户，为`/data/mysql`和`/usr/local/mysql/{data,binlogs,log,etc,run}`赋权：
+
+```bash
+[emon@emon ~]$ sudo useradd -s /sbin/nologin -M -c "MySQL User" mysql
+[emon@emon ~]$ sudo chown -R mysql.mysql /data/mysql/
+[emon@emon ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
