@@ -1316,7 +1316,7 @@ export PATH=/usr/local/mysql/bin:$PATH
 [emon@emon ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
 ```
 
-
+8. 配置`my.cnf`
 
 
 
