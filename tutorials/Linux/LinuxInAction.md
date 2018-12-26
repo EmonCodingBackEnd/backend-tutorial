@@ -1308,9 +1308,10 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 
 - 敲黑板，划重点：
   - `/sftpadmin`和/`sftpnormal`及上级目录的属主必须是root，否则Chroot会拒绝连接。
-  - `/sftpadmin` 目录规划了高级组的用户组目录；属主是root，属组是sftpadmin。
-  - `/sftpnormal` 目录规划了普通组的用户组目录；属主是root，属组是sftpnormal。
-  - `/sftpadmin` 和`/sftpnormal`的子目录对应sftp用户；属主与属组归具体用户所有。
+  - `/sftpadmin` 目录规划了高级组的用户组目录；属主是root，属组是root。
+  - `/sftpnormal` 目录规划了普通组的用户组目录；属主是root，属组是root。
+  - `/sftpadmin`的子目录对应sftp高级组用户的宿主目录，属主是具体用户，属组是`sftpadmin`
+  - `/sftpnormal`的子目录对应sftp普通组用户的宿主目录，属主是具体用户，属组是`sftpnormal`
 
 2. 创建用户组
 
