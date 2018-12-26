@@ -1631,7 +1631,7 @@ http://192.168.1.116/
 
 6. 配置环境变量
 
-在`/etc/profile.d`目录创建`.sh`文件： 
+在`/etc/profile.d`目录创建`mysql.sh`文件： 
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/mysql.sh
