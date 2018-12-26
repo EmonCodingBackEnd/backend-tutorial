@@ -941,9 +941,10 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 
 - 敲黑板，划重点：
   - `/sftpadmin`和/`sftpnormal`及上级目录的属主必须是root，否则Chroot会拒绝连接。
-  - `/sftpadmin` 目录规划了高级组的用户组目录；属主是root，属组是sftpadmin。
-  - `/sftpnormal` 目录规划了普通组的用户组目录；属主是root，属组是sftpnormal。
-  - `/sftpadmin` 和`/sftpnormal`的子目录对应sftp用户；属主与属组归具体用户所有。
+  - `/sftpadmin` 目录规划了高级组的用户组目录；属主是root，属组是root。
+  - `/sftpnormal` 目录规划了普通组的用户组目录；属主是root，属组是root。
+  - `/sftpadmin`的子目录对应sftp高级组用户的宿主目录，属主是具体用户，属组是`sftpadmin`
+  - `/sftpnormal`的子目录对应sftp普通组用户的宿主目录，属主是具体用户，属组是`sftpnormal`
 
 2. 创建用户组
 
@@ -975,6 +976,114 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 [emon@emon ~]$ sudo passwd sftpuser1
 [emon@emon ~]$ sudo passwd sftpuser2
 ```
+
+查看权限：
+
+```bash
+[emon@emon ~]$ ll /fileserver/sftproot/
+total 8
+drwxr-xr-x. 3 root root 4096 Dec 25 17:09 sftpadmin
+drwxr-xr-x. 4 root root 4096 Dec 25 17:09 sftpnormal
+[emon@emon ~]$ ll /fileserver/sftproot/sftpadmin/
+total 4
+drwx------. 2 sftpadmin sftpadmin 4096 Dec 25 17:09 sftpadmin
+[emon@emon ~]$ ll /fileserver/sftproot/sftpnormal/
+total 8
+drwx------. 2 sftpuser1 sftpnormal 4096 Dec 25 17:09 sftpuser1
+drwx------. 2 sftpuser2 sftpnormal 4096 Dec 25 17:09 sftpuser2
+```
+
+可以看到，用户目录`sftpadmin`、 `sftpuser1`、`sftpuser2` 的权限是700，它们的上级目录权限是755。
+
+4. 配置`sshd_config`
+
+```bash
+[emon@emon ~]$ sudo vim /etc/ssh/sshd_config
+```
+
+注释掉下面这一行：
+
+```
+# Subsystem   sftp    /usr/libexec/openssh/sftp-server
+```
+
+在文件末尾追加sftp的配置
+
+```
+# 个人配置
+Subsystem   sftp    internal-sftp
+Match Group sftpadmin
+       ForceCommand internal-sftp
+       ChrootDirectory /fileserver/sftproot/sftpadmin
+Match Group sftpnormal
+       X11Forwarding no
+       AllowTcpForwarding no
+       ForceCommand internal-sftp
+       ChrootDirectory /fileserver/sftproot/sftpnormal
+```
+
+5. 重启`sshd`
+
+```
+[emon@emon ~]$ sudo systemctl restart sshd
+```
+
+6. 校验
+
+```bash
+[emon@emon ~]$ sftp sftpadmin@127.0.0.1
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ECDSA key fingerprint is f6:d2:07:f7:60:71:5f:30:2c:e3:21:b6:bc:ab:6a:a2.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '127.0.0.1' (ECDSA) to the list of known hosts.
+sftpadmin@127.0.0.1's password: 
+Connected to 127.0.0.1.
+sftp> ls
+sftpadmin   
+sftp> cd sftpadmin/
+sftp> pwd
+Remote working directory: /sftpadmin
+sftp> mkdir test
+sftp> ls
+test  
+sftp> 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
