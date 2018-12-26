@@ -1318,17 +1318,13 @@ export PATH=/usr/local/mysql/bin:$PATH
 
 8. 配置`my.cnf`
 
+备份移除系统自带的my.cnf文件：
 
+```
+[emon@emon ~]$ sudo mv /etc/my.cnf /etc/my.cnf.bak
+```
 
-
-
-
-
-
-
-
-
-
+在`/usr/local/mysql/etc/`下创建`my.cnf`文件并配置如下：
 
 
 
