@@ -1326,15 +1326,70 @@ export PATH=/usr/local/mysql/bin:$PATH
 
 在`/usr/local/mysql/etc/`下创建`my.cnf`文件并配置如下：
 
+```bash
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+```
 
+```bash
+[client]
+port = 3306
+socket = /usr/local/mysql/run/mysql.sock
 
+[mysqld]
+port = 3306
+socket = /usr/local/mysql/run/mysql.sock
+pid_file = /usr/local/mysql/run/mysql.pid
+basedir = /usr/local/mysql
+datadir = /usr/local/mysql/data
+default_storage_engine = InnoDB
+max_allowed_packet = 512M
+max_connections = 2048
+open_files_limit = 65535
 
+skip-name-resolve
+lower_case_table_names=1
 
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+init_connect='SET NAMES utf8mb4'
 
+innodb_buffer_pool_size = 1024M
+innodb_log_file_size = 2048M
+innodb_file_per_table = 1
+innodb_flush_log_at_trx_commit = 0
 
+key_buffer_size = 64M
 
+log-error = /usr/local/mysql/log/mysql_error.log
+slow_query_log = 1
+slow_query_log_file = /usr/local/mysql/log/mysql_slow_query.log
+long_query_time = 5
 
+tmp_table_size = 32M
+max_heap_table_size = 32M
+# 考虑到MySQL8移除了Query cache “Query cache was deprecated in MySQL 5.7 and removed in MySQL 8.0 (and later).”，这里注释掉关于Query cache的配置
+# query_cache_type = 0
+# query_cache_size = 0
 
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = mixed
+server-id=1
+```
+
+9. 初始化数据库
+
+```bash
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
+```
+
+在日志文件里会提示一个临时密码，记录这个密码：
+
+```bash
+[emon@emon ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log
+2018-12-27T02:20:59.805287Z 5 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: cNpYg(4CgW8t
+```
+
+10. 生成SSL
 
 
 
