@@ -1389,15 +1389,223 @@ server-id=1
 2018-12-27T02:20:59.805287Z 5 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: cNpYg(4CgW8t
 ```
 
-10. 生成SSL
+10. 生成SSL【未提示输出信息，记录】
+
+```bash
+[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
+```
+
+11. 设置启动项
+
+```bash
+[emon@emon ~]$ sudo vim /usr/lib/systemd/system/mysqld.service
+```
+
+```bash
+# Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+#
+# systemd service file for MySQL forking server
+#
+
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+
+Type=forking
+
+PIDFile=/usr/local/mysql/run/mysqld.pid
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Execute pre and post scripts as root
+PermissionsStartOnly=true
+
+# Needed to create system tables
+#ExecStartPre=/usr/bin/mysqld_pre_systemd
+
+# Start main service
+# ExecStart=/usr/local/mysql/bin/mysqld --daemonize --pid-file=/usr/local/mysql/run/mysqld.pid $MYSQLD_OPTS
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --daemonize --pid-file=/usr/local/mysql/run/mysqld.pid $MYSQLD_OPTS
+
+# Use this to switch malloc implementation
+EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 65535
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+PrivateTmp=false
+```
+
+加载启动项：
+
+```bash
+[emon@emon ~]$ sudo systemctl daemon-reload
+```
+
+12. 启动mysql
+
+```bash
+[emon@emon ~]$ sudo systemctl start mysqld.service
+```
+
+13. 初始化mysql服务程序
+
+```bash
+[emon@emon ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
+
+Securing the MySQL server deployment.
+
+Enter password for user root: 
+
+The existing password for the user account root has expired. Please set a new password.
+
+New password: 
+
+Re-enter new password: 
+
+VALIDATE PASSWORD COMPONENT can be used to test passwords
+and improve security. It checks the strength of password
+and allows the users to set only those passwords which are
+secure enough. Would you like to setup VALIDATE PASSWORD component?
+
+Press y|Y for Yes, any other key for No: y
+
+There are three levels of password validation policy:
+
+LOW    Length >= 8
+MEDIUM Length >= 8, numeric, mixed case, and special characters
+STRONG Length >= 8, numeric, mixed case, special characters and dictionary                  file
+
+Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG: 2
+Using existing password for root.
+
+Estimated strength of the password: 100 
+Change the password for root ? ((Press y|Y for Yes, any other key for No) : n
+
+ ... skipping.
+By default, a MySQL installation has an anonymous user,
+allowing anyone to log into MySQL without having to have
+a user account created for them. This is intended only for
+testing, and to make the installation go a bit smoother.
+You should remove them before moving into a production
+environment.
+
+Remove anonymous users? (Press y|Y for Yes, any other key for No) : y
+Success.
 
 
+Normally, root should only be allowed to connect from
+'localhost'. This ensures that someone cannot guess at
+the root password from the network.
+
+Disallow root login remotely? (Press y|Y for Yes, any other key for No) : y
+Success.
+
+By default, MySQL comes with a database named 'test' that
+anyone can access. This is also intended only for testing,
+and should be removed before moving into a production
+environment.
 
 
+Remove test database and access to it? (Press y|Y for Yes, any other key for No) : y
+ - Dropping test database...
+Success.
 
+ - Removing privileges on test database...
+Success.
 
+Reloading the privilege tables will ensure that all changes
+made so far will take effect immediately.
 
+Reload privilege tables now? (Press y|Y for Yes, any other key for No) : y
+Success.
 
+All done! 
+```
+
+14. 测试
+
+```bash
+[emon@emon ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+```
+
+查看变量：
+
+```bash
+[emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
+541
+```
+
+登录：
+
+```bash
+[emon@emon ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+mysql> select user,host from mysql.user;
++------------------+-----------+
+| user             | host      |
++------------------+-----------+
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| root             | localhost |
++------------------+-----------+
+4 rows in set (0.00 sec)
+```
+
+停止：
+
+```bash
+[emon@emon ~]$ sudo systemctl stop mysqld
+```
+
+15. 开放端口
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp
+success
+[emon@emon ~]$ sudo firewall-cmd --reload
+success
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+61001-62000/tcp 80/tcp 20-21/tcp 3306/tcp
+```
+
+## 7、安装Git
+
+1. 检查安装情况
+
+```bash
+[emon@emon ~]$ yum list git|tail -n 2
+Available Packages
+git.x86_64                        1.8.3.1-20.el7                         updates
+```
 
 
 
