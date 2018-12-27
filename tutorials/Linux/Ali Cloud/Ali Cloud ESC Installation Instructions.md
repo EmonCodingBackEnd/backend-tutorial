@@ -1607,17 +1607,191 @@ Available Packages
 git.x86_64                        1.8.3.1-20.el7                         updates
 ```
 
+2. 下载
 
+下载地址： <https://www.kernel.org/pub/software/scm/git/>
 
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.20.1.tar.gz
+```
 
+3. 依赖检查与安装
 
+```bash
+[emon@emon ~]$ yum list gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+[emon@emon ~]$ sudo yum install -y gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+```
 
+4. 创建解压目录
 
+```bash
+[emon@emon ~]$ mkdir /usr/local/Git
+```
 
+5. 解压
 
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.20.1.tar.gz -C /usr/local/Git/
+```
 
+6. 执行配置脚本，并编译安装
 
+- 切换目录并执行脚本
 
+```bash
+[emon@emon ~]$ cd /usr/local/Git/git-2.20.1/
+[emon@emon git-2.20.1]$ ./configure --prefix=/usr/local/Git/git2.20.1/
+```
+
+- 编译
+
+```bash
+[emon@emon git-2.20.1]$ make
+```
+
+- 安装
+
+```bash
+[emon@emon git-2.20.1]$ make install
+[emon@emon git-2.20.1]$ cd
+[emon@emon ~]$ ls /usr/local/Git/git2.20.1/
+bin  libexec  share
+```
+
+7. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Git/git2.20.1/ /usr/local/git
+```
+
+8. 配置环境变量
+
+```
+[emon@emon ~]$ sudo vim /etc/profile.d/git.sh
+export GIT_HOME=/usr/local/git
+export GIT_EDITOR=vim
+export PATH=$GIT_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+9. 设置账户信息
+
+```bash
+[emon@emon ~]$ git config --global user.name "emon"
+[emon@emon ~]$ git config --global user.email "[邮箱]"
+```
+
+10. 配置SSH信息
+
+- 检查SSH keys是否存在：
+
+```
+[emon@emon ~]$ ls -a ~/.ssh/
+.  ..  known_hosts
+```
+
+- 如果不存在，生成SSH keys：
+
+```bash
+[emon@emon ~]$ ssh-keygen -t rsa -b 4096 -C "liming20110711@163.com"
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/emon/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/emon/.ssh/id_rsa.
+Your public key has been saved in /home/emon/.ssh/id_rsa.pub.
+The key fingerprint is:
+21:e2:c0:6c:a7:51:ed:dd:84:93:68:49:cb:2f:8a:ea liming20110711@163.com
+The key's randomart image is:
++--[ RSA 4096]----+
+|    .o.o o       |
+| o . .=.+ .      |
+|  * oo+..+       |
+| . * ..o...      |
+|  . . . S        |
+|   . . .         |
+|  . .            |
+| .               |
+|oE               |
++-----------------+
+```
+
+- 配置自动加载ssh-agent：
+
+把下面的内容放入`~/.bashrc`或`~/.bash_profile` 即可。
+
+```
+[emon@emon ~]$ vim ~/.bash_profile 
+```
+
+以下是关于SSH keys中私钥加载到ssh-agent的自动配置，无需每次登陆配置。
+
+```
+#以下是关于SSH keys中私钥加载到ssh-agent的自动配置，无需每次登陆配置
+env=~/.ssh/agent.env
+
+agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
+
+agent_start () {
+    (umask 077; ssh-agent >| "$env")
+    . "$env" >| /dev/null ; }
+
+agent_load_env
+
+# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2= agent not running
+agent_run_state=$(ssh-add -l >| /dev/null 2>&1; echo $?)
+
+if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
+    agent_start
+    ssh-add
+elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
+    ssh-add
+fi
+
+unset env
+```
+
+- 拷贝公钥到GitHub上【需要有GitHub账户才可以配置】
+
+```
+[emon@emon ~]$ cat ~/.ssh/id_rsa.pub
+```
+
+拷贝了公钥，打开GitHub配置SSH keys的页面： <https://github.com/settings/keys> 【Settings->SSH and GPG keys->New SSH key->写入Title，粘贴Key】
+
+| Title           | Key                |
+| --------------- | ------------------ |
+| aliyun-emon-rsa | 【刚才拷贝的公钥】 |
+
+点击Add SSH key，确定添加。
+
+- 验证SSH连接
+
+```bash
+[emon@emon ~]$ ssh -T git@github.com
+The authenticity of host 'github.com (13.250.177.223)' can't be established.
+RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'github.com,13.250.177.223' (RSA) to the list of known hosts.
+Enter passphrase for key '/home/emon/.ssh/id_rsa': 
+Hi Rushing0711! You've successfully authenticated, but GitHub does not provide shell access.
+[emon@emon ~]$ ls -a ~/.ssh/
+.  ..  id_rsa  id_rsa.pub  known_hosts
+```
+
+11. 校验
+
+```bash
+[emon@emon ~]$ git --version
+git version 2.20.1
+```
+
+## 8、安装Python
 
 
 
