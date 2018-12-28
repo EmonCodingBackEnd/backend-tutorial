@@ -1690,7 +1690,7 @@ export PATH=$GIT_HOME/bin:$PATH
 
 - 检查SSH keys是否存在：
 
-```
+```bash
 [emon@emon ~]$ ls -a ~/.ssh/
 .  ..  known_hosts
 ```
@@ -1725,13 +1725,13 @@ The key's randomart image is:
 
 把下面的内容放入`~/.bashrc`或`~/.bash_profile` 即可。
 
-```
+```bash
 [emon@emon ~]$ vim ~/.bash_profile 
 ```
 
 以下是关于SSH keys中私钥加载到ssh-agent的自动配置，无需每次登陆配置。
 
-```
+```bash
 #以下是关于SSH keys中私钥加载到ssh-agent的自动配置，无需每次登陆配置
 env=~/.ssh/agent.env
 
@@ -1758,7 +1758,7 @@ unset env
 
 - 拷贝公钥到GitHub上【需要有GitHub账户才可以配置】
 
-```
+```bash
 [emon@emon ~]$ cat ~/.ssh/id_rsa.pub
 ```
 
@@ -1793,47 +1793,164 @@ git version 2.20.1
 
 ## 8、安装Python
 
+### 8.1、安装Python2.7版本
 
+1. 检查是否安装
 
+```bash
+[emon@emon ~]$ yum list python|tail -n 2
+Available Packages
+python.x86_64                       2.7.5-76.el7                       base     
+```
 
+2. 下载
 
+下载页地址： <https://www.python.org/ftp/python/>
 
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tar.xz
+```
 
+3. 创建解压目录
 
+```bash
+[emon@emon ~]$ mkdir /usr/local/Python
+```
 
+4. 解压
 
+```bash
+[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-2.7.15.tar.xz -C /usr/local/Python/
+```
 
+5. 执行配置脚本，并编译安装
 
+- 切换目录并执行配置脚本生成Makefile
 
+```bash
+[emon@emon ~]$ cd /usr/local/Python/Python-2.7.15/
+[emon@emon Python-2.7.15]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python2.7.15/
+```
 
+命令解释：`--enable-optimizations`：启用优化安装，建议使用。
 
+- 编译
 
+```bash
+[emon@emon Python-2.7.15]$ make
+```
 
+- 安装
 
+```bash
+[emon@emon Python-2.7.15]$ make install
+[emon@emon ~]$ ls /usr/local/Python/Python2.7.15/
+bin  include  lib  share
+```
 
+6. 创建软连接
 
+```bash
+[emon@emon ~]$ ln -s /usr/local/Python/Python2.7.15/ /usr/local/python
+```
 
+7. 配置环境变量
 
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/python.sh
+```
 
+```bash
+export PYTHON_HOME=/usr/local/python
+export PATH=$PYTHON_HOME/bin:$PATH
+```
 
+使之生效：
 
+```bash
+[emon@emon ~]$ source /etc/profile
+```
 
+8. 校验
 
+```bash
+[emon@emon ~]$ python -V
+Python 2.7.15
+```
 
+  ### 8.2、安装Python3.7版本
 
+Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个版本。
 
+1. 依赖安装
 
+```bash
+# 3.7版本需要一个新的包 libffi-devel，否则make install报错： ModuleNotFoundError: No module named '_ctypes'
+[emon@emon ~]$ sudo yum install -y libffi-devel
+```
 
+2. 下载
 
+下载页地址： <https://www.python.org/ftp/python/>
 
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tar.xz
+```
 
+3. 解压
 
+```bash
+[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.2.tar.xz -C /usr/local/Python/
+```
 
+4. 执行配置脚本，并编译安装
 
+- 切换目录并执行配置脚本生成Makefile
 
+```bash
+[emon@emon ~]$ cd /usr/local/Python/Python-3.7.2/
+[emon@emon Python-3.7.2]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.7.2/
+```
 
+命令解释：`--enable-optimizations`：启用优化安装，建议使用。
 
+- 编译
 
+```bash
+[emon@emon Python-3.7.2]$ make
+```
+
+- 安装
+
+```bash
+[emon@emon Python-3.7.2]$ make install
+[emon@emon Python-3.7.2]$ cd
+[emon@emon ~]$ ls /usr/local/Python/Python3.7.2/
+bin  include  lib  share
+```
+
+5. 修改软连接
+
+```bash
+[emon@emon ~]$ rm -rf /usr/local/python
+[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.2/ /usr/local/python
+```
+
+6. 校验
+
+```bash
+[emon@emon ~]$ python3 -V
+Python 3.7.2
+```
+
+**目前还是使用Python2.7，如下切换**
+
+```bash
+[emon@emon ~]$ rm -rf /usr/local/python
+[emon@emon ~]$ ln -s /usr/local/Python/Python2.7.15/ /usr/local/python
+[emon@emon ~]$ python -V
+Python 2.7.15
+```
 
 
 
