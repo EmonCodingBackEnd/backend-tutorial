@@ -1958,5 +1958,54 @@ Python 2.7.15
 
 > 创建PyPI(Python Package Index)的安装目录：
 >
-> [emon@emon ~]$ mkdir /usr/local/PythonPyPI
+> [emon@emon ~]$ mkdir /usr/local/Python/PythonPyPI
 
+#### 8.3.1、安装setuptools模块
+
+在安装其他模块之前，首先要安装setuptools模块，否则会报错：`ImportError: No module named setuptools`
+
+1. 下载并安装
+
+下载页地址： <https://pypi.org/project/setuptools/>
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/37/1b/b25507861991beeade31473868463dad0e58b1978c209de27384ae541b0b/setuptools-40.6.3.zip
+[emon@emon ~]$ unzip /usr/local/src/setuptools-40.6.3.zip -d /usr/local/Python/PythonPyPI/
+[emon@emon ~]$ cd /usr/local/Python/PythonPyPI/setuptools-40.6.3/
+[emon@emon setuptools-40.6.3]$ python setup.py install
+[emon@emon setuptools-40.6.3]$ cd
+```
+
+2. easy_install命令
+
+| 命令                | 说明     |
+| ------------------- | -------- |
+| easy_install        | 安装套件 |
+| easy_install -U     | 更新套件 |
+| easy_install -m     | 卸载套件 |
+| easy_install --help | 显示说明 |
+
+#### 10.3.3、安装pip
+
+1. 下载并安装
+
+下载页地址：<https://pypi.org/project/pip/>
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/45/ae/8a0ad77defb7cc903f09e551d88b443304a9bd6e6f124e75c0fbbf6de8f7/pip-18.1.tar.gz
+[emon@emon ~]$ tar -zxvf /usr/local/src/pip-18.1.tar.gz -C /usr/local/Python/PythonPyPI/
+[emon@emon ~]$ cd /usr/local/Python/PythonPyPI/pip-18.1/
+[emon@emon pip-18.1]$ python setup.py install
+[emon@emon ~]$ pip -V
+pip 18.1 from /usr/local/python/lib/python2.7/site-packages/pip-18.1-py2.7.egg/pip (python 2.7)
+```
+
+2. pip命令
+
+| 命令           | 说明     |
+| -------------- | -------- |
+| pip install    | 安装套件 |
+| pip install -U | 更新套件 |
+| pip uninstall  | 搜索套件 |
+| pip search     | 搜索套件 |
+| pip help       | 显示说明 |
