@@ -1952,5 +1952,11 @@ Python 3.7.2
 Python 2.7.15
 ```
 
+### 8.3、Python工具
 
+`easy_install`和`pip`都是Python的安装工具，其中`pip`是`easy_install`的改进版，提供更好的提示信息，删除package等的功能。老版本python中只有`easy_install`，没有`pip`。
+
+> 创建PyPI(Python Package Index)的安装目录：
+>
+> [emon@emon ~]$ mkdir /usr/local/PythonPyPI
 
