@@ -2676,3 +2676,19 @@ success
 ```
 
 打开浏览器访问：[http://39.107.97.197:8360](http://39.107.97.197:8360/)
+
+4. 通过PM2启动
+
+```bash
+[emon@emon thinkjs-demo]$ pm2 start pm2.json 
+[PM2][WARN] Applications demo not running, starting...
+[PM2] App [demo] launched (1 instances)
+┌──────────┬────┬──────┬───────┬────────┬─────────┬────────┬─────┬───────────┬──────┬──────────┐
+│ App name │ id │ mode │ pid   │ status │ restart │ uptime │ cpu │ mem       │ user │ watching │
+├──────────┼────┼──────┼───────┼────────┼─────────┼────────┼─────┼───────────┼──────┼──────────┤
+│ demo     │ 0  │ fork │ 79723 │ online │ 0       │ 0s     │ 9%  │ 17.4 MB   │ emon │ disabled │
+└──────────┴────┴──────┴───────┴────────┴─────────┴────────┴─────┴───────────┴──────┴──────────┘
+ Use `pm2 show <id|name>` to get more details about an app
+```
+
+【注意】：这样的启动，是无法通过上面的地址访问的，待续……
