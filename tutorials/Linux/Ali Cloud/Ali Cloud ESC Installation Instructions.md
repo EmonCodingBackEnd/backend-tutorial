@@ -198,8 +198,6 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode)
 
 ## 3、安装Maven
 
-## 安装Maven
-
 1. 下载
 
 下载地址获取页面： <https://maven.apache.org/download.cgi>
