@@ -75,6 +75,16 @@ set expandtab
 SELinux配置生效。
 别忘记**创建快照**哦！
 
+## 6、安装常用命令
+
+1. tree
+
+```bash
+[root@emon ~]# yum install -y tree
+```
+
+
+
 # 二、安装项目所需软件
 
 ---
@@ -2397,3 +2407,272 @@ WantedBy=multi-user.target
 ```bash
 [emon@emon ~]$ sudo systemctl stop supervisord.service 
 ```
+
+## 11、安装NVM
+
+NVM管理不同版本的node与npm：
+
+```
+nvm是NodeJS的多版本管理工具，有点类似管理Ruby的rvm，如果是需要管理Windows下的node，官方推荐是使用nvmw或nvm-windows。
+```
+
+卸载已经安装的全局node/npm：
+
+```
+在官网下载的node安装包，运行后会自动安装在全局目录，其中node命令在`/usr/bin/node`，npm命令在全局`node_modules`目录中，具体路径为`/usr/[lib|lib64]/node_modules/npm。
+```
+
+安装nvm之后最好先删除已安装的node和全局node模块。
+
+### 11.1、安装NVM
+
+下载页地址：<https://github.com/creationix/nvm>
+
+1. 安装
+
+```bash
+[emon@emon ~]$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 12819  100 12819    0     0  16534      0 --:--:-- --:--:-- --:--:-- 16519
+=> Downloading nvm from git to '/home/emon/.nvm'
+=> Cloning into '/home/emon/.nvm'...
+remote: Enumerating objects: 267, done.
+remote: Counting objects: 100% (267/267), done.
+remote: Compressing objects: 100% (242/242), done.
+remote: Total 267 (delta 31), reused 86 (delta 15), pack-reused 0
+Receiving objects: 100% (267/267), 119.47 KiB | 105.00 KiB/s, done.
+Resolving deltas: 100% (31/31), done.
+=> Compressing and cleaning up git repository
+
+=> Appending nvm source string to /home/emon/.bashrc
+=> Appending bash_completion source string to /home/emon/.bashrc
+=> Close and reopen your terminal to start using nvm or run the following to use it now:
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+```
+
+2. 验证
+
+【需要重新开启shell加载，或者`source ~/.bashrc`使之生效，否则命令无法生效，因为配置到了用户根目录下的`.bashrc`文件中】
+
+```bash
+[emon@emon ~]$ command -v nvm
+nvm
+[emon@emon ~]$ nvm --version
+0.33.11
+[emon@emon ~]$ nvm --help
+```
+
+3. 安装 node/npm 并切换版本
+
+查看远程可安装的node版本：
+
+```bash
+[emon@emon ~]$ nvm ls-remote
+```
+
+选择并安装：最新的(Latest LTS: XXX)或者(LTS: XXX)版本，如下，安装两个版本：
+
+```bash
+[emon@emon ~]$ nvm install v8.15.0
+Downloading and installing node v8.15.0...
+Downloading https://nodejs.org/dist/v8.15.0/node-v8.15.0-linux-x64.tar.xz...
+######################################################################## 100.0%
+Computing checksum with sha256sum
+Checksums matched!
+Now using node v8.15.0 (npm v6.4.1)
+Creating default alias: default -> v8.15.0
+[emon@emon ~]$ nvm install v10.15.0
+Downloading and installing node v10.15.0...
+Downloading https://nodejs.org/dist/v10.15.0/node-v10.15.0-linux-x64.tar.xz...
+######################################################################## 100.0%
+Computing checksum with sha256sum
+Checksums matched!
+Now using node v10.15.0 (npm v6.4.1)
+```
+
+4. nvm常用命令
+
+| 命令                         | 说明                                 | 示例                      |
+| ---------------------------- | ------------------------------------ | ------------------------- |
+| nvm ls                       | 本地查看                             |                           |
+| nvm use [--silent] <version> | 切换版本，支持模糊匹配               | nvm use 6                 |
+| nvm current                  | 查看当前版本                         |                           |
+| npm list -g --depth 0        | 查看安装过的全局软件，其中-g表示全局 |                           |
+| nvm ls-remote                | 查看远程版本                         |                           |
+| nvm alias default <version>  | 设置NodeJS默认版本                   | nvm alias default v8.11.2 |
+
+### 11.2、安装PM2
+
+```
+PM2是node进程管理工具，可以利用它来简化很多node应用管理的繁琐任务，如性能监控、自动重启、负载均衡等等，而且使用非常的简单。
+```
+
+官网： <http://pm2.keymetrics.io/>
+
+1. 依赖检查
+
+想要安装PM2，需要有node环境，且可以使用npm命令。
+
+```bash
+[emon@emon ~]$ node --version
+v10.15.0
+[emon@emon ~]$ npm --version
+6.4.1
+```
+
+2. 安装
+
+```
+[emon@emon ~]$ npm install pm2 -g
+```
+
+3. pm2常用命令
+
+| 命令                          | 说明                                                         | 示例 |
+| ----------------------------- | ------------------------------------------------------------ | ---- |
+| pm2 start app.js              | 启动                                                         |      |
+| pm2 start ./bin/www [--name ] | 启动并命名【推荐】                                           |      |
+| pm2 stop <name\|pid>          | 停止指定的进程                                               |      |
+| pm2 restart <name\|pid>       | 重启指定的进程                                               |      |
+| pm2 delete <name\|pid>        | 删除指定的进程                                               |      |
+| pm2 monit                     | 监视所有进程                                                 |      |
+| pm2 list                      | 显示所有进程状态                                             |      |
+| pm2 logs                      | 显示所有进程日志                                             |      |
+| pm2 startup                   | 生成init脚本，保持进程活着                                   |      |
+| pm2 web                       | 运行健壮的computer API endpoint([http://localhost:9615](http://localhost:9615/)) |      |
+| pm2 stop all                  | 停止所有进程                                                 |      |
+| pm2 restart all               | 重启所有进程                                                 |      |
+| pm2 delete all                | 删除所有进程                                                 |      |
+| pm2 reload all                | 0秒停机重载进程（用于NETWORKER进程）                         |      |
+| pm2 save                      |                                                              |      |
+| pm2 update                    |                                                              |      |
+| pm2 --help                    | 查看帮助文档                                                 |      |
+| pm2 -V                        | 查看版本信息                                                 |      |
+
+### 11.3、安装ThinkJS
+
+ThinkJS是一款面向未来开发的Node.js框架，整合了大量的项目最佳实践，让企业级开发变得如此简单、高效。从3.0开始，框架底层基于Koa2.x实现，兼容Koad所有功能。
+
+1. 安装
+
+```bash
+[emon@emon ~]$ npm install -g think-cli
+```
+
+安装完成后，系统中会有thinkjs命令（可以通过`thinkjs -V`查看think-cli的版本号，此版本号非thinkjs的版本号）。如果找不到这个命令，请确认环境变量是否正确。
+
+查看版本：
+
+```bash
+[emon@emon ~]$ thinkjs -V
+2.2.8
+```
+
+如果是从2.x升级，需要将之前的命令删除，然后重新安装。
+
+卸载旧版本命令：
+
+```bash
+[emon@emon ~]$ npm uninstall -g thinkjs
+```
+
+2. 创建项目
+
+执行`thinkjs new <project_name>`来创建项目，如：
+
+```bash
+[emon@emon ~]$ cd saas/
+[emon@emon saas]$ thinkjs new thinkjs-demo
+
+? Project name thinkjs-demo
+? Project description application created by thinkjs
+? Author emon <liming20110711@163.com>
+? Do you want to turn on babel? No
+
+   think-cli · Generated thinkjs-demo
+
+   To get started:
+   
+   # enter path
+   $ cd thinkjs-demo
+   
+   # install dependencies:
+   $ npm install
+   
+   # run the app
+   $ npm start
+
+[emon@emon saas]$ cd thinkjs-demo/
+[emon@emon thinkjs-demo]$ npm install
+[emon@emon thinkjs-demo]$ npm start
+
+> thinkjs-demo@1.0.0 start /home/emon/saas/thinkjs-demo
+> node development.js
+
+[2018-12-30T15:48:00.175] [31668] [INFO] - Server running at http://127.0.0.1:8360
+[2018-12-30T15:48:00.178] [31668] [INFO] - ThinkJS version: 3.2.10
+[2018-12-30T15:48:00.178] [31668] [INFO] - Environment: development
+[2018-12-30T15:48:00.178] [31668] [INFO] - Workers: 1
+```
+
+项目结构：
+
+```bash
+# 刚创建的项目，在npm install之前的目录结构如下：
+[emon@emon saas]$ tree demo/
+demo/
+├── development.js                      // 开发环境下的入口文件
+├── nginx.conf                          // nginx配置文件
+├── package.json
+├── pm2.json                            // pm2配置文件
+├── production.js                       // 生产环境下的入口文件
+├── README.md
+├── src
+│   ├── bootstrap                       // 启动自动执行目录
+│   │   ├── master.js                   // Master进程下自动执行
+│   │   └── worker.js                   // Worker进程下自动执行
+│   ├── config                          // 配置文件目录
+│   │   ├── adapter.js                  // adapter配置文件
+│   │   ├── config.js                   // 默认配置文件
+│   │   ├── config.production.js        // 生产环境下的默认配置文件，和config.js合并
+│   │   ├── extend.js                   // extend配置文件
+│   │   ├── middleware.js               // middleware配置文件
+│   │   └── router.js                   // 自定义路由配置文件
+│   ├── controller                      // 控制器目录
+│   │   ├── base.js
+│   │   └── index.js
+│   ├── logic                           // logic目录
+│   │   └── index.js
+│   └── model                           // 模型目录
+│       └── index.js
+├── test
+│   └── index.js
+├── view                                // 模板目录
+│   └── index_index.html
+└── www
+    └── static
+        ├── css
+        ├── image
+        └── js
+
+13 directories, 20 files
+```
+
+3. 开放端口
+
+```bash
+# 开放一个系列的端口（生产环境按需开放，安全第一）
+# 开放8360-8370端口，供Web服务器使用。
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8360-8370/tcp
+success
+[emon@emon ~]$ sudo firewall-cmd --reload
+success
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+80/tcp 9001/tcp 3306/tcp 20-21/tcp 8360-8370/tcp 61001-62000/tcp 8080-8090/tcp
+```
+
+打开浏览器访问：[http://39.107.97.197:8360](http://39.107.97.197:8360/)
