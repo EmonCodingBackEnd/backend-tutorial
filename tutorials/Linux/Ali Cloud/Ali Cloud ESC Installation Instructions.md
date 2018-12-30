@@ -2071,6 +2071,20 @@ Python 2.7.15
 [emon@emon setuptools-40.6.3]$ cd
 ```
 
+#### 10.3.2、安装easy_install
+
+1. 下载并安装
+
+下载页地址： <https://pypi.org/project/ez_setup>
+
+```
+[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/ba/2c/743df41bd6b3298706dfe91b0c7ecdc47f2dc1a3104abeb6e9aa4a45fa5d/ez_setup-0.9.tar.gz
+[emon@emon ~]$ tar -zxvf /usr/local/src/ez_setup-0.9.tar.gz -C /usr/local/Python/PythonPyPI/
+[emon@emon ~]$ cd /usr/local/Python/PythonPyPI/ez_setup-0.9/
+[emon@emon ez_setup-0.9]$ python setup.py install
+[emon@emon ez_setup-0.9]$ cd
+```
+
 2. easy_install命令
 
 | 命令                | 说明     |
@@ -2079,10 +2093,6 @@ Python 2.7.15
 | easy_install -U     | 更新套件 |
 | easy_install -m     | 卸载套件 |
 | easy_install --help | 显示说明 |
-
-#### 10.3.2、安装easy_install
-
-
 
 #### 10.3.3、安装pip
 
@@ -2108,3 +2118,282 @@ pip 18.1 from /usr/local/python/lib/python2.7/site-packages/pip-18.1-py2.7.egg/p
 | pip uninstall  | 搜索套件 |
 | pip search     | 搜索套件 |
 | pip help       | 显示说明 |
+
+#### 10.3.4、安装Supervisor
+
+1. 安装
+
+```bash
+[emon@emon ~]$ pip install supervisor
+```
+
+2. 创建配置文件
+
+```bash
+[emon@emon ~]$ sudo mkdir /etc/supervisor
+[emon@emon ~]$ echo_supervisord_conf | sudo tee /etc/supervisor/supervisord.conf 
+```
+
+3. 调整配置文件
+
+打开配置文件：
+
+```
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisord.conf 
+```
+
+- 增加Web管理界面
+
+找到`;[inet_http_server]`
+
+```bash
+;[inet_http_server]         ; inet (TCP) server disabled by default
+;port=127.0.0.1:9001        ; ip_address:port specifier, *:port for all iface
+;username=user              ; default is no username (open server)
+;password=123               ; default is no password (open server)
+```
+
+内容追加：
+
+```bash
+[inet_http_server]         	; inet (TCP) server disabled by default
+port=0.0.0.0:9001        	; ip_address:port specifier, *:port for all iface
+username=`[用户名]`          ; default is no username (open server)
+password=`[密码]`            ; default is no password (open server)
+```
+
+- 修改`supervisord.pid`、`supervisor.sock`和`supervisord.log`位置
+
+默认这几个文件是放在/tmp目录下，但是/tmp目录是存放临时文件的，里面的文件会被Linux系统删除的，一旦这些文件丢失，就无法再通过supervisorctl来执行restart和stop命令了。而是会得到 `unix:///tmp/supervisor.sock` 不存在的错误。
+
+创建目录：
+
+```bash
+[emon@emon ~]$ sudo mkdir /var/run/supervisor
+[emon@emon ~]$ sudo mkdir /var/log/supervisor
+```
+
+配置修改规划：
+
+| 位置               | 原配置                                | 新配置                                               |
+| ------------------ | ------------------------------------- | ---------------------------------------------------- |
+| [unix_http_server] | file=/tmp/supervisor.sock             | file=/var/run/supervisor/supervisor.sock             |
+| [supervisord]      | logfile=/tmp/supervisord.log          | logfile=/var/log/supervisor/supervisord.log          |
+| [supervisord]      | pidfile=/tmp/supervisord.pid          | pidfile=/var/run/supervisor/supervisord.pid          |
+| [supervisorctl]    | serverurl=unix:///tmp/supervisor.sock | serverurl=unix:///var/run/supervisor/supervisor.sock |
+
+默认情况下，进程的日志文件达到50MB时，将进行分割，最多保留10个文件，当然这些配置也可以对每个进程单独配置。
+
+- 使用include
+
+在配置文件最后，有一个[include]的配置项，跟Nginx一样，可以include某个文件夹下的所有配置文件，这样我们就可以为每一个进程或者相关的几个进程的配置单独创建一个文件。
+
+创建目录：
+
+```bash
+[emon@emon ~]$ sudo mkdir /etc/supervisor/supervisor.d
+[emon@emon ~]$ mkdir /home/emon/supervisor.d
+```
+
+修改配置：
+
+```bash
+;[include]
+;files = relative/directory/*.ini
+```
+
+追加：
+
+```bash
+[include]
+files = /etc/supervisor/supervisor.d/*.ini /home/emon/supervisor.d/*.ini
+```
+
+注意： /etc/supervisor/supervisor.d/*.ini用来存放系统软件的启动配置，/root/supervisor.d/*.ini用来存放用户项目的启动配置。
+
+4. 实战配置
+
+- 配置tomcat
+
+```ini
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/tomcat.ini
+[program:tomcat]
+command=/usr/local/tomcat/bin/catalina.sh run ; command=/usr/local/tomcat/bin/startup.sh 默认的startup.sh是后台运行，而supervisor要求前台运行
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=root                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/etc/supervisor/supervisor.d/tomcat.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+备注：需要开放8080端口
+
+- 配置wechat（一个SpringBoot开发的演示微信的项目）
+
+```ini
+# 创建所需目录，并通过scp命令上传到/home/emon/saas/wechat目录
+[emon@emon ~]$ mkdir -p /home/emon/saas/wechat/logs
+[emon@emon ~]$ vim supervisor.d/wechat.ini
+[program:wechat]
+command=/usr/local/java/bin/java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -Dspring.profiles.active=prod wechat-1.0.0-SNAPSHOT.jar
+directory=/home/emon/saas/wechat
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+stdout_logfile=/home/emon/saas/wechat/logs/wechat.log     ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+备注：需要开放8081端口
+
+```bash
+# 开放一个系列的端口（生产环境按需开放，安全第一）
+# 开放8080-8090端口，供Web服务器使用。
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8080-8090/tcp
+success
+[emon@emon ~]$ sudo firewall-cmd --reload
+success
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+61001-62000/tcp 80/tcp 20-21/tcp 8080-8090/tcp 3306/tcp
+```
+
+5. 启动
+
+执行supervisord命令，将会启动supervisord进程，同时我们在配置文件中设置的进程也会相应启动。
+
+> ##### 使用默认的配置文件启动 /etc/supervisor/supervisord.conf
+>
+> supervisord
+>
+> ##### 明确指定配置文件
+>
+> supervisord -c /etc/supervisor/supervisord.conf
+>
+> ##### 使用user用户启动supervisord
+>
+> supervisord -u user
+
+```bash
+# 提升到root权限
+[emon@emon ~]$ sudo -s
+# 明确指定配置文件
+[root@emon emon]# supervisord -c /etc/supervisor/supervisord.conf
+[root@emon emon]# supervisorctl status
+tomcat                           STOPPED   Not started
+wechat                           STOPPED   Not started
+# 启动
+[root@emon emon]# supervisorctl start tomcat
+# 降级到emon权限
+[root@emon emon]# exit
+exit
+```
+
+**为了能直接使用sudo supervisord或者sudo supervisorctl而不报错sudo: supervisord：找不到命令或者sudo: supervisorctl：找不到命令，做如下操作：**
+
+具体原因参见Nginx中关于`配置环境变量【特殊】`的描述。
+
+```bash
+[emon@emon ~]$ sudo ln -s /usr/local/python/bin/supervisord /usr/sbin/supervisord
+[emon@emon ~]$ sudo ln -s /usr/local/python/bin/supervisorctl /usr/sbin/supervisorctl
+```
+
+接下来可以直接使用sudo+命令模式了：
+
+```bash
+[emon@emon ~]$ sudo supervisorctl status
+tomcat                           STOPPED   Not started
+wechat                           STOPPED   Not started
+```
+
+6. 开放端口
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=9001/tcp
+[emon@emon ~]$ sudo firewall-cmd --reload
+success
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+80/tcp 9001/tcp 3306/tcp 20-21/tcp 61001-62000/tcp 8080-8090/tcp
+```
+
+此时，可以访问Web界面了： [http://192.168.1.116:9001](http://192.168.1.116:9001/)
+
+7. supervisorctl常用命令
+
+| 命令                                            | 说明                                                         |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| supervisord -c /etc/supervisor/supervisord.conf | 启动supervisor服务                                           |
+| supervisorctl start <program_name>              | 启动某个进程                                                 |
+| supervisorctl stop <program_name>               | 停止某一个进程，program_name为[program:x]里的x               |
+| supervisorctl restart <program_name>            | 重启某个进程                                                 |
+| supervisorctl start groupworker:                | 启动一组进程                                                 |
+| supervisorctl start groupworker:program_name    | 启动一组进程中的一个                                         |
+| supervisorctl stop groupworker:                 | 结束一组进程                                                 |
+| supervisorctl stop groupworker:program_name     | 结束一组进程中的一个                                         |
+| supervisorctl restart groupworker:              | 重启一组进程                                                 |
+| supervisorctl restart groupworker:program_name  | 重启一组进程中的一个                                         |
+| supervisorctl start all                         | 启动全部进程                                                 |
+| supervisorctl stop all                          | 停止全部进程，注：start,restart,stop都不会载入最新的配置文件 |
+| supervisorctl reread                            | 重新read配置文件                                             |
+| supervisorctl reload                            | 载入最新的配置文件，停止原来进程并按新的配置启动，管理所有进程【重点：如果没有配置*.ini的autostart=true，只会停止；否则，会启动所有配置了true的】 |
+| supervisorctl update                            | 根据最新的配置文件，启动新配置或者有改动的配置，配置没有改动的进程不会受影响【重点：如果没有配置*.ini的autostart=true，只会停止；否则，会启动那些配置了true的且更新了配置文件的】 |
+| supervisorctl shutdown                          | 关闭supervisor服务                                           |
+| supervisorctl help                              | 命令帮助                                                     |
+
+8. 添加自启动脚本
+
+```bash
+[emon@emon ~]$ sudo vim /usr/lib/systemd/system/supervisord.service
+[Unit]
+Description=Supervisor daemon
+
+[Service]
+Type=forking
+ExecStart=/usr/local/python/bin/supervisord -c /etc/supervisor/supervisord.conf
+ExecStop=/usr/local/python/bin/supervisorctl shutdown
+ExecReload=/usr/local/python/bin/supervisorctl reload
+KillMode=process
+Restart=on-failure
+RestartSec=50s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- 加载
+
+```bash
+[emon@emon ~]$ sudo systemctl daemon-reload
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ sudo systemctl start supervisord.service 
+```
+
+- 查看
+
+```bash
+[emon@emon ~]$ sudo systemctl status supervisord.service
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ sudo systemctl stop supervisord.service 
+```

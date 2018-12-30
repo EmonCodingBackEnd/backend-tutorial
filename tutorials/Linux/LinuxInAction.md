@@ -2850,7 +2850,7 @@ success
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 9001/tcp 8080-8090/tcp
+20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp
 ```
 
 5. 启动
@@ -2906,7 +2906,7 @@ wechat                           STOPPED   Not started
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 9001/tcp
+20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp 9001/tcp
 ```
 
 此时，可以访问Web界面了： http://192.168.1.116:9001
