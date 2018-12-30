@@ -196,6 +196,58 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode)
 [emon@emon ~]$ /usr/local/tomcat/bin/catalina.sh version
 ```
 
+## 3、安装Maven
+
+## 安装Maven
+
+1. 下载
+
+下载地址获取页面： <https://maven.apache.org/download.cgi>
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Maven
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-maven-3.6.0-bin.tar.gz -C /usr/local/Maven/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Maven/apache-maven-3.6.0/ /usr/local/maven
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`mvn.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/mvn.sh
+export MAVEN_HOME=/usr/local/maven
+export PATH=$MAVEN_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 校验
+
+```bash
+[emon@emon ~]$ mvn -v
+```
+
 ## 4、安装vsftpd
 
 1. 检查是否安装

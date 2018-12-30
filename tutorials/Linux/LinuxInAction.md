@@ -394,7 +394,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 
 5. 配置环境变量
 
-在`/etc/profile.d`目录创建`.sh`文件：
+在`/etc/profile.d`目录创建`mvn.sh`文件：
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/mvn.sh
