@@ -349,7 +349,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 
 5. 配置UTF-8字符集
 
-打开文件`/usr/local/tomcat/conf/server.xml ` 找到8080默认端口的配置位置，在xml节点末尾增加`URIEncoding=UTF-8` ，修改后的内容如下：
+打开文件`/usr/local/tomcat/conf/server.xml ` 找到8080默认端口的配置位置，在xml节点末尾增加`URIEncoding="UTF-8"` ，修改后的内容如下：
 
 ```bash
  [emon@emon ~]$ vim /usr/local/tomcat/conf/server.xml 

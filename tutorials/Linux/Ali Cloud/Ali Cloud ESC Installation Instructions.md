@@ -151,7 +151,52 @@ Java(TM) SE Runtime Environment (build 1.8.0_191-b12)
 Java HotSpot(TM) 64-Bit Server VM (build 25.191-b12, mixed mode)
 ```
 
-## 2、安装vsftpd
+## 2、安装Tomcat
+
+1. 下载
+
+下载地址获取页面： <https://tomcat.apache.org/whichversion.html>
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.37/bin/apache-tomcat-8.5.37.tar.gz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Tomcat
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-tomcat-8.5.37.tar.gz -C /usr/local/Tomcat/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Tomcat/apache-tomcat-8.5.37/ /usr/local/tomcat
+```
+
+5. 配置UTF-8字符集
+
+打开文件`/usr/local/tomcat/conf/server.xml `找到8080默认端口的配置位置，在xml节点末尾增加`URIEncoding="UTF-8"` ，修改后的内容如下：
+
+```bash
+ [emon@emon ~]$ vim /usr/local/tomcat/conf/server.xml 
+     <Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" URIEncoding="UTF-8"/>
+```
+
+6. 校验
+
+```
+[emon@emon ~]$ /usr/local/tomcat/bin/catalina.sh version
+```
+
+## 4、安装vsftpd
 
 1. 检查是否安装
 
@@ -468,7 +513,7 @@ success
 61001-62000/tcp 20-21/tcp
 ```
 
-## 3、安装ftps服务器
+## 5、安装ftps服务器
 
 **ftps=ftps+ssl**
 
@@ -487,7 +532,7 @@ Available Packages
 openssl.x86_64                   1:1.0.2k-16.el7                        base  
 ```
 
-### 3.1、方式一：使用自签名证书
+### 5.1、方式一：使用自签名证书
 
 1. 切换目录
 
@@ -659,7 +704,7 @@ lftp ftp@127.0.0.1:~> ls
 
 怎么办呢？ **推荐使用Windows操作系统的FlashFXP软件验证。**
 
-### 3.2、方式二：使用私有CA签名证书
+### 5.2、方式二：使用私有CA签名证书
 
 私有CA签名证书的使用与自签名证书一样的，这里不再赘述，主要讲解如何生成私有CA签名证书。
 
@@ -679,7 +724,7 @@ lftp ftp@127.0.0.1:~> ls
 >
 >   > /etc/pki/tls/openssl.cnf
 
-#### 3.2.1、创建私有证书签发机构CA步骤
+#### 5.2.1、创建私有证书签发机构CA步骤
 
 在确定配置为CA的服务器主机上生成一个自签证书，并为CA提供所需要的目录及文件。在真正的通信过程中CA服务器主机不需要网络参与，只需要参与到签名中，不需要提供服务。
 
@@ -753,7 +798,7 @@ Email Address []:
 01
 ```
 
-#### 3.2.2、OpenSSL：服务申请证书签署实现SSL安全通信
+#### 5.2.2、OpenSSL：服务申请证书签署实现SSL安全通信
 
 要用到证书进行安全通信的服务器，需要向CA请求签署证书，需要签署的服务无需和CA证书签署机构主机在同一台服务器上。
 
@@ -917,7 +962,7 @@ rsa_cert_file=/etc/vsftpd/ssl/vsftpd.crt
 rsa_private_key_file=/etc/vsftpd/ssl/vsftpd.key
 ```
 
-### 3.3、方式三：使用公信CA签名证书
+### 5.3、方式三：使用公信CA签名证书
 
 其实，方式二已经讲解了如何向CA申请证书，只不过那个是私有CA而已。
 
@@ -927,7 +972,7 @@ rsa_private_key_file=/etc/vsftpd/ssl/vsftpd.key
 2. 生成证书签署请求
 3. 将请求通过可靠方式发送给CA主机
 
-## 4、 安装sftp服务器
+## 6、 安装sftp服务器
 
 sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp没有单独的守护进程，它必须使用sshd守护进程（默认端口号是22）来完成相应的连接和答复操作。
 
@@ -1049,7 +1094,7 @@ test
 sftp> 
 ```
 
-## 5、安装Nginx
+## 7、安装Nginx
 
 1. 下载
 
@@ -1230,7 +1275,7 @@ success
 
 http://39.107.97.197
 
-## 6、安装MySQL
+## 8、安装MySQL
 
 1. 检查是否安装
 
@@ -1597,7 +1642,7 @@ success
 61001-62000/tcp 80/tcp 20-21/tcp 3306/tcp
 ```
 
-## 7、安装Git
+## 9、安装Git
 
 1. 检查安装情况
 
@@ -1791,9 +1836,9 @@ Hi Rushing0711! You've successfully authenticated, but GitHub does not provide s
 git version 2.20.1
 ```
 
-## 8、安装Python
+## 10、安装Python
 
-### 8.1、安装Python2.7版本
+### 10.1、安装Python2.7版本
 
 1. 检查是否安装
 
@@ -1878,7 +1923,7 @@ export PATH=$PYTHON_HOME/bin:$PATH
 Python 2.7.15
 ```
 
-  ### 8.2、安装Python3.7版本
+### 10.2、安装Python3.7版本
 
 Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个版本。
 
@@ -1952,7 +1997,7 @@ Python 3.7.2
 Python 2.7.15
 ```
 
-### 8.3、Python工具
+### 10.3、Python工具
 
 `easy_install`和`pip`都是Python的安装工具，其中`pip`是`easy_install`的改进版，提供更好的提示信息，删除package等的功能。老版本python中只有`easy_install`，没有`pip`。
 
@@ -1960,7 +2005,7 @@ Python 2.7.15
 >
 > [emon@emon ~]$ mkdir /usr/local/Python/PythonPyPI
 
-#### 8.3.1、安装setuptools模块
+#### 10.3.1、安装setuptools模块
 
 在安装其他模块之前，首先要安装setuptools模块，否则会报错：`ImportError: No module named setuptools`
 
@@ -1984,6 +2029,10 @@ Python 2.7.15
 | easy_install -U     | 更新套件 |
 | easy_install -m     | 卸载套件 |
 | easy_install --help | 显示说明 |
+
+#### 10.3.2、安装easy_install
+
+
 
 #### 10.3.3、安装pip
 
