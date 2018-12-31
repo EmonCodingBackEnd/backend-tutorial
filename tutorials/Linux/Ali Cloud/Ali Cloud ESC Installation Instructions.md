@@ -69,6 +69,7 @@ root用户以`visudo`命令打开文件，在99行添加：`emon ALL=(ALL) ALL`�
 打开文件后，在最后一行追加如下内容：
 
 ```bash
+" 个人设置
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
