@@ -20,7 +20,11 @@
 emon
 ```
 
-## 2、创建具有sudo权限的普通用户
+## 2、修改本地域名解析
+
+打开`/etc/hosts`文件，编辑主机名为`iZ2zeccmg1u7pjn8jm0wg4Z`为emon即可。
+
+## 3、创建具有sudo权限的普通用户
 
 1. 创建普通用户
 
@@ -38,7 +42,7 @@ emon
 
 root用户以`visudo`命令打开文件，在99行添加：`emon ALL=(ALL) ALL`即可。
 
-## 3、开启SELinux
+## 4、开启SELinux
 
 阿里云默认关闭SELinux，请开启。
 
@@ -48,7 +52,7 @@ root用户以`visudo`命令打开文件，在99行添加：`emon ALL=(ALL) ALL`�
 
 找到`SELINUX=disabled`修改为`SELINUX=enforcing`，这种修改需要重启系统才能生效。
 
-## 4、开启firewalld防火墙
+## 5、开启firewalld防火墙
 
 阿里云默认关闭firewalld服务，请开启。
 
@@ -56,7 +60,7 @@ root用户以`visudo`命令打开文件，在99行添加：`emon ALL=(ALL) ALL`�
 [root@emon ~]# systemctl start firewalld
 ```
 
-## 5、修改vim的缩进为4个空格
+## 6、修改vim的缩进为4个空格
 
 ```bash
 [root@emon ~]# vim /etc/vimrc 
@@ -75,7 +79,7 @@ set expandtab
 SELinux配置生效。
 别忘记**创建快照**哦！
 
-## 6、安装常用命令
+## 7、安装常用命令
 
 1. tree
 
