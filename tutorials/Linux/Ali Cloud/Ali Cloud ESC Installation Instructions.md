@@ -1337,7 +1337,7 @@ success
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-61001-62000/tcp 80/tcp 20-21/tcp
+20-21/tcp 61001-62000/tcp 80/tcp
 ```
 
 13. 访问
