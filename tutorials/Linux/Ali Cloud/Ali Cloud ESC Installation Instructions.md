@@ -92,6 +92,12 @@ SELinux配置生效。
 [root@emon ~]# yum install -y tree
 ```
 
+2. unzip
+
+```bash
+[root@emon ~]# yum install -y unzip
+```
+
 
 
 # 二、安装项目所需软件
@@ -2294,7 +2300,7 @@ success
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-61001-62000/tcp 80/tcp 20-21/tcp 8080-8090/tcp 3306/tcp
+20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp
 ```
 
 5. 启动
@@ -2352,7 +2358,7 @@ wechat                           STOPPED   Not started
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-80/tcp 9001/tcp 3306/tcp 20-21/tcp 61001-62000/tcp 8080-8090/tcp
+20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp 9001/tcp
 ```
 
 此时，可以访问Web界面了： [http://39.107.97.197:9001](http://39.107.97.197:9001/)
@@ -2687,7 +2693,7 @@ success
 [emon@emon ~]$ sudo firewall-cmd --reload
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
-80/tcp 9001/tcp 3306/tcp 20-21/tcp 8360-8370/tcp 61001-62000/tcp 8080-8090/tcp
+20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp 9001/tcp 8360-8370/tcp
 ```
 
 打开浏览器访问：[http://39.107.97.197:8360](http://39.107.97.197:8360/)
