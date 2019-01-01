@@ -1492,6 +1492,12 @@ server-id=1
 
 9. 初始化数据库
 
+依赖安装：
+
+```bash
+[emon@emon ~]$ sudo yum install -y libaio
+```
+
 ```bash
 [emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
