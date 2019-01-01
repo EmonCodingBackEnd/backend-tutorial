@@ -3419,7 +3419,7 @@ export PATH=$ImageMagick_HOME/bin:$PATH
 
 ```bash
 [emon@emon ~]$ sudo mkdir /data/gimg
-[emon@emon ~]$ chown -R emon.emon /data/gimg/
+[emon@emon ~]$ sudo chown -R emon.emon /data/gimg/
 ```
 
 3. 编辑gimg项目配置
