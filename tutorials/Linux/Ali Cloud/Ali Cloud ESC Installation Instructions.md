@@ -52,6 +52,10 @@ root用户以`visudo`命令打开文件，在99行添加：`emon ALL=(ALL) ALL`�
 
 找到`SELINUX=disabled`修改为`SELINUX=enforcing`，这种修改需要重启系统才能生效。
 
+**重要提示：**
+
+阿里云7.6版本，
+
 ## 5、开启firewalld防火墙
 
 阿里云默认关闭firewalld服务，请开启。
@@ -567,7 +571,7 @@ tftp_home_dir --> off
 
 11. 开放端口
 
-```
+```bash
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=20-21/tcp
 success
 [emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=61001-62000/tcp
