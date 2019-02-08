@@ -154,13 +154,13 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 4. netstat和ifconfig
 
 ```bash
-[root@emon ~]$ sudo yum install -y net-tools
+[root@emon ~]$ yum install -y net-tools
 ```
 
 5. unzip
 
 ```bash
-[emon@emon ~]$ sudo yum install -y unzip
+[root@emon ~]$ yum install -y unzip
 ```
 
 
