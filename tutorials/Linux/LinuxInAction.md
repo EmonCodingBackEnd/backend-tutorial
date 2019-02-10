@@ -4201,6 +4201,10 @@ http://192.168.1.116:8088
         - Passphrase / Password： `[密码]`
   - 使用插件：在构建Job时，Post Steps可以勾选Send files or execute commands over SSH了。
 
+2. 安装`Maven Integration`
+
+
+
 ### 13.3、Jenkins配置
 
 ```bash
