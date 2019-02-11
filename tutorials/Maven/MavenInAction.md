@@ -26,18 +26,21 @@
 
 ```bash
 [emon@emon ~]$ mkdir /usr/local/Nexus
+# 每一个版本解压到一个目录
+[emon@emon ~]$ mkdir /usr/local/Nexus/nexus3.15.2-01-bundle/
 ```
 
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/
+[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/nexus3.15.2-01-bundle
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus-3.15.2-01/ /usr/local/nexus
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/nexus-3.15.2-01 /usr/local/nexus
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/sonatype-work/ /usr/local/nexus-work
 ```
 
 6. 修改默认服务端口
@@ -58,6 +61,7 @@ application-port=8089
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/nexus.sh
 export NEXUS_HOME=/usr/local/nexus
+export NEXUS_WORK_HOME=/usr/local/nexus-work
 export PATH=$NEXUS_HOME/bin:$PATH
 ```
 
@@ -93,4 +97,107 @@ nexus is stopped.
 ```bash
 [emon@emon ~]$ nexus restart
 ```
+
+10. 设置启动项【推荐】
+
+参考：https://help.sonatype.com/repomanager3/system-requirements#SystemRequirements-Linux
+
+```bash
+[emon@emon ~]$ sudo vim /usr/lib/systemd/system/nexus.service
+```
+
+```bash
+[Unit]
+Description=nexus service
+After=network.target
+
+[Service]
+Type=forking
+LimitNOFILE=65536
+ExecStart=/usr/local/nexus/bin/nexus start
+ExecReload=/usr/local/nexus/bin/nexus restart
+ExecStop=/usr/local/nexus/bin/nexus stop
+User=emon
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+```
+
+加载启动项：
+
+```bash
+[emon@emon ~]$ sudo systemctl daemon-reload
+```
+
+设置开机启动：
+
+```bash
+[emon@emon ~]$ sudo systemctl enable nexus.service
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ sudo systemctl start nexus.service
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ sudo systemctl stop nexus.service
+```
+
+- 重启
+
+```bash
+[emon@emon ~]$ sudo systemctl restart nexus.service
+```
+
+
+
+11. 访问
+
+http://192.168.1.116:8089
+
+默认用户名密码： admin/admin123
+
+12. 更新nexus索引
+
+在 http://repo.maven.apache.org/maven2/.index/ 下载
+
+nexus-maven-repository-index.gz
+
+nexus-maven-repository-index.properties
+
+以及点击下载：[indexer-cli-6.0.0.jar](http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar)
+
+```bash
+
+http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.gz
+
+http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.properties
+
+http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar
+```
+
+
+
+上传上面的三个文件到服务器同一个目录，然后执行：
+
+```bash
+java -jar indexer-cli-6.0.0.jar -u nexus-maven-repository-index.gz -d indexer
+```
+
+等程序运行完成之后，可以发现indexer文件夹出现了很多的文件，将这些文件拷贝到`$NEXUS_WORK_HOME/sonatype-`
+
+# 九、用户信息
+
+## 1、nexus用户
+
+| 用户名 | 密码     |
+| ------ | -------- |
+| admin  | admin123 |
+|        |          |
+|        |          |
 
