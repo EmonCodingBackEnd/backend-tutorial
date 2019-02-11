@@ -28,23 +28,21 @@
 [emon@emon ~]$ mkdir /usr/local/Nexus
 ```
 
-4. 修改默认服务端口
+4. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/
+```
+
+5. 修改默认服务端口
 
 ```bash
 [emon@emon ~]$ vim /usr/local/nexus/etc/nexus-default.properties 
 ```
 
-```properties
+```bash
 # 默认的8081端口，修改为8089
 application-port=8089
-```
-
-
-
-5. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/
 ```
 
 6. 创建软连接
