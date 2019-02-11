@@ -34,7 +34,13 @@
 [emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/
 ```
 
-5. 修改默认服务端口
+5. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus-3.15.2-01/ /usr/local/nexus
+```
+
+6. 修改默认服务端口
 
 ```bash
 [emon@emon ~]$ vim /usr/local/nexus/etc/nexus-default.properties 
@@ -43,12 +49,6 @@
 ```bash
 # 默认的8081端口，修改为8089
 application-port=8089
-```
-
-6. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus-3.15.2-01/ /usr/local/nexus
 ```
 
 7. 配置环境变量
