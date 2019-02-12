@@ -40,7 +40,7 @@
 
 ```bash
 [emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/nexus-3.15.2-01 /usr/local/nexus
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/sonatype-work/ /usr/local/nexus-work
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
 ```
 
 6. 修改默认服务端口
