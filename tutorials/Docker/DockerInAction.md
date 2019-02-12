@@ -67,7 +67,34 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 [emon@emon ~]$ docker info
 ```
 
+## 1.3、配置docker加速器
 
+采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
+
+登录DaoCloud，找到小火箭图标，根据说明操作：
+
+- 配置
+
+```bash
+[root@emon docker]# curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://c018e274.m.daocloud.io
+docker version >= 1.12
+{"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
+Success.
+You need to restart docker to take effect: sudo systemctl restart docker 
+```
+
+- 查看
+
+```bash
+[root@emon docker]# cat /etc/docker/daemon.json 
+{"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
+```
+
+- 重启
+
+```bash
+[root@emon docker]# systemctl restart docker
+```
 
 ## 2、配置Docker服务
 
