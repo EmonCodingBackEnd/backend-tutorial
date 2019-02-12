@@ -209,7 +209,7 @@ http://maven.aliyun.com/nexus/content/groups/public
             <mirrorOf>*</mirrorOf>
             <name>nexus maven</name>
             <!--<url>http://maven.aliyun.com/nexus/content/groups/public</url>-->
-            <url>http://192.168.0.155:8089/repository/maven-public/</url>
+            <url>http://localhost:8089/repository/maven-public/</url>
         </mirror>
 ```
 
