@@ -154,15 +154,70 @@ WantedBy=multi-user.target
 [emon@emon ~]$ sudo systemctl restart nexus.service
 ```
 
-
-
 11. 访问
 
 http://192.168.1.116:8089
 
 默认用户名密码： admin/admin123
 
-12. 更新nexus索引
+12. 添加阿里云代理资源库
+
+第一步：创建Blob Stores
+
+登录后，点击齿轮，
+
+左侧：Repositories->Blob Stores
+
+右侧：Create blob store
+
+在`type`、`Name`和`Path`中的`Name`输入`alimaven`，点击`Create blob store`按钮，确定。
+
+第二步：创建 Repository
+
+左侧：Repositories
+
+右侧：Create repository
+
+选择maven2(proxy)，主要录入以下几项：
+
+`Name`: alimaven
+
+`Proxy`->`Remote storage`:录入阿里云镜像地址
+
+```
+http://maven.aliyun.com/nexus/content/groups/public
+```
+
+`Storage`->`Blob store`:选择第一步创建的Blob Stores `alimaven`，点击`Create repository`按钮，确定。
+
+第三步：把alimaven加入maven-public
+
+左侧：Repositories
+
+右侧：`Group`中，把`alimaven`加入右侧，顺序调整为：
+
+- `maven-releases`
+- `maven-snapshots`
+- `alimaven`
+- `maven-central`
+
+13. 配置maven的`settings.xml`文件
+
+```xml
+        <mirror>
+            <id>nexus</id>
+            <mirrorOf>*</mirrorOf>
+            <name>nexus maven</name>
+            <!--<url>http://maven.aliyun.com/nexus/content/groups/public</url>-->
+            <url>http://192.168.0.155:8089/repository/maven-public/</url>
+        </mirror>
+```
+
+
+
+---
+
+更新nexus索引【暂时不用】
 
 在 http://repo.maven.apache.org/maven2/.index/ 下载
 
@@ -173,15 +228,10 @@ nexus-maven-repository-index.properties
 以及点击下载：[indexer-cli-6.0.0.jar](http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar)
 
 ```bash
-
 http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.gz
-
 http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.properties
-
 http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar
 ```
-
-
 
 上传上面的三个文件到服务器同一个目录，然后执行：
 
@@ -189,7 +239,9 @@ http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/index
 java -jar indexer-cli-6.0.0.jar -u nexus-maven-repository-index.gz -d indexer
 ```
 
-等程序运行完成之后，可以发现indexer文件夹出现了很多的文件，将这些文件拷贝到`$NEXUS_WORK_HOME/sonatype-`
+等程序运行完成之后，可以发现indexer文件夹出现了很多的文件，将这些文件拷贝到`$NEXUS_WORK_HOME/blobs/default`
+
+---
 
 # 九、用户信息
 
