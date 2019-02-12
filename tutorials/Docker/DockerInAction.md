@@ -67,7 +67,7 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 [emon@emon ~]$ docker info
 ```
 
-## 1.3、配置docker加速器
+### 1.3、配置docker加速器
 
 采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
 
