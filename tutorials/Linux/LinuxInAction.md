@@ -2855,7 +2855,7 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ```ini
 [program:wechat]
-command=/usr/local/java/bin/java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -Dspring.profiles.active=prod wechat-1.0.0-SNAPSHOT.jar
+command=/usr/local/java/bin/java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -Dspring.profiles.active=test wechat-provider.jar
 directory=/home/emon/saas/wechat
 autostart=false                 ; 在supervisord启动的时候也自动启动
 startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
