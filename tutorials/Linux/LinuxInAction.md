@@ -667,6 +667,10 @@ pasv_max_port=62000
    								<td>nexus</td><td>8089</td>
    								<td><a href="#" target="_blank" onclick="jump(8089)">nexus</a></td>
    							</tr>
+   							<tr>
+   								<td>eureka</td><td>8761</td>
+   								<td><a href="#" target="_blank" onclick="jump(8761)">eureka</a></td>
+   							</tr>
    						</tbody>
    					</table>
                    </div>
