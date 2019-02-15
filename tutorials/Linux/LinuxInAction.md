@@ -671,6 +671,10 @@ pasv_max_port=62000
    								<td>eureka</td><td>8761</td>
    								<td><a href="#" target="_blank" onclick="jump(8761)">eureka</a></td>
    							</tr>
+   							<tr>
+   								<td>RabbitMQ</td><td>5672/15672</td>
+   								<td><a href="#" target="_blank" onclick="jump(15672)">RabbitMQ</a></td>
+   							</tr>
    						</tbody>
    					</table>
                    </div>
