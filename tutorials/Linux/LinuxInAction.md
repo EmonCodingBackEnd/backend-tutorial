@@ -619,6 +619,15 @@ pasv_max_port=62000
        <head>
            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
            <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+   		<script>
+   			function jump(port) {
+   				var baseHref = window.location.href;
+   				var index = baseHref.lastIndexOf("/");
+   				var baseUrl = baseHref.substring(0, index);
+   				var url = baseUrl + ":" + port;
+   				window.location.href = url;
+   			}
+   		</script>
        </head>
        <body>
            <h1>
@@ -640,10 +649,32 @@ pasv_max_port=62000
                            </p>
                        </div>
                    </div>
+                   <div class="col-md-12 column">
+   					<table class="table table-bordered">
+   						<thead>
+   							<tr><th>服务</th><th>端口</th><th>url</th></tr>
+   						</thead>
+   						<tbody>
+   							<tr>
+   								<td>supervisor</td><td>9001</td>
+   								<td><a href="#" target="_blank" onclick="jump(9001)">supervisor</a></td>
+   							</tr>
+   							<tr>
+   								<td>jenkins</td><td>8088</td>
+   								<td><a href="#" target="_blank" onclick="jump(8088)">jenkins</a></td>
+   							</tr>
+   							<tr>
+   								<td>nexus</td><td>8089</td>
+   								<td><a href="#" target="_blank" onclick="jump(8089)">nexus</a></td>
+   							</tr>
+   						</tbody>
+   					</table>
+                   </div>
                </div>
            </div>
        </body>
    </html>
+   
    ```
 
 9. 配置SELinux对ftp服务器目录`/fileserver/ftproot/` 的限制
