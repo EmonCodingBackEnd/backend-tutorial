@@ -250,6 +250,6 @@ java -jar indexer-cli-6.0.0.jar -u nexus-maven-repository-index.gz -d indexer
 | 用户名 | 密码     |
 | ------ | -------- |
 | admin  | admin123 |
-|        |          |
+| nexus  | nexus123 |
 |        |          |
 
