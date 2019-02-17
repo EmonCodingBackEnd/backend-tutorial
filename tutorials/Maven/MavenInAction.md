@@ -204,6 +204,21 @@ http://maven.aliyun.com/nexus/content/groups/public
 13. 配置maven的`settings.xml`文件
 
 ```xml
+        <server>
+            <id>nexus-releases</id>
+            <username>admin</username>
+            <password>admin123</password>
+        </server>
+        <server>
+            <id>nexus-snapshots</id>
+            <username>admin</username>
+            <password>admin123</password>
+        </server>
+```
+
+
+
+```xml
         <mirror>
             <id>nexus</id>
             <mirrorOf>*</mirrorOf>
@@ -211,6 +226,30 @@ http://maven.aliyun.com/nexus/content/groups/public
             <!--<url>http://maven.aliyun.com/nexus/content/groups/public</url>-->
             <url>http://localhost:8089/repository/maven-public/</url>
         </mirror>
+```
+
+14. 配置nginx
+
+```bash
+[emon@emon ~]$ vim /usr/local/nginx/conf/vhost/repo.emon.vip.conf 
+```
+
+```bash
+server {
+    listen 80;
+    autoindex on;
+    server_name repo.emon.vip;
+    access_log /usr/local/nginx/logs/access.log combined;
+    index index.html index.htm index.jsp index.php;
+    #error_page 404 /404.html;
+    if ( $query_string ~* ".*[\;'\<\>].*" ){
+        return 404;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8089;
+    }
+}
 ```
 
 
