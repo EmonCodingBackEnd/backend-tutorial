@@ -109,7 +109,7 @@ user.email=liming20110711@163.com
       [root@emon git]# vim .ssh/authorized_keys 
       ```
 
-      ​
+      
 
 # 三、Git仓库
 
@@ -176,7 +176,7 @@ user.email=liming20110711@163.com
    Receiving objects: 100% (5/5), 4.78 KiB | 4.78 MiB/s, done.
    ```
 
-   ​
+   
 
 # 四、Git文件管理
 
@@ -617,20 +617,32 @@ git tag -d <版本号>
 
 - 删除远程仓库的标签
 
-```
+```bash
 git push origin --delete <版本号>
 ```
 
 - 查看标签
 
-```
+```bash
 git tag
+```
+
+- 查看标签和注释
+
+```bash
+git tag -n
 ```
 
 - 查看符合条件的标签
 
-```
+```bash
 git tag -l <过滤条件，输入部分标签名>
+```
+
+- 查看某个标签的详情
+
+```bash
+git show <标签名称>
 ```
 
 
