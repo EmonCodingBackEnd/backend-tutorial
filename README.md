@@ -41,3 +41,21 @@
 - [Git](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Git)
 - [MySQL](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/MySQL)
 - [Maven](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Maven/MavenInAction.md)
+
+
+
+
+
+# util与component和experience的区别
+
+## util
+
+对Apache Commons和Spring工具类的补充，更偏向领域的业务。
+
+## component
+
+可以直接当作组件引入的二次封装。
+
+## experience
+
+仅用于参考实现，不太适合于拿来直接使用的封装。
