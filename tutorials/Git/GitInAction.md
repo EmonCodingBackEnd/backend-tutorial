@@ -215,28 +215,6 @@ git commit -m "<message>"
 git commit -am "<message>"
 ```
 
-- 修改历史多次提交注释，未push的commit
-
-  - 第一步，X表示最近几条commit日志
-
-  ```bash
-  git rebase -i HEAD~X
-  ```
-
-
-
-  - 第二步，
-
-  ```bash
-  git commit --amend
-  ```
-
-  - 第三步，
-
-  ```bash
-  git rebase --continue
-  ```
-
 - 提交远程仓库
 
 ```shell
@@ -847,6 +825,23 @@ git reset <commit id>
 
 ```bash
 git push -f <remote> <branchname>
+```
+
+- 回退后对其他用户造成的后果如何处理？
+
+回退后，会导致其他在回退之前已经更新代码的用户，出现如下错误：
+
+```bash
+git status
+Git Your branch is ahead of 'origin/master' by X commits
+```
+
+这时，如果采用命令`git push origin`会导致版本管理者的回退无效，所以不应该这样做。
+
+应该如下，回退本地代码：
+
+```bash
+git reset --hard origin/master
 ```
 
 
