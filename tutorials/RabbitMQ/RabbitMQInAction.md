@@ -205,6 +205,9 @@ export PATH=$RABBITMQ_HOME/sbin:$PATH
 ```bash
 # 启动 rabbitmq, -detached 代表后台守护进程方式启动。
 [emon@emon ~]$ rabbitmq-server -detached
+
+# 后台启动的另一种方式【推荐】
+[emon@emon ~]$ rabbitmq-server start &
 ```
 
 - 查看启动状态
