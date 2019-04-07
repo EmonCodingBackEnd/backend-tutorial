@@ -4,7 +4,7 @@
 
 [TOC]
 
-# 一、安装RabbitMQ
+# 一、Docker版本安装
 
 ## 1、下载
 
@@ -27,6 +27,242 @@ docker镜像页面： https://hub.docker.com/_/rabbitmq/
 http://IP:15672
 
 
+
+# 二、普通版本安装
+
+## 1、安装Erlang
+
+1. 下载安装包
+
+下载地址获取页面： http://www.erlang.org/downloads
+
+选择 OTP 21.3 Source File
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ http://erlang.org/download/otp_src_21.3.tar.gz
+```
+
+2. 依赖检查与安装
+
+```bash
+[emon@emon ~]$ yum list make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel unixODBC-devel
+[emon@emon ~]$ sudo yum -y install make gcc gcc-c++ kernel-devel m4 ncurses-devel openssl-devel unixODBC-devel
+```
+
+3. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Erlang
+```
+
+4. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/otp_src_21.3.tar.gz -C /usr/local/Erlang/
+```
+
+5. 执行配置脚本，并编译安装
+
+- 切换目录并执行配置脚本生成Makefile
+
+```bash
+[emon@emon ~]$ cd /usr/local/Erlang/otp_src_21.3/
+[emon@emon otp_src_21.3]$ ./configure --prefix=/usr/local/Erlang/erlang21.3 --disable-javac
+```
+
+注意：看到如下提示，不会影响编译。
+
+```bash
+*********************************************************************
+**********************  APPLICATIONS INFORMATION  *******************
+*********************************************************************
+
+wx             : wxWidgets not found, wx will NOT be usable
+
+*********************************************************************
+*********************************************************************
+**********************  DOCUMENTATION INFORMATION  ******************
+*********************************************************************
+
+documentation  : 
+                 fop is missing.
+                 Using fakefop to generate placeholder PDF files.
+
+*********************************************************************
+```
+
+- 编译
+
+```bash
+[emon@emon otp_src_21.3]$ make
+```
+
+- 安装
+
+```bash
+[emon@emon otp_src_21.3]$ make install
+[emon@emon otp_src_21.3]$ cd
+[emon@emon ~]$ ls /usr/local/Erlang/erlang21.3/
+bin  lib
+```
+
+6. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Erlang/erlang21.3/ erl
+```
+
+7. 配置环境变量
+
+在`/etc/profile.d`目录创建`erl.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/erl.sh
+export ERLANG_HOME=/usr/local/erl
+export PATH=$ERLANG_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+8. 校验
+
+```bash
+[emon@emon ~]$ erl
+Erlang/OTP 21 [erts-10.3] [source] [64-bit] [smp:1:1] [ds:1:1:10] [async-threads:1] [hipe]
+
+Eshell V10.3  (abort with ^G)
+1> halt().
+```
+
+## 2、安装RabbitMQ
+
+1. 下载
+
+下载地址获取页面：https://www.rabbitmq.com/download.html
+
+下载地址列表：https://www.rabbitmq.com/releases/rabbitmq-server/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.14/rabbitmq-server-generic-unix-3.7.14.tar.xz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/RabbitMQ
+```
+
+3. 解压安装
+
+```bash
+# 其中，tar -Jxvf 可以分为两步执行， xz -d *.tar.xz 然后 tar -xvf *.tar
+[emon@emon ~]$ tar -Jxvf /usr/local/src/rabbitmq-server-generic-unix-3.7.14.tar.xz -C /usr/local/RabbitMQ/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/RabbitMQ/rabbitmq_server-3.7.14 /usr/local/rabbitmq
+```
+
+如果创建软连接时，`rabbitmq_server-3.7.14`后面带有TAB键补全的`/`，会导致错误：
+
+```bash
+[emon@emon ~]$ rabbitmqctl status
+escript: exception error: undefined function rabbitmqctl_escript:main/1
+  in function  escript:run/2 (escript.erl, line 758)
+  in call from escript:start/1 (escript.erl, line 277)
+  in call from init:start_em/1 
+  in call from init:do_boot/3 
+```
+
+
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`rabbit.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/rabbitmq.sh
+export RABBITMQ_HOME=/usr/local/rabbitmq
+export PATH=$RABBITMQ_HOME/sbin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 校验
+
+- 启动服务
+
+```bash
+# 启动 rabbitmq, -detached 代表后台守护进程方式启动。
+[emon@emon ~]$ rabbitmq-server -detached
+```
+
+- 查看启动状态
+
+```bash
+[emon@emon ~]$ rabbitmqctl status
+```
+
+- 关闭服务
+
+```bash
+[emon@emon ~]$ rabbitmqctl stop
+```
+
+- 列出角色
+
+```bash
+[emon@emon ~]$ rabbitmqctl list_users
+Listing users ...
+user	tags
+guest	[administrator]
+```
+
+- 启动网页插件(15672端口)
+
+```bash
+[emon@emon ~]$ rabbitmq-plugins enable rabbitmq_management
+```
+
+7. 开放防火墙端口
+
+```bash
+# 配置Linux端口15672网页管理，5672 AMQP端口
+[emon@emon ~]$ firewall-cmd --permanent --zone=public --add-port=5672/tcp
+[emon@emon ~]$ firewall-cmd --permanent --zone=public --add-port=15672/tcp
+[emon@emon ~]$ firewall-cmd --reload
+[emon@emon ~]$ firewall-cmd --permanent --zone=public --list-ports
+```
+
+8. 访问网页
+
+http://192.168.1.116:15672
+
+错误提示：User can only log in via localhost 
+
+因为RabbitMQ从3.3.0开始禁止使用guest/guest权限通过除localhost外的访问。
+
+如果想使用guest/guest通过远程机器访问，需要调整如下：
+
+```bash
+[emon@emon ~]$ vim /usr/local/rabbitmq/ebin/rabbit.app 
+```
+
+找到`loopback_users`并调整内容：
+
+`{loopback_users, [<<"guest">>]},` -> `{loopback_users, []},`
+
+然后重启即可。
 
 # 九十九、用户信息
 
