@@ -14,11 +14,9 @@ docker镜像页面： https://hub.docker.com/_/rabbitmq/
 
 ## 2、安装
 
-### 2.1、docker安装
-
 - 安装镜像
 
-```shell
+```bash
 [emon@emon ~]$ docker run -d --hostname my-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3.7.7-management
 ```
 
@@ -180,8 +178,6 @@ escript: exception error: undefined function rabbitmqctl_escript:main/1
   in call from init:do_boot/3 
 ```
 
-
-
 5. 配置环境变量
 
 在`/etc/profile.d`目录创建`rabbit.sh`文件：
@@ -231,6 +227,12 @@ user	tags
 guest	[administrator]
 ```
 
+- 查看插件列表
+
+```bash
+[emon@emon ~]$ rabbitmq-plugins list
+```
+
 - 启动网页插件(15672端口)
 
 ```bash
@@ -266,6 +268,140 @@ http://192.168.1.116:15672
 `{loopback_users, [<<"guest">>]},` -> `{loopback_users, []},`
 
 然后重启即可。
+
+
+
+# 三、入门
+
+## 1、RabbitMQ的命令行与管控台
+
+### 1.1、基础操作
+
+- 添加用户
+
+```bash
+rabbitmqctl add_user username password
+```
+
+- 列出用户
+
+```bash
+rabbitmqctl list_users
+```
+
+- 删除用户
+
+```bash
+rabbitmqctl delete_user username
+```
+
+- 清除用户权限
+
+```bash
+rabbitmqctl clear_permissions -p vhostpath username
+```
+
+- 列出用户权限
+
+```bash
+rabbitmqctl list_user_permissions username
+```
+
+- 修改密码
+
+```bash
+rabbitmqctl change_password username newpassword
+```
+
+- 设置用户权限
+
+```bash
+rabbitmqctl set_permissions -p vhostpath username 
+```
+
+- 创建虚拟主机
+
+```bash
+rabbitmqctl add_vhost vhostpath
+```
+
+- 列出所有虚拟主机
+
+```bash
+rabbitmqctl list_vhosts
+```
+
+- 列出虚拟主机上所有权限
+
+```bash
+rabbitmqctl list_permissions -p vhostpath
+```
+
+- 删除虚拟主机
+
+```bash
+rabbitmqctl delete_vhost vhostpath
+```
+
+- 查看所有队列信息
+
+```bash
+rabbitmqctl list_queues
+```
+
+- 清除队列里的消息
+
+```bash
+rabbitmqctl - p vhostpath purge_queue blue
+```
+
+### 1.3、高级操作
+
+- 移除所有数据，要在rabbitmqctl stop之后使用
+
+```bash
+rabbitmqctl reset
+```
+
+- 组成集群命令
+
+```bash
+rabbitmqctl join_cluster <clusternode> [--ram]
+```
+
+- 查看集群状态
+
+```bash
+rabbitmqctl cluster_status
+```
+
+- 修改集群节点的存储形式
+
+```bash
+rabbitmqctl change_cluster_node_type disc|ram
+```
+
+- 忘记节点（摘除节点）
+
+```bash
+rabbitmqctl forget_cluster_node [--offline]
+```
+
+- 修改节点名称
+
+```bash
+rabbitmqctl rename_cluster_node oldnode1 newnode1 [oldnode2] [newnode2] ...
+```
+
+
+
+
+
+
+
+
+
+
 
 # 九十九、用户信息
 
