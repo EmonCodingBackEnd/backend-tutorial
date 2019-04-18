@@ -441,7 +441,7 @@ log_queries_not_using_indexes = 1
 mysqldump [OPTIONS] database [tables]
 # 备份多个数据库
 mysqldump [OPTIONS] --databases [OPTIONS] DB1 [DB2 DB3...]
-# 备份示例下的所有数据库
+# 备份实例下的所有数据库
 mysqldump [OPTIONS] --all-databases [OPTIONS]
 ```
 
