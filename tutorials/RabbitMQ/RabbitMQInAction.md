@@ -107,7 +107,7 @@ bin  lib
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Erlang/erlang21.3/ erl
+[emon@emon ~]$ ln -s /usr/local/Erlang/erlang21.3/ /usr/local/erl
 ```
 
 7. 配置环境变量
@@ -243,10 +243,10 @@ guest	[administrator]
 
 ```bash
 # 配置Linux端口15672网页管理，5672 AMQP端口
-[emon@emon ~]$ firewall-cmd --permanent --zone=public --add-port=5672/tcp
-[emon@emon ~]$ firewall-cmd --permanent --zone=public --add-port=15672/tcp
-[emon@emon ~]$ firewall-cmd --reload
-[emon@emon ~]$ firewall-cmd --permanent --zone=public --list-ports
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=5672/tcp
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=15672/tcp
+[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 ```
 
 8. 访问网页
