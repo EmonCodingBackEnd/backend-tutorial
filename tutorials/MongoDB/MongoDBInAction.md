@@ -134,7 +134,7 @@ bind_ip=0.0.0.0
 
 
 
-# 二、Robomongo连接
+# 二、Robo 3T连接
 
 ## 1、下载
 
