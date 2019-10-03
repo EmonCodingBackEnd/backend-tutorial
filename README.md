@@ -42,6 +42,7 @@
 - [MySQL](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/MySQL)
 - [Maven](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Maven/MavenInAction.md)
 - [MongoDB](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/MongoDB)
+- [ZooKeeper](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/ZooKeeper/ZooKeeperInAction.md)
 
 
 
