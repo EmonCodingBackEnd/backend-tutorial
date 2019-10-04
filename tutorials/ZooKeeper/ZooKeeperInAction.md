@@ -38,7 +38,7 @@
 
 ## 5、配置环境变量
 
-在`/etc/profile.d`目录创建`mongodb.sh`文件：
+在`/etc/profile.d`目录创建`zoo.sh`文件：
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
