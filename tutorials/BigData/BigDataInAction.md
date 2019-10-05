@@ -441,6 +441,105 @@ Scala code runner version 2.12.10 -- Copyright 2002-2019, LAMP/EPFL and Lightben
 
 官网地址：http://spark.apache.org/
 
+下载地HI：http://spark.apache.org/downloads.html
+
+![1570272639317](images/1570272639317.png)
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Spark
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.4-bin-hadoop2.7.tgz -C /usr/local/Spark/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Spark/spark-2.4.4-bin-hadoop2.7/ /usr/local/spark
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`spark.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
+export SPARK_HOME=/usr/local/spark
+export PATH=$SPARK_HOME/bin:$PATH
+```
+
+使之生效：
+
+```
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 校验
+
+- 进入默认的scala命令行
+
+```bash
+emon@emon ~]$ spark-shell 
+19/10/05 19:06:45 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://emon:4040
+Spark context available as 'sc' (master = local[*], app id = local-1570273742184).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.4
+      /_/
+         
+Using Scala version 2.11.12 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_171)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> 
+```
+
+- 退出
+
+```bash
+scala> :quit
+```
+
+7. 修改日志级别（推荐使用默认的WARN）
+
+- 复制
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/log4j.properties.template /usr/local/spark/conf/log4j.properties
+```
+
+- 编辑
+
+```bash
+[emon@emon ~]$ vim /usr/local/spark/conf/log4j.properties
+```
+
+比如，调整为INFO级别：
+
+```bash
+log4j.logger.org.apache.spark.repl.Main=INFO
+```
+
+
+
+
+
 
 
 
