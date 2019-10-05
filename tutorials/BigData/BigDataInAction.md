@@ -356,7 +356,7 @@ export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
 </configuration>
 ```
 
-8. 启动与停用
+8. 启动与停止
 
 - 启动
 
@@ -364,7 +364,7 @@ export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
 [emon@emon ~]$ start-hbase.sh 
 ```
 
-- 停用
+- 停止
 
 ```bash
 [emon@emon ~]$ stop-hbase.sh 
