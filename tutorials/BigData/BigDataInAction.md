@@ -122,7 +122,7 @@ dataLogDir=/usr/local/zoo/logs
 [zk: localhost:2181(CONNECTED) 0] quit
 ```
 
-## 2、安装kafka
+## 2、安装kafka（使用外部的ZooKeeper）
 
 1. 下载
 
@@ -171,7 +171,6 @@ export PATH=/usr/local/kafka/bin:$PATH
 
 ```bash
 [emon@emon ~]$ mkdir -p /usr/local/kafka/logs
-[emon@emon ~]$ mkdir -p /usr/local/kafka/zookeeper/{data,logs}
 ```
 
 7. 配置文件
@@ -187,19 +186,6 @@ export PATH=/usr/local/kafka/bin:$PATH
 log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
 ```
 
-- 编辑`zookeeper.properties`配置文件
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/zookeeper.properties 
-```
-
-```bash
-# [修改]
-dataDir=/tmp/zookeeper => dataDir=/usr/local/kafka/zookeeper/data
-# [新增]
-dataLogDir=/usr/local/kafka/zookeeper/logs
-```
-
 8. 编写启动停止脚本
 
 - 启动脚本
@@ -209,12 +195,8 @@ dataLogDir=/usr/local/kafka/zookeeper/logs
 ```
 
 ```bash
-# 启动zookeeper
-/usr/local/kafka/bin/zookeeper-server-start.sh /usr/local/kafka/config/zookeeper.properties &
-# 等待3秒后执行
-sleep 3
 # 启动kafka
-/usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &
+/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
 ```
 
 - 停止脚本
@@ -224,12 +206,8 @@ sleep 3
 ```
 
 ```bash
-# 关闭zookeeper
-/usr/local/kafka/bin/zookeeper-server-stop.sh /usr/local/kafka/config/zookeeper.properties &
-# 等待3秒后执行
-sleep 3
 # 关闭kafka
-/usr/local/kafka/bin/kafka-server-stop.sh /usr/local/kafka/config/server.properties &
+/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
 ```
 
 - 修改可执行权限
@@ -239,10 +217,18 @@ sleep 3
 [emon@emon ~]$ chmod +x /usr/local/kafka/kafkaStop.sh 
 ```
 
-9. 启动kafka
+9. 启动与停止
+
+- 启动
 
 ```bash
 [emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
 ```
 
 10. 创建`topic`
@@ -260,7 +246,6 @@ Created topic test-kafka-topic.
 ```bash
 [emon@emon ~]$ kafka-topics.sh --list --zookeeper localhost:2181
 # 命令执行结果
-__consumer_offsets
 test-kafka-topic
 ```
 
@@ -278,7 +263,7 @@ test-kafka-topic
 [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-kafka-topic --from-beginning
 ```
 
-## 3、安装HBase
+## 3、安装HBase（使用外部的ZooKeeper）
 
 1. 下载
 
@@ -331,15 +316,42 @@ export PATH=/usr/local/hbase/bin:$PATH
 
 7. 配置文件
 
+- 配置使用外部的`zookeeper`
+
 ```bash
-[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-site.xml 
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-env.sh 
+```
+
+```bash
+# [修改]
+export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
+```
+
+- 配置`hbase-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-site.xml
 ```
 
 ```xml
 <configuration>
+    <!-- hbase数据存放的目录，若用本地目录，必须带上file://,否则hbase启动不起来 -->
     <property>
         <name>hbase.rootdir</name>
         <value>file:///usr/local/hbase/data</value>
+    </property>
+
+    <!-- zk的位置 -->
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>localhost</value>
+        <description>the pos of zk</description>
+    </property>
+
+    <!-- 此处必须为true，不然hbase仍用自带的zk，若启动了外部的zookeeper，会导致冲突，hbase启动不起来 -->
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
     </property>
 </configuration>
 ```
