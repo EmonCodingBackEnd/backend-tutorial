@@ -376,11 +376,70 @@ export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
 [emon@emon ~]$ hbase shell
 ```
 
+- 退出hbase命令行
 
+```bash
+hbase(main):014:0> exit
+```
 
+## 4、安装Scala
 
+1. 下载
 
+官网地址：https://www.scala-lang.org/
 
+下载地址：https://www.scala-lang.org/download/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10.tgz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Scala
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/scala-2.12.10.tgz -C /usr/local/Scala/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Scala/scala-2.12.10/ /usr/local/scala
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`scala.sh`文件：
+
+```
+[emon@emon ~]$ sudo vim /etc/profile.d/scala.sh
+export SCALA_HOME=/usr/local/scala
+export PATH=$SCALA_HOME/bin:$PATH
+```
+
+使之生效：
+
+```
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 校验
+
+```bash
+[emon@emon ~]$ scala -version
+Scala code runner version 2.12.10 -- Copyright 2002-2019, LAMP/EPFL and Lightbend, Inc.
+```
+
+## 5、安装Spark
+
+1. 下载
+
+官网地址：http://spark.apache.org/
 
 
 
