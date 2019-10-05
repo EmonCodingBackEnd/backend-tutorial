@@ -45,6 +45,7 @@
 - [BigData](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData)
 - [ZooKeeper](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/ZooKeeper)
 - [Kafka](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Kafka)
+- [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
 
 
 
