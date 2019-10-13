@@ -391,7 +391,7 @@ hbase(main):014:0> exit
 下载地址：https://www.scala-lang.org/download/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://downloads.lightbend.com/scala/2.13.1/scala-2.13.1.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10.tgz
 ```
 
 2. 创建安装目录
@@ -403,13 +403,13 @@ hbase(main):014:0> exit
 3. 解压安装
 
 ```bash
-[emon@emon ~]$  tar -zxvf /usr/local/src/scala-2.13.1.tgz -C /usr/local/Scala/
+[emon@emon ~]$ tar -zxvf /usr/local/src/scala-2.12.10.tgz -C /usr/local/Scala/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Scala/scala-2.13.1/ /usr/local/scala
+[emon@emon ~]$ ln -s /usr/local/Scala/scala-2.12.10/ /usr/local/scala
 ```
 
 5. 配置环境变量
@@ -431,8 +431,8 @@ export PATH=$SCALA_HOME/bin:$PATH
 6. 校验
 
 ```bash
-[emon@emon ~]$ scala -version
-Scala code runner version 2.13.1 -- Copyright 2002-2019, LAMP/EPFL and Lightbend, Inc.
+[emon@emon Scala]$ scala -version
+Scala code runner version 2.12.10 -- Copyright 2002-2019, LAMP/EPFL and Lightbend, Inc.
 ```
 
 ## 5、安装Spark
