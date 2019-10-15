@@ -437,11 +437,15 @@ Scala code runner version 2.12.10 -- Copyright 2002-2019, LAMP/EPFL and Lightben
 
 ## 5、安装Spark
 
+### 5.1、基本安装
+
 1. 下载
 
 官网地址：http://spark.apache.org/
 
-下载地HI：http://spark.apache.org/downloads.html
+下载地址：http://spark.apache.org/downloads.html
+
+各个版本：https://archive.apache.org/dist/spark/
 
 ![1570272639317](images/1570272639317.png)
 
@@ -483,9 +487,29 @@ export PATH=$SPARK_HOME/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-6. 校验
+6. 修改日志级别（推荐使用默认的WARN）
 
-- 进入默认的scala命令行
+- 复制
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/log4j.properties.template /usr/local/spark/conf/log4j.properties
+```
+
+- 编辑
+
+```bash
+[emon@emon ~]$ vim /usr/local/spark/conf/log4j.properties
+```
+
+比如，调整为INFO级别：
+
+```bash
+log4j.logger.org.apache.spark.repl.Main=INFO
+```
+
+### 5.2、local模式
+
+- 进入local模式
 
 ```bash
 emon@emon ~]$ spark-shell 
@@ -510,31 +534,33 @@ Type :help for more information.
 scala> 
 ```
 
-- 退出
+- jps查看JAVA进程
+
+```bash
+[emon@emon ~]$ jps
+60273 Jps
+60202 SparkSubmit
+15854 jar
+```
+
+- 查看60202进程下端口，访问4040端口
+
+```bash
+[emon@emon ~]$ sudo netstat -tnlp|grep 60202
+tcp6       0      0 :::4040                 :::*                    LISTEN      60202/java          
+tcp6       0      0 192.168.1.116:37676     :::*                    LISTEN      60202/java          
+tcp6       0      0 192.168.1.116:32793     :::*                    LISTEN      60202/java 
+```
+
+http://192.168.1.116:4040
+
+- 退出local模式
 
 ```bash
 scala> :quit
 ```
 
-7. 修改日志级别（推荐使用默认的WARN）
-
-- 复制
-
-```bash
-[emon@emon ~]$ cp /usr/local/spark/conf/log4j.properties.template /usr/local/spark/conf/log4j.properties
-```
-
-- 编辑
-
-```bash
-[emon@emon ~]$ vim /usr/local/spark/conf/log4j.properties
-```
-
-比如，调整为INFO级别：
-
-```bash
-log4j.logger.org.apache.spark.repl.Main=INFO
-```
+### 5.2、Standalone模式
 
 
 
