@@ -383,6 +383,18 @@ git stash drop <stash@{id}>
 git stash clear
 ```
 
+- 查看暂存的文件列表
+
+```bash
+git stash show [<stash@{id}>]
+```
+
+- 查看暂存的文件内容
+
+```bash
+git stash show -p [<stash@{id}>]
+```
+
 
 
 # 五、Git分支
