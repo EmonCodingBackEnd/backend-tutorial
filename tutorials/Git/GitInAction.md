@@ -25,6 +25,30 @@ user.name=emon
 user.email=liming20110711@163.com
 ```
 
+## 1.2 https或http方式设置记录用户名密码的方法
+
+https方式每次都要输入密码，按照如下设置即可解决。
+
+设置记住密码（默认15分钟）：
+
+```bash
+git config --global credential.helper cache
+```
+
+如果像自己设置时间，可以做：
+
+```bash
+git config --global credential.helper 'cache --timeout=3600'
+```
+
+
+
+
+
+
+
+
+
 
 
 # 二、Git服务器
