@@ -35,21 +35,36 @@ https方式每次都要输入密码，按照如下设置即可解决。
 git config --global credential.helper cache
 ```
 
-如果像自己设置时间，可以做：
+如果想自己设置时间，可以这样做：
 
 ```bash
 git config --global credential.helper 'cache --timeout=3600'
 ```
 
+这样就设置了一个小时之后失效。
 
+长期存储密码：
 
+```bash
+git config --global credential.helper store
+```
 
+增加远程地址时带上密码也是可以的。（推荐）
 
+```
+http://yourname:password@git.oschina.net/name/project.git
+```
 
+另外，如果你正在使用ssh而且想要体验https带来的高速，那么你可以这样做：
 
-
-
-
+```bash
+# 切换到项目根目录下
+cd projectfile/
+# 移除远程ssh方式的仓库地址
+git remote rm origin
+# 增加https远程仓库地址
+git remote add origin http://yourname:password@git.oschina.net/name/project.git
+```
 
 # 二、Git服务器
 
