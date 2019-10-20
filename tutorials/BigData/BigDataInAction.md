@@ -258,6 +258,14 @@ Created topic test-kafka-topic.
 test-kafka-topic
 ```
 
+- 其他
+
+```bash
+kafka-topics.sh --describe --zookeeper localhost:2181 --topic test-kafka-topic
+```
+
+
+
 11. 测试生产者消费者
 
 - 生产者
@@ -271,6 +279,10 @@ test-kafka-topic
 ```bash
 [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-kafka-topic --from-beginning
 ```
+
+
+
+
 
 ## 3、安装HBase（使用外部的ZooKeeper）
 
