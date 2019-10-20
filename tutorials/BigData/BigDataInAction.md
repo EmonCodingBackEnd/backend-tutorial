@@ -245,12 +245,12 @@ log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
 - 创建
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic test-kafka-topic
+[emon@emon ~]$ kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test-kafka-topic
 # 命令执行结果
 Created topic test-kafka-topic.
 ```
 
-- 查看
+- 查看topic列表
 
 ```bash
 [emon@emon ~]$ kafka-topics.sh --list --zookeeper localhost:2181
@@ -258,10 +258,13 @@ Created topic test-kafka-topic.
 test-kafka-topic
 ```
 
-- 其他
+- 查看单个topic详情
 
 ```bash
-kafka-topics.sh --describe --zookeeper localhost:2181 --topic test-kafka-topic
+[emon@emon logs]$ kafka-topics.sh --describe --zookeeper localhost:2181 --topic test-kafka-topic
+# 命令执行结果
+Topic:test-kafka-topic	PartitionCount:1	ReplicationFactor:1	Configs:
+	Topic: test-kafka-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
 ```
 
 
