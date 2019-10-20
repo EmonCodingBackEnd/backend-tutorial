@@ -80,6 +80,8 @@ export PATH=/usr/local/zoo/bin:$PATH
 dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
 # [新增]
 dataLogDir=/usr/local/zoo/logs
+# [新增]修改默认的8080端口
+admin.serverPort=8090
 ```
 
 8. 启动与停止
@@ -103,6 +105,13 @@ dataLogDir=/usr/local/zoo/logs
 ```
 
 9. 连接
+
+- 访问8090端口的服务
+
+```bash
+# 比如
+http://192.168.1.116:8090/commands/stat
+```
 
 - 远程连接
 
