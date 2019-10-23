@@ -62,4 +62,5 @@ http://ip:port/{context-path}/actuator
         curl -X POST "http://localhost:8080/actuator/shutdown"
         ```
 
-        
+- 自定义端点
+
