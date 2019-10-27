@@ -12,7 +12,7 @@
 
 [学习1](https://www.jianshu.com/p/bf73c8d50dc2)
 
-
+[学习2](https://www.jianshu.com/p/41583e87c061)
 
 背景： 基于`MySQL5.7.22/InnoDB`存储引擎
 
