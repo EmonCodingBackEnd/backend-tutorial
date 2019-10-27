@@ -6,6 +6,14 @@
 
 # 一、索引
 
+[参考1](http://www.zuidaima.com/blog/4221720819125248.htm)
+
+[参考2](https://segmentfault.com/a/1190000003072424)
+
+[学习1](https://www.jianshu.com/p/bf73c8d50dc2)
+
+
+
 背景： 基于`MySQL5.7.22/InnoDB`存储引擎
 
 ## 1、二叉树
