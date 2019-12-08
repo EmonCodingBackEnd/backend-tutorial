@@ -2317,10 +2317,6 @@ mysql> select user,host from mysql.user;
 [emon@emon ~]$ sudo systemctl start mysqld
 ```
 
-
-
-
-
 ## 9、安装Git
 
 1. 检查安装情况
