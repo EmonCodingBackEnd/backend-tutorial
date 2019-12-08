@@ -2294,12 +2294,32 @@ mysql> select user,host from mysql.user;
 **目前还是使用MySQL5.7，如下切换**
 
 ```bash
+# 如果服务器启动中，先停止
+[emon@emon ~]$ sudo systemctl stop mysqld
+# 再执行如下
 [emon@emon ~]$ rm -rf /usr/local/mysql
 [emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64/ /usr/local/mysql
 [emon@emon ~]$ sudo rm -rf /data/mysql
 [emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.22/ /data/mysql
 [emon@emon ~]$ sudo systemctl start mysqld
 ```
+
+**若需要切换到MySQL8.0，如下切换**
+
+```bash
+# 如果服务器启动中，先停止
+[emon@emon ~]$ sudo systemctl stop mysqld
+# 再执行如下
+[emon@emon ~]$ rm -rf /usr/local/mysql
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.11-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@emon ~]$ sudo rm -rf /data/mysql
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.11/ /data/mysql
+[emon@emon ~]$ sudo systemctl start mysqld
+```
+
+
+
+
 
 ## 9、安装Git
 
