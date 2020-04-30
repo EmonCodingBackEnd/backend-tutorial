@@ -45,19 +45,19 @@
 1. 下载
 
 ```shell
-[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.1.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-linux-x86_64.tar.gz
 ```
 
 2. 解压安装
 
 ```shell
-[emon@emon ~]$ tar -zxvf /usr/local/src/elasticsearch-6.4.1.tar.gz -C /usr/local/ElasticStack/Elasticsearch/
+[emon@emon ~]$ tar -zxvf /usr/local/src/elasticsearch-7.6.2-linux-x86_64.tar.gz -C /usr/local/ElasticStack/Elasticsearch/
 ```
 
 3. 创建软连接
 
 ```shell
-[emon@emon ~]$ ln -s /usr/local/ElasticStack/Elasticsearch/elasticsearch-6.4.1/ /usr/local/es
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Elasticsearch/elasticsearch-7.6.2/ /usr/local/es
 ```
 
 4. 配置
@@ -74,7 +74,12 @@ cluster.name: emon
 node.name: master
 # 表示该节点具有成为master的权利，但不一定就是master
 node.master: true
+path.data: /usr/local/es/data
+path.logs: /usr/local/es/logs
 network.host: 0.0.0.0
+cluster.initial_master_nodes: ["master"]
+
+
 http.cors.enabled: true
 http.cors.allow-origin: "*"
 ```
@@ -103,6 +108,15 @@ http.cors.allow-origin: "*"
   [1]: max file descriptors [4096] for elasticsearch process is too low, increase to at least [65536]
   ```
 
+  - 修改前查看
+
+  ```shell
+  [emon@emon ~]$ ulimit -Sn
+  1024
+  [emon@emon ~]$ ulimit -Hn
+  4096
+  ```
+
   - 解决办法
 
   ```shell
@@ -118,6 +132,15 @@ http.cors.allow-origin: "*"
 
   **需要重新登录emon用户，才能生效**
 
+  - 修改后查看
+
+  ```
+  [emon@emon ~]$ ulimit -Sn
+  1024
+  [emon@emon ~]$ ulimit -Hn
+  65536
+  ```
+
 - 问题二
 
   - 问题描述
@@ -131,23 +154,25 @@ http.cors.allow-origin: "*"
   ```shell
   # 查看
   [emon@emon ~]$ sudo sysctl -a|grep vm.max_map_count
+  vm.max_map_count = 65530
   # 打开文件并追加
   [emon@emon ~]$ sudo vim /etc/sysctl.conf 
-  ```
-
+```
+  
   ```
   vm.max_map_count=655360
-  ```
-
+```
+  
   ```shell
   # 使配置生效
   [emon@emon ~]$ sudo sysctl -p
+  vm.max_map_count = 655360
   ```
 
 6. 配置启动
 
 ```shell
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/elasticsearch.ini
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/es.ini
 ```
 
 ```ini
@@ -172,6 +197,51 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl update
 [emon@emon ~]$ sudo supervisorctl start es
 ```
+
+- **supervisor启动时的问题**
+
+在shell中执行命令可以启动了，但supervisor还是无法启动，报错：
+
+```
+020-04-30T15:53:15,294][ERROR][o.e.b.Bootstrap          ] [master] node validation exception
+[1] bootstrap checks failed
+[1]: max file descriptors [4096] for elasticsearch process is too low, increase to at least [65535]
+```
+
+因为supervisor中默认的打开的文件句柄的数量太少，看错误应该是能打开4096，但是一些资料上说是1024。
+
+打开supervisor配置文件：
+
+```shell
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisord.conf 
+```
+
+找到`[supervisord]`下面的`minfds=1024`修改。
+
+```bash
+minfds=1024                  ; min. avail startup file descriptors; default 1024
+```
+
+=>
+
+```bash
+;minfds=1024                  ; min. avail startup file descriptors; default 1024
+minfds=65535                  ; min. avail startup file descriptors; default 1024
+```
+
+重启`supervisord`服务：
+
+```
+[emon@emon ~]$ sudo systemctl restart supervisord.service
+```
+
+再次启动`supervisor es`服务：
+
+```bash
+[emon@emon ~]$ sudo supervisorctl start es
+```
+
+
 
 7. 访问
 
