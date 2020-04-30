@@ -2699,7 +2699,7 @@ Python 2.7.15
 >
 > [emon@emon ~]$ mkdir /usr/local/PythonPyPI
 
-#### 10.3.1、安装setuptools模块
+#### 10.3.1、安装setuptools模块【废弃】
 
 在安装其他模块之前，首先要安装setuptools模块，否则会报错：`ImportError: No module named setuptools`
 
@@ -2715,7 +2715,7 @@ Python 2.7.15
 [emon@emon setuptools-39.2.0]$ cd
 ```
 
-#### 10.3.2、安装easy_install
+#### 10.3.2、安装easy_install【废弃】
 
 1. 下载并安装
 
@@ -2738,7 +2738,7 @@ Python 2.7.15
 | easy_install -m <package name> | 卸载套件 |
 | easy_install --help            | 显示说明 |
 
-#### 10.3.3、安装pip
+#### 10.3.3、安装pip【废弃】
 
 1. 下载并安装
 
@@ -2763,6 +2763,20 @@ pip 10.0.1 from /usr/local/python/lib/python2.7/site-packages/pip-10.0.1-py2.7.e
 | pip uninstall <package name>  | 搜索套件 |
 | pip search <package name>     | 搜索套件 |
 | pip help                      | 显示说明 |
+
+3. pip3命令
+
+| 命令                                  | 说明         |
+| ------------------------------------- | ------------ |
+| pip3 install <package name>           | 安装套件     |
+| pip3 install -U <package name>        | 更新套件     |
+| pip3 install --upgrade <package name> | 更新套件     |
+| pip3 uninstall <package name>         | 搜索套件     |
+| pip3 search <package name>            | 搜索套件     |
+| pip3 help                             | 显示说明     |
+| pip3 show <package name>              | 显示套件详情 |
+
+
 
 #### 10.3.4、安装Supervisor
 
