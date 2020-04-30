@@ -2868,7 +2868,7 @@ password=spvr123            ; default is no password (open server)
 files = /etc/supervisor/supervisor.d/*.ini /home/emon/supervisor.d/*.ini
 ```
 
-注意： /etc/supervisor/supervisor.d/*.ini用来存放系统软件的启动配置，/root/supervisor.d/*.ini用来存放用户项目的启动配置。
+注意： /etc/supervisor/supervisor.d/*.ini用来存放系统软件的启动配置，/home/emon/supervisor.d/*.ini用来存放用户项目的启动配置。
 
 4. 实战配置
 
