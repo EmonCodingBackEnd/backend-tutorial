@@ -106,12 +106,6 @@ SkyWalking Web Application started successfully!
 
 **注意2：** 注意`SkyWalking`会使用(8080, 10800, 11800, 12800)端口，因此先排除端口占用情况。
 
-
-
-
-
-
-
 # 二、分布式日志链路追踪trace-id
 
 1. 配置agent
