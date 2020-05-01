@@ -6,5 +6,5 @@
 
 # 一、前言
 
-学习命令时，如果碰到疑问，可以使用 [explainshell](https://explainshell.com/)去获取相关命令、参数、管道等内容的解释。
+学习命令时，如果碰到疑问，可以使用 [explainshell](https://explainshell.com/) 去获取相关命令、参数、管道等内容的解释。
 
