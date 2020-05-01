@@ -177,6 +177,18 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 [root@emon ~]# yum install -y unzip
 ```
 
+6. lsof
+
+```bash
+[root@emon ~]# yum install -y lsof
+```
+
+
+
+
+
+
+
 
 
 ### 2.4、更换yum源配置为阿里云源配置

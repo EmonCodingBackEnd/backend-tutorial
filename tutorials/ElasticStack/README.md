@@ -157,9 +157,10 @@ http.cors.allow-origin: "*"
   vm.max_map_count = 65530
   # 打开文件并追加
   [emon@emon ~]$ sudo vim /etc/sysctl.conf 
+  ```
 ```
   
-  ```
+```
   vm.max_map_count=655360
 ```
   
@@ -167,7 +168,7 @@ http.cors.allow-origin: "*"
   # 使配置生效
   [emon@emon ~]$ sudo sysctl -p
   vm.max_map_count = 655360
-  ```
+```
 
 6. 配置启动
 
@@ -241,8 +242,6 @@ minfds=65535                  ; min. avail startup file descriptors; default 102
 [emon@emon ~]$ sudo supervisorctl start es
 ```
 
-
-
 7. 访问
 
 http://192.168.3.116:9200
@@ -266,6 +265,36 @@ http://192.168.3.116:9200
     tagline: "You Know, for Search"
 }
 ```
+
+8. 相关命令
+
+- 查看当前进程的最大可打开文件数和进程数等
+
+```bash
+cat /proc/<进程ID>/limits
+比如：
+[emon@emon ~]$ cat /proc/55756/limits
+```
+
+- 查看当前进程实时打开的文件数
+
+```bash
+lsof -p <PID> | wc -l
+比如：
+[emon@emon ~]$ lsof -p 55756 | wc -l
+3788
+```
+
+- 查看系统总限制打开文件的最大数量
+
+```bash
+[emon@emon ~]$ cat /proc/sys/fs/file-max
+481578
+```
+
+
+
+
 
 ### 1.2、配置【二从之一】
 
