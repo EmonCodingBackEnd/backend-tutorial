@@ -3424,10 +3424,10 @@ success
 
 官网： http://www.graphicsmagick.org/index.html
 
-下载页地址：ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/1.3/
+下载页地址：ftp://ftp.graphicsmagick.org/pub/GraphicsMagick
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/1.3/GraphicsMagick-1.3.29.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/1.3/GraphicsMagick-1.3.35.tar.gz
 ```
 
 3. 创建解压目录
@@ -3439,7 +3439,7 @@ success
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/GraphicsMagick-1.3.29.tar.gz -C /usr/local/GraphicsMagick/
+[emon@emon ~]$ tar -zxvf /usr/local/src/GraphicsMagick-1.3.35.tar.gz -C /usr/local/GraphicsMagick/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -3447,21 +3447,21 @@ success
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/GraphicsMagick/GraphicsMagick-1.3.29/
-[emon@emon GraphicsMagick-1.3.29]$ ./configure --prefix=/usr/local/GraphicsMagick/GraphicsMagick1.3.29 --enable-shared
+[emon@emon ~]$ cd /usr/local/GraphicsMagick/GraphicsMagick-1.3.35/
+[emon@emon GraphicsMagick-1.3.35]$ ./configure --prefix=/usr/local/GraphicsMagick/GraphicsMagick1.3.35 --enable-shared
 ```
 
 - 编译
 
 ```bash
-[emon@emon GraphicsMagick-1.3.29]$ make
+[emon@emon GraphicsMagick-1.3.35]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon GraphicsMagick-1.3.29]$ make install
-[emon@emon GraphicsMagick-1.3.29]$ cd
+[emon@emon GraphicsMagick-1.3.35]$ make install
+[emon@emon GraphicsMagick-1.3.35]$ cd
 [emon@emon ~]$ ls /usr/local/GraphicsMagick/GraphicsMagick1.3.29/
 bin  include  lib  share
 ```
@@ -3469,7 +3469,7 @@ bin  include  lib  share
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/GraphicsMagick/GraphicsMagick1.3.29/ /usr/local/graphicsMagick
+[emon@emon ~]$ ln -s /usr/local/GraphicsMagick/GraphicsMagick1.3.35/ /usr/local/graphicsMagick
 ```
 
 7. 配置环境变量
