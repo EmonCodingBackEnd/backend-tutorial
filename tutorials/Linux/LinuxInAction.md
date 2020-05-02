@@ -2066,7 +2066,7 @@ All done!
 
 ```bash
 [emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
-510
+514
 ```
 
 登录：
@@ -2241,6 +2241,8 @@ max_heap_table_size = 32M
 # query_cache_type = 0
 # query_cache_size = 0
 
+explicit_defaults_for_timestamp=true
+
 log-bin = /usr/local/mysql/binlogs/mysql-bin
 binlog_format = mixed
 server-id=1
@@ -2256,7 +2258,7 @@ server-id=1
 
 ```bash
 [emon@emon ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
-2018-05-30T15:44:10.643524Z 5 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: F%Kp.(glt02(
+2020-05-02T13:12:48.974545Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: =3w5d=karZtj
 ```
 
 7. 生成SSL【未提示输出信息，记录】
@@ -2370,7 +2372,7 @@ Threads: 2  Questions: 14  Slow queries: 0  Opens: 139  Flush tables: 2  Open ta
 
 ```bash
 [emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
-542
+578
 ```
 
 登录：
@@ -2402,9 +2404,9 @@ mysql> select user,host from mysql.user;
 [emon@emon ~]$ sudo systemctl stop mysqld
 # 再执行如下
 [emon@emon ~]$ rm -rf /usr/local/mysql
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
 [emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.22/ /data/mysql
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
 [emon@emon ~]$ sudo systemctl start mysqld
 ```
 
@@ -2415,9 +2417,9 @@ mysql> select user,host from mysql.user;
 [emon@emon ~]$ sudo systemctl stop mysqld
 # 再执行如下
 [emon@emon ~]$ rm -rf /usr/local/mysql
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.11-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
 [emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.11/ /data/mysql
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
 [emon@emon ~]$ sudo systemctl start mysqld
 ```
 
