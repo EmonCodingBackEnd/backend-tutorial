@@ -3530,29 +3530,29 @@ export PATH=$GraphicsMagick_HOME/bin:$PATH
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/ImageMagick/ImageMagick-7.0.7-38/
-[emon@emon ImageMagick-7.0.7-38]$ ./configure --prefix=/usr/local/ImageMagick/ImageMagick7.0.7-38 --enable-shared
+[emon@emon ~]$ cd /usr/local/ImageMagick/ImageMagick-7.0.10-10/
+[emon@emon ImageMagick-7.0.10-10]$ ./configure --prefix=/usr/local/ImageMagick/ImageMagick7.0.10-10 --enable-shared
 ```
 
 - 编译
 
 ```bash
-[emon@emon ImageMagick-7.0.7-38]$ make
+[emon@emon ImageMagick-7.0.10-10]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon ImageMagick-7.0.7-38]$ make install
-[emon@emon ImageMagick-7.0.7-38]$ cd
-[emon@emon ~]$ ls /usr/local/ImageMagick/ImageMagick7.0.7-38/
+[emon@emon ImageMagick-7.0.10-10]$ make install
+[emon@emon ImageMagick-7.0.10-10]$ cd
+[emon@emon ~]$ ls /usr/local/ImageMagick/ImageMagick7.0.10-10/
 bin  etc  include  lib  share
 ```
 
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/ImageMagick/ImageMagick7.0.7-38/ /usr/local/imageMagick
+[emon@emon ~]$ ln -s /usr/local/ImageMagick/ImageMagick7.0.10-10/ /usr/local/imageMagick
 ```
 
 7. 配置环境变量
