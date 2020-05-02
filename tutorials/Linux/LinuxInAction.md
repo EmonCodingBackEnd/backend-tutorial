@@ -183,11 +183,13 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 [root@emon ~]# yum install -y lsof
 ```
 
+7. semanage
 
+CentOS8默认没安装semanage命令，安装如下：
 
-
-
-
+```bash
+[emon@emon ~]$ sudo yum install -y policycoreutils-python-utils
+```
 
 
 
@@ -1673,7 +1675,7 @@ http://192.168.1.116/
 下载页地址： https://dev.mysql.com/downloads/mysql/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz
 ```
 
 3. 创建安装目录
@@ -1685,13 +1687,13 @@ http://192.168.1.116/
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/mysql-5.7.22-linux-glibc2.12-x86_64.tar.gz -C /usr/local/MySQL/
+[emon@emon ~]$ tar -zxvf /usr/local/src/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz -C /usr/local/MySQL/
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.22-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
 ```
 
 6. 配置环境变量
@@ -1700,6 +1702,9 @@ http://192.168.1.116/
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/mysql.sh
+```
+
+```bash
 export PATH=/usr/local/mysql/bin:$PATH
 ```
 
@@ -1713,8 +1718,8 @@ export PATH=/usr/local/mysql/bin:$PATH
 
 ```bash
 # 多版本安装
-[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql5.7.22
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.22/ /data/mysql
+[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql5.7.30
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
 ```
 
 | 文件说明                      | 软连接位置                                | 实际存储位置                  |
@@ -1751,6 +1756,7 @@ export PATH=/usr/local/mysql/bin:$PATH
 备份移除系统自带的my.cnf文件：
 
 ```bash
+# 在CentOS8不需要处理了，默认不存在
 [emon@emon ~]$ sudo mv /etc/my.cnf /etc/my.cnf.bak
 ```
 
@@ -1800,6 +1806,8 @@ max_heap_table_size = 32M
 query_cache_type = 0
 query_cache_size = 0
 
+explicit_defaults_for_timestamp=true
+
 log-bin = /usr/local/mysql/binlogs/mysql-bin
 binlog_format = mixed
 server-id=1
@@ -1815,12 +1823,13 @@ server-id=1
 
 ```bash
 [emon@emon ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
-2018-05-30T14:58:29.629664Z 1 [Note] A temporary password is generated for root@localhost: mZV?_HtVg6+4
+2020-05-02T09:28:34.098958Z 1 [Note] A temporary password is generated for root@localhost: gQpHosqS+1h(
 ```
 
 10. 生成SSL
 
 ```bash
+# mysql5.7.30执行命令时已经不再会输出生成日志了
 [emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
 Generating a 2048 bit RSA private key
 ..................+++
@@ -1920,10 +1929,62 @@ PrivateTmp=false
 [emon@emon ~]$ sudo systemctl start mysqld.service
 ```
 
+启动时发现命令卡住了，查看如下：
+
+```bash
+[emon@emon ~]$ sudo systemctl status mysqld
+● mysqld.service - MySQL Server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; vendor preset: disabled)
+   Active: activating (start) since Sat 2020-05-02 18:39:10 CST; 1min 1s ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+  Process: 58921 ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --daemonize --pid-file=/usr/local/mysql/run/mysqld.pid $MYSQLD_OPTS (cod>
+    Tasks: 30 (limit: 30278)
+   Memory: 265.4M
+   CGroup: /system.slice/mysqld.service
+           └─58923 /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --daemonize --pid-file=/usr/local/mysql/run/mysqld.pid
+
+5月 02 18:39:10 emon systemd[1]: Starting MySQL Server...
+5月 02 18:39:10 emon systemd[1]: mysqld.service: Can't open PID file /usr/local/mysql/run/mysqld.pid (yet?) after start: Permission denied
+```
+
+这是`selinux`安全策略导致的错误，有两种方式处理：
+
+- 方式一：【不推荐】
+
+```bash
+[emon@emon ~]$ sudo setenforece 0
+```
+
+- 方式二：【推荐】
+
+```bash
+# 查询
+[emon@emon ~]$ sudo semanage fcontext -l|grep mysqld_db
+/var/lib/mysql(-files|-keyring)?(/.*)?             all files          system_u:object_r:mysqld_db_t:s0 
+```
+
+```bash
+# 设置
+[emon@emon ~]$ sudo semanage fcontext -a -t mysqld_db_t "/usr/local/mysql(/.*)?"
+# estorecon命令用来恢复SELinux文件属性即恢复文件的安全上下文
+[emon@emon ~]$ sudo restorecon -Rv /usr/local/mysql
+Relabeled /usr/local/mysql from unconfined_u:object_r:usr_t:s0 to unconfined_u:object_r:mysqld_db_t:s0
+```
+
+```bash
+# 查询
+[emon@emon ~]$ sudo semanage fcontext -l|grep mysqld_db
+/usr/local/mysql(/.*)?                             all files          system_u:object_r:mysqld_db_t:s0 
+/var/lib/mysql(-files|-keyring)?(/.*)?             all files          system_u:object_r:mysqld_db_t:s0
+```
+
+
+
 13. 初始化mysql服务程序
 
 ```bash
-[emon@emon local]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
+[emon@emon ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
 
 Securing the MySQL server deployment.
 
@@ -2023,6 +2084,23 @@ mysql> select user,host from mysql.user;
 3 rows in set (0.00 sec)
 ```
 
+**说明**
+
+如果发现错误：
+
+```bash
+# CentOS8报错如下
+[emon@emon ~]$ mysql -uroot -p
+mysql: error while loading shared libraries: libncurses.so.5: cannot open shared object file: No such file or directory
+```
+
+请安装：
+
+```bash
+# 特别说明：yum list libncurses* 匹配不到，但是可以安装成功
+[emon@emon ~]$ sudo yum install -y libncurses*
+```
+
 停止：
 
 ```bash
@@ -2064,13 +2142,13 @@ success
 下载页地址： <https://dev.mysql.com/downloads/mysql/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-8.0.11-linux-glibc2.12-x86_64.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 ```
 
 2. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/mysql-8.0.11-linux-glibc2.12-x86_64.tar.gz -C /usr/local/MySQL/
+[emon@emon ~]$ tar -Jxvf /usr/local/src/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz -C /usr/local/MySQL/
 ```
 
 3. 修改软件连接
@@ -2085,15 +2163,15 @@ success
 创建软连接：
 
 ```baash
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.11-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
 ```
 
 4. 修改数据库目录规划所用的软连接
 
 ```bash
 [emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql8.0.11
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.11/ /data/mysql
+[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql8.0.20
+[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
 ```
 
 备注：考虑到数据和二进制日志比较大，需要软链接： 
