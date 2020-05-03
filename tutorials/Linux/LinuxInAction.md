@@ -356,7 +356,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 下载地址获取页面： https://tomcat.apache.org/whichversion.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://111.1.50.52/files/31470000095F0019/mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.31/bin/apache-tomcat-8.5.31.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.34/bin/apache-tomcat-9.0.34.tar.gz
 ```
 
 2. 创建安装目录
@@ -368,13 +368,13 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-tomcat-8.5.31.tar.gz -C /usr/local/Tomcat/
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-tomcat-9.0.34.tar.gz -C /usr/local/Tomcat/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Tomcat/apache-tomcat-8.5.31/ /usr/local/tomcat
+[emon@emon ~]$ ln -s /usr/local/Tomcat/apache-tomcat-9.0.34/ /usr/local/tomcat
 ```
 
 5. 配置UTF-8字符集
