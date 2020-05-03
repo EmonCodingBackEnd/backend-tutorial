@@ -523,6 +523,9 @@ export PATH=$MAVEN_HOME/bin:$PATH
    ```bash
    auth sufficient pam_userdb.so db=/etc/vsftpd/virtual_user_list
    account sufficient pam_userdb.so db=/etc/vsftpd/virtual_user_list
+   
+   # CentOS7.6及以上版本，本地用户ftpuser无法登陆，报错“530 Login incorrect.”，注释掉如下一行即可：
+   # auth       required   pam_shells.so
    ```
 
 7. 配置`vsftpd.conf`
