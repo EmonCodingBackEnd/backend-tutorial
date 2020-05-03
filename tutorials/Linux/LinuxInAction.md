@@ -3671,7 +3671,7 @@ exports.imgtypes={
 下载页地址： https://redis.io/download
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://111.1.50.13/files/3059000006ADE16D/download.redis.io/releases/redis-4.0.9.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ http://download.redis.io/releases/redis-6.0.1.tar.gz
 ```
 
 3. 创建解压目录
@@ -3683,21 +3683,24 @@ exports.imgtypes={
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/redis-4.0.9.tar.gz -C /usr/local/Redis/
+[emon@emon ~]$ tar -zxvf /usr/local/src/redis-6.0.1.tar.gz -C /usr/local/Redis/
 ```
 
-5. 切换目录并执行编译
+5. 切换目录并执行编译cd src && make all
+   make[1]: 进入目录“/usr/local/Redis/redis-6.0.1/src”
+       CC Makefile.dep
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Redis/redis-4.0.9/
-[emon@emon redis-4.0.9]$ make MALLOC=libc
+[emon@emon ~]$ cd /usr/local/Redis/redis-6.0.1/
+# 默认的是jemalloc分配器，如果不存在，需要设置malloc分配器才可以
+[emon@emon redis-6.0.1]$ make MALLOC=libc
 cd src && make all
 make[1]: 进入目录“/usr/local/Redis/redis-4.0.9/src”
     CC Makefile.dep
 ......`[省略输出]`
 Hint: It's a good idea to run 'make test' ;)
 
-make[1]: 离开目录“/usr/local/Redis/redis-4.0.9/src”
+make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
 ```
 
 注意：make命令执行完成编译后，会在src目录下生成7个可执行文件，分别是：
@@ -3713,17 +3716,18 @@ make[1]: 离开目录“/usr/local/Redis/redis-4.0.9/src”
 6. 编译测试
 
 ```bash
-[emon@emon redis-4.0.9]$ make test
+[emon@emon redis-6.0.1]$ make test
 cd src && make test
-make[1]: 进入目录“/usr/local/Redis/redis-4.0.9/src”
+make[1]: 进入目录“/usr/local/Redis/redis-6.0.1/src”
     CC Makefile.dep
-......
+Cleanup: may take some time... OK
+Starting test server at port 11111
 ......`[省略输出]`
 \o/ All tests passed without errors!
 
 Cleanup: may take some time... OK
-make[1]: 离开目录“/usr/local/Redis/redis-4.0.9/src”
-[emon@emon redis-4.0.9]$ cd
+make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
+[emon@emon redis-6.0.1]$ cd
 ```
 
 ### 12.1、【一主二从三哨兵】
@@ -3735,32 +3739,32 @@ make[1]: 离开目录“/usr/local/Redis/redis-4.0.9/src”
 - 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis4.0.9
+[emon@emon ~]$ mkdir /usr/local/Redis/redis6.0.1
 ```
 
-- 复制`/usr/local/Redis/redis-4.0.9/src`目录下的可执行文件，到安装目录
+- 复制`/usr/local/Redis/redis-6.0.1/src`目录下的可执行文件，到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-4.0.9/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis4.0.9/
+[emon@emon ~]$ cp /usr/local/Redis/redis-6.0.1/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis6.0.1/
 ```
 
 - 复制`redis.config`与`sentinel.conf`到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-4.0.9/{redis.conf,sentinel.conf} /usr/local/Redis/redis4.0.9/
+[emon@emon ~]$ cp /usr/local/Redis/redis-6.0.1/{redis.conf,sentinel.conf} /usr/local/Redis/redis6.0.1/
 ```
 
 - 在内置目录创建RDB文件目录与log日志文件
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis4.0.9/redis_rdb
-[emon@emon ~]$ touch /usr/local/Redis/redis4.0.9/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
+[emon@emon ~]$ mkdir /usr/local/Redis/redis6.0.1/redis_rdb
+[emon@emon ~]$ touch /usr/local/Redis/redis6.0.1/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
 ```
 
 - 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Redis/redis4.0.9/ /usr/local/redis
+[emon@emon ~]$ ln -s /usr/local/Redis/redis6.0.1/ /usr/local/redis
 ```
 
 - 配置环境变量
@@ -3812,7 +3816,7 @@ requirepass `[密码]`
 
 2. 如何配置启动？有三种启动方式，如下：
 
-- 直接命令`redis-server redis.conf`
+- 直接命令`/usr/local/redis/redis-server /usr/local/redis/redis.conf `
 - 增加开机服务systemctl
 
 ```bash
@@ -3866,6 +3870,51 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl update
 [emon@emon ~]$ sudo supervisorctl start redis
 ```
+
+**关于警告：**
+
+启动后有两个警告：
+
+- 第一个警告
+
+`WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128`
+
+```bash
+# 打开文件追加
+[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+net.core.somaxconn=1024
+# 使配置生效
+[emon@emon ~]$ sudo sysctl -p
+```
+
+- 第二个警告
+
+`WARNING overcommit_memory is set to 0! Background save may fail under low memory condition`
+
+```bash
+# 打开文件追加
+[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+vm.overcommit_memory=1
+# 使配置生效
+[emon@emon ~]$ sudo sysctl -p
+```
+
+- 第三个警告
+
+`WARNING you have Transparent Huge Pages (THP) support enabled in your kernel`，意思是你使用的是透明大页，可能导致redis延迟和内层使用问题。
+
+解决方法：将其写入`/etc/rc.local`文件中。
+
+```bash
+[emon@emon ~]$ sudo vim /etc/rc.local
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+# 使配置生效
+[emon@emon ~]$ sudo bash -c "source /etc/rc.local"
+```
+
+
 
 3. 校验
 

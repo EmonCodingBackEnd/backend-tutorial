@@ -162,12 +162,10 @@ http.cors.allow-origin: "*"
   
 ```
   vm.max_map_count=655360
-```
-  
-  ```shell
-  # 使配置生效
-  [emon@emon ~]$ sudo sysctl -p
-  vm.max_map_count = 655360
+```bash
+# 使配置生效
+[emon@emon ~]$ sudo sysctl -p
+vm.max_map_count = 655360
 ```
 
 6. 配置启动
