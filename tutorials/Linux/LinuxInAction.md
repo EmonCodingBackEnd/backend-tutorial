@@ -250,6 +250,8 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
+" 如下设置，在vim的插入模式下，点击F9可以进入“插入(粘贴)”模式，再执行粘贴时不会混乱格式；再次点击F9退出“插入(粘贴)”模式。
+set pastetoggle=<F9>
 ```
 
 ### 2.7、配置本地DNS解析
@@ -1486,7 +1488,7 @@ sftp>
 下载页：  http://nginx.org/en/download.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://nginx.org/download/nginx-1.14.0.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ http://nginx.org/download/nginx-1.18.0.tar.gz
 ```
 
 2. 依赖检查与安装
@@ -1505,7 +1507,7 @@ sftp>
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nginx-1.14.0.tar.gz -C /usr/local/Nginx/
+[emon@emon ~]$ tar -zxvf /usr/local/src/nginx-1.18.0.tar.gz -C /usr/local/Nginx/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -1513,8 +1515,8 @@ sftp>
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Nginx/nginx-1.14.0/
-[emon@emon nginx-1.14.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.14.0 --with-http_ssl_module
+[emon@emon ~]$ cd /usr/local/Nginx/nginx-1.18.0/
+[emon@emon nginx-1.18.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.18.0 --with-http_ssl_module
 ```
 
 命令解释： `--with-http_ssl_module`指定编译时支持ssl，为Nginx代理时https准备。
@@ -1522,14 +1524,14 @@ sftp>
 - 编译
 
 ```bash
-[emon@emon nginx-1.14.0]$ make
+[emon@emon nginx-1.18.0]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon nginx-1.14.0]$ make install
-[emon@emon nginx-1.14.0]$ cd
+[emon@emon nginx-1.18.0]$ make install
+[emon@emon nginx-1.18.0]$ cd
 [emon@emon ~]$ ls /usr/local/Nginx/nginx1.14.0/
 conf  html  logs  sbin
 ```
@@ -1537,13 +1539,13 @@ conf  html  logs  sbin
 6. 备份主配置文件`nginx.conf`
 
 ```bash
-[emon@emon ~]$ cp -a /usr/local/Nginx/nginx1.14.0/conf/nginx.conf /usr/local/Nginx/nginx1.14.0/conf/nginx.conf.bak
+[emon@emon ~]$ cp -a /usr/local/Nginx/nginx1.18.0/conf/nginx.conf /usr/local/Nginx/nginx1.18.0/conf/nginx.conf.bak
 ```
 
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Nginx/nginx1.14.0/ /usr/local/nginx
+[emon@emon ~]$ ln -s /usr/local/Nginx/nginx1.18.0/ /usr/local/nginx
 ```
 
 8. 配置环境变量【特殊】
@@ -1562,13 +1564,13 @@ conf  html  logs  sbin
 
 ```bash
 [emon@emon ~]$ nginx -V
-nginx version: nginx/1.14.0
-built by gcc 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) 
-built with OpenSSL 1.0.2k-fips  26 Jan 2017
+nginx version: nginx/1.18.0
+built by gcc 8.3.1 20190507 (Red Hat 8.3.1-4) (GCC) 
+built with OpenSSL 1.1.1c FIPS  28 May 2019
 TLS SNI support enabled
-configure arguments: --prefix=/usr/local/Nginx/nginx1.14.0 --with-http_ssl_module
+configure arguments: --prefix=/usr/local/Nginx/nginx1.18.0 --with-http_ssl_module
 [emon@emon ~]$ nginx -v
-nginx version: nginx/1.14.0
+nginx version: nginx/1.18.0
 ```
 
 10. 配置`nginx.conf`
