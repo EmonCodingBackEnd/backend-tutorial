@@ -2752,10 +2752,10 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 
 ```bash
 [emon@emon ~]$ cd /usr/local/Python/Python-3.7.7/
-[emon@emon Python-3.7.7]$ ./configure --prefix=/usr/local/Python/Python3.7.7 --enable-optimizations --with-openssl=/usr/bin/openssl 
+[emon@emon Python-3.7.7]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.7.7
 ```
 
-命令解释：`--enable-optimizations`：启用优化安装，建议使用；`--with-ssl`在安装`pip`时会用到。
+命令解释：`--enable-optimizations`：启用优化安装。
 
 - 编译
 
