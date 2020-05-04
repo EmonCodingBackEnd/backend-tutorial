@@ -2734,13 +2734,19 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 [emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.0/Python-3.7.0a1.tar.xz
 ```
 
-3. 解压
+3. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Python
+```
+
+4. 解压
 
 ```bash
 [emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.0a1.tar.xz -C /usr/local/Python/
 ```
 
-4. 执行配置脚本，并编译安装
+5. 执行配置脚本，并编译安装
 
 - 切换目录并执行配置脚本生成Makefile
 
@@ -2766,13 +2772,13 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 bin  include  lib  share
 ```
 
-5. 修改软连接
+6. 修改软连接
 
 ```bash
 [emon@emon ~]$ ln -s /usr/local/Python/Python3.7.0a1/ /usr/local/python3
 ```
 
-6. 配置环境变量
+7. 配置环境变量
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/python3.sh
@@ -2783,7 +2789,7 @@ export PYTHON_HOME=/usr/local/python3
 export PATH=$PYTHON_HOME/bin:$PATH
 ```
 
-7. 校验
+8. 校验
 
 ```bash
 [emon@emon ~]$ python3 -V
