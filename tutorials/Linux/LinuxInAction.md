@@ -2789,6 +2789,12 @@ export PYTHON_HOME=/usr/local/python3
 export PATH=$PYTHON_HOME/bin:$PATH
 ```
 
+使之生效：
+
+```
+[emon@emon ~]$ source /etc/profile
+```
+
 8. 校验
 
 ```bash
