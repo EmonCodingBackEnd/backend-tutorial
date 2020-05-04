@@ -2731,7 +2731,7 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 下载页地址： <https://www.python.org/ftp/python/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.0/Python-3.7.0a1.tar.xz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tar.xz
 ```
 
 3. 创建解压目录
@@ -2743,7 +2743,7 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.0a1.tar.xz -C /usr/local/Python/
+[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.7.tar.xz -C /usr/local/Python/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -2751,31 +2751,31 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Python/Python-3.7.0a1/
-[emon@emon Python-3.7.0a1]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.7.0a1
+[emon@emon ~]$ cd /usr/local/Python/Python-3.7.7/
+[emon@emon Python-3.7.7]$ ./configure --prefix=/usr/local/Python/Python3.7.7 --enable-optimizations --with-openssl=/usr/bin/openssl 
 ```
 
-命令解释：`--enable-optimizations`：启用优化安装，建议使用。
+命令解释：`--enable-optimizations`：启用优化安装，建议使用；`--with-ssl`在安装`pip`时会用到。
 
 - 编译
 
 ```bash
-[emon@emon Python-3.7.0a1]$ make
+[emon@emon Python-3.7.7]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon Python-3.7.0a1]$ make install
-[emon@emon Python-3.7.0a1]$ cd
-[emon@emon ~]$ ls /usr/local/Python/Python3.7.0a1/
+[emon@emon Python-3.7.7]$ make install
+[emon@emon Python-3.7.7]$ cd
+[emon@emon ~]$ ls /usr/local/Python/Python3.7.7/
 bin  include  lib  share
 ```
 
 6. 修改软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.0a1/ /usr/local/python3
+[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.7/ /usr/local/python3
 ```
 
 7. 配置环境变量
@@ -2799,7 +2799,7 @@ export PATH=$PYTHON_HOME/bin:$PATH
 
 ```bash
 [emon@emon ~]$ python3 -V
-Python 3.7.0a1
+Python 3.7.7
 ```
 
 ### 10.3、Python工具
@@ -2810,7 +2810,7 @@ Python 3.7.0a1
 >
 > [emon@emon ~]$ mkdir /usr/local/PythonPyPI
 
-#### 10.3.1、安装setuptools模块【废弃】
+#### 10.3.1、安装setuptools模块
 
 在安装其他模块之前，首先要安装setuptools模块，否则会报错：`ImportError: No module named setuptools`
 
@@ -2819,14 +2819,14 @@ Python 3.7.0a1
 下载页地址： https://pypi.org/project/setuptools/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/1a/04/d6f1159feaccdfc508517dba1929eb93a2854de729fa68da9d5c6b48fa00/setuptools-39.2.0.zip
-[emon@emon ~]$ unzip /usr/local/src/setuptools-39.2.0.zip -d /usr/local/PythonPyPI/
-[emon@emon ~]$ cd /usr/local/PythonPyPI/setuptools-39.2.0/
-[emon@emon setuptools-39.2.0]$ python setup.py install
-[emon@emon setuptools-39.2.0]$ cd
+[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/b5/96/af1686ea8c1e503f4a81223d4a3410e7587fd52df03083de24161d0df7d4/setuptools-46.1.3.zip
+[emon@emon ~]$ unzip /usr/local/src/setuptools-46.1.3.zip -d /usr/local/PythonPyPI/
+[emon@emon ~]$ cd /usr/local/PythonPyPI/setuptools-46.1.3/
+[emon@emon setuptools-46.1.3]$ python3 setup.py install
+[emon@emon setuptools-46.1.3]$ cd
 ```
 
-#### 10.3.2、安装easy_install【废弃】
+#### 10.3.2、安装easy_install
 
 1. 下载并安装
 
@@ -2836,7 +2836,7 @@ Python 3.7.0a1
 [emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/ba/2c/743df41bd6b3298706dfe91b0c7ecdc47f2dc1a3104abeb6e9aa4a45fa5d/ez_setup-0.9.tar.gz
 [emon@emon ~]$ tar -zxvf /usr/local/src/ez_setup-0.9.tar.gz -C /usr/local/PythonPyPI/
 [emon@emon ~]$ cd /usr/local/PythonPyPI/ez_setup-0.9/
-[emon@emon ez_setup-0.9]$ python setup.py install
+[emon@emon ez_setup-0.9]$ python3 setup.py install
 [emon@emon ez_setup-0.9]$ cd
 ```
 
