@@ -2680,6 +2680,7 @@ python.x86_64                       2.7.5-68.el7                       @anaconda
 
 ```bash
 [emon@emon Python-2.7.15]$ make install
+[emon@emon Python-2.7.15]$ cd
 [emon@emon ~]$ ls /usr/local/Python/Python2.7.15/
 bin  include  lib  share
 ```
@@ -2768,24 +2769,25 @@ bin  include  lib  share
 5. 修改软连接
 
 ```bash
-[emon@emon ~]$ rm -rf /usr/local/python
-[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.0a1/ /usr/local/python
+[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.0a1/ /usr/local/python3
 ```
 
-6. 校验
+6. 配置环境变量
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/python3.sh
+```
+
+```bash
+export PYTHON_HOME=/usr/local/python3
+export PATH=$PYTHON_HOME/bin:$PATH
+```
+
+7. 校验
 
 ```bash
 [emon@emon ~]$ python3 -V
 Python 3.7.0a1
-```
-
-**目前还是使用Python2.7，如下切换**
-
-```bash
-[emon@emon ~]$ rm -rf /usr/local/python
-[emon@emon ~]$ ln -s /usr/local/Python/Python2.7.15/ /usr/local/python
-[emon@emon ~]$ python -V
-Python 2.7.15
 ```
 
 ### 10.3、Python工具
