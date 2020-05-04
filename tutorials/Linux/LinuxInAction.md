@@ -2443,7 +2443,7 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 下载地址：  https://www.kernel.org/pub/software/scm/git/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.17.1.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz
 ```
 
 3. 依赖检查与安装
@@ -2462,7 +2462,7 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 5. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.17.1.tar.gz -C /usr/local/Git/
+[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.26.2.tar.gz -C /usr/local/Git/
 ```
 
 6. 执行配置脚本，并编译安装
@@ -2470,29 +2470,29 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 - 切换目录并执行脚本
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Git/git-2.17.1/
-[emon@emon git-2.17.1]$ ./configure --prefix=/usr/local/Git/git2.17.1
+[emon@emon ~]$ cd /usr/local/Git/git-2.26.2/
+[emon@emon git-2.26.2]$ ./configure --prefix=/usr/local/Git/git2.26.2
 ```
 
 - 编译
 
 ```bash
-[emon@emon git-2.17.1]$ make
+[emon@emon git-2.26.2]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon git-2.17.1]$ make install
-[emon@emon git-2.17.1]$ cd
-[emon@emon ~]$ ls /usr/local/Git/git2.17.1/
+[emon@emon git-2.26.2]$ make install
+[emon@emon git-2.26.2]$ cd
+[emon@emon ~]$ ls /usr/local/Git/git2.26.2/
 bin  libexec  share
 ```
 
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Git/git2.17.1/ /usr/local/git
+[emon@emon ~]$ ln -s /usr/local/Git/git2.26.2/ /usr/local/git
 ```
 
 8. 配置环境变量
