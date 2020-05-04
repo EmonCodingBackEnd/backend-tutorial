@@ -2849,20 +2849,20 @@ Python 3.7.7
 | easy_install -m <package name> | 卸载套件 |
 | easy_install --help            | 显示说明 |
 
-#### 10.3.3、安装pip【废弃】
+#### 10.3.3、安装pip
 
 1. 下载并安装
 
 下载页地址：https://pypi.org/project/pip/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/ae/e8/2340d46ecadb1692a1e455f13f75e596d4eab3d11a57446f08259dee8f02/pip-10.0.1.tar.gz
-[emon@emon ~]$ tar -zxvf /usr/local/src/pip-10.0.1.tar.gz -C /usr/local/PythonPyPI/
-[emon@emon ~]$ cd /usr/local/PythonPyPI/pip-10.0.1/
-[emon@emon pip-10.0.1]$ python setup.py install
-[emon@emon pip-10.0.1]$ cd
+[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/d1/05/059c78cd5d740d2299266ffa15514dad6692d4694df571bf168e2cdd98fb/pip-20.1.tar.gz
+[emon@emon ~]$ tar -zxvf /usr/local/src/pip-20.1.tar.gz -C /usr/local/PythonPyPI/
+[emon@emon ~]$ cd /usr/local/PythonPyPI/pip-20.1/
+[emon@emon pip-20.1]$ python3 setup.py install
+[emon@emon pip-20.1]$ cd
 [emon@emon ~]$ pip -V
-pip 10.0.1 from /usr/local/python/lib/python2.7/site-packages/pip-10.0.1-py2.7.egg/pip (python 2.7)
+pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1-py3.7.egg/pip (python 3.7)
 ```
 
 2. pip命令
@@ -3082,8 +3082,8 @@ exit
 具体原因参见Nginx中关于`配置环境变量【特殊】`的描述。
 
 ```bash
-[emon@emon ~]$ sudo ln -s /usr/local/python/bin/supervisord /usr/sbin/supervisord
-[emon@emon ~]$ sudo ln -s /usr/local/python/bin/supervisorctl /usr/sbin/supervisorctl
+[emon@emon ~]$ sudo ln -s /usr/local/python3/bin/supervisord /usr/sbin/supervisord
+[emon@emon ~]$ sudo ln -s /usr/local/python3/bin/supervisorctl /usr/sbin/supervisorctl
 ```
 
 接下来可以直接使用sudo+命令模式了：
@@ -3140,9 +3140,9 @@ Description=Supervisor daemon
 
 [Service]
 Type=forking
-ExecStart=/usr/local/python/bin/supervisord -c /etc/supervisor/supervisord.conf
-ExecStop=/usr/local/python/bin/supervisorctl shutdown
-ExecReload=/usr/local/python/bin/supervisorctl reload
+ExecStart=/usr/local/python3/bin/supervisord -c /etc/supervisor/supervisord.conf
+ExecStop=/usr/local/python3/bin/supervisorctl shutdown
+ExecReload=/usr/local/python3/bin/supervisorctl reload
 KillMode=process
 Restart=on-failure
 RestartSec=50s
