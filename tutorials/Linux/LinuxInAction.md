@@ -2624,12 +2624,12 @@ Hi Rushing0711! You've successfully authenticated, but GitHub does not provide s
 
 ```bash
 [emon@emon ~]$ git --version
-git version 2.17.1
+git version 2.26.2
 ```
 
 ## 10、安装Python
 
-### 10.1、安装Python2.7版本
+### 10.1、安装Python2.7版本【废弃】
 
 1. 检查是否安装
 
