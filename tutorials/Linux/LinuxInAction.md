@@ -2714,14 +2714,14 @@ export PATH=$PYTHON_HOME/bin:$PATH
 Python 2.7.15
 ```
 
-### 10.2、安装Python3.9版本
+### 10.2、安装Python3.7版本
 
-Python3.9和Python2.7安装类似，同一时刻环境变量只会指向一个版本。
+Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个版本。
 
 1. 依赖安装
 
 ```bash
-# 3.9版本需要一个新的包 libffi-devel，否则make install报错： ModuleNotFoundError: No module named '_ctypes'
+# 3.7版本需要一个新的包 libffi-devel，否则make install报错： ModuleNotFoundError: No module named '_ctypes'
 [emon@emon ~]$ sudo yum install -y libffi-devel
 ```
 
@@ -2730,13 +2730,13 @@ Python3.9和Python2.7安装类似，同一时刻环境变量只会指向一个�
 下载页地址： <https://www.python.org/ftp/python/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.9.0/Python-3.9.0a6.tar.xz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.0/Python-3.7.0a1.tar.xz
 ```
 
 3. 解压
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.9.0a6.tar.xz -C /usr/local/Python/
+[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.0a1.tar.xz -C /usr/local/Python/
 ```
 
 4. 执行配置脚本，并编译安装
@@ -2744,8 +2744,8 @@ Python3.9和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Python/Python-3.9.0a6/
-[emon@emon Python-3.9.0a6]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.9.0a6
+[emon@emon ~]$ cd /usr/local/Python/Python-3.7.0a1/
+[emon@emon Python-3.7.0a1]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.7.0a1
 ```
 
 命令解释：`--enable-optimizations`：启用优化安装，建议使用。
@@ -2753,30 +2753,30 @@ Python3.9和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 编译
 
 ```bash
-[emon@emon Python-3.9.0a6]$ make
+[emon@emon Python-3.7.0a1]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon Python-3.9.0a6]$ make install
-[emon@emon Python-3.9.0a6]$ cd
-[emon@emon ~]$ ls /usr/local/Python/Python3.9.0a6/
+[emon@emon Python-3.7.0a1]$ make install
+[emon@emon Python-3.7.0a1]$ cd
+[emon@emon ~]$ ls /usr/local/Python/Python3.7.0a1/
 bin  include  lib  share
 ```
 
 5. 修改软连接
 
 ```bash
-# [emon@emon ~]$ rm -rf /usr/local/python 不再安装python2.X版本，废弃 20200504
-[emon@emon ~]$ ln -s /usr/local/Python/Python3.9.0a6/ /usr/local/python3
+[emon@emon ~]$ rm -rf /usr/local/python
+[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.0a1/ /usr/local/python
 ```
 
 6. 校验
 
 ```bash
 [emon@emon ~]$ python3 -V
-Python 3.9.0a6
+Python 3.7.0a1
 ```
 
 **目前还是使用Python2.7，如下切换**
