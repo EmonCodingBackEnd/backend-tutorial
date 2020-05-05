@@ -4344,6 +4344,8 @@ success
 
 下载地址获取页面： https://jenkins.io/download/
 
+下载地址专项页面： https://pkg.jenkins.io/redhat-stable/
+
 ```bash
 [emon@emon ~]$ wget -cP /usr/local/src/ https://pkg.jenkins.io/redhat-stable/jenkins-2.121.1-1.1.noarch.rpm
 ```
