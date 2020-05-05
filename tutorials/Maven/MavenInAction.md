@@ -237,7 +237,7 @@ http://maven.aliyun.com/nexus/content/groups/public
             <mirrorOf>*</mirrorOf>
             <name>nexus maven</name>
             <!--<url>http://maven.aliyun.com/nexus/content/groups/public</url>-->
-            <url>http://localhost:8089/repository/maven-public/</url>
+            <url>http://localhost:8081/repository/maven-public/</url>
         </mirror>
 ```
 
@@ -260,7 +260,7 @@ server {
     }
 
     location / {
-        proxy_pass http://127.0.0.1:8089;
+        proxy_pass http://127.0.0.1:8081;
     }
 }
 ```
