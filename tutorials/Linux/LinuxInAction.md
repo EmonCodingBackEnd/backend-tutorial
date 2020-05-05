@@ -693,12 +693,12 @@ pasv_max_port=62000
    								<td><a href="#" target="_blank" onclick="jump(9001)">supervisor</a></td>
    							</tr>
    							<tr>
-   								<td>jenkins</td><td>8088</td>
-   								<td><a href="#" target="_blank" onclick="jump(8088)">jenkins</a></td>
+   								<td>nexus</td><td>8081</td>
+   								<td><a href="#" target="_blank" onclick="jump(8089)">nexus</a></td>
    							</tr>
    							<tr>
-   								<td>nexus</td><td>8089</td>
-   								<td><a href="#" target="_blank" onclick="jump(8089)">nexus</a></td>
+   								<td>jenkins</td><td>8088</td>
+   								<td><a href="#" target="_blank" onclick="jump(8088)">jenkins</a></td>
    							</tr>
    							<tr>
    								<td>eureka</td><td>8761</td>

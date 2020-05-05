@@ -43,15 +43,28 @@
 [emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
 ```
 
-6. 修改默认服务端口
+6. 修改配置
+
+- 修改默认服务端口
 
 ```bash
+# 如果需要修改，可以在该文件修改 application-port；默认使用8081，不修改
 [emon@emon ~]$ vim /usr/local/nexus/etc/nexus-default.properties 
 ```
 
+- 修改默认启动内存
+
 ```bash
-# 默认的8081端口，修改为8089
-application-port=8089
+[emon@emon ~]$ vim /usr/local/nexus/bin/nexus.vmoptions 
+```
+
+```bash
+#-Xms1200M
+#-Xmx1200M
+#-XX:MaxDirectMemorySize=2G
+-Xms512M
+-Xmx512M
+-XX:MaxDirectMemorySize=1G
 ```
 
 7. 配置环境变量
@@ -156,7 +169,7 @@ WantedBy=multi-user.target
 
 11. 访问
 
-http://192.168.1.116:8089
+http://192.168.1.116:8081
 
 默认用户名密码： admin/admin123
 
