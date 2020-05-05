@@ -4344,16 +4344,18 @@ success
 
 下载地址获取页面： https://jenkins.io/download/
 
-下载地址专项页面： https://pkg.jenkins.io/redhat-stable/
+下载地址专项页面(rpm)： https://pkg.jenkins.io/redhat-stable/
+
+下载地址专项页面(war)： http://mirrors.jenkins.io/war-stable/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://pkg.jenkins.io/redhat-stable/jenkins-2.121.1-1.1.noarch.rpm
+[emon@emon ~]$ wget -cP /usr/local/src/ https://pkg.jenkins.io/redhat-stable/jenkins-2.222.3-1.1.noarch.rpm
 ```
 
 2. 安装
 
 ```bash
-[emon@emon ~]$ sudo rpm -ivh /usr/local/src/jenkins-2.121.1-1.1.noarch.rpm 
+[emon@emon ~]$ sudo rpm -ivh /usr/local/src/jenkins-2.222.3-1.1.noarch.rpm
 ```
 
 3. 修改默认服务端口
