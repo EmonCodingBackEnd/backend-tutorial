@@ -3705,9 +3705,7 @@ exports.imgtypes={
 [emon@emon ~]$ tar -zxvf /usr/local/src/redis-6.0.1.tar.gz -C /usr/local/Redis/
 ```
 
-5. 切换目录并执行编译cd src && make all
-   make[1]: 进入目录“/usr/local/Redis/redis-6.0.1/src”
-       CC Makefile.dep
+5. 切换目录并执行编译
 
 ```bash
 [emon@emon ~]$ cd /usr/local/Redis/redis-6.0.1/
