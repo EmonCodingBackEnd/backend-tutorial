@@ -10,7 +10,7 @@
 
 | 模块          | 安装目录                              | 软连接              |
 | ------------- | ------------------------------------- | ------------------- |
-| Elasticsearch | /usr/local/ElasticStack/Elasticsearch | /usr/local/es*      |
+| Elasticsearch | /usr/local/ElasticStack/Elasticsearch | /usr/local/es       |
 | Logstash      | /usr/local/ElasticStack/Logstash      | /usr/local/logstash |
 | kibana        | /usr/local/ElasticStack/kibana        | /usr/local/kibana   |
 | Beats         | /usr/local/ElasticStack/Beats         | /usr/local/beats    |
