@@ -64,6 +64,28 @@ storage:
     nameSpace: ${SW_NAMESPACE:"emon"} #nameSpace: ${SW_NAMESPACE:""}
 ```
 
+- 第三处：相对路径修改为绝对路径
+
+```yaml
+receiver-trace:
+  default:
+    bufferPath: ${SW_RECEIVER_BUFFER_PATH:../trace-buffer/}
+=>
+receiver-trace:
+  default:
+    bufferPath: ${SW_RECEIVER_BUFFER_PATH:/usr/local/sw/trace-buffer/}
+    
+service-mesh:
+  default:
+    bufferPath: ${SW_SERVICE_MESH_BUFFER_PATH:../mesh-buffer/}
+=>
+service-mesh:
+  default:
+    bufferPath: ${SW_SERVICE_MESH_BUFFER_PATH:/usr/local/sw/mesh-buffer/}
+```
+
+
+
 配置文件`vim /usr/local/sw/webapp/webapp.yml`：
 
 ```bash

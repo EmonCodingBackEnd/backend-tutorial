@@ -92,8 +92,8 @@ http.cors.allow-origin: "*"
 ```
 
 ```
-#-Xms1g
-#-Xmx1g
+#-Xms4g
+#-Xmx4g
 -Xms256m
 -Xmx256m
 ```
@@ -159,9 +159,8 @@ http.cors.allow-origin: "*"
   [emon@emon ~]$ sudo vim /etc/sysctl.conf 
   ```
 ```
-  
-```
   vm.max_map_count=655360
+```
 ```bash
 # 使配置生效
 [emon@emon ~]$ sudo sysctl -p
@@ -187,7 +186,7 @@ redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
 environment=JAVA_HOME="/usr/local/java"
-stdout_logfile=/etc/supervisor/supervisor.d/elasticsearch.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stdout_logfile=/etc/supervisor/supervisor.d/es.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
 stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
 killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
 ```
@@ -280,14 +279,14 @@ cat /proc/<进程ID>/limits
 lsof -p <PID> | wc -l
 比如：
 [emon@emon ~]$ lsof -p 55756 | wc -l
-3788
+478
 ```
 
 - 查看系统总限制打开文件的最大数量
 
 ```bash
 [emon@emon ~]$ cat /proc/sys/fs/file-max
-481578
+488387
 ```
 
 
