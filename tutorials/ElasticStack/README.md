@@ -92,8 +92,8 @@ http.cors.allow-origin: "*"
 ```
 
 ```
-#-Xms4g
-#-Xmx4g
+#-Xms1g
+#-Xmx1g
 -Xms256m
 -Xmx256m
 ```
