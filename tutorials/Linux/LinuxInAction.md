@@ -3690,7 +3690,7 @@ exports.imgtypes={
 下载页地址： https://redis.io/download
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://download.redis.io/releases/redis-6.0.1.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ http://download.redis.io/releases/redis-5.0.8.tar.gz
 ```
 
 3. 创建解压目录
@@ -3702,22 +3702,22 @@ exports.imgtypes={
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/redis-6.0.1.tar.gz -C /usr/local/Redis/
+[emon@emon ~]$ tar -zxvf /usr/local/src/redis-5.0.8.tar.gz -C /usr/local/Redis/
 ```
 
 5. 切换目录并执行编译
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Redis/redis-6.0.1/
+[emon@emon ~]$ cd /usr/local/Redis/redis-5.0.8/
 # 默认的是jemalloc分配器，如果不存在，需要设置malloc分配器才可以
-[emon@emon redis-6.0.1]$ make MALLOC=libc
+[emon@emon redis-5.0.8]$ make MALLOC=libc
 cd src && make all
 make[1]: 进入目录“/usr/local/Redis/redis-4.0.9/src”
     CC Makefile.dep
 ......`[省略输出]`
 Hint: It's a good idea to run 'make test' ;)
 
-make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
+make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
 ```
 
 注意：make命令执行完成编译后，会在src目录下生成7个可执行文件，分别是：
@@ -3733,9 +3733,9 @@ make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
 6. 编译测试
 
 ```bash
-[emon@emon redis-6.0.1]$ make test
+[emon@emon redis-5.0.8]$ make test
 cd src && make test
-make[1]: 进入目录“/usr/local/Redis/redis-6.0.1/src”
+make[1]: 进入目录“/usr/local/Redis/redis-5.0.8/src”
     CC Makefile.dep
 Cleanup: may take some time... OK
 Starting test server at port 11111
@@ -3743,8 +3743,8 @@ Starting test server at port 11111
 \o/ All tests passed without errors!
 
 Cleanup: may take some time... OK
-make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
-[emon@emon redis-6.0.1]$ cd
+make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
+[emon@emon redis-5.0.8]$ cd
 ```
 
 ### 12.1、【一主二从三哨兵】
@@ -3756,32 +3756,32 @@ make[1]: 离开目录“/usr/local/Redis/redis-6.0.1/src”
 - 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis6.0.1
+[emon@emon ~]$ mkdir /usr/local/Redis/redis5.0.8
 ```
 
-- 复制`/usr/local/Redis/redis-6.0.1/src`目录下的可执行文件，到安装目录
+- 复制`/usr/local/Redis/redis-5.0.8/src`目录下的可执行文件，到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-6.0.1/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis6.0.1/
+[emon@emon ~]$ cp /usr/local/Redis/redis-5.0.8/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis5.0.8/
 ```
 
 - 复制`redis.config`与`sentinel.conf`到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-6.0.1/{redis.conf,sentinel.conf} /usr/local/Redis/redis6.0.1/
+[emon@emon ~]$ cp /usr/local/Redis/redis-5.0.8/{redis.conf,sentinel.conf} /usr/local/Redis/redis5.0.8/
 ```
 
 - 在内置目录创建RDB文件目录与log日志文件
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis6.0.1/redis_rdb
-[emon@emon ~]$ touch /usr/local/Redis/redis6.0.1/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
+[emon@emon ~]$ mkdir /usr/local/Redis/redis5.0.8/redis_rdb
+[emon@emon ~]$ touch /usr/local/Redis/redis5.0.8/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
 ```
 
 - 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Redis/redis6.0.1/ /usr/local/redis
+[emon@emon ~]$ ln -s /usr/local/Redis/redis5.0.8/ /usr/local/redis
 ```
 
 - 配置环境变量
