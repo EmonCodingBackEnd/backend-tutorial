@@ -4633,7 +4633,7 @@ test                Overall->Read,Run->Replay
 
 ```bash
 1、创建一个Maven项目
-【新建任务】->输入一个任务名称，比如 wechat-maven->选择构建一个maven项目->点击确定
+【新建任务】->输入一个任务名称，比如 spring-boot-demo->选择构建一个maven项目->点击确定
 2、配置页面
 	-- General
 		-- 项目名称：			自动填写了
@@ -4647,7 +4647,7 @@ test                Overall->Read,Run->Replay
 				-- Repository URL： git@github.com:emoncoding/wechat.git
 				-- Credentials： 上面创建的认证方式
 			-- Branches to build
-				-- Branch Specifier(blank for 'any')：*/develop
+				-- Branch Specifier(blank for 'any')：*/master
 	-- Build
 		-- Root POM: pom.xml
 		-- Goals and opotions: clean package -Dmaven.test.skip=true
@@ -4661,7 +4661,7 @@ test                Overall->Read,Run->Replay
 					-- Transfer Set
 						-- Source files: target/*.jar
 						-- Remove prefix: target
-						-- Remote directory: wechat
+						-- Remote directory: spring-boot-demo
 						-- Exec command: /home/emon/bin/start.sh wechat
 ```
 
