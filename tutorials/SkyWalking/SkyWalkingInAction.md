@@ -130,7 +130,22 @@ SkyWalking Web Application started successfully!
 
 # 二、分布式日志链路追踪trace-id
 
-1. 配置agent
+1. 添加依赖
+
+```xml
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-trace</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-toolkit-logback-1.x</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+```
+
+2. 配置agent
 
 在项目的`VM options:`中配置如下内容：
 
@@ -150,7 +165,7 @@ SkyWalking Web Application started successfully!
 
 
 
-2. 配置logback
+3. 配置logback
 
 对SpringBoot项目，在`resources`目录下创建文件`logback-spring-defaults.xml`，内容如下：
 
