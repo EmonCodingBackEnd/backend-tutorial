@@ -3071,7 +3071,7 @@ success
 [root@emon emon]# supervisord -c /etc/supervisor/supervisord.conf
 [root@emon emon]# supervisorctl status
 tomcat                           STOPPED   Not started
-wechat                           STOPPED   Not started
+sbd                              STOPPED   Not started
 # 启动
 [root@emon emon]# supervisorctl start tomcat
 # 降级到emon权限
@@ -3093,7 +3093,7 @@ exit
 ```bash
 [emon@emon ~]$ sudo supervisorctl status
 tomcat                           STOPPED   Not started
-wechat                           STOPPED   Not started
+sbd                              STOPPED   Not started
 ```
 
 6. 开放端口
@@ -4644,7 +4644,7 @@ test                Overall->Read,Run->Replay
 	-- 源码管理
 		-- Git
 			-- Repositories
-				-- Repository URL： git@github.com:emoncoding/wechat.git
+				-- Repository URL： git@github.com:EmonCodingBackEnd/spring-boot-demo.git
 				-- Credentials： 上面创建的认证方式
 			-- Branches to build
 				-- Branch Specifier(blank for 'any')：*/master
@@ -4662,7 +4662,7 @@ test                Overall->Read,Run->Replay
 						-- Source files: target/*.jar
 						-- Remove prefix: target
 						-- Remote directory: spring-boot-demo
-						-- Exec command: /home/emon/bin/start.sh wechat
+						-- Exec command: /home/emon/bin/start.sh sbd
 ```
 
 start.sh是什么？
