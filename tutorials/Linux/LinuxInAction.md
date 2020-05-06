@@ -4673,6 +4673,7 @@ start.sh是什么？
 #!/bin/bash
 MODULE=$1
 echo 'emon123' | sudo -S supervisorctl restart $MODULE
+[emon@emon ~]$ chmod u+x /home/emon/bin/start.sh 
 ```
 
 
