@@ -179,7 +179,7 @@ http://192.168.1.116:8081
 
 ```bash
 [emon@emon ~]$ cat /usr/local/Nexus/nexus3.23.0-03-bundle/sonatype-work/nexus3/admin.password
-# 然后按照步骤修改为admin123，并禁止匿名用户访问。
+# 然后按照步骤修改为admin123，并允许匿名用户访问。
 ```
 
 12. 添加阿里云代理资源库
@@ -275,32 +275,6 @@ server {
 ```
 
 
-
----
-
-更新nexus索引【暂时不用】
-
-在 http://repo.maven.apache.org/maven2/.index/ 下载
-
-nexus-maven-repository-index.gz
-
-nexus-maven-repository-index.properties
-
-以及点击下载：[indexer-cli-6.0.0.jar](http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar)
-
-```bash
-http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.gz
-http://repo.maven.apache.org/maven2/.index/nexus-maven-repository-index.properties
-http://central.maven.org/maven2/org/apache/maven/indexer/indexer-cli/6.0.0/indexer-cli-6.0.0.jar
-```
-
-上传上面的三个文件到服务器同一个目录，然后执行：
-
-```bash
-java -jar indexer-cli-6.0.0.jar -u nexus-maven-repository-index.gz -d indexer
-```
-
-等程序运行完成之后，可以发现indexer文件夹出现了很多的文件，将这些文件拷贝到`$NEXUS_WORK_HOME/blobs/default`
 
 ---
 
