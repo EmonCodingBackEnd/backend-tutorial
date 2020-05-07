@@ -111,6 +111,8 @@ nexus is stopped.
 [emon@emon ~]$ nexus restart
 ```
 
+查看日志：`/usr/local/nexus-work/log/nexus.log`
+
 10. 设置启动项【推荐】
 
 参考：https://help.sonatype.com/repomanager3/system-requirements#SystemRequirements-Linux
@@ -173,6 +175,13 @@ http://192.168.1.116:8081
 
 默认用户名密码： admin/admin123
 
+查看admin密码：
+
+```bash
+[emon@emon ~]$ cat /usr/local/Nexus/nexus3.23.0-03-bundle/sonatype-work/nexus3/admin.password
+# 然后按照步骤修改为admin123，并禁止匿名用户访问。
+```
+
 12. 添加阿里云代理资源库
 
 第一步：创建Blob Stores
@@ -197,7 +206,7 @@ http://192.168.1.116:8081
 
 `Proxy`->`Remote storage`:录入阿里云镜像地址
 
-```
+```bash
 http://maven.aliyun.com/nexus/content/groups/public
 ```
 
@@ -207,7 +216,7 @@ http://maven.aliyun.com/nexus/content/groups/public
 
 左侧：Repositories
 
-右侧：`Group`中，把`alimaven`加入右侧，顺序调整为：
+右侧：`maven-public`中，把`alimaven`加入右侧，顺序调整为：
 
 - `maven-releases`
 - `maven-snapshots`
