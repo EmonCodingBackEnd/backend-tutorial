@@ -4360,13 +4360,16 @@ success
 [emon@emon ~]$ sudo rpm -ivh /usr/local/src/jenkins-2.222.3-1.1.noarch.rpm
 ```
 
-3. 修改默认服务端口
+3. 修改配置
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/sysconfig/jenkins 
 ```
 
 ```bash
+# 控制内存占用
+JENKINS_JAVA_OPTIONS="-XX:MaxPermSize=512m -Djava.awt.headless=true"
+
 # 默认的8080端口，与tomcat冲突
 JENKINS_PORT="8088"
 ```
@@ -4427,6 +4430,26 @@ http://192.168.1.116:8088
 重点安装一个`Misc(localization)->Locale`插件，可以在【Manage Jenkins】->【Manage Plugins】->【Available】中过滤`Localization`看到。
 
 备注：安装后部分内容变为中文，并不是全部汉化。
+
+**如果碰到jenkins时区问题（登录页面右下角时间不正确，比实际慢8小时），处理如下：**
+
+配置时区：【Manage Jenkins】->【Script Console】，输入如下命令并【运行】
+
+```bash
+System.setProperty('org.apache.commons.jelly.tags.fmt.timeZone', 'Asia/Shanghai')
+```
+
+同时确保linux服务器的时区：
+
+```bash
+[emon@emon ~]$ timedatectl |grep "Time zone"
+       Time zone: Asia/Shanghai (CST, +0800)
+[emon@emon ~]$ ll /etc/localtime 
+lrwxrwxrwx. 1 root root 35 5月   3 20:19 /etc/localtime -> ../usr/share/zoneinfo/Asia/Shanghai
+# 如果不是上面的时区，可以修改
+rm -rf /etc/localtime
+[emon@emon ~]$ ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+```
 
 9. Jenkins URL
 
@@ -4675,8 +4698,6 @@ MODULE=$1
 echo 'emon123' | sudo -S supervisorctl restart $MODULE
 [emon@emon ~]$ chmod u+x /home/emon/bin/start.sh 
 ```
-
-
 
 
 
