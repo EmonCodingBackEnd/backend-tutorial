@@ -19,7 +19,7 @@
 专项下载地址：https://help.sonatype.com/repomanager3/download
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://sonatype-download.global.ssl.fastly.net/repository/repositoryManager/3/nexus-3.15.2-01-unix.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.23.0-03-unix.tar.gz
 ```
 
 3. 创建安装目录
@@ -27,20 +27,20 @@
 ```bash
 [emon@emon ~]$ mkdir /usr/local/Nexus
 # 每一个版本解压到一个目录
-[emon@emon ~]$ mkdir /usr/local/Nexus/nexus3.15.2-01-bundle/
+[emon@emon ~]$ mkdir /usr/local/Nexus/nexus3.23.0-03-bundle/
 ```
 
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.15.2-01-unix.tar.gz -C /usr/local/Nexus/nexus3.15.2-01-bundle
+[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.23.0-03-unix.tar.gz -C /usr/local/Nexus/nexus3.23.0-03-bundle
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/nexus-3.15.2-01 /usr/local/nexus
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.15.2-01-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.23.0-03-bundle/nexus-3.23.0-03 /usr/local/nexus
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.23.0-03-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
 ```
 
 6. 修改配置
