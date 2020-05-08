@@ -250,7 +250,7 @@ Server:
 # 等效于 docker pull registry.hub.docker.com/ubuntu:14.04
 [emon@emon ~]$ docker pull ubuntu:14.04
 # 我喜欢的centos
-[emon@emon ~]$ docker pull centos:7.5.1804
+[emon@emon ~]$ docker pull centos:7
 ```
 
 - 获取其他服务器镜像
@@ -295,15 +295,17 @@ Server:
 	为了方便在后续工作中使用特定镜像，还可以使用`docker tag`命令来为本地镜像任意添加新的标签。
 
 ```shell
-[emon@emon ~]$ docker tag hub.c.163.com/public/ubuntu:14.04 163_ubuntu:14.04
+[emon@emon ~]$ docker tag centos:7 centos:7.8
+[emon@emon ~]$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              7                   b5b4d78bc90c        2 days ago          203MB
+centos              7.8                 b5b4d78bc90c        2 days ago          203MB
 ```
-
-	之后，用户就可以直接使用 163_ubuntu:14.04 来表示这个镜像了。 
 
 ## 4、使用`inspect`命令查看详细信息
 
 ```shell
-[emon@emon ~]$ docker inspect ubuntu:14.04
+[emon@emon ~]$ docker inspect centos:7
 ```
 
 ## 5、搜寻镜像
@@ -327,16 +329,19 @@ Server:
 - 使用标签删除镜像，命令格式： `docker rmi IMAGE [IMAGE...]`，其中IMAGE可以是标签或者ID
 
 ```shell
-[emon@emon ~]$ docker rmi ubuntu:14.04
+[emon@emon ~]$ docker rmi centos:7.8
+[emon@emon ~]$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              7                   b5b4d78bc90c        2 days ago          203MB
 ```
 
 - 使用镜像ID（或者部分ID串前缀）删除镜像
 
 ```shell
-[emon@emon ~]$ docker rmi 2fe5c4bba1f9
+[emon@emon ~]$ docker rmi -f b5b4d78bc90c
 ```
 
-	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。
+	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。哪怕基于该镜像启动了容器，也会删除镜像。但不影响容器。
 
 ## 7、创建镜像
 
@@ -607,8 +612,7 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 - 新建容器
 
 ```shell
-[emon@emon ~]$ docker create -it centos:7.5.1804
-61d0bd1c9c24ef46e88ba73bdf71e539d30f35ba23827b4c64f5d2c9f9876c76
+[emon@emon ~]$ docker create -it --name centos7.8 centos:7
 ```
 
 使用docker create命令创建的容器处于停止状态，可以使用docker start命令来启动。
@@ -616,32 +620,24 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 - 启动容器
 
 ```shell
-[emon@emon ~]$ docker start 61d0bd1c9c24
+[emon@emon ~]$ docker start <CONTAINER ID>
 ```
 
-- 新建并启动容器
+- 新建并启动容器：守护态运行(Daemonized)【推荐的启动方式】
 
-```shell
-[emon@emon ~]$ docker run -it centos:7.5.1804 /bin/bash
+```bash
+[emon@emon ~]$ docker run -itd --name centos7.8 centos:7 [/bin/bash]
 ```
 
-用户可以按Ctrl+d或者输入exit命令来退出容器：
+- 新建并启动容器：非守护态运行
 
-TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P]或[Ctrl+Q]退出而不是终止容器。
-
-```shell
-[root@3ac494840e14 /]# exit
+```bash
+[emon@emon ~]$ docker run -it --name centos7.8 centos:7 [/bin/bash]
 ```
 
-- 守护态运行
+这种运行方式，用户可以按Ctrl+d或者输入exit命令来退出容器：
 
-更多的时候，需要让Docker容器在后台以守护态（Daemonized）形式运行。此时，可以通过添加-d参数来实现。
-
-```shell
-[emon@emon ~]$ docker run -d centos:7.5.1804 /bin/bash -c "while true;do echo hello world;sleep 1;done"
-```
-
-说明：如果没有运行的内容，会自动停掉。
+TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P+Q]退出而不是终止容器。
 
 ## 3、终止容器
 
@@ -650,7 +646,7 @@ TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P]
 首先向容器发送SIGTERM信号，等待一段超时时间（默认为10秒）后，再发送SIGKILL信号来终止容器：
 
 ```shell
-[emon@emon ~]$ docker stop 2534df637e7e
+[emon@emon ~]$ docker stop <CONTAINER ID>
 ```
 
 [docker kill 命令会直接发送SIGKILL信号来强制终止容器。]
@@ -660,7 +656,7 @@ TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P]
 此外，docker restart命令会将一个运行态的容器先终止，然后再重新启动它：
 
 ```shell
-[emon@emon ~]$ docker restart 2534df637e7e
+[emon@emon ~]$ docker restart <CONTAINER ID>
 ```
 
 ## 4、进入容器
@@ -681,16 +677,8 @@ docker attach [--detach-keys[=[]]][--no-stdin] [--sig-proxy[=true]] CONTAINER
 | --no-stdin         | false  | 是否关闭标准输入                                    |
 | --sig-proxy        | true   | 是否代理收到的系统信号给应用进程                    |
 
-1. 创建容器并后台启动
-
 ```shell
-[emon@emon ~]$ docker run -itd centos:7.5.1804
-```
-
-2. 进入容器
-
-```shell
-[emon@emon ~]$ docker attach 201cd2b1eee5
+[emon@emon ~]$ docker attach <CONTAINER ID>
 ```
 
 但是使用attach命令有时候不方便。当多个窗口同时用attach命令连接到同一个容器的时候，所有窗口都会同步显示。当某个窗口因命令阻塞时，其他窗口也无法执行操作了。
@@ -708,16 +696,10 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 | -t,--tty         | false  | 分配伪终端，默认为false      |
 | -u,--user        |        | 执行命令的用户名或者ID       |
 
-1. 创建容器并后台启动
-
-```shell
-[emon@emon ~]$ docker run -itd centos:7.5.1804
-```
-
 2. 进入容器
 
 ```shell
-[emon@emon ~]$ docker exec -it eac2c8d31678 /bin/bash
+[emon@emon ~]$ docker exec -it <CONTAINER ID> /bin/bash
 ```
 
 - 使用nsenter工具
@@ -747,7 +729,7 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]。
 2. 删除停止状态的容器
 
 ```shell
-[emon@emon ~]$ docker rm 31f3f0a229e5
+[emon@emon ~]$ docker rm <CONTAINER ID>
 ```
 
 - 删除运行状态的容器
