@@ -694,7 +694,7 @@ pasv_max_port=62000
    							</tr>
    							<tr>
    								<td>nexus</td><td>8081</td>
-   								<td><a href="#" target="_blank" onclick="jump(8089)">nexus</a></td>
+   								<td><a href="#" target="_blank" onclick="jump(8081)">nexus</a></td>
    							</tr>
    							<tr>
    								<td>jenkins</td><td>8088</td>
