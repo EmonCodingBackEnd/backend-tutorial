@@ -17,7 +17,8 @@ docker镜像页面： https://hub.docker.com/_/rabbitmq/
 - 安装镜像
 
 ```bash
-[emon@emon ~]$ docker run -d --hostname my-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3.7.7-management
+# 如果找不到镜像，下载并启动
+[emon@emon ~]$ docker run -itd --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.8.3-management
 ```
 
 - 验证
