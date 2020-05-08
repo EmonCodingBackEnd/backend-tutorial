@@ -422,7 +422,7 @@ root@fe1aa9bd8460:/# exit
 
 用户在Docker Hub网站注册后可以上传自制的镜像。例如用户user上传本地的test:latest镜像，可以先添加新的标签user/test:latest，然后用docker push命令上传镜像；
 
-**请确保自己在 [Docker Hub](https://hub.docker.com/) 上有注册的用户，并把user替换为字节的用户名**
+**请确保自己在 [Docker Hub](https://hub.docker.com/) 上有注册的用户，并把user替换为自己的用户名**
 
 1. 打标签
 
