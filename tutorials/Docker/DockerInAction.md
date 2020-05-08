@@ -76,9 +76,9 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 - ≈‰÷√
 
 ```bash
-[emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://c018e274.m.daocloud.io
+[emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
 docker version >= 1.12
-{"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
+{"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
 Success.
 You need to restart docker to take effect: sudo systemctl restart docker
 ```
@@ -87,7 +87,7 @@ You need to restart docker to take effect: sudo systemctl restart docker
 
 ```bash
 [emon@emon ~]$ sudo cat /etc/docker/daemon.json 
-{"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
+{"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
 ```
 
 - ÷ÿ∆Ù
@@ -151,40 +151,45 @@ Containers: 0
  Paused: 0
  Stopped: 0
 Images: 0
-Server Version: 17.05.0-ce
-Storage Driver: overlay
+Server Version: 18.06.3-ce
+Storage Driver: overlay2
  Backing Filesystem: xfs
  Supports d_type: true
+ Native Overlay Diff: true
 Logging Driver: json-file
 Cgroup Driver: cgroupfs
-Plugins: 
+Plugins:
  Volume: local
  Network: bridge host macvlan null overlay
+ Log: awslogs fluentd gcplogs gelf journald json-file logentries splunk syslog
 Swarm: inactive
 Runtimes: runc
 Default Runtime: runc
 Init Binary: docker-init
-containerd version: 9048e5e50717ea4497b757314bad98ea3763c145
-runc version: 9c2d8d184e5da67c95d601382adf14862e4f2228
-init version: 949e6fa
+containerd version: 468a545b9edcd5932818eb9de8e72413e616e86e
+runc version: a592beb5bc4c4092b1b1bac971afed27687340c5
+init version: fec3683
 Security Options:
  seccomp
   Profile: default
-Kernel Version: 3.10.0-862.el7.x86_64
+Kernel Version: 3.10.0-1062.el7.x86_64
 Operating System: CentOS Linux 7 (Core)
 OSType: linux
 Architecture: x86_64
-CPUs: 1
-Total Memory: 1.779GiB
+CPUs: 4
+Total Memory: 4.743GiB
 Name: emon
-ID: QKZW:Q2LO:75KW:UETN:UKN7:7N6Y:H74J:R2RV:VQIB:7YNB:RVEV:UMN4
+ID: GN4G:MRL4:3LOQ:IHZP:CXV6:TE33:WSIG:FAYD:4UBO:3VU6:VBAZ:5I5I
 Docker Root Dir: /var/lib/docker
 Debug Mode (client): false
 Debug Mode (server): false
 Registry: https://index.docker.io/v1/
+Labels:
 Experimental: false
 Insecure Registries:
  127.0.0.0/8
+Registry Mirrors:
+ http://c018e274.m.daocloud.io/
 Live Restore Enabled: false
 ```
 
@@ -193,21 +198,23 @@ Live Restore Enabled: false
 ```shell
 [emon@emon ~]$ docker version
 Client:
- Version:      17.05.0-ce
- API version:  1.29
- Go version:   go1.7.5
- Git commit:   89658be
- Built:        Thu May  4 22:06:25 2017
- OS/Arch:      linux/amd64
+ Version:           18.06.3-ce
+ API version:       1.38
+ Go version:        go1.10.3
+ Git commit:        d7080c1
+ Built:             Wed Feb 20 02:26:51 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
 
 Server:
- Version:      17.05.0-ce
- API version:  1.29 (minimum version 1.12)
- Go version:   go1.7.5
- Git commit:   89658be
- Built:        Thu May  4 22:06:25 2017
- OS/Arch:      linux/amd64
- Experimental: false
+ Engine:
+  Version:          18.06.3-ce
+  API version:      1.38 (minimum version 1.12)
+  Go version:       go1.10.3
+  Git commit:       d7080c1
+  Built:            Wed Feb 20 02:28:17 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
 ```
 
 
