@@ -69,19 +69,37 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 
 ### 1.3、配置docker加速器
 
-采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
-
-登录DaoCloud，找到小火箭图标，根据说明操作：
-
 - 配置
 
-```bash
-[emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
-docker version >= 1.12
-{"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
-Success.
-You need to restart docker to take effect: sudo systemctl restart docker
-```
+  - DaoCloud
+
+  采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
+
+  登录DaoCloud，找到小火箭图标，根据说明操作：
+
+  ```bash
+  [emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
+  docker version >= 1.12
+  {"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
+  Success.
+  You need to restart docker to take effect: sudo systemctl restart docker
+  ```
+
+  - 阿里云
+
+  登录阿里开发者平台： https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
+
+  点击【镜像搜索】按钮，自动跳转到控制台的镜像搜索，根据提示注册并登录：
+
+  在左侧【镜像中心】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
+
+  ```bash
+  sudo tee /etc/docker/daemon.json <<-'EOF'
+  {
+    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"]
+  }
+  EOF
+  ```
 
 - 查看
 
