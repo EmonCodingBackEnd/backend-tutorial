@@ -121,7 +121,7 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 
 ```shell
 [emon@emon ~]$ vim .bashrc
-alias docker="sudo /usr/bin/docker"
+alias docker="echo 'emon123' | sudo -S /usr/bin/docker"
 ```
 
 	使之生效：
