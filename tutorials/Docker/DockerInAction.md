@@ -51,7 +51,7 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 4. 安装docker
 
 ```shell
-[emon@emon ~]$ sudo yum install -y docker-ce-17.12.0.ce
+[emon@emon ~]$ sudo yum install -y docker-ce-18.06.3.ce
 ```
 
 5. 启动
@@ -63,8 +63,8 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 6. 验证安装
 
 ```shell
-[emon@emon ~]$ docker version
-[emon@emon ~]$ docker info
+[emon@emon ~]$ sudo docker version
+[emon@emon ~]$ sudo docker info
 ```
 
 ### 1.3、配置docker加速器
@@ -76,24 +76,24 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 - 配置
 
 ```bash
-[root@emon docker]# curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://c018e274.m.daocloud.io
+[emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://c018e274.m.daocloud.io
 docker version >= 1.12
 {"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
 Success.
-You need to restart docker to take effect: sudo systemctl restart docker 
+You need to restart docker to take effect: sudo systemctl restart docker
 ```
 
 - 查看
 
 ```bash
-[root@emon docker]# cat /etc/docker/daemon.json 
+[emon@emon ~]$ sudo cat /etc/docker/daemon.json 
 {"registry-mirrors": ["http://c018e274.m.daocloud.io"]}
 ```
 
 - 重启
 
 ```bash
-[root@emon docker]# systemctl restart docker
+[emon@emon ~]$ sudo systemctl restart docker
 ```
 
 ## 2、配置Docker服务
