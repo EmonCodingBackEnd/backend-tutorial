@@ -284,6 +284,12 @@ http://192.168.1.116:15672
 rabbitmqctl add_user username password
 ```
 
+- 赋予其administrator角色
+
+```bash
+rabbitmqctl set_user_tags username administrator
+```
+
 - 列出用户
 
 ```bash
@@ -317,7 +323,7 @@ rabbitmqctl change_password username newpassword
 - 设置用户权限
 
 ```bash
-rabbitmqctl set_permissions -p vhostpath username 
+rabbitmqctl set_permissions -p vhostpath username '.*' '.*' '.*'
 ```
 
 - 创建虚拟主机
@@ -406,9 +412,9 @@ rabbitmqctl rename_cluster_node oldnode1 newnode1 [oldnode2] [newnode2] ...
 
 # 九十九、用户信息
 
-| 用户名 | 密码  |
-| ------ | ----- |
-| guest  | guest |
-|        |       |
-|        |       |
+| 用户名 | 密码      |
+| ------ | --------- |
+| guest  | guest     |
+| rabbit | rabbit123 |
+|        |           |
 
