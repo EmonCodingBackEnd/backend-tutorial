@@ -639,6 +639,26 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P+Q]退出而不是终止容器。
 
+**异常情况：**
+
+如果创建容器时，发现如下错误的处理办法：
+
+`WARNING: IPv4 forwarding is disabled. Networking will not work.`
+
+```bash
+# 检查
+[emon@emon ~]$ sudo sysctl -a|grep net.ipv4.ip_forward
+# 配置
+[emon@emon ~]$ sudo vim /etc/sysctl.conf
+net.ipv4.ip_forward=1
+# 使之生效
+[emon@emon ~]$ sudo sysctl -p
+# 重启网络
+[emon@emon ~]$ sudo systemctl restart network
+```
+
+
+
 ## 3、终止容器
 
 可以使用docker stop来终止一个运行中的容器。该命令的格式为docker stop [-t|--time[=10]][CONTAINER...]。
