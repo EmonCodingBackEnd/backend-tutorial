@@ -1604,7 +1604,7 @@ nginx version: nginx/1.18.0
 server {
     listen 80;
     autoindex on;
-    server_name 192.168.1.116 10.0.0.116;
+    server_name file.emon.vip;
     access_log /usr/local/nginx/logs/access.log combined;
     index index.html index.htm index.jsp index.php;
     #error_page 404 /404.html;
