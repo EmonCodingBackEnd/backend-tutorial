@@ -542,6 +542,27 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl start cerebro
 ```
 
+### 1.6、ES插件安装
+
+#### 1.6.1、ik分词插件
+
+1. 插件地址： [ik分词插件github地址](https://github.com/medcl/elasticsearch-analysis-ik)
+2. 安装
+
+```bash
+[emon@emon ~]$ sudo /usr/local/es/bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip
+```
+
+**说明：**如果您正在使用 Elasticsearch 的DEB / RPM分发，请以超级用户权限运行安装；否则可能会碰到错误：
+
+```bash
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@     WARNING: plugin requires additional permissions     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+```
+
+导致安装失败，加上sudo适用root安装即可。
+
 ## 2、Logstash
 
 1. 下载
@@ -758,6 +779,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ sudo supervisorctl update
 [emon@emon ~]$ sudo supervisorctl start kibana
 ```
+
+**说明：**如果碰到启动失败，一直解决不了，可以使用root用户启动，并在command后追加`--allow-root`即可。
 
 6. 访问
 
