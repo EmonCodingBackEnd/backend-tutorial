@@ -671,6 +671,88 @@ output {
 
 可以在控制台命令行输入消息，会被传递到es服务器。
 
+6. 准备一个`mysql.conf`配置文件【一个接近实战的例子】
+
+```bash
+# 上传mysql驱动jar到该目录下，比如mysql-connector-java-5.1.41.jar
+[emon@emon ~]$ mkdir -pv /usr/local/logstash/config/custom_config/mysql_config
+```
+
+```bash
+# 编辑goods.config
+[emon@emon ~]$ vim /usr/local/logstash/config/custom_config/mysql_config/goods.conf 
+```
+
+```bash
+input {
+    stdin {}
+    jdbc {
+        # 驱动jar包位置
+        jdbc_driver_library => "/usr/local/logstash/config/custom_config/mysql_config/mysql-connector-java-5.1.41.jar"
+        # 驱动类
+        jdbc_driver_class => "com.mysql.jdbc.Driver"
+        jdbc_paging_enabled => "true"
+        jdbc_page_size => "50000"
+        # 数据库
+        jdbc_connection_string => "jdbc:mysql://192.168.1.52:3306/hbsitedb-test?useSSL=false"
+        # 用户名密码
+        jdbc_user => "jpss"
+        jdbc_password => "Jpss541018!"
+        # 是否开启记录追踪
+        record_last_run => "true"
+        plugin_timezone => "local"
+        # 是否需要追踪字段，如果为true，则需要制定tracking_column，默认是timestamp
+        use_column_value => "true"
+        # 指定追踪的字段
+        tracking_column => "modify_time"
+        # 追踪字段的类型，目前只有数字和时间类型，默认是数字类型
+        tracking_column_type => "timestamp"
+        # 执行
+        last_run_metadata_path => "/usr/local/logstash/config/custom_config/mysql_config/last_run_metadata_path"
+        schedule => "* * * * *"
+        statement_filepath => "/usr/local/logstash/config/custom_config/mysql_config/goods.sql"
+    }
+}
+filter {
+    json {
+        source => "message"
+        remove_field => ["message"]
+    }
+}
+output {
+    elasticsearch {
+        hosts => "192.168.1.56:9200"
+        index => "logstash-es-goods-%{+YYYY.MM.dd}"
+        # 需要关联的数据库中有一个id字段，对应索引的id号
+        document_id => "%{id}"
+    }
+    stdout {
+        codec => json_lines
+    }
+}
+```
+
+```bash
+# 编辑goods.sql文件
+[emon@emon ~]$ vim /usr/local/logstash/config/custom_config/mysql_config/goods.sql
+```
+
+```sql
+select sku.id, spu.id spu_id, spu.tenant_id , spu.shop_id , spu.cover , spu.imgs , spu.spu_name , sku.price , sku.spread_price , spu.sale_start_time ,spu.sale_end_time, spu.modify_time
+from goods_sku sku
+left join goods_spu spu
+on spu.id=sku.spu_id
+where spu.modify_time > :sql_last_value
+```
+
+
+
+执行配置文件：
+
+```bash
+[emon@emon ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/mysql_config/goods.conf
+```
+
 
 
 ### 1.2 安装插件
