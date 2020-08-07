@@ -565,22 +565,24 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ## 2、Logstash
 
+### 1.1 安装与配置
+
 1. 下载
 
 ```shell
-[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/logstash/logstash-6.4.1.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.tar.gz
 ```
 
 2. 解压安装
 
 ```shell
-[emon@emon ~]$ tar -zxvf /usr/local/src/logstash-6.4.1.tar.gz -C /usr/local/ElasticStack/Logstash/
+[emon@emon ~]$ tar -zxvf /usr/local/src/logstash-7.6.2.tar.gz -C /usr/local/ElasticStack/Logstash/
 ```
 
 3. 创建软连接
 
 ```shell
-[emon@emon ~]$ ln -s /usr/local/ElasticStack/Logstash/logstash-6.4.1/ /usr/local/logstash
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Logstash/logstash-7.6.2/ /usr/local/logstash
 ```
 
 4. 配置
@@ -610,10 +612,143 @@ http.host: "0.0.0.0"
 -Xmx256m
 ```
 
-5. 准备一个`logstash.conf`配置文件
+5. 测试安装是否成功
+
+```bash
+[emon@emon ~]$ /usr/local/logstash/bin/logstash -e 'input { stdin { } } output { stdout {} }'
+```
+
+**说明：** `-e`参数启用命令行模式。
+
+看到如下输出表示成功：
 
 ```
-等待补充
+[2020-08-07T14:40:35,609][INFO ][logstash.javapipeline    ][main] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>8, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50, "pipeline.max_inflight"=>1000, "pipeline.sources"=>["config string"], :thread=>"#<Thread:0x2d2eec91 run>"}
+[2020-08-07T14:40:36,706][INFO ][logstash.javapipeline    ][main] Pipeline started {"pipeline.id"=>"main"}
+The stdin plugin is now waiting for input:
+[2020-08-07T14:40:36,760][INFO ][logstash.agent           ] Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
+[2020-08-07T14:40:37,076][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+```
+
+在打开的命令行下随便输入内容，比如：
+
+```bash
+hello world
+```
+
+会输出如下：
+
+```bash
+{
+      "@version" => "1",
+          "host" => "localhost.localdomain",
+    "@timestamp" => 2020-08-07T06:53:47.828Z,
+       "message" => "hello world"
+}
+```
+
+
+
+5. 准备一个`logstash-simple.conf`配置文件
+
+```
+[emon@emon ~]$ vim /usr/local/logstash/config/logstash-simple.conf
+```
+
+```
+input { stdin { } }
+output {
+  elasticsearch { hosts => ["localhost:9200"] }
+  stdout { codec => rubydebug }
+}
+```
+
+执行命令测试：
+
+```bash
+[emon@emon ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/logstash-simple.conf 
+```
+
+可以在控制台命令行输入消息，会被传递到es服务器。
+
+
+
+### 1.2 安装插件
+
+查看安装了那些logstash插件：
+
+```bash
+[emon@emon ~]$ /usr/local/logstash/bin/logstash-plugin list --verbose
+```
+
+### 1.2.1、查看是否安装了`logstash-integration-jdbc`插件
+
+```bash
+[saas@localhost ~]$ /usr/local/logstash/bin/logstash-plugin list --verbose|grep jdbc
+logstash-integration-jdbc (5.0.1)
+ ├── logstash-input-jdbc
+ ├── logstash-filter-jdbc_streaming
+ └── logstash-filter-jdbc_static
+```
+
+发现已经安装了`logstash-integration-jdbc`插件。
+
+
+
+#### 1.2.x logstash-integration-jdbc【已废弃】
+
+- logstash插件地址：https://github.com/logstash-plugins
+- logstash-integration-jdbc插件地址：https://github.com/logstash-plugins/logstash-integration-jdbc
+
+1. 安装`gem`
+
+由于插件是基于ruby语言开发，需要安装Ruby包管理器`RubyGems`。
+
+```bash
+[saas@localhost ~]$ sudo yum install gem
+```
+
+`gem`命令用于构建、上传、下载以及安装Gem包。`gem`的用法在功能上与`apt-get`、`yum`和`npm`非常相似。
+
+| 命令                       | 说明                     |
+| -------------------------- | ------------------------ |
+| gem install mygem          | 安装                     |
+| gem uninstal mygem         | 卸载                     |
+| gem list --local           | 列出已安装的gem          |
+| gem list --remote          | 列出可用的gem            |
+| gem rdoc --all             | 为所有的gems创建RDoc文档 |
+| gem fetch mygem            | 下载gem，但不安装        |
+| gem search STRING --remote | 从可用的gem中搜索        |
+| gem sources -l             | 查看当前源               |
+
+2. 配置`gem`镜像
+
+由于国内网络，导致`rubygems.org`存放在Amazon S3上面的资源文件间歇性的链接失败。所以你会遇到`gem install rack`或者`bundle install`的时候半天没有响应，具体可用`gem install rails -V`来查看执行过程。
+
+- 查看`gem`源
+
+```bash
+[emon@emon ~]$ gem sources -l
+*** CURRENT SOURCES ***
+
+https://rubygems.org/
+```
+
+- 移除`https://rubygems.org/`并添加国内下载源`https://gems.ruby-china.com/`
+
+```bash
+[emon@emon ~]$ gem sources --remove https://rubygems.org/
+https://rubygems.org/ removed from sources
+[emon@emon ~]$ gem sources -a https://gems.ruby-china.com/
+https://gems.ruby-china.com/ added to sources
+```
+
+如果你使用`Gemfile`和`Bundle`（例如：Rails项目）
+
+你可以使用`bundle`的`gem`源代码镜像命令。
+
+```bash
+bundle config mirror.https://rubygems.org https://gems.ruby-china.com/
 ```
 
 
