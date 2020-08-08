@@ -486,7 +486,7 @@ mysqldump [OPTIONS] --all-databases [OPTIONS]
 ```shell
 [emon@emon ~]$ mysql -uroot -proot123
 mysql> create user 'backup'@'%' identified by 'Backup@123';
-mysql> grant select,reload,lock tables,replication client,show view,event,process on *.* to 'backup'@'%' with grant option;
+mysql> grant select,reload,lock tables,replication slave,replication client,show view,event,process ON *.* TO 'backup'@'%' with grant option;
 ```
 
 备注：如果要导出单张表数据，需要系统的file权限，还需要授权`file`。
@@ -818,7 +818,7 @@ systemctl start mysqld
 2. 从服务器的`I/O线程`使用主服务器上的专用账号登录到主服务器中读取该`Binary log`并写入到自己本地的`Relay log`中继日志文件中
 3. 从服务器的`SQL线程`会根据中继日志中的内容执行SQL语句。
 
-![MySQL主从备份原理](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/MySQL/images/2018100701.gif)
+![2018100701](images/2018100701.gif)
 
 ## 2、MySQL单机版主主复制与主从复制
 
