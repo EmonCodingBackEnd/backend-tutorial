@@ -328,6 +328,14 @@ log-bin = /usr/local/mysql/binlogs/mysql-bin
 binlog_format = ROW
 # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
 binlog_row_image = minimal
+# binlog过期清理时间
+expire_logs_days = 7
+# 每个日志文件大小
+max_binlog_size = 100m
+# binlog缓存大小
+binlog_cache_size = 4m
+# 最大binlog缓存大小
+max_binlog_cache_size = 512m
 
 # 作为从库时生效，想进行级联复制，则需要此参数
 log_slave_updates
@@ -337,6 +345,40 @@ relay_log_recovery = 1
 slave_skip_errors = ddl_exist_errors
 # 值为null，表示限制mysqld不允许导入导出；值为/tmp/，限制mysqld的导入导出只能发生在/tmp/目录下；值为'',不对mysqld的导入导出限制；且注意该参数无法通过set global命令修改。
 secure_file_priv = ''
+```
+
+**说明：**
+
+- `binlog_format`的三种方式：
+
+  - `statement`：基于SQL语句的复制（statement-based replication,SBR)
+
+  ```
+  每一条会修改数据的sql语句都会记录到binlog中。优点是并不需要记录每一条sql语句和每一行的数据变化，减少了binlog日志量，节约IO，提高性能；缺点是在某些情况下会导致master-slave中的数据不一致（如sleep()函数、last_insert_id()以及user-defined functions(udf)等会出现问题）。
+  ```
+
+  - `row`：基于行的复制（row-based replication,RBR）【5.7后的默认值，也是推荐值】
+
+  ```
+  不记录每条sql语句的上下文信息，仅需记录哪一条数据被修改了，修改成什么样了。而且不会出现某些特定情况下的存储过程、function或trigger的调用和触发无法被正确复制的问题。缺点是会产生大量的日志，尤其是alter table的时候回让日志暴涨。
+  ```
+
+  - `mixed`：混合模式的复制（mixed-based replication,MBR）
+
+  ```
+  以上两种模式的混合使用，一般的复制使用statement模式保存binlong，对于statement模式无法复制的操作使用row模式保存binlog，MySQL会根据执行的SQL语句选择日志保存方式。
+  ```
+
+- `binlog_row_image`的两种方式
+
+  - `FULL`记录每一行变更【默认】
+  - `minimal`只记录影像后的行【推荐】
+
+- 如何校验binlog是否开启
+
+```bash
+mysql> show variables like 'log_bin';
+mysql> show variables like 'binlog_format';
 ```
 
 ## 2、设置变量
