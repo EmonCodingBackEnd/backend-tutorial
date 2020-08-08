@@ -328,6 +328,8 @@ log-bin = /usr/local/mysql/binlogs/mysql-bin
 binlog_format = ROW
 # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
 binlog_row_image = minimal
+# 主从之间server_id不能相同
+server_id=1
 # binlog过期清理时间
 expire_logs_days = 7
 # 每个日志文件大小
