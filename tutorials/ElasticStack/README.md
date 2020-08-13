@@ -533,7 +533,7 @@ nohup grunt server &
 
 #### 1.5.2、cerebro插件
 
-
+[插件cerebro](https://github.com/lmenezes/cerebro/tags)
 
 1. 下载安装与运行
 
