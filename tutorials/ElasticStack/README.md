@@ -539,8 +539,8 @@ nohup grunt server &
 
 ```shell
 [emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/lmenezes/cerebro/releases/download/v0.9.2/cerebro-0.9.2.tgz
-[emon@emon ~]$ tar -zxvf /usr/local/src/cerebro-0.8.1.tgz -C /usr/local/ElasticStack/ThirdPlugins/
-[emon@emon ~]$ ln -s /usr/local/ElasticStack/ThirdPlugins/cerebro-0.8.1/ /usr/local/cerebro
+[emon@emon ~]$ tar -zxvf /usr/local/src/cerebro-0.9.2.tgz -C /usr/local/ElasticStack/ThirdPlugins/
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/ThirdPlugins/cerebro-0.9.2/ /usr/local/cerebro
 [emon@emon ~]$ /usr/local/cerebro/bin/cerebro
 ```
 
