@@ -468,6 +468,8 @@ priority=999
 
 #### 1.5.1、elasticsearch-head
 
+[elasticsearch-head](https://github.com/mobz/elasticsearch-head)
+
 1. 依赖安装
 
 安装bzip2的解压工具：
@@ -488,22 +490,55 @@ http.cors.allow-origin: "*"
 
 ```shell
 [emon@emon ~]$ cd /usr/local/ElasticStack/ThirdPlugins/
-[emon@emon ThirdPlugins]$ git clone git@github.com:mobz/elasticsearch-head.git
+[emon@emon ThirdPlugins]$ git clone git://github.com/mobz/elasticsearch-head.git
 [emon@emon ThirdPlugins]$ cd elasticsearch-head/
 [emon@emon elasticsearch-head]$ npm install
 [emon@emon elasticsearch-head]$ npm start
+[emon@emon elasticsearch-head]$ pwd
+/usr/local/ElasticStack/ThirdPlugins/elasticsearch-head
 ```
 
 3. 访问测试
 
 http://192.168.3.116:9100
 
+4. 更好的启动
+
+使用`npm start`会阻塞运行，如果想要长期运行，需要如下方式：
+
+- 安装`grunt`
+
+```bash
+# 在目录 /usr/local/ElasticStack/ThirdPlugins/elasticsearch-head 下
+[emon@emon elasticsearch-head]$ npm install -g grunt-cli
+[emon@emon elasticsearch-head]$ npm ls -g --depth=0|grep grunt
+├── grunt-cli@1.3.2
+```
+
+- 编写脚本
+
+```bash
+[emon@emon elasticsearch-head]$ vim startup.sh
+nohup grunt server &
+[emon@emon elasticsearch-head]$ chmod u+x startup.sh
+```
+
+- 启动
+
+```bash
+[emon@emon elasticsearch-head]$ ./startup.sh
+```
+
+
+
 #### 1.5.2、cerebro插件
+
+
 
 1. 下载安装与运行
 
 ```shell
-[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/lmenezes/cerebro/releases/download/v0.8.1/cerebro-0.8.1.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/lmenezes/cerebro/releases/download/v0.9.2/cerebro-0.9.2.tgz
 [emon@emon ~]$ tar -zxvf /usr/local/src/cerebro-0.8.1.tgz -C /usr/local/ElasticStack/ThirdPlugins/
 [emon@emon ~]$ ln -s /usr/local/ElasticStack/ThirdPlugins/cerebro-0.8.1/ /usr/local/cerebro
 [emon@emon ~]$ /usr/local/cerebro/bin/cerebro
@@ -543,6 +578,12 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ### 1.6、ES插件安装
+
+查看安装了哪些es插件：
+
+```bash
+[emon@emon bin]$ /usr/local/es/bin/elasticsearch-plugin list --verbose
+```
 
 #### 1.6.1、ik分词插件
 
@@ -757,7 +798,7 @@ where spu.modify_time > :sql_last_value
 
 ### 1.2 安装插件
 
-查看安装了那些logstash插件：
+查看安装了哪些logstash插件：
 
 ```bash
 [emon@emon ~]$ /usr/local/logstash/bin/logstash-plugin list --verbose
