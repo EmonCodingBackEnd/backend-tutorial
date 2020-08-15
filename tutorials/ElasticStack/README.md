@@ -546,6 +546,10 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 导致安装失败，加上sudo适用root安装即可。另外，安装后需要**重启**。
 
+### 1.7、X-Pack
+
+X-Pack是`Elastic Stack`的一个扩展，提供了安全性、警报、监视、报告、机器学习和许多其他功能。默认情况下，当你安装Elasticsearch后，X-Pack也安装了。
+
 ## 2、Logstash
 
 ### 1.1 安装与配置
