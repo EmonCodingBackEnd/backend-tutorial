@@ -70,13 +70,16 @@
 ```
 
 ```yaml
-cluster.name: emon
+cluster.name: es-cluster
 node.name: master
 # 表示该节点具有成为master的权利，但不一定就是master
 node.master: true
 path.data: /usr/local/es/data
 path.logs: /usr/local/es/logs
 network.host: 0.0.0.0
+# 指定所有想加入集群的地址
+discovery.seed_hosts: ["127.0.0.1:9300", "127.0.0.1:9301"]
+# 指定可以成为master的所有节点的name或者ip
 cluster.initial_master_nodes: ["master"]
 
 
@@ -314,11 +317,23 @@ lsof -p <PID> | wc -l
 ```
 
 ```yaml
-cluster.name: emon
+cluster.name: es-cluster
 node.name: slave1
+# 表示该节点具有成为master的权利，但不一定就是master
+node.master: false
+path.data: /usr/local/es-slave1/data
+path.logs: /usr/local/es-slave1/logs
 network.host: 0.0.0.0
+# es服务端口
 http.port: 9201
-discovery.zen.ping.unicast.hosts: ["0.0.0.0"]
+# 内部节点之间沟通端口
+transport.tcp.port: 9301
+# 指定所有想加入集群的地址
+discovery.seed_hosts: ["127.0.0.1:9301", "127.0.0.1:9300"]
+# 指定可以成为master的所有节点的name或者ip
+cluster.initial_master_nodes: ["master"]
+
+
 http.cors.enabled: true
 http.cors.allow-origin: "*"
 ```
@@ -369,83 +384,6 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 4. 访问
 
 http://192.168.3.116:9201
-
-### 1.3、配置【二从之二】
-
-1. 复制主节点
-
-```shell
-[emon@emon ~]$ cp -ra /usr/local/es/ /usr/local/ElasticStack/Elasticsearch/elasticsearch-6.4.1-slave2/
-[emon@emon ~]$ ln -s /usr/local/ElasticStack/Elasticsearch/elasticsearch-6.4.1-slave2/ /usr/local/es-slave2
-# 清除主节点中运行产生的数据
-[emon@emon ~]$ rm -rf /usr/local/es-slave2/data/
-```
-
-2. 配置
-
-- 配置`elasticsearch.yml`文件
-
-```shell
-# 打开文件并追加
-[emon@emon ~]$ vim /usr/local/es-slave2/config/elasticsearch.yml
-```
-
-```yaml
-cluster.name: emon
-node.name: slave2
-network.host: 0.0.0.0
-http.port: 9202
-discovery.zen.ping.unicast.hosts: ["0.0.0.0"]
-http.cors.enabled: true
-http.cors.allow-origin: "*"
-```
-
-- 配置`jvm.options`
-
-```shell
-# 打开文件并追加
-[emon@emon ~]$ vim /usr/local/es-slave2/config/jvm.options 
-```
-
-```
-#-Xms1g
-#-Xmx1g
--Xms256m
--Xmx256m
-```
-
-3. 配置启动
-
-```shell
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/elasticsearch-slave2.ini 
-```
-
-```ini
-[program:es-slave2]
-command=/usr/local/es-slave2/bin/elasticsearch
-autostart=false                 ; 在supervisord启动的时候也自动启动
-startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
-autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
-startretries=3                  ; 启动失败自动重试次数，默认是3
-user=emon                       ; 用哪个用户启动进程，默认是root
-priority=72                     ; 进程启动优先级，默认999，值小的优先启动
-redirect_stderr=true            ; 把stderr重定向到stdout，默认false
-stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
-stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
-environment=JAVA_HOME="/usr/local/java"
-stdout_logfile=/etc/supervisor/supervisor.d/elasticsearch-slave2.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
-stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
-killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
-```
-
-```shel
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start es-slave2
-```
-
-4. 访问
-
-http://192.168.3.116:9202
 
 ### 1.4、配置es启动组
 
