@@ -202,6 +202,197 @@ canal.instance.filter.regex=canaldb\\..*
 [emon@emon ~]$ /usr/local/canal/deployer/bin/stop.sh
 ```
 
+### 1.2、部署`adapter`服务
+
+- 下载
+
+```bash
+[saas@local-66 ~]$ wget -cP /usr/local/src/ https://github.com/alibaba/canal/releases/download/canal-1.1.4/canal.adapter-1.1.4.tar.gz
+```
+
+- 解压
+
+```bash
+[saas@local-66 ~]$ tar -zxvf /usr/local/src/canal.adapter-1.1.4.tar.gz -C /usr/local/canal/adapter
+```
+
+```bash
+[saas@local-66 ~]$ ls /usr/local/canal/adapter/
+bin  conf  lib  logs  plugin
+```
+
+- 修改启动器配置：`application.yml`
+
+```bash
+[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/application.yml
+```
+
+```yaml
+# 修改
+  canalServerHost: 127.0.0.1:11111
+# =>
+  canalServerHost: 192.168.1.66:11111 
+  
+# 修改
+#  srcDataSources:
+#    defaultDS:
+#      url: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true
+#      username: root
+#      password: 121212
+  canalAdapters:
+  - instance: example # canal instance Name or mq topic name
+    groups:
+    - groupId: g1
+      outerAdapters:
+      - name: logger
+# =>
+  srcDataSources:
+    defaultDS:
+      url: jdbc:mysql://192.168.1.66:3306/canaldb?useUnicode=true&useSSL=false
+      username: backup
+      password: Jpss541018!
+  canalAdapters:
+  - instance: develop
+    groups:
+    - groupId: g1
+      outerAdapters:
+      - name: logger
+      - name: es
+        hosts: 192.168.1.56:9200 # 127.0.0.1:9300 # 127.0.0.1:9200 for rest mode
+        properties:
+          mode: rest # transport # or rest
+          # security.auth: test:123456 #  only used for rest mode
+          cluster.name: es-cluster # elasticsearch
+#  - instance: example # canal instance Name or mq topic name
+#    groups:
+#    - groupId: g1
+#      outerAdapters:
+#      - name: logger
+```
+
+adapter将会自动加载conf/es下的所有.yml结尾的配置文件
+
+- 适配器表映射文件`conf/es/*.yml`
+
+添加一个新的yml文件：
+
+```bash
+# 拷贝创建
+[saas@local-66 ~]$ cp /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/loginfo.yml
+# 备份默认的几个yml文件
+[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/biz_order.yml /usr/local/canal/adapter/conf/es/biz_order.yml.bak
+[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/customer.yml /usr/local/canal/adapter/conf/es/customer.yml.bak
+[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/mytest_user.yml.bak
+# 编辑文件
+[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/es/loginfo.yml 
+```
+
+```yaml
+dataSourceKey: defaultDS
+destination: develop
+groupId: g1
+esMapping:
+  _index: loginfo
+  _type: _doc
+  _id: _id
+  upsert: true
+#  pk: id
+  sql: "select l.id _id, l.log_type, l.content from loginfo l "
+#  objFields:
+#    _labels: array:;
+  etlCondition: "where l.modify_time>={}"
+  commitBatch: 3000
+```
+
+- `kibana`创建es的索引`loginfo`
+
+```bash
+PUT loginfo
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "long"
+      }
+    }
+  }
+}
+```
+
+- 启动
+
+```bash
+[saas@local-66 ~]$ /usr/local/canal/adapter/bin/startup.sh 
+```
+
+- 查看日志
+
+[saas@local-66 ~]$ vim /usr/local/canal/adapter/logs/adapter/adapter.log 
+
+```
+2020-08-15 22:57:43.297 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterService - ## start the canal client adapters.
+2020-08-15 22:57:43.304 [main] INFO  c.a.otter.canal.client.adapter.support.ExtensionLoader - extension classpath dir: /usr/local/canal/adapter/plugin
+2020-08-15 22:57:43.323 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterLoader - Load canal adapter: logger succeed
+2020-08-15 22:57:43.326 [main] INFO  c.a.o.canal.client.adapter.es.config.ESSyncConfigLoader - ## Start loading es mapping config ... 
+2020-08-15 22:57:43.383 [main] INFO  c.a.o.canal.client.adapter.es.config.ESSyncConfigLoader - ## ES mapping config loaded
+2020-08-15 22:57:43.969 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterLoader - Load canal adapter: es succeed
+2020-08-15 22:57:43.981 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterLoader - Start adapter for canal instance: develop succeed
+2020-08-15 22:57:43.981 [Thread-4] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterWorker - =============> Start to connect destination: develop <=============
+2020-08-15 22:57:43.981 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterService - ## the canal client adapters are running now ......
+2020-08-15 22:57:43.989 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2020-08-15 22:57:43.990 [main] INFO  org.apache.tomcat.util.net.NioSelectorPool - Using a shared selector for servlet write/read
+2020-08-15 22:57:44.008 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8081 (http) with context path ''
+2020-08-15 22:57:44.013 [main] INFO  c.a.otter.canal.adapter.launcher.CanalAdapterApplication - Started CanalAdapterApplication in 4.906 seconds (JVM running for 5.57)
+2020-08-15 22:57:44.051 [Thread-4] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterWorker - =============> Start to subscribe destination: develop <=============
+2020-08-15 22:57:44.091 [Thread-4] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterWorker - =============> Subscribe destination: develop succeed <=============
+```
+
+- 停止
+
+```bash
+[saas@local-66 ~]$ /usr/local/canal/adapter/bin/stop.sh 
+```
+
+- 全量数据同步
+
+```bash
+# `kibana`查看es的索引loginfo文档数
+GET /_cat/count/loginfo?v
+epoch      timestamp count
+1597503719 15:01:59  0
+
+# 全量数据同步
+[saas@local-66 ~]$ curl http://192.168.1.66:8081/etl/es/loginfo.yml -X POST
+{"succeeded":true,"resultMessage":"导入ES 数据：2 条"}
+
+# `kibana`查看es的索引loginfo文档数
+GET /_cat/count/loginfo?v
+epoch      timestamp count
+1597503865 15:04:25  2
+# `kibana`查看第一条数据
+GET loginfo/_source/1
+{
+  "log_type" : 1,
+  "content" : "202008152033记录该文档"
+}
+```
+
+- 增量数据同步
+
+```bash
+update loginfo set content = concat(content , '-更新时间', now());
+# `kibana`查看第一条数据，验证
+GET loginfo/_source/1
+{
+  "log_type" : 1,
+  "content" : "202008152033记录该文档-更新时间2020-08-15 23:09:57"
+}
+```
+
 
 
 
