@@ -6,41 +6,203 @@
 
 [临时：ES配置文件详解](https://www.cnblogs.com/sunxucool/p/3799190.html)
 
-# 一、配置
+# 一、使用`canal`同步数据
 
-## 1、配置说明
+**canal [kə'næl]**，译意为水道/管道/沟渠，主要用途是基于 MySQL 数据库增量日志解析，提供增量数据订阅和消费。
 
-- 配置文件位于`/usr/local/elasticsearch/config`目录中
-  - `elasticsearch.yml` es的相关配置
-  - `jvm.options` jvm的相关参数
-  - `log4j2.properties` 日志相关配置
+基于日志增量订阅和消费的业务包括
 
-### 1.1、JVM配置
+- 数据库镜像
+- 数据库实时备份
+- 索引构建和实时维护(拆分异构索引、倒排索引等)
+- 业务 cache 刷新
+- 带业务逻辑的增量数据处理
 
-#### 1.1.1、配置堆内存大小
+[canal github地址](https://github.com/alibaba/canal)
 
-默认的2g调整为256m
+以上是`canal`的官方说明文档。
+
+## 1、安装
+
+下载`canal`，共有4部分：
+
+[各组件下载地址](https://github.com/alibaba/canal/releases)
+
+- canal.adapter-1.1.4.tar.gz
+  - 订阅deployer服务，适配到各个数据存储库，比如mysql/kafka/elasticsearch/hbase等
+- canal.admin-1.1.4.tar.gz
+  - 为canal提供整体配置管理、节点运维等面向运维的功能
+- canal.deployer-1.1.4.tar.gz
+  - canal的deployer服务
+- canal.example-1.1.4.tar.gz
+  - 订阅`deployer`服务的客户端演示版示例
+
+整体安装的目录规划：
+
+```bash
+[emon@emon ~]$ mkdir -pv /usr/local/canal/{adapter,admin,deployer,example}
+```
+
+### 1.1、部署`deployer`服务
+
+- 对于自建`MySQL`服务，需要开启`Binlog`写入功能
+
+```bash
+[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+```
+
+```bash
+log-bin = /usr/local/mysql/binlogs/mysql-bin
+binlog_format = row
+server-id=1
+```
+
+- 授权`canal`链接`MySQL`账号具有作为MySQL slave的权限，，如果已有账户可直接`grant`
+
+```bash
+-- 创建备份用户
+create user 'backup'@'%' identified by 'XXX';
+-- 授权备份用户
+grant select,replication slave,replication client ON *.* TO 'backup'@'%';
+-- 刷新生效
+flush privileges;
+```
+
+- 演示用的MySQL库实例与表
+
+```sql
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS canaldb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- 使用数据库
+use canaldb;
+
+-- 创建数据表
+drop table if exists loginfo;
+
+/*==============================================================*/
+/* Table: loginfo                                               */
+/*==============================================================*/
+create table loginfo
+(
+   id                   bigint(20) not null comment '主键ID',
+   log_type             tinyint not null comment '日志类型',
+   content              varchar(1000) not null comment '日志内容',
+   deleted              tinyint not null default 0 comment '记录状态
+            0-未删除
+            1-已删除',
+   create_time          datetime not null default current_timestamp comment '创建时间',
+   modify_time          datetime not null default current_timestamp on update current_timestamp comment '更新时间',
+   version              int not null default 0 comment '版本信息',
+   primary key (id)
+);
+
+alter table loginfo comment '日志信息表';
+
+-- 初始化数据
+INSERT into loginfo (id, log_type, content, deleted, create_time, modify_time, version) VALUES(1, 1, '202008152033记录该文档', 0, '2020-08-15 20:34:12.0', '2020-08-15 20:34:12.0', 0);
+INSERT INTO loginfo (id, log_type, content, deleted, create_time, modify_time, version) VALUES(2, 1, 'canal达到单机生产可用的效果', 0, '2020-08-15 20:34:57.0', '2020-08-15 20:34:57.0', 0);
+```
+
+- 下载
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/alibaba/canal/releases/download/canal-1.1.4/canal.deployer-1.1.4.tar.gz
+```
+
+- 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/canal.deployer-1.1.4.tar.gz -C /usr/local/canal/deployer/
+```
+
+```bash
+[emon@emon ~]$ ls /usr/local/canal/deployer/
+bin  conf  lib  logs
+```
+
+- 配置`canal.properties
+
+[配置文件详解](https://blog.csdn.net/my201110lc/article/details/80765356)
+
+```bash
+[emon@emon ~]$ vim /usr/local/canal/deployer/conf/canal.properties 
+```
+
+```properties
+# 修改
+canal.destinations = example
+=>
+canal.destinations = develop
+```
+
+- 复制`conf/example`配置文件进行修改
+
+```bash
+[emon@emon ~]$ cp -R /usr/local/canal/deployer/conf/example/ /usr/local/canal/deployer/conf/develop
+[emon@emon ~]$ vim /usr/local/canal/deployer/conf/develop/instance.properties 
+```
+
+```properties
+# 修改
+canal.instance.master.address=127.0.0.1:3306
+=>
+canal.instance.master.address=192.168.1.66:3306
+# 修改
+canal.instance.dbUsername=canal
+canal.instance.dbPassword=canal
+=>
+canal.instance.dbUsername=backup
+canal.instance.dbPassword=xxx
+# 修改：注意，\\.是.的转义;.*\\..*表示任何schema的任何表
+canal.instance.filter.regex=.*\\..*
+=>
+canal.instance.filter.regex=canaldb\\..*
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ /usr/local/canal/deployer/bin/startup.sh
+```
+
+- 查看server日志
+
+```bash
+[emon@emon ~]$ vim /usr/local/canal/deployer/logs/canal/canal.log 
+```
 
 ```
-# -Xms2g
-# -Xmx2g
--Xms256m
--Xmx256m
+2020-08-15 20:40:49.945 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## set default uncaught exception handler
+2020-08-15 20:40:49.991 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## load canal configurations
+2020-08-15 20:40:50.003 [main] INFO  com.alibaba.otter.canal.deployer.CanalStarter - ## start the canal server.
+2020-08-15 20:40:50.049 [main] INFO  com.alibaba.otter.canal.deployer.CanalController - ## start the canal server[192.168.1.66(192.168.1.66):11111]
+2020-08-15 20:40:51.278 [main] INFO  com.alibaba.otter.canal.deployer.CanalStarter - ## the canal server is running now ......
+2020-08-15 20:40:51.383 [canal-instance-scan-0] INFO  com.alibaba.otter.canal.deployer.CanalController - auto notify start example successful.
 ```
 
-### 1.2、es配置
+- 查看instance的日志
 
-- `elasticsearch.yml`关键配置说明
-  - `cluster.name` 集群名称，以此作为是否统一集群的判断条件
-  - `node.name` 节点名称，以此作为集群中不同节点的区分条件
-  - `network.host/http.port` 网络地址和断开，用于http和transport服务使用
-  - `path.data` 数据存储地址
-  - `path.log` 日志存储地址
+```bash
+[emon@emon ~]$ vim /usr/local/canal/deployer/logs/develop/develop.log 
+```
 
-- Development与Production模式说明
-  - 以transport的地址是否绑定在localhost为判断标准 network.host
-  - Development模式下在启动时会以warning的方式提示配置检查异常
-  - Production模式下在启动时会以error的方式提示配置检查异常并退出
+```
+2020-08-15 21:16:46.942 [main] INFO  c.a.otter.canal.instance.spring.CanalInstanceWithSpring - start CannalInstance for 1-develop
+2020-08-15 21:16:46.952 [main] WARN  c.a.o.canal.parse.inbound.mysql.dbsync.LogEventConvert - --> init table filter : ^canaldb\..*$
+2020-08-15 21:16:46.952 [main] WARN  c.a.o.canal.parse.inbound.mysql.dbsync.LogEventConvert - --> init table black filter :
+2020-08-15 21:16:46.961 [main] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - start successful....
+2020-08-15 21:16:47.054 [destination = develop , address = /192.168.1.66:3306 , EventParser] WARN  c.a.o.c.p.inbound.mysql.rds.RdsBinlogEventParserProxy - ---> begin to find start position, it will be long time for reset or first position
+2020-08-15 21:16:47.055 [destination = develop , address = /192.168.1.66:3306 , EventParser] WARN  c.a.o.c.p.inbound.mysql.rds.RdsBinlogEventParserProxy - prepare to find start position just show master status
+2020-08-15 21:16:47.658 [destination = develop , address = /192.168.1.66:3306 , EventParser] WARN  c.a.o.c.p.inbound.mysql.rds.RdsBinlogEventParserProxy - ---> find start position successfully, EntryPosition[included=false,journalName=mysql-bin.000244,position=5841,serverId=1,gtid=,timestamp=1597497385000] cost : 593ms , the next step is binlog dump
+```
+
+- 关闭
+
+```bash
+[emon@emon ~]$ /usr/local/canal/deployer/bin/stop.sh
+```
+
+
 
 
 # 三、概念
