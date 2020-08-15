@@ -74,6 +74,8 @@ cluster.name: es-cluster
 node.name: master
 # 表示该节点具有成为master的权利，但不一定就是master
 node.master: true
+# 表示该节点不存储数据
+node.data: false
 path.data: /usr/local/es/data
 path.logs: /usr/local/es/logs
 network.host: 0.0.0.0
@@ -301,8 +303,8 @@ lsof -p <PID> | wc -l
 1. 复制主节点
 
 ```shell
-[emon@emon ~]$ cp -ra /usr/local/es/ /usr/local/ElasticStack/Elasticsearch/elasticsearch-6.4.1-slave1/
-[emon@emon ~]$ ln -s /usr/local/ElasticStack/Elasticsearch/elasticsearch-6.4.1-slave1/ /usr/local/es-slave1
+[emon@emon ~]$ cp -ra /usr/local/es/ /usr/local/ElasticStack/Elasticsearch/elasticsearch-7.4.2-slave1/
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Elasticsearch/elasticsearch-7.6.2-slave1/ /usr/local/es-slave1
 # 清除主节点中运行产生的数据
 [emon@emon ~]$ rm -rf /usr/local/es-slave1/data/
 ```
@@ -318,11 +320,13 @@ lsof -p <PID> | wc -l
 
 ```yaml
 cluster.name: es-cluster
-node.name: slave1
+node.name: slave
 # 表示该节点具有成为master的权利，但不一定就是master
 node.master: false
-path.data: /usr/local/es-slave1/data
-path.logs: /usr/local/es-slave1/logs
+# 表示该节点不存储数据
+node.data: true
+path.data: /usr/local/es-slave/data
+path.logs: /usr/local/es-slave/logs
 network.host: 0.0.0.0
 # es服务端口
 http.port: 9201
