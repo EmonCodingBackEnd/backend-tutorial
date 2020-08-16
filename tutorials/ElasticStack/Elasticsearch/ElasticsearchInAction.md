@@ -254,6 +254,11 @@ bin  conf  lib  logs  plugin
       username: backup
       password: Jpss541018!
   canalAdapters:
+#  - instance: example # canal instance Name or mq topic name
+#    groups:
+#    - groupId: g1
+#      outerAdapters:
+#      - name: logger
   - instance: develop
     groups:
     - groupId: g1
@@ -265,11 +270,6 @@ bin  conf  lib  logs  plugin
           mode: rest # transport # or rest
           # security.auth: test:123456 #  only used for rest mode
           cluster.name: es-cluster # elasticsearch
-#  - instance: example # canal instance Name or mq topic name
-#    groups:
-#    - groupId: g1
-#      outerAdapters:
-#      - name: logger
 ```
 
 adapter将会自动加载conf/es下的所有.yml结尾的配置文件
