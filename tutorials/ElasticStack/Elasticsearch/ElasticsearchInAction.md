@@ -22,7 +22,7 @@
 
 以上是`canal`的官方说明文档。
 
-## 1、安装
+## 1、canal各个服务列表
 
 下载`canal`，共有4部分：
 
@@ -43,7 +43,9 @@
 [emon@emon ~]$ mkdir -pv /usr/local/canal/{adapter,admin,deployer,example}
 ```
 
-### 1.1、部署`deployer`服务
+## 2、同步mysql到es
+
+### 2.1、部署`deployer`服务
 
 - 对于自建`MySQL`服务，需要开启`Binlog`写入功能
 
@@ -202,7 +204,7 @@ canal.instance.filter.regex=canaldb\\..*
 [emon@emon ~]$ /usr/local/canal/deployer/bin/stop.sh
 ```
 
-### 1.2、部署`adapter`服务
+### 2.2、部署`adapter`服务
 
 - 下载
 
@@ -392,6 +394,10 @@ GET loginfo/_source/1
   "content" : "202008152033记录该文档-更新时间2020-08-15 23:09:57"
 }
 ```
+
+
+
+## 3、同步mysql到mysql
 
 
 
