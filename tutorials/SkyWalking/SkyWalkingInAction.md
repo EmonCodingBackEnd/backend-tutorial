@@ -54,14 +54,14 @@ storage:
   selector: ${SW_STORAGE:elasticsearch7} #selector: ${SW_STORAGE:h2}
 ```
 
-- 第二处：es的集群名称
+- 第二处：es索引名称命名空间
 
 ```yaml
   elasticsearch7:
     nameSpace: ${SW_NAMESPACE:""}
 =>
   elasticsearch7:
-    nameSpace: ${SW_NAMESPACE:"emon"} #nameSpace: ${SW_NAMESPACE:""}
+    nameSpace: ${SW_NAMESPACE:"skywalking"} #nameSpace: ${SW_NAMESPACE:""}
 ```
 
 - 第三处：相对路径修改为绝对路径
