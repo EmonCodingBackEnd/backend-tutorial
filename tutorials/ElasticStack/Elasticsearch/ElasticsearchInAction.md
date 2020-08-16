@@ -562,7 +562,7 @@ adapter将会自动加载conf/es下的所有.yml结尾的配置文件
   dbMapping:
     database: canaldb
     table: loginfo
-    targetTable: canaldb-bak.loginfo
+    targetTable: loginfo
     targetPk:
       id: id
     mapAll: true
@@ -608,10 +608,16 @@ adapter将会自动加载conf/es下的所有.yml结尾的配置文件
 - 全量数据同步
 
 ```bash
-[emon@emon conf]# curl http://192.168.1.66:8081/etl/rdb/mysql1/canaldb_bak_loginfo.yml -X POST
+[emon@emon ~]# curl http://192.168.1.66:8081/etl/rdb/mysql1/canaldb_bak_loginfo.yml -X POST
 ```
 
+- 增量同步
 
+```sql
+update loginfo set content = concat(content , '-更新时间', now());
+-- 在canaldb-bak库查询并验证
+select * from loginfo;
+```
 
 
 # 三、概念
