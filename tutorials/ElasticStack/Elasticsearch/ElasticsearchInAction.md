@@ -122,7 +122,7 @@ INSERT INTO loginfo (id, log_type, content, deleted, create_time, modify_time, v
 bin  conf  lib  logs
 ```
 
-- 配置`canal.properties
+- 配置`canal.properties`
 
 [配置文件详解](https://blog.csdn.net/my201110lc/article/details/80765356)
 
@@ -398,6 +398,134 @@ GET loginfo/_source/1
 
 
 ## 3、同步mysql到mysql
+
+### 3.1、部署`deployer`服务
+
+- 前提条件
+
+  - 作为数据供应方的mysql开启binlog，提供具有备份权限的用户；
+
+    - 开启Binlog：请参考【同步mysql到es】->【部署deployer服务】
+
+    - 创建备份账号：请参考【同步mysql到es】->【部署deployer服务】
+
+  - 作为数据目标方的mysql提供具有写入数据权限的用户；
+
+    - 创建具有数据写入权限的用户
+
+    ```sql
+    -- 创建用户
+    CREATE USER 'huiba'@'%' identified BY 'xxx';
+    -- 授权用户
+    GRANT ALL PRIVILEGES ON *.* TO 'huiba'@'%' WITH GRANT OPTION;
+    ```
+
+  - 演示用的MySQL库实例与表
+    - 源数据库：请参考【同步mysql到es】->【部署deployer服务】
+    - 目标数据库
+
+    ```sql
+    -- 创建数据库
+    CREATE DATABASE IF NOT EXISTS `canaldb-bak` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    -- 使用数据库
+    use  canaldb-bak;
+    -- 创建数据表
+    drop table if exists loginfo;
+    
+    /*==============================================================*/
+    /* Table: loginfo                                               */
+    /*==============================================================*/
+    create table loginfo
+    (
+       id                   bigint(20) not null comment '主键ID',
+       log_type             tinyint not null comment '日志类型',
+       content              varchar(1000) not null comment '日志内容',
+       deleted              tinyint not null default 0 comment '记录状态
+                0-未删除
+                1-已删除',
+       create_time          datetime not null default current_timestamp comment '创建时间',
+       modify_time          datetime not null default current_timestamp on update current_timestamp comment '更新时间',
+       version              int not null default 0 comment '版本信息',
+       primary key (id)
+    );
+    
+    alter table loginfo comment '日志信息表';
+    ```
+
+  
+
+- 配置`canal.properties`
+
+```bash
+[emon@emon ~]$ vim /usr/local/canal/deployer/conf/canal.properties 
+```
+
+```properties
+# 修改canal.destinations来增加destinations
+# 修改
+canal.destinations = develop
+=>
+canal.destinations = develop,rdbsync
+```
+
+- 复制`conf/example`配置文件进行修改
+
+```bash
+[emon@emon ~]$ cp -R /usr/local/canal/deployer/conf/example/ /usr/local/canal/deployer/conf/rdbsync
+[emon@emon ~]$ vim /usr/local/canal/deployer/conf/rdbsync/instance.properties 
+```
+
+```properties
+# 修改
+canal.instance.master.address=127.0.0.1:3306
+=>
+canal.instance.master.address=192.168.1.66:3306
+# 修改
+canal.instance.dbUsername=canal
+canal.instance.dbPassword=canal
+=>
+canal.instance.dbUsername=backup
+canal.instance.dbPassword=xxx
+# 修改：注意，\\.是.的转义;.*\\..*表示任何schema的任何表
+canal.instance.filter.regex=.*\\..*
+=>
+canal.instance.filter.regex=canaldb-bak\\..*
+```
+
+- 启动
+
+```
+[emon@emon ~]$ /usr/local/canal/deployer/bin/startup.sh
+```
+
+- 查看server日志
+
+```
+[emon@emon ~]$ vim /usr/local/canal/deployer/logs/canal/canal.log 
+```
+
+- 查看instance的日志
+
+```
+[emon@emon ~]$ vim /usr/local/canal/deployer/logs/rdbsync/rdbsync.log
+```
+
+### 3.2、部署`adapter`服务
+
+- 修改启动器配置：`application.yml`
+
+```bash
+[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/application.yml
+```
+
+```bash
+# 基于【同步mysql到es】增加配置
+# 在srcDataSources元素下新增DS
+    rdbsyncDS:
+      url: jdbc:mysql://192.168.1.66:3306/canaldb?useUnicode=true&useSSL=false
+      username: backup
+      password: Jpss541018!
+```
 
 
 
