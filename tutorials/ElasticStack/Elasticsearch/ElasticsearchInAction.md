@@ -209,24 +209,24 @@ canal.instance.filter.regex=canaldb\\..*
 - 下载
 
 ```bash
-[saas@local-66 ~]$ wget -cP /usr/local/src/ https://github.com/alibaba/canal/releases/download/canal-1.1.4/canal.adapter-1.1.4.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/alibaba/canal/releases/download/canal-1.1.4/canal.adapter-1.1.4.tar.gz
 ```
 
 - 解压
 
 ```bash
-[saas@local-66 ~]$ tar -zxvf /usr/local/src/canal.adapter-1.1.4.tar.gz -C /usr/local/canal/adapter
+[emon@emon ~]$ tar -zxvf /usr/local/src/canal.adapter-1.1.4.tar.gz -C /usr/local/canal/adapter
 ```
 
 ```bash
-[saas@local-66 ~]$ ls /usr/local/canal/adapter/
+[emon@emon ~]$ ls /usr/local/canal/adapter/
 bin  conf  lib  logs  plugin
 ```
 
 - 修改启动器配置：`application.yml`
 
 ```bash
-[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/application.yml
+[emon@emon ~]$ vim /usr/local/canal/adapter/conf/application.yml
 ```
 
 ```yaml
@@ -280,13 +280,13 @@ adapter将会自动加载conf/es下的所有.yml结尾的配置文件
 
 ```bash
 # 拷贝创建
-[saas@local-66 ~]$ cp /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/loginfo.yml
+[emon@emon ~]$ cp /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/loginfo.yml
 # 备份默认的几个yml文件
-[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/biz_order.yml /usr/local/canal/adapter/conf/es/biz_order.yml.bak
-[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/customer.yml /usr/local/canal/adapter/conf/es/customer.yml.bak
-[saas@local-66 ~]$ mv /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/mytest_user.yml.bak
+[emon@emon ~]$ mv /usr/local/canal/adapter/conf/es/biz_order.yml /usr/local/canal/adapter/conf/es/biz_order.yml.bak
+[emon@emon ~]$ mv /usr/local/canal/adapter/conf/es/customer.yml /usr/local/canal/adapter/conf/es/customer.yml.bak
+[emon@emon ~]$ mv /usr/local/canal/adapter/conf/es/mytest_user.yml /usr/local/canal/adapter/conf/es/mytest_user.yml.bak
 # 编辑文件
-[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/es/loginfo.yml 
+[emon@emon ~]$ vim /usr/local/canal/adapter/conf/es/loginfo.yml 
 ```
 
 ```yaml
@@ -328,12 +328,12 @@ PUT loginfo
 - 启动
 
 ```bash
-[saas@local-66 ~]$ /usr/local/canal/adapter/bin/startup.sh 
+[emon@emon ~]$ /usr/local/canal/adapter/bin/startup.sh 
 ```
 
 - 查看日志
 
-[saas@local-66 ~]$ vim /usr/local/canal/adapter/logs/adapter/adapter.log 
+[emon@emon ~]$ vim /usr/local/canal/adapter/logs/adapter/adapter.log 
 
 ```
 2020-08-15 22:57:43.297 [main] INFO  c.a.o.canal.adapter.launcher.loader.CanalAdapterService - ## start the canal client adapters.
@@ -356,7 +356,7 @@ PUT loginfo
 - 停止
 
 ```bash
-[saas@local-66 ~]$ /usr/local/canal/adapter/bin/stop.sh 
+[emon@emon ~]$ /usr/local/canal/adapter/bin/stop.sh 
 ```
 
 - 全量数据同步
@@ -368,7 +368,7 @@ epoch      timestamp count
 1597503719 15:01:59  0
 
 # 全量数据同步
-[saas@local-66 ~]$ curl http://192.168.1.66:8081/etl/es/loginfo.yml -X POST
+[emon@emon ~]$ curl http://192.168.1.66:8081/etl/es/loginfo.yml -X POST
 {"succeeded":true,"resultMessage":"导入ES 数据：2 条"}
 
 # `kibana`查看es的索引loginfo文档数
@@ -489,7 +489,7 @@ canal.instance.dbPassword=xxx
 # 修改：注意，\\.是.的转义;.*\\..*表示任何schema的任何表
 canal.instance.filter.regex=.*\\..*
 =>
-canal.instance.filter.regex=canaldb-bak\\..*
+canal.instance.filter.regex=canaldb\\..*
 ```
 
 - 启动
@@ -515,7 +515,7 @@ canal.instance.filter.regex=canaldb-bak\\..*
 - 修改启动器配置：`application.yml`
 
 ```bash
-[saas@local-66 ~]$ vim /usr/local/canal/adapter/conf/application.yml
+[emon@emon ~]$ vim /usr/local/canal/adapter/conf/application.yml
 ```
 
 ```bash
@@ -525,6 +525,90 @@ canal.instance.filter.regex=canaldb-bak\\..*
       url: jdbc:mysql://192.168.1.66:3306/canaldb?useUnicode=true&useSSL=false
       username: backup
       password: Jpss541018!
+# 在canalAdapters下增加新的instance
+  - instance: rdbsync
+    groups:
+    - groupId: g1
+      outerAdapters:
+      - name: logger
+      - name: rdb
+        key: mysql1
+        properties:
+          jdbc.driverClassName: com.mysql.jdbc.Driver
+          jdbc.url: jdbc:mysql://192.168.1.66:3306/canaldb-bak?useUnicode=true&useSSL=false
+          jdbc.username: jpss
+          jdbc.password: Jpss541018!
+```
+
+adapter将会自动加载conf/es下的所有.yml结尾的配置文件
+
+- 适配器表映射文件`conf/rdbsync/*.yml`
+
+- 添加一个新的yml文件：
+
+  ```bash
+  # 拷贝创建
+  [emon@emon ~]$ cp /usr/local/canal/adapter/conf/rdb/mytest_user.yml /usr/local/canal/adapter/conf/rdb/canaldb_bak_loginfo.yml
+  # 编辑文件
+  [emon@emon ~]$ vim /usr/local/canal/adapter/conf/rdb/canaldb_bak_loginfo.yml 
+  ```
+
+  ```yaml
+  dataSourceKey: rdbsyncDS
+  destination: rdbsync
+  groupId: g1
+  outerAdapterKey: mysql1
+  concurrent: true
+  dbMapping:
+    database: canaldb
+    table: loginfo
+    targetTable: canaldb-bak.loginfo
+    targetPk:
+      id: id
+    mapAll: true
+  #  targetColumns:
+  #    id:
+  #    name:
+  #    role_id:
+  #    c_time:
+  #    test1:
+    etlCondition: "where modify_time>={}"
+    commitBatch: 3000 # 批量提交的大小
+  
+  
+  ## Mirror schema synchronize config
+  #dataSourceKey: defaultDS
+  #destination: example
+  #groupId: g1
+  #outerAdapterKey: mysql1
+  #concurrent: true
+  #dbMapping:
+  #  mirrorDb: true
+  #  database: mytest
+  ```
+
+- 启动
+
+```bash
+[emon@emon ~]$ /usr/local/canal/adapter/bin/startup.sh 
+```
+
+- 查看日志
+
+```bash
+[emon@emon ~]$ vim /usr/local/canal/adapter/logs/adapter/adapter.log
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ /usr/local/canal/adapter/bin/stop.sh 
+```
+
+- 全量数据同步
+
+```bash
+[emon@emon conf]# curl http://192.168.1.66:8081/etl/rdb/mysql1/canaldb_bak_loginfo.yml -X POST
 ```
 
 
