@@ -265,7 +265,8 @@ bin  conf  lib  logs  plugin
       outerAdapters:
       - name: logger
       - name: es
-        hosts: 192.168.1.56:9200 # 127.0.0.1:9300 # 127.0.0.1:9200 for rest mode
+      # 注意，写入数据时链接的最好是数据节点，否则很容易出现堆内存溢出。
+        hosts: 192.168.1.66:9200 # 127.0.0.1:9300 # 127.0.0.1:9200 for rest mode
         properties:
           mode: rest # transport # or rest
           # security.auth: test:123456 #  only used for rest mode
