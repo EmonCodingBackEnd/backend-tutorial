@@ -103,3 +103,89 @@ df -h
 
 
 
+## 1.2、centos7配置用户打开文件数和进程数
+
+- 查看用户最大文件打开数和最大可用进程数
+
+```bash
+# 注意，查看具体用户的信息，需要以相应用户执行命令；root用户查看的，只是root用户的。
+[root@emon ~]# ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 160002
+max locked memory       (kbytes, -l) 64
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 800000
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 655360
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+```
+
+- 查看用户最大文件打开数
+
+```bash
+[root@emon ~]# ulimit -n
+800000
+# 查看软限制
+[root@emon ~]# ulimit -Sn
+800000
+# 查看硬限制
+[root@emon ~]# ulimit -Hn
+800000
+```
+
+- 查看用户最大可用进程数
+
+```bash
+[root@emon ~]# ulimit -u
+655360
+# 查看软限制
+[root@emon ~]# ulimit -Su
+655360
+# 查看硬限制
+[root@emon ~]# ulimit -Hu
+655360
+```
+
+- 配置位置之`/etc/security/limits.conf`和`/etc/security/limits.d/`目录下的配置
+  - 如果`/etc/security/limits.d/`存在，则`/etc/security/limits.conf`无效
+  - 在`/etc/security/limits.d/`目录下，可用配置：
+    - `/etc/security/limits.d/20-nproc.conf`
+    - `/etc/security/limits.d/20-nofile.conf`
+- 系统级别最大用户可用进程
+
+```bash
+cat /proc/sys/kernel/threads-max
+```
+
+- 查看全局的pid_max方法
+
+```bash
+cat /proc/sys/kernel/pid_max
+```
+
+- 系统级别最大用户可打开文件数
+
+```bash
+cat /proc/sys/fs/file-max
+```
+
+- 查询某个进程最大可打开文件数和进程数
+
+```bash
+cat /proc/45602/limits
+```
+
+- 查看某个进程当前打开的文件数
+
+```bash
+lsof -p 45602|wc -l
+```
+
