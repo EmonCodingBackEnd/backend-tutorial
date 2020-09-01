@@ -562,13 +562,13 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `S1CMX`年轻代中第二个survivor（幸存区）的最大容量（KB）
   - `S1C`年轻代第二个survivor（幸存区）的容量（KB）
 
-  - ECMX：年轻代中Eden（伊甸园）的最大容量 (KB)
+  - `ECMX`年轻代中Eden（伊甸园）的最大容量 (KB)
 
-  - EC：年轻代中Eden（伊甸园）的容量 (KB)
+  - `EC`年轻代中Eden（伊甸园）的容量 (KB)
 
-  - YGC：从应用程序启动到采样时年轻代中gc次数
+  - `YGC`从应用程序启动到采样时年轻代中gc次数
 
-  - FGC：从应用程序启动到采样时old代(全gc)gc次数
+  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
 
 ### 5.9、old代对象的信息
 
@@ -578,13 +578,75 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 104408.0  94483.6  15100.0  12222.2    174784.0    112822.2   8440 57645 1527.104 1578.678
 ```
 
-### 5.10 old对象的信息及其占用量
+- 说明：
+
+  - `MC`metaspace(元空间)的容量 (KB)
+
+  - `MU`metaspace(元空间)目前已使用空间 (KB)
+
+  - `CCSC`压缩类空间大小
+
+  - `CCSU`压缩类空间使用大小
+
+  - `OC`Old代的容量 (KB)
+
+  - `OU`Old代目前已使用空间 (KB)
+
+  - `YGC`从应用程序启动到采样时年轻代中gc次数
+
+  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
+
+  - `FGCT`从应用程序启动到采样时old代(全gc)gc所用时间(s)
+
+  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+
+### 5.10、old代对象的信息及其占用量
+
+```bash
+[emon@emon ~]$ jstat -gcoldcapacity 61572
+   OGCMN       OGCMX        OGC         OC       YGC   FGC    FGCT     GCT   
+   174784.0    174784.0    174784.0    174784.0  8448 57645 1527.104 1578.703
+```
+
+- 说明：
+
+  - `OGCMN`Old代中初始化(最小)的大小 (KB)
+
+  - `OGCMX`Old代的最大容量(KB)
+
+  - `OGC`Old代当前新生成的容量 (KB)
+  - `OC`Old代的容量 (KB)
+
+  - `YGC`从应用程序启动到采样时年轻代中gc次数
+
+  - `FGC`从应用程序启动到采样时Old代(全gc)gc次数
+
+  - `FGCT`从应用程序启动到采样时Old代(全gc)gc所用时间(s)
+
+  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+
+### 5.10 统计gc信息
 
 ```bash
 [emon@emon ~]$ jstat -gcutil 61572
   S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT   
   0.00   3.35  71.82  64.55  90.49  80.94   8441   51.578 57645 1527.104 1578.681
 ```
+
+- 说明：
+
+  - `S0`年轻代中第一个survivor（幸存区）已使用的占当前容量百分比
+  - `S1`年轻代中第二个survivor（幸存区）已使用的占当前容量百分比
+  - `E`年轻代中Eden（伊甸园）已使用的占当前容量百分比
+  - `O`old代已使用的占当前容量百分比
+  - `M`perm代已使用的占当前容量百分比
+  - `YGC`从应用程序启动到采样时年轻代中gc次数
+  - `YGCT`从应用程序启动到采样时年轻代中gc所用时间(s)
+  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
+  - `FGCT`从应用程序启动到采样时old代(全gc)gc所用时间(s)
+  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+
+  
 
 ### 5.11、显示垃圾回收的相关信息(-gcutil)
 
