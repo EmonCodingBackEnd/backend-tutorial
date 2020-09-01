@@ -447,16 +447,16 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 ```
 
 - 说明：
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（字节）
-  - `S1C`年轻代中第二个survivor（幸存区）的容量（字节）
-  - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（字节）
-  - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（字节）
-  - `EC`年轻代中Eden（伊甸园）的容量（字节）
-  - `EU`年轻但中Eden（伊甸园）目前已使用空间（字节）
-  - `OC`Old代的容量（字节）
-  - `OU`Old代目前已使用空间（字节）
-  - `MC`metaspace（元空间）的容量（字节）
-  - `MU`metaspace（元空间）目前已使用空间（字节）
+  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
+  - `S1C`年轻代中第二个survivor（幸存区）的容量（KB）
+  - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（KB）
+  - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（KB）
+  - `EC`年轻代中Eden（伊甸园）的容量（KB）
+  - `EU`年轻但中Eden（伊甸园）目前已使用空间（KB）
+  - `OC`Old代的容量（KB）
+  - `OU`Old代目前已使用空间（KB）
+  - `MC`metaspace（元空间）的容量（KB）
+  - `MU`metaspace（元空间）目前已使用空间（KB）
   - `YGC`从应用程序启动到采样时年轻代中gc次数
   - `YGCT`从应用程序启动到采样时年轻代中gc所用时间（秒：s）
   - `FGC`从应用程序启动到采样时old代全gc次数
@@ -473,20 +473,20 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `NGCMN`年轻代（young）中初始化（最小）的大小（字节）
-  - `NGCMX`年轻代（young）的最大容量（字节）
-  - `NGC`年轻代（young）中当前GC后产生的容量（字节）
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（字节）
-  - `S1C`年轻代第二个survivor（幸存区）的容量（字节）
-  - `EC`年轻代中Eden（伊甸园）的容量（字节）
+  - `NGCMN`年轻代（young）中初始化（最小）的大小（KB）
+  - `NGCMX`年轻代（young）的最大容量（KB）
+  - `NGC`年轻代（young）中当前GC后产生的容量（KB）
+  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
+  - `S1C`年轻代第二个survivor（幸存区）的容量（KB）
+  - `EC`年轻代中Eden（伊甸园）的容量（KB）
 
-  - `OGCMN`old代中初始化（最小）的大小（字节）
-  - `OGCMX`old代的最大容量（字节）
-  - `OGC`old代当前GC后产生的容量（字节）
-  - `OC`old代的容量（字节）
-  - `MCMN`metaspace（元空间）中初始化（最小）的大小（字节）
-  - `MCMX`metaspace（元空间）的最大容量（字节）
-  - `MC`metaspace（元空间）当前新生成的容量（字节）
+  - `OGCMN`old代中初始化（最小）的大小（KB）
+  - `OGCMX`old代的最大容量（KB）
+  - `OGC`old代当前GC后产生的容量（KB）
+  - `OC`old代的容量（KB）
+  - `MCMN`metaspace（元空间）中初始化（最小）的大小（KB）
+  - `MCMX`metaspace（元空间）的最大容量（KB）
+  - `MC`metaspace（元空间）当前新生成的容量（KB）
   - `CCSMN`最小压缩类空间大小
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
@@ -527,16 +527,16 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（字节）
-  - `S1C`年轻代中第二个survivor（幸存区）的容量（字节）
-  - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（字节）
-  - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（字节）
+  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
+  - `S1C`年轻代中第二个survivor（幸存区）的容量（KB）
+  - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（KB）
+  - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（KB）
   - `TT`持有次数限制
   - `MIT`最大持有次数限制
   - `DSS`期望的幸存区大小
 
-  - `EC`年轻代中Eden（伊甸园）的容量（字节）
-  - `EU`年轻但中Eden（伊甸园）目前已使用空间（字节）
+  - `EC`年轻代中Eden（伊甸园）的容量（KB）
+  - `EU`年轻但中Eden（伊甸园）目前已使用空间（KB）
 
   - `YGC`从应用程序启动到采样时年轻代中gc次数
   - `YGCT`从应用程序启动到采样时年轻代中gc所用时间（秒：s）
@@ -553,18 +553,18 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `NGCMN`年轻代（young）中初始化（最小）的大小（字节）
-  - `NGCMX`年轻代（young）的最大容量（字节）
+  - `NGCMN`年轻代（young）中初始化（最小）的大小（KB）
+  - `NGCMX`年轻代（young）的最大容量（KB）
 
-  - `NGC`年轻代（young）中当前GC后产生的容量（字节）
-  - `S0CMX`年轻代中第一个survivor（幸存区）的最大容量（字节）
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（字节）
-  - `S1CMX`年轻代中第二个survivor（幸存区）的最大容量（字节）
-  - `S1C`年轻代第二个survivor（幸存区）的容量（字节）
+  - `NGC`年轻代（young）中当前GC后产生的容量（KB）
+  - `S0CMX`年轻代中第一个survivor（幸存区）的最大容量（KB）
+  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
+  - `S1CMX`年轻代中第二个survivor（幸存区）的最大容量（KB）
+  - `S1C`年轻代第二个survivor（幸存区）的容量（KB）
 
-  - ECMX：年轻代中Eden（伊甸园）的最大容量 (字节)
+  - ECMX：年轻代中Eden（伊甸园）的最大容量 (KB)
 
-  - EC：年轻代中Eden（伊甸园）的容量 (字节)
+  - EC：年轻代中Eden（伊甸园）的容量 (KB)
 
   - YGC：从应用程序启动到采样时年轻代中gc次数
 
