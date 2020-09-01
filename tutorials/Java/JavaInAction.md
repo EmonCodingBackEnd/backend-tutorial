@@ -297,6 +297,14 @@ concurrent mark-sweep generation:
 37904 interned Strings occupying 4638792 bytes.
 ```
 
+- 扩展知识：
+  - -XX:NewRatio
+    - 新生代(eden+2*survivor)和老年代（不包含永久区/元数据区）的比值
+    - 2 表示`新生代`:`老年代`=1:2，即年轻代占堆的1/3
+  - -XX:SurvivorRatio
+    - 设置两个Survivor区和eden的比
+    - 8表示`两个Survivor`:`eden`=2:8，即一个Survivor占年轻代的1/10
+
 ### 4.4、显示堆中对象的统计信息
 
 ```bash
