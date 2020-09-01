@@ -303,7 +303,8 @@ concurrent mark-sweep generation:
     - 2 表示`新生代`:`老年代`=1:2，即年轻代占堆的1/3
   - -XX:SurvivorRatio
     - 设置两个Survivor区和eden的比
-    - 8表示`两个Survivor`:`eden`=2:8，即一个Survivor占年轻代的1/10
+    - 8表示`from`:`to`:`eden`=1:1:8，即一个Survivor占年轻代的1/10
+  - JVM每次只会使用Eden和其中的一块Survivor区域来为对象服务，所以无论什么时候，总是有一块Survivor区域是空闲着的（1/3*1/10=1/30)。
 
 ### 4.4、显示堆中对象的统计信息
 
