@@ -468,11 +468,12 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `MU`metaspace（元空间）目前已使用空间（KB）
   - `CCSC`压缩类空间大小
   - `CCSU`压缩类空间使用大小
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
-  - `YGCT`从应用程序启动到采样时年轻代中gc所用时间（秒：s）
-  - `FGC`从应用程序启动到采样时old代全gc次数
+  - `YGC`新生代中gc次数
+  - `YGCT`新生代中gc所用时间（秒）
+  - `FGC`老年代全gc次数
   - `FGCT`从应用程序启动到采样时old代全gc所用时间（秒：s）
-  - `GCT`从应用程序启动到采样时gc用的总时间（秒：s）
+  - `FGCT`老年代全gc用的总时间（秒）
+  - `GCT`垃圾回收总消耗时间（秒）
 
 ### 5.5、显示VM内存中三代（young、old、perm）对象的使用和占用大小
 
@@ -484,25 +485,28 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `NGCMN`年轻代（young）中初始化（最小）的大小（KB）
-  - `NGCMX`年轻代（young）的最大容量（KB）
-  - `NGC`年轻代（young）中当前GC后产生的容量（KB）
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
-  - `S1C`年轻代第二个survivor（幸存区）的容量（KB）
-  - `EC`年轻代中Eden（伊甸园）的容量（KB）
+  - `NGCMN`新生代最小容量（KB）
+  - `NGCMX`新生代最大容量（KB）
+  - `NGC`当前新生代容量（KB）
+  - `S0C`第一个幸存区大小（KB）
+  - `S1C`第二个幸存区大小（KB）
+  - `EC`伊甸园区的容量大小（KB）
 
-  - `OGCMN`old代中初始化（最小）的大小（KB）
-  - `OGCMX`old代的最大容量（KB）
-  - `OGC`old代当前GC后产生的容量（KB）
-  - `OC`old代的容量（KB）
-  - `MCMN`metaspace（元空间）中初始化（最小）的大小（KB）
-  - `MCMX`metaspace（元空间）的最大容量（KB）
-  - `MC`metaspace（元空间）当前新生成的容量（KB）
+  - `OGCMN`老年代最小容量（KB）
+  - `OGCMX`老年代最大容量（KB）
+  - `OGC`当前老年代大小（KB）
+  - `OC`当前老年代大小（KB）
+  - `MCMN`最小元数据容量（KB）
+
+  - `MCMX`最大元数据容量（KB）
+  - `MC`当前元数据空间大小（KB）
   - `CCSMN`最小压缩类空间大小
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
-  - `FGC`从应用程序启动带采样时old代全gc次数
+  - `YGC`新生代GC次数
+  - `FGC`老年代全GC次数
+
+### 5.6、metaspace中对象的信息及其占用量
 
 ### 5.6、metaspace中对象的信息及其占用量
 
