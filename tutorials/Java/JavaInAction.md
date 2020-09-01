@@ -687,3 +687,96 @@ Compiled  Size  Type Method
   - `Type`编译类型
   - `Method`类名和方法名用来标识编译的方法。类名使用/作为一个命名空间分隔符。方法名是给定类中的方法。上述格式是由`-XX:+PrintComplation`选项进行设置的。
 
+
+
+## 6、Alibaba开源的Java诊断工具——Arthas
+
+Arthas（阿尔萨斯）是Alibaba开源的Java诊断工具。
+
+### 6.1、快速安装
+
+- 使用`arthas-boot`（推荐）
+
+```bash
+[emon@emon ~]$ curl -O https://arthas.aliyun.com/arthas-boot.jar
+# 打印帮助信息
+[emon@emon ~]$ java -jar arthas-boot.jar -h
+# 启动
+[emon@emon ~]$ java -jar arthas-boot.jar 
+[INFO] arthas-boot version: 3.3.9
+[INFO] Found existing java process, please choose one and input the serial number of the process, eg : 1. Then hit ENTER.
+* [1]: 10913 com.install4j.runtime.launcher.UnixLauncher
+  [2]: 111842 service-config-provider.jar
+  [3]: 61572 org.elasticsearch.bootstrap.Elasticsearch
+  [4]: 111228 service-eureka-provider.jar
+2
+[INFO] arthas home: /home/emon/.arthas/lib/3.3.9/arthas
+[INFO] Try to attach process 111842
+[INFO] Attach process 111842 success.
+[INFO] arthas-client connect 127.0.0.1 3658
+  ,---.  ,------. ,--------.,--.  ,--.  ,---.   ,---.                           
+ /  O  \ |  .--. ''--.  .--'|  '--'  | /  O  \ '   .-'                          
+|  .-.  ||  '--'.'   |  |   |  .--.  ||  .-.  |`.  `-.                          
+|  | |  ||  |\  \    |  |   |  |  |  ||  | |  |.-'    |                         
+`--' `--'`--' '--'   `--'   `--'  `--'`--' `--'`-----'                          
+                                                                                
+
+wiki      https://arthas.aliyun.com/doc                                         
+tutorials https://arthas.aliyun.com/doc/arthas-tutorials.html                   
+version   3.3.9                                                                 
+pid       111842                                                                
+time      2020-09-01 16:45:08                                                   
+
+[arthas@111842]$ 
+```
+
+- 使用`as.sh`
+
+Arthas支持在Linux/Unix?Mac等平台上一键安装，请复制一下内容，并粘贴到命令行中，敲`回车`执行即可。
+
+```bash
+[emon@emon ~]$ curl -L https://arthas.aliyun.com/install.sh | sh
+```
+
+上述命令会下载启动脚本文件`as.sh`到当前目录，你可以放在任何地方或将其加入到`$PATH`中。
+
+可以使用`./as.sh`启动，也可以`./as.sh -h`查看更多参数信息。但也可能报错：
+
+```bash
+[emon@emon ~]$ ./as.sh 
+Error: telnet is not installed. Try to use java -jar arthas-boot.jar
+```
+
+- 卸载
+
+在Linux/Unix/Mac平台：
+
+```bash
+[emon@emon ~]$ rm -rf ~/.arthas/ ~/logs/arthas*
+```
+
+### 6.2、arthas使用
+
+在arthas命令行模式下，可以执行如下操作：
+
+- 基础命令
+  - `cls` 清空当前屏幕区域
+  - `session` 查看当前会话的信息
+  - 
+
+- `dashboard`
+
+展示当前进程的信息，`ctrl+c`或者输入`q`可退出。
+
+
+
+
+
+
+
+
+
+
+
+
+
