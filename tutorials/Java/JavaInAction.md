@@ -470,9 +470,9 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSU`压缩类空间使用大小
   - `YGC`新生代中gc次数
   - `YGCT`新生代中gc所用时间（秒）
-  - `FGC`堆代全GC次数
+  - `FGC`堆全GC次数
   - `FGCT`从应用程序启动到采样时old代全gc所用时间（秒：s）
-  - `FGCT`堆代全GC用的总时间（秒）
+  - `FGCT`堆全GC用的总时间（秒）
   - `GCT`垃圾回收总消耗时间（秒）
 
 ### 5.5、显示VM内存中三代（young、old、perm）对象的使用和占用大小
@@ -504,7 +504,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
   - `YGC`新生代GC次数
-  - `FGC`堆代全GC次数
+  - `FGC`堆全GC次数
 
 ### 5.6、metaspace中对象的信息及其占用量
 
@@ -526,8 +526,8 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
   - `YGC`新生代GC次数
-  - `FGC`堆代全GC次数
-  - `FGCT`堆代全GC时间（秒）
+  - `FGC`堆全GC次数
+  - `FGCT`堆全GC时间（秒）
   - `GCT`垃圾回收消耗总时间（秒）
 
 ### 5.7、年轻代对象的信息
@@ -579,7 +579,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
   - `YGC`新生代垃圾回收次数
 
-  - `FGC`老年代垃圾回收次数
+  - `FGC`堆垃圾回收全GC次数
 
 ### 5.9、old代对象的信息
 
