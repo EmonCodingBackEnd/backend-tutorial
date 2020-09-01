@@ -525,12 +525,10 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSMN`最小压缩类空间大小
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
-  - `FGC`从应用程序启动带采样时old代全gc次数
-  - `FGCT`从应用程序启动到采样时old代全gc所用时间（秒：s）
-  - `GCT`从应用程序启动到采样时gc用的总时间（秒：s）
-
-
+  - `YGC`新生代GC次数
+  - `FGC`老年代全GC次数
+  - `FGCT`老年代全GC时间（秒）
+  - `GCT`垃圾回收消耗总时间（秒）
 
 ### 5.7、年轻代对象的信息
 
@@ -542,21 +540,19 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
-  - `S1C`年轻代中第二个survivor（幸存区）的容量（KB）
-  - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（KB）
-  - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（KB）
-  - `TT`持有次数限制
-  - `MIT`最大持有次数限制
+  - `S0C`第一个幸存区大小（KB）
+  - `S1C`第二个幸存区大小（KB）
+  - `S0U`第一个幸存区的使用大小（KB）
+  - `S1U`第二个幸存区的使用大小（KB）
+  - `TT`对象在新生代存货的次数
+  - `MIT`对象在新生代存活的最大次数
   - `DSS`期望的幸存区大小
 
-  - `EC`年轻代中Eden（伊甸园）的容量（KB）
-  - `EU`年轻但中Eden（伊甸园）目前已使用空间（KB）
+  - `EC`新生代中Eden（伊甸园）的容量（KB）
+  - `EU`新生代中Eden（伊甸园）目前已使用空间（KB）
 
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
-  - `YGCT`从应用程序启动到采样时年轻代中gc所用时间（秒：s）
-
-
+  - `YGC`新生代gc次数
+  - `YGCT`新生代GC消耗的时间（秒）
 
 ### 5.8、年轻代对象的信息及其占用量
 
@@ -568,22 +564,22 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 - 说明：
 
-  - `NGCMN`年轻代（young）中初始化（最小）的大小（KB）
-  - `NGCMX`年轻代（young）的最大容量（KB）
+  - `NGCMN`新生代最小容量（KB）
+  - `NGCMX`新生代最大容量（KB）
 
-  - `NGC`年轻代（young）中当前GC后产生的容量（KB）
-  - `S0CMX`年轻代中第一个survivor（幸存区）的最大容量（KB）
-  - `S0C`年轻代中第一个survivor（幸存区）的容量（KB）
-  - `S1CMX`年轻代中第二个survivor（幸存区）的最大容量（KB）
-  - `S1C`年轻代第二个survivor（幸存区）的容量（KB）
+  - `NGC`当前新生代容量（KB）
+  - `S0CMX`第一个幸存区最大大小（KB）
+  - `S0C`第一个幸存区容量（KB）
+  - `S1CMX`第二个幸存区最大大小（KB）
+  - `S1C`第二个幸存区容量（KB）
 
-  - `ECMX`年轻代中Eden（伊甸园）的最大容量 (KB)
+  - `ECMX`新生代中Eden（伊甸园）的最大容量 (KB)
 
-  - `EC`年轻代中Eden（伊甸园）的容量 (KB)
+  - `EC`新生代中Eden（伊甸园）的容量 (KB)
 
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
+  - `YGC`新生代垃圾回收次数
 
-  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
+  - `FGC`老年代垃圾回收次数
 
 ### 5.9、old代对象的信息
 
