@@ -466,6 +466,8 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `OU`Old代目前已使用空间（KB）
   - `MC`metaspace（元空间）的容量（KB）
   - `MU`metaspace（元空间）目前已使用空间（KB）
+  - `CCSC`压缩类空间大小
+  - `CCSU`压缩类空间使用大小
   - `YGC`从应用程序启动到采样时年轻代中gc次数
   - `YGCT`从应用程序启动到采样时年轻代中gc所用时间（秒：s）
   - `FGC`从应用程序启动到采样时old代全gc次数
