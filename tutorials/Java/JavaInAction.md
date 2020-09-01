@@ -470,9 +470,9 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSU`压缩类空间使用大小
   - `YGC`新生代中gc次数
   - `YGCT`新生代中gc所用时间（秒）
-  - `FGC`老年代全gc次数
+  - `FGC`堆代全GC次数
   - `FGCT`从应用程序启动到采样时old代全gc所用时间（秒：s）
-  - `FGCT`老年代全gc用的总时间（秒）
+  - `FGCT`堆代全GC用的总时间（秒）
   - `GCT`垃圾回收总消耗时间（秒）
 
 ### 5.5、显示VM内存中三代（young、old、perm）对象的使用和占用大小
@@ -504,7 +504,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
   - `YGC`新生代GC次数
-  - `FGC`老年代全GC次数
+  - `FGC`堆代全GC次数
 
 ### 5.6、metaspace中对象的信息及其占用量
 
@@ -526,8 +526,8 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `CCSMX`最大压缩类空间大小
   - `CCSC`当前压缩类空间大小
   - `YGC`新生代GC次数
-  - `FGC`老年代全GC次数
-  - `FGCT`老年代全GC时间（秒）
+  - `FGC`堆代全GC次数
+  - `FGCT`堆代全GC时间（秒）
   - `GCT`垃圾回收消耗总时间（秒）
 
 ### 5.7、年轻代对象的信息
@@ -603,13 +603,13 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
   - `OU`Old代目前已使用空间 (KB)
 
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
+  - `YGC`新生代中gc次数
 
-  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
+  - `FGC`堆全gc次数（秒）
 
-  - `FGCT`从应用程序启动到采样时old代(全gc)gc所用时间(s)
+  - `FGCT`堆全GC花费总时间（秒）
 
-  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+  - `GCT`系统gc用的总时间(秒)
 
 ### 5.10、old代对象的信息及其占用量
 
@@ -628,13 +628,13 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `OGC`Old代当前新生成的容量 (KB)
   - `OC`Old代的容量 (KB)
 
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
+  - `YGC`新生代中gc次数
 
-  - `FGC`从应用程序启动到采样时Old代(全gc)gc次数
+  - `FGC`堆全gc次数（秒）
 
-  - `FGCT`从应用程序启动到采样时Old代(全gc)gc所用时间(s)
+  - `FGCT`堆全GC花费总时间（秒）
 
-  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+  - `GCT`系统gc用的总时间(秒)
 
 ### 5.10 统计gc信息
 
@@ -651,11 +651,11 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `E`年轻代中Eden（伊甸园）已使用的占当前容量百分比
   - `O`old代已使用的占当前容量百分比
   - `M`perm代已使用的占当前容量百分比
-  - `YGC`从应用程序启动到采样时年轻代中gc次数
-  - `YGCT`从应用程序启动到采样时年轻代中gc所用时间(s)
-  - `FGC`从应用程序启动到采样时old代(全gc)gc次数
-  - `FGCT`从应用程序启动到采样时old代(全gc)gc所用时间(s)
-  - `GCT`从应用程序启动到采样时gc用的总时间(s)
+  - `YGC`新生代中gc次数
+  - `YGCT`新生代中gc所用时间（秒）
+  - `FGC`堆全gc次数（秒）
+  - `FGCT`堆全GC花费总时间（秒）
+  - `GCT`系统gc用的总时间(秒)
 
   
 
