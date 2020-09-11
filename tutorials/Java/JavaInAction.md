@@ -760,23 +760,93 @@ Error: telnet is not installed. Try to use java -jar arthas-boot.jar
 在arthas命令行模式下，可以执行如下操作：
 
 - 基础命令
+
+  - `help` 查看命令帮助信息
+  - `echo` 打印参数，和linux里的echo命令类型
+
+  - `grep` 匹配查找，和linux里的grep命令类型
+
   - `cls` 清空当前屏幕区域
   - `session` 查看当前会话的信息
-  - 
+  - `version` 输出当前目标Java进程所加载的Arthas版本号
+  - `history` 打印命令历史
+  - `quit` 退出当前Arthas客户端，其他Arthas客户端不受影响
+  - `stop` 关闭Arthas服务端，所有Arthas客户端全部退出
+  - `keymap` Arthas快捷键列表及自定义快捷键
 
-- `dashboard`
+- jvm相关
 
-展示当前进程的信息，`ctrl+c`或者输入`q`可退出。
-
-
-
-
-
-
-
-
+  - `dashboard` 展示当前进程的信息，`ctrl+c`或者输入`q`可退出。
+  - `thread` 查看当前JVM的线程堆栈信息
+  - `jvm` 查看当前JVM的信息
+  - `sysprop` 查看和修改JVM的系统属性
+  - `sysenv` 查看JVM的环境变量
+  - `vmoption` 查看和修改JVM里诊断相关的option
+  - `perfcounter` 查看当前JVM的Perf Counter信息
 
 
 
+### 6.3、几个常用命令解析
 
+- dashboard
+
+参数说明：
+
+| 参数名称 | 参数说明                                 |
+| -------- | ---------------------------------------- |
+| [i:]     | 刷新实时数据的时间间隔（ms），默认5000ms |
+| [n:]     | 刷新实时数据的次数                       |
+
+示例1：
+
+```bash
+[arthas@10913]$ dashboard -i 2000 -n 5
+```
+
+- thread
+
+参数说明：
+
+| 参数名称    | 参数说明                              |
+| ----------- | ------------------------------------- |
+| id          | 线程id                                |
+| [n:]        | 指定最忙的前N个线程并打印堆栈         |
+| [b]         | 找出当前阻塞其他线程的线程            |
+| [i <value>] | 指定cpu占比统计的采样间隔，单位为毫秒 |
+
+示例1：查询当前最忙的N个线程把那个打印堆栈
+
+```bash
+thread -n 3
+```
+
+示例2：查询所有线程的信息
+
+```bash
+thread
+```
+
+示例3：显示指定线程的运行堆栈
+
+```bash
+thread 1
+```
+
+示例4：找出当前阻塞其他线程的线程
+
+```bash
+thread -b
+```
+
+示例5：指定采样时间间隔
+
+```bash
+thread -n 3 -i 1000
+```
+
+示例6：查看指定状态的现场
+
+```bash
+thread --state WAITING
+```
 

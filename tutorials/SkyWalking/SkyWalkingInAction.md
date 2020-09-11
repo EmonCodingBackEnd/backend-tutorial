@@ -15,7 +15,7 @@
 由于要搭配Elasticsearch使用，这里下载`Binary Distribution for ElasticSearch 7`
 
 ```shell
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirror.bit.edu.cn/apache/skywalking/7.0.0/apache-skywalking-apm-es7-7.0.0.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.bfsu.edu.cn/apache/skywalking/8.1.0/apache-skywalking-apm-es7-8.1.0.tar.gz
 ```
 
 2. 创建安装目录
@@ -27,7 +27,7 @@
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-skywalking-apm-es7-7.0.0.tar.gz -C /usr/local/SkyWalking/
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-skywalking-apm-es7-8.1.0.tar.gz -C /usr/local/SkyWalking/
 ```
 
 4. 创建软连接
@@ -64,7 +64,7 @@ storage:
     nameSpace: ${SW_NAMESPACE:"skywalking"} #nameSpace: ${SW_NAMESPACE:""}
 ```
 
-- 第三处：相对路径修改为绝对路径
+- 第三处：相对路径修改为绝对路径【7版本需要修改，8版本优化了不需要修改了】
 
 ```yaml
 receiver-trace:
@@ -150,7 +150,7 @@ SkyWalking Web Application started successfully!
 在项目的`VM options:`中配置如下内容：
 
 ```
--Xmx512m -Xms512m -Xmn256m -Xss228k -javaagent:C:\Job\JobSoftware\apache-skywalking-apm-es7-7.0.0\agent\skywalking-agent.jar -DSW_AGENT_NAME=huiba-site-provider -DSW_AGENT_COLLECTOR_BACKEND_SERVICES=192.168.5.116:11800
+-Xmx512m -Xms512m -Xmn256m -Xss228k -javaagent:C:\Job\JobSoftware\apache-skywalking-apm-es7-8.1.0\apache-skywalking-apm-bin-es7\agent\skywalking-agent.jar -DSW_AGENT_NAME=huiba-site-provider -DSW_AGENT_COLLECTOR_BACKEND_SERVICES=192.168.5.116:11800
 ```
 
 **说明：**
