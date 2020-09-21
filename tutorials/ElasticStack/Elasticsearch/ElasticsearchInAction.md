@@ -396,6 +396,39 @@ GET loginfo/_source/1
 }
 ```
 
+### 2.3、常见问题
+
+- adapter端问题之`net_write_timeout`
+
+```bash
+2020-09-21 08:36:27.422 [pool-3-thread-1] ERROR c.a.o.canal.adapter.launcher.loader.CanalAdapterWorker - java.lang.RuntimeException: java.lang.RuntimeException: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Application was streaming results when the connection failed. Consider raising value of 'net_write_timeout' on the server.
+java.lang.RuntimeException: java.lang.RuntimeException: java.lang.RuntimeException: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Application was streaming results when the connection failed. Consider raising value of 'net_write_timeout' on the server.
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.sync(ESSyncService.java:110)
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.sync(ESSyncService.java:58)
+    at com.alibaba.otter.canal.client.adapter.es.ESAdapter.sync(ESAdapter.java:179)
+    at com.alibaba.otter.canal.client.adapter.es.ESAdapter.sync(ESAdapter.java:158)
+    at com.alibaba.otter.canal.adapter.launcher.loader.AbstractCanalAdapterWorker.batchSync(AbstractCanalAdapterWorker.java:201)
+    at com.alibaba.otter.canal.adapter.launcher.loader.AbstractCanalAdapterWorker.lambda$null$1(AbstractCanalAdapterWorker.java:62)
+    at java.util.ArrayList.forEach(ArrayList.java:1255)
+    at com.alibaba.otter.canal.adapter.launcher.loader.AbstractCanalAdapterWorker.lambda$null$2(AbstractCanalAdapterWorker.java:58)
+    at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at java.lang.Thread.run(Thread.java:748)
+Caused by: java.lang.RuntimeException: java.lang.RuntimeException: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Application was streaming results when the connection failed. Consider raising value of 'net_write_timeout' on the server.
+    at com.alibaba.otter.canal.client.adapter.support.Util.sqlRS(Util.java:45)
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.wholeSqlOperation(ESSyncService.java:706)
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.update(ESSyncService.java:306)
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.sync(ESSyncService.java:95)
+    ... 11 common frames omitted
+Caused by: java.lang.RuntimeException: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Application was streaming results when the connection failed. Consider raising value of 'net_write_timeout' on the server.
+    at com.alibaba.otter.canal.client.adapter.es.service.ESSyncService.lambda$wholeSqlOperation$6(ESSyncService.java:774)
+    at com.alibaba.otter.canal.client.adapter.support.Util.sqlRS(Util.java:41)
+    ... 14 common frames omitted
+```
+
+
+
 
 
 ## 3、同步mysql到mysql

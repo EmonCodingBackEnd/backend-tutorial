@@ -994,13 +994,67 @@ http://192.168.3.116:5601
 
 ## 4、Beats
 
+1. 下载
 
+```bash
+[saas@local-66 ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.2-linux-x86_64.tar.gz
+```
 
+2. 解压安装
 
+```bash
+[saas@local-66 ~]$ tar -zxvf /usr/local/src/filebeat-7.6.2-linux-x86_64.tar.gz -C /usr/local/ElasticStack/Beats/
+```
 
+3. 创建软连接
 
+```bash
+[saas@local-66 ~]$ ln -s /usr/local/ElasticStack/Beats/filebeat-7.6.2-linux-x86_64/ /usr/local/filebeat
+```
 
+4. 配置文件
 
+`/usr/local/filebeat/filebeat.reference.yml` 包含所有未过时的配置项
+
+`/usr/local/filebeat/filebeat.yml` 配置文件
+
+filebeat命令需要在根目录下执行，所以先切换到根目录下：
+
+```bash
+[saas@local-66 ~]$ cd /usr/local/filebeat/
+```
+
+- 如何使用`filebeat`命令
+
+```bash
+[saas@local-66 filebeat]$ ./filebeat -h
+```
+
+```bash
+Usage:
+  filebeat [flags]
+  filebeat [command]
+
+Available Commands:
+  enroll      Enroll in Kibana for Central Management                  	
+  export      Export current config or index template					# 导出
+  generate    Generate Filebeat modules, filesets and fields.yml
+  help        Help about any command
+  keystore    Manage secrets keystore									# 秘钥存储
+  modules     Manage configured modules									# 模块配置管理
+  run         Run filebeat												# 执行（默认执行）
+  setup       Setup index template, dashboards and ML jobs				# 设置初始环境
+  test        Test config												# 测算配置
+  version     Show current version info
+```
+
+- 如何测算配置文件是否正确：
+
+```bash
+[saas@local-66 filebeat]$ ./filebeat test config
+```
+
+- 配置`filebeat.yml`文件，log输入类型为例
 
 
 
