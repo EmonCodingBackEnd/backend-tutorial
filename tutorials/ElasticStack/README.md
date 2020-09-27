@@ -634,9 +634,162 @@ hello world
 }
 ```
 
+6. 命令使用详解
 
+```bash
+[saas@local-66 bin]$ ./logstash -h
+Usage:
+    bin/logstash [OPTIONS]
 
-5. 准备一个`logstash-simple.conf`配置文件
+Options:
+    -n, --node.name NAME          Specify the name of this logstash instance, if no value is given
+                                  it will default to the current hostname.
+                                   (default: "local-66")
+    -f, --path.config CONFIG_PATH Load the logstash config from a specific file
+                                  or directory.  If a directory is given, all
+                                  files in that directory will be concatenated
+                                  in lexicographical order and then parsed as a
+                                  single config file. You can also specify
+                                  wildcards (globs) and any matched files will
+                                  be loaded in the order described above.
+    -e, --config.string CONFIG_STRING Use the given string as the configuration
+                                  data. Same syntax as the config file. If no
+                                  input is specified, then the following is
+                                  used as the default input:
+                                  "input { stdin { type => stdin } }"
+                                  and if no output is specified, then the
+                                  following is used as the default output:
+                                  "output { stdout { codec => rubydebug } }"
+                                  If you wish to use both defaults, please use
+                                  the empty string for the '-e' flag.
+                                   (default: nil)
+    --field-reference-parser MODE (DEPRECATED) This option is no longer
+                                  configurable.
+                                  
+                                  Use the given MODE when parsing field
+                                  references.
+                                  
+                                  The field reference parser is used to expand
+                                  field references in your pipeline configs,
+                                  and has become more strict to better handle
+                                  ambiguous- and illegal-syntax inputs.
+                                  
+                                  The only available MODE is:
+                                   - `STRICT`: parse in a strict manner; when
+                                     given ambiguous- or illegal-syntax input,
+                                     raises a runtime exception that should
+                                     be handled by the calling plugin.
+                                  
+                                   (default: "STRICT")
+    --modules MODULES             Load Logstash modules.
+                                  Modules can be defined using multiple instances
+                                  '--modules module1 --modules module2',
+                                     or comma-separated syntax
+                                  '--modules=module1,module2'
+                                  Cannot be used in conjunction with '-e' or '-f'
+                                  Use of '--modules' will override modules declared
+                                  in the 'logstash.yml' file.
+    -M, --modules.variable MODULES_VARIABLE Load variables for module template.
+                                  Multiple instances of '-M' or
+                                  '--modules.variable' are supported.
+                                  Ignored if '--modules' flag is not used.
+                                  Should be in the format of
+                                  '-M "MODULE_NAME.var.PLUGIN_TYPE.PLUGIN_NAME.VARIABLE_NAME=VALUE"'
+                                  as in
+                                  '-M "example.var.filter.mutate.fieldname=fieldvalue"'
+    --setup                       Load index template into Elasticsearch, and saved searches, 
+                                  index-pattern, visualizations, and dashboards into Kibana when
+                                  running modules.
+                                   (default: false)
+    --cloud.id CLOUD_ID           Sets the elasticsearch and kibana host settings for
+                                  module connections in Elastic Cloud.
+                                  Your Elastic Cloud User interface or the Cloud support
+                                  team should provide this.
+                                  Add an optional label prefix '<label>:' to help you
+                                  identify multiple cloud.ids.
+                                  e.g. 'staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRub3RhcmVhbCRpZGVudGlmaWVy'
+    --cloud.auth CLOUD_AUTH       Sets the elasticsearch and kibana username and password
+                                  for module connections in Elastic Cloud
+                                  e.g. 'username:<password>'
+    --pipeline.id ID              Sets the ID of the pipeline.
+                                   (default: "main")
+    -w, --pipeline.workers COUNT  Sets the number of pipeline workers to run.
+                                   (default: 24)
+    --java-execution              Use Java execution engine.
+                                   (default: true)
+    --plugin-classloaders         (Beta) Load Java plugins in independent classloaders to isolate their dependencies.
+                                   (default: false)
+    -b, --pipeline.batch.size SIZE Size of batches the pipeline is to work in.
+                                   (default: 125)
+    -u, --pipeline.batch.delay DELAY_IN_MS When creating pipeline batches, how long to wait while polling
+                                  for the next event.
+                                   (default: 50)
+    --pipeline.unsafe_shutdown    Force logstash to exit during shutdown even
+                                  if there are still inflight events in memory.
+                                  By default, logstash will refuse to quit until all
+                                  received events have been pushed to the outputs.
+                                   (default: false)
+    --path.data PATH              This should point to a writable directory. Logstash
+                                  will use this directory whenever it needs to store
+                                  data. Plugins will also have access to this path.
+                                   (default: "/usr/local/logstash/data")
+    -p, --path.plugins PATH       A path of where to find plugins. This flag
+                                  can be given multiple times to include
+                                  multiple paths. Plugins are expected to be
+                                  in a specific directory hierarchy:
+                                  'PATH/logstash/TYPE/NAME.rb' where TYPE is
+                                  'inputs' 'filters', 'outputs' or 'codecs'
+                                  and NAME is the name of the plugin.
+                                   (default: [])
+    -l, --path.logs PATH          Write logstash internal logs to the given
+                                  file. Without this flag, logstash will emit
+                                  logs to standard output.
+                                   (default: "/usr/local/logstash/logs")
+    --log.level LEVEL             Set the log level for logstash. Possible values are:
+                                    - fatal
+                                    - error
+                                    - warn
+                                    - info
+                                    - debug
+                                    - trace
+                                   (default: "info")
+    --config.debug                Print the compiled config ruby code out as a debug log (you must also have --log.level=debug enabled).
+                                  WARNING: This will include any 'password' options passed to plugin configs as plaintext, and may result
+                                  in plaintext passwords appearing in your logs!
+                                   (default: false)
+    -i, --interactive SHELL       Drop to shell instead of running as normal.
+                                  Valid shells are "irb" and "pry"
+    -V, --version                 Emit the version of logstash and its friends,
+                                  then exit.
+    -t, --config.test_and_exit    Check configuration for valid syntax and then exit.
+                                   (default: false)
+    -r, --config.reload.automatic Monitor configuration changes and reload
+                                  whenever it is changed.
+                                  NOTE: use SIGHUP to manually reload the config
+                                   (default: false)
+    --config.reload.interval RELOAD_INTERVAL How frequently to poll the configuration location
+                                  for changes, in seconds.
+                                   (default: 3000000000)
+    --http.host HTTP_HOST         Web API binding host (default: "127.0.0.1")
+    --http.port HTTP_PORT         Web API http port (default: 9600..9700)
+    --log.format FORMAT           Specify if Logstash should write its own logs in JSON form (one
+                                  event per line) or in plain text (using Ruby's Object#inspect)
+                                   (default: "plain")
+    --path.settings SETTINGS_DIR  Directory containing logstash.yml file. This can also be
+                                  set through the LS_SETTINGS_DIR environment variable.
+                                   (default: "/usr/local/logstash/config")
+    --verbose                     Set the log level to info.
+                                  DEPRECATED: use --log.level=info instead.
+    --debug                       Set the log level to debug.
+                                  DEPRECATED: use --log.level=debug instead.
+    --quiet                       Set the log level to info.
+                                  DEPRECATED: use --log.level=info instead.
+    -h, --help                    print help
+```
+
+7. 几个实例
+
+- 准备一个`logstash-simple.conf`配置文件
 
 ```
 [emon@emon ~]$ vim /usr/local/logstash/config/logstash-simple.conf
@@ -658,7 +811,7 @@ output {
 
 可以在控制台命令行输入消息，会被传递到es服务器。
 
-6. 准备一个`mysql.conf`配置文件【一个接近实战的例子】
+- 准备一个`mysql.conf`配置文件【一个接近实战的例子】
 
 ```bash
 # 上传mysql驱动jar到该目录下，比如mysql-connector-java-5.1.41.jar
@@ -732,15 +885,11 @@ on spu.id=sku.spu_id
 where spu.modify_time > :sql_last_value
 ```
 
-
-
 执行配置文件：
 
 ```bash
 [emon@emon ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/mysql_config/goods.conf
 ```
-
-
 
 ### 1.2 安装插件
 
@@ -1048,15 +1197,156 @@ Available Commands:
   version     Show current version info
 ```
 
+- 如何使用`file beat [command]子命令
+
+```bash
+# 查看使用方法： filebeat [command] -h，比如：
+[saas@local-66 filebeat]$ ./filebeat modules -h
+```
+
 - 如何测算配置文件是否正确：
 
 ```bash
 [saas@local-66 filebeat]$ ./filebeat test config
 ```
 
+- 如何测算配置文件是否可以连通到output
+
+```bash
+[saas@local-66 filebeat]$ ./filebeat test output
+```
+
 - 配置`filebeat.yml`文件，log输入类型为例
 
+```bash
+# 备份
+[saas@local-66 ~]$ cp /usr/local/filebeat/filebeat.yml /usr/local/filebeat/filebeat.yml.bak
+# 编辑
+[saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml 
+```
 
+5. 几个实例
+
+- 实例一：logstash作为输出
+  - 配置logstash
+
+  ```bash
+  # 创建目录
+  [saas@local-66 ~]$ mkdir -pv /usr/local/logstash/config/custom_config/filebeats_config/
+  # 编辑文件
+  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf 
+  ```
+
+  ```bash
+  input {
+    beats {
+      port => 5044
+    }
+  }
+  filter {
+    grok {
+      patterns_dir => ["/usr/local/logstash/config/custom_config/hbsite/patterns"]
+      match => {
+        "message" => "%{CDATE:date} \[%{CTID:tid}]  %{CLEVEL:level} %{CPID:pid} --- \[%{CTHREAD:thread}"
+      }
+    }
+}
+  output {
+    elasticsearch {
+      hosts => ["http://192.168.1.66:9200"]
+      index => "hbsite-log-%{+YYYY.MM.dd}"
+  }
+  }
+  ```
+  
+```bash
+  # 执行配置文件
+  [saas@local-66 ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf
+  ```
+  
+  ```bash
+  # 配置supervisor启动
+  ```
+  
+  ```bash
+  [program:huiba-site-logstash]
+  command=/usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+  autostart=false                 ; 在supervisord启动的时候也自动启动
+  startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+  autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+  startretries=3                  ; 启动失败自动重试次数，默认是3
+  user=saas                       ; 用哪个用户启动进程，默认是root
+  priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+  stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+  environment=JAVA_HOME="/usr/local/java"
+  stdout_logfile=/etc/program/huiba-site-logstash.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+  stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+  killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+  
+  - 配置filebeat
+  
+  ```bash
+  # 编辑配置文件
+  [saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml
+  ```
+  
+  ```yml
+  filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /home/saas/huiba/site/huiba-site-server/logs/huiba-site-provider.log
+    # 表示过滤掉包含 TID:N/A 的行
+    exclude_lines: ['TID:N/A']
+    fields:
+      appName: huiba-site-provider
+    fields_under_root: true
+    # multiline开头的3个配置表示：匹配 yyyy-MM-dd HH:mm:ss 开头的日志，作为独立成行的标志；该标志后面的行要和该行合并处理
+    multiline.pattern: ^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])
+    multiline.negate: true
+    multiline.match: after
+    close_inactive: 2m
+  filebeat.config.modules:
+    path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+  setup.template.settings:
+    index.number_of_shards: 1
+  setup.kibana:
+  output.logstash:
+  hosts: ["localhost:5044"]
+  processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+  ```
+  
+  ```bash
+  # 执行配置文件，注意--path.config和-c参数的不同之处
+  [saas@local-66 ~]$ /usr/local/filebeat/filebea --path.config /usr/local/filebeat -e
+  ```
+  
+  ```bash
+  [program:huiba-site-filebeat]
+  command=/usr/local/filebeat/filebeat -c /usr/local/filebeat/filebeat.yml -e
+  autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+  autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+  startretries=3                  ; 启动失败自动重试次数，默认是3
+  user=saas                       ; 用哪个用户启动进程，默认是root
+  priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+  redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+  stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+  stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+  stdout_logfile=/etc/program/huiba-site-filebeat.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+  stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+  killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+  ```
+  
+  
 
 
 
