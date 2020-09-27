@@ -1240,18 +1240,17 @@ Available Commands:
   ```bash
   CDATE ((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])\.\d{3}
   CTID TID:\w*\.\d+\.\d+|TID:N/A
-  CIPORHOST (?:%{IPORHOST})?
-  CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)?
-  CURL ((?:/\w+)+(?:/)?)?
-  CBROWER_NAME (\w+ \d+)?
-  COSNAME_NAME (\w+ \d+)?
+  CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)
+  CURL (/\w+)+(/)?
+  CBROWER_NAME \w+ \d+
+  COSNAME_NAME \w+ \d+
   CPID \d+
   CTHREAD [\w-]+
   ```
   
   ```bash
-# 编辑文件
-  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+  # 编辑文件
+[saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
   ```
   
   ```bash
@@ -1263,8 +1262,9 @@ Available Commands:
   filter {
     grok {
       patterns_dir => ["/usr/local/logstash/config/custom_config/hbsite/patterns"]
+      break_on_match => false
       match => {
-        "message" => "%{CDATE:date} \[%{CTID:tid}] \[%{CIPORHOST:clientip} %{CMETHOD:method} %{CURL:url} %{CBROWER_NAME:browerName} %{COSNAME_NAME:osName}]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}"
+        "message" => ["%{CDATE:date} \[%{CTID:tid}] \[\s+]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}", "%{CDATE:date} \[%{CTID:tid}] \[%{IPORHOST:clientip} %{CMETHOD:method} %{CURL:url} %{CBROWER_NAME:browerName} %{COSNAME_NAME:osName}]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}"]
       }
     }
   }
