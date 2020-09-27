@@ -1232,11 +1232,28 @@ Available Commands:
 
   ```bash
   # 创建目录
-  [saas@local-66 ~]$ mkdir -pv /usr/local/logstash/config/custom_config/filebeats_config/
-  # 编辑文件
-  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf 
+  [saas@local-66 ~]$ mkdir -pv /usr/local/logstash/config/custom_config/hbsite/
+  # 自定义grok的patterns
+  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/patterns/custom-grok-patterns
   ```
 
+  ```bash
+  CDATE ((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])\.\d{3}
+  CTID TID:\w*\.\d+\.\d+|TID:N/A
+  CIPORHOST (?:%{IPORHOST})?
+  CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)?
+  CURL ((?:/\w+)+(?:/)?)?
+  CBROWER_NAME (\w+ \d+)?
+  COSNAME_NAME (\w+ \d+)?
+  CPID \d+
+  CTHREAD [\w-]+
+  ```
+  
+  ```bash
+# 编辑文件
+  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+  ```
+  
   ```bash
   input {
     beats {
@@ -1247,52 +1264,51 @@ Available Commands:
     grok {
       patterns_dir => ["/usr/local/logstash/config/custom_config/hbsite/patterns"]
       match => {
-        "message" => "%{CDATE:date} \[%{CTID:tid}]  %{CLEVEL:level} %{CPID:pid} --- \[%{CTHREAD:thread}"
+        "message" => "%{CDATE:date} \[%{CTID:tid}] \[%{CIPORHOST:clientip} %{CMETHOD:method} %{CURL:url} %{CBROWER_NAME:browerName} %{COSNAME_NAME:osName}]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}"
       }
     }
-}
+  }
   output {
     elasticsearch {
       hosts => ["http://192.168.1.66:9200"]
       index => "hbsite-log-%{+YYYY.MM.dd}"
+    }
   }
-  }
-  ```
-  
-```bash
-  # 执行配置文件
-  [saas@local-66 ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf
   ```
   
   ```bash
-  # 配置supervisor启动
+    # 执行配置文件
+    [saas@local-66 ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf
   ```
   
   ```bash
-  [program:huiba-site-logstash]
-  command=/usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
-  autostart=false                 ; 在supervisord启动的时候也自动启动
-  startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
-  autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
-  startretries=3                  ; 启动失败自动重试次数，默认是3
-  user=saas                       ; 用哪个用户启动进程，默认是root
-  priority=70                     ; 进程启动优先级，默认999，值小的优先启动
-redirect_stderr=true            ; 把stderr重定向到stdout，默认false
-  stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
-stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
-  environment=JAVA_HOME="/usr/local/java"
-  stdout_logfile=/etc/program/huiba-site-logstash.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
-  stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
-  killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
-```
+    # 配置supervisor启动
+  ```
   
+  ```bash
+    [program:huiba-logstash]
+    command=/usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+    autostart=false                 ; 在supervisord启动的时候也自动启动
+    startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+    autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+    startretries=3                  ; 启动失败自动重试次数，默认是3
+    user=saas                       ; 用哪个用户启动进程，默认是root
+    priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+  redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+    stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+  stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+    environment=JAVA_HOME="/usr/local/java"
+    stdout_logfile=/etc/program/huibalogstash.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+    stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+    killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+  ```
   - 配置filebeat
-  
+
   ```bash
   # 编辑配置文件
   [saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml
   ```
-  
+
   ```yml
   filebeat.inputs:
   - type: log
@@ -1323,12 +1339,12 @@ stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
   ```
-  
+
   ```bash
   # 执行配置文件，注意--path.config和-c参数的不同之处
   [saas@local-66 ~]$ /usr/local/filebeat/filebea --path.config /usr/local/filebeat -e
   ```
-  
+
   ```bash
   [program:huiba-site-filebeat]
   command=/usr/local/filebeat/filebeat -c /usr/local/filebeat/filebeat.yml -e
@@ -1345,7 +1361,7 @@ startsecs=10                    ; 启动10秒后没有异常退出，就表示�
   stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
   killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
   ```
-  
+
   
 
 
