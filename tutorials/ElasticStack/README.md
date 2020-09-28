@@ -1242,10 +1242,10 @@ Available Commands:
   CTID TID:\w*\.\d+\.\d+|TID:N/A
   CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)
   CURL (/\w+)+(/)?
-  CBROWER_NAME \w+ \w+
-  COSNAME_NAME \w+ \w+
+  CBROWER_NAME [\w/\s]+
+  COSNAME_NAME [\w/\s]+
   CPID \d+
-  CTHREAD [\w-]+
+  CTHREAD [\s\w-]+
   ```
   
   ```bash
