@@ -1267,6 +1267,9 @@ Available Commands:
         "message" => ["%{CDATE:logger.date} \[%{CTID:logger.tid}] \[\s+]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}", "%{CDATE:logger.date} \[%{CTID:logger.tid}] \[%{IPORHOST:logger.clientIp} %{CMETHOD:logger.method} %{CURL:logger.url} %{CBROWER_NAME:logger.browerName} %{COSNAME_NAME:logger.osName}]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}"]
       }
     }
+    date {
+      match => ["logger.date", "yyyy-MM-dd HH:mm:ss.SSS"]
+    }
   }
   output {
     elasticsearch {
