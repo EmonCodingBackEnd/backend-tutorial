@@ -1241,7 +1241,7 @@ Available Commands:
   CDATE ((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])\.\d{3}
   CTID TID:\w*\.\d+\.\d+|TID:N/A
   CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)
-  CURL (/\w+)+(/)?
+  CURL (/\w*)+(/)?
   CBROWER_NAME [\w/\s]+
   COSNAME_NAME [\w/\s]+
   CPID \d+
@@ -1264,7 +1264,7 @@ Available Commands:
       patterns_dir => ["/usr/local/logstash/config/custom_config/hbsite/patterns"]
       break_on_match => false
       match => {
-        "message" => ["%{CDATE:logger.date} \[%{CTID:logger.tid}] \[\s+]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}", "%{CDATE:logger.date} \[%{CTID:logger.tid}] \[%{IPORHOST:logger.clientIp} %{CMETHOD:logger.method} %{CURL:logger.url} %{CBROWER_NAME:logger.browerName} %{COSNAME_NAME:logger.osName}]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}"]
+        "message" => ["%{CDATE:logger.date} \[%{CTID:logger.tid}] \[\s+]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}", "%{CDATE:logger.date} \[%{CTID:logger.tid}] \[%{IPORHOST:logger.clientIp} %{CMETHOD:logger.method} %{CURL:logger.url} %{CBROWER_NAME:logger.browerName},%{COSNAME_NAME:logger.osName}]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}"]
       }
     }
     date {
