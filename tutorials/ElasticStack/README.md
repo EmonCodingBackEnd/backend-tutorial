@@ -1306,15 +1306,15 @@ Available Commands:
   stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
   killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
   ```
+  
 - 配置filebeat
   
   ```bash
   # 编辑配置文件
   [saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml
   ```
-```
   
-  ```yml
+  ```bash
   #=========================== Filebeat inputs =============================
   
   filebeat.inputs:
@@ -1338,26 +1338,27 @@ Available Commands:
     fields:
       appName: huiba-site-es-provider
     fields_under_root: true
+    # multiline开头的3个配置表示：匹配 yyyy-MM-dd HH:mm:ss 开头的日志，作为独立成行的标志；该标志后面的行要和该行合并处理
     multiline.pattern: ^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])
     multiline.negate: true
     multiline.match: after
     close_inactive: 2m
   
-#============================= Filebeat modules ===============================
+  #============================= Filebeat modules ===============================
   
   filebeat.config.modules:
     path: ${path.config}/modules.d/*.yml
     reload.enabled: false
-
+  
   #==================== Elasticsearch template setting ==========================
   
   setup.template.settings:
     index.number_of_shards: 1
-
+  
   #----------------------------- Logstash output --------------------------------
   output.logstash:
     # The Logstash hosts
-    hosts: ["localhost:5044"]
+    hosts: ["192.168.1.66:5044"]
   
   #================================ Processors =====================================
   
@@ -1365,9 +1366,14 @@ Available Commands:
   
   processors:
     - add_host_metadata: ~
-  - add_cloud_metadata: ~
+    - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+  ```
+  
+  
+```
+
 ```
 
   ```bash
