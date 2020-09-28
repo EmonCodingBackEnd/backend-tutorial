@@ -1242,8 +1242,8 @@ Available Commands:
   CTID TID:\w*\.\d+\.\d+|TID:N/A
   CMETHOD (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE)
   CURL (/\w+)+(/)?
-  CBROWER_NAME \w+ \d+
-  COSNAME_NAME \w+ \d+
+  CBROWER_NAME \w+ \w+
+  COSNAME_NAME \w+ \w+
   CPID \d+
   CTHREAD [\w-]+
   ```
@@ -1264,7 +1264,7 @@ Available Commands:
       patterns_dir => ["/usr/local/logstash/config/custom_config/hbsite/patterns"]
       break_on_match => false
       match => {
-        "message" => ["%{CDATE:date} \[%{CTID:tid}] \[\s+]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}", "%{CDATE:date} \[%{CTID:tid}] \[%{IPORHOST:clientip} %{CMETHOD:method} %{CURL:url} %{CBROWER_NAME:browerName} %{COSNAME_NAME:osName}]\s+%{LOGLEVEL:loglevel} %{CPID:pid} --- \[%{CTHREAD:thread}"]
+        "message" => ["%{CDATE:logger.date} \[%{CTID:logger.tid}] \[\s+]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}", "%{CDATE:logger.date} \[%{CTID:logger.tid}] \[%{IPORHOST:logger.clientIp} %{CMETHOD:logger.method} %{CURL:logger.url} %{CBROWER_NAME:logger.browerName} %{COSNAME_NAME:logger.osName}]\s+%{LOGLEVEL:logger.level} %{CPID:logger.pid} --- \[%{CTHREAD:logger.thread}"]
       }
     }
   }
@@ -1308,6 +1308,7 @@ Available Commands:
   ```bash
   # 编辑配置文件
   [saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml
+  ```
 ```
   
   ```yml
@@ -1364,18 +1365,18 @@ Available Commands:
   - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
-  ```
-  
+```
+
   ```bash
   # 执行配置文件，注意--path.config和-c参数的不同之处
   [saas@local-66 ~]$ /usr/local/filebeat/filebea --path.config /usr/local/filebeat -e
   ```
-  
+
   ```bash
   # 配置supervisor启动
   [saas@local-66 ~]$ sudo vim /etc/program/huiba-site-filebeat.ini 
   ```
-  
+
   ```bash
   [program:huiba-site-filebeat]
   command=/usr/local/filebeat/filebeat -c /usr/local/filebeat/filebeat.yml -e
@@ -1392,7 +1393,7 @@ Available Commands:
   stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
   killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
   ```
-  
+
   
 
 
