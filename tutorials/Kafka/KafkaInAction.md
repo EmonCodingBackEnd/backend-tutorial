@@ -13,7 +13,7 @@
 下载地址：http://kafka.apache.org/downloads
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/kafka/2.3.0/kafka_2.12-2.3.0.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirror.bit.edu.cn/apache/kafka/2.6.0/kafka_2.12-2.6.0.tgz
 ```
 
 ## 2、创建安装目录
@@ -25,13 +25,13 @@
 ### 3、解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.3.0.tgz -C /usr/local/Kafka/
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.6.0.tgz -C /usr/local/Kafka/
 ```
 
 ## 4、创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.3.0/ /usr/local/kafka
+[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.6.0/ /usr/local/kafka
 ```
 
 ## 5、配置环境变量

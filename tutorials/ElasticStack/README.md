@@ -637,14 +637,14 @@ hello world
 6. 命令使用详解
 
 ```bash
-[saas@local-66 bin]$ ./logstash -h
+[emon@emon bin]$ ./logstash -h
 Usage:
     bin/logstash [OPTIONS]
 
 Options:
     -n, --node.name NAME          Specify the name of this logstash instance, if no value is given
                                   it will default to the current hostname.
-                                   (default: "local-66")
+                                   (default: "emon")
     -f, --path.config CONFIG_PATH Load the logstash config from a specific file
                                   or directory.  If a directory is given, all
                                   files in that directory will be concatenated
@@ -902,7 +902,7 @@ where spu.modify_time > :sql_last_value
 ### 1.2.1、查看是否安装了`logstash-integration-jdbc`插件
 
 ```bash
-[saas@localhost ~]$ /usr/local/logstash/bin/logstash-plugin list --verbose|grep jdbc
+[emon@localhost ~]$ /usr/local/logstash/bin/logstash-plugin list --verbose|grep jdbc
 logstash-integration-jdbc (5.0.1)
  ├── logstash-input-jdbc
  ├── logstash-filter-jdbc_streaming
@@ -923,7 +923,7 @@ logstash-integration-jdbc (5.0.1)
 由于插件是基于ruby语言开发，需要安装Ruby包管理器`RubyGems`。
 
 ```bash
-[saas@localhost ~]$ sudo yum install gem
+[emon@localhost ~]$ sudo yum install gem
 ```
 
 `gem`命令用于构建、上传、下载以及安装Gem包。`gem`的用法在功能上与`apt-get`、`yum`和`npm`非常相似。
@@ -1146,19 +1146,19 @@ http://192.168.3.116:5601
 1. 下载
 
 ```bash
-[saas@local-66 ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.2-linux-x86_64.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.2-linux-x86_64.tar.gz
 ```
 
 2. 解压安装
 
 ```bash
-[saas@local-66 ~]$ tar -zxvf /usr/local/src/filebeat-7.6.2-linux-x86_64.tar.gz -C /usr/local/ElasticStack/Beats/
+[emon@emon ~]$ tar -zxvf /usr/local/src/filebeat-7.6.2-linux-x86_64.tar.gz -C /usr/local/ElasticStack/Beats/
 ```
 
 3. 创建软连接
 
 ```bash
-[saas@local-66 ~]$ ln -s /usr/local/ElasticStack/Beats/filebeat-7.6.2-linux-x86_64/ /usr/local/filebeat
+[emon@emon ~]$ ln -s /usr/local/ElasticStack/Beats/filebeat-7.6.2-linux-x86_64/ /usr/local/filebeat
 ```
 
 4. 配置文件
@@ -1170,13 +1170,13 @@ http://192.168.3.116:5601
 filebeat命令需要在根目录下执行，所以先切换到根目录下：
 
 ```bash
-[saas@local-66 ~]$ cd /usr/local/filebeat/
+[emon@emon ~]$ cd /usr/local/filebeat/
 ```
 
 - 如何使用`filebeat`命令
 
 ```bash
-[saas@local-66 filebeat]$ ./filebeat -h
+[emon@emon filebeat]$ ./filebeat -h
 ```
 
 ```bash
@@ -1201,28 +1201,28 @@ Available Commands:
 
 ```bash
 # 查看使用方法： filebeat [command] -h，比如：
-[saas@local-66 filebeat]$ ./filebeat modules -h
+[emon@emon filebeat]$ ./filebeat modules -h
 ```
 
 - 如何测算配置文件是否正确：
 
 ```bash
-[saas@local-66 filebeat]$ ./filebeat test config
+[emon@emon filebeat]$ ./filebeat test config
 ```
 
 - 如何测算配置文件是否可以连通到output
 
 ```bash
-[saas@local-66 filebeat]$ ./filebeat test output
+[emon@emon filebeat]$ ./filebeat test output
 ```
 
 - 配置`filebeat.yml`文件，log输入类型为例
 
 ```bash
 # 备份
-[saas@local-66 ~]$ cp /usr/local/filebeat/filebeat.yml /usr/local/filebeat/filebeat.yml.bak
+[emon@emon ~]$ cp /usr/local/filebeat/filebeat.yml /usr/local/filebeat/filebeat.yml.bak
 # 编辑
-[saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml 
+[emon@emon ~]$ vim /usr/local/filebeat/filebeat.yml 
 ```
 
 5. 几个实例
@@ -1232,9 +1232,9 @@ Available Commands:
 
   ```bash
   # 创建目录
-  [saas@local-66 ~]$ mkdir -pv /usr/local/logstash/config/custom_config/hbsite/
+  [emon@emon ~]$ mkdir -pv /usr/local/logstash/config/custom_config/hbsite/
   # 自定义grok的patterns
-  [saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/patterns/custom-grok-patterns
+  [emon@emon ~]$ vim /usr/local/logstash/config/custom_config/hbsite/patterns/custom-grok-patterns
   ```
 
   ```bash
@@ -1250,7 +1250,7 @@ Available Commands:
   
   ```bash
   # 编辑文件
-[saas@local-66 ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+[emon@emon ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
   ```
   
   ```bash
@@ -1281,12 +1281,12 @@ Available Commands:
   
   ```bash
     # 执行配置文件
-    [saas@local-66 ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf
+    [emon@emon ~]$ /usr/local/logstash/bin/logstash -f /usr/local/logstash/config/custom_config/filebeats_config/filebeats.conf
   ```
   
   ```bash
   # 配置supervisor启动
-  [saas@local-66 ~]$ sudo vim /etc/program/huiba-logstash.ini
+  [emon@emon ~]$ sudo vim /etc/program/huiba-logstash.ini
   ```
   
   ```bash
@@ -1311,7 +1311,7 @@ Available Commands:
   
   ```bash
   # 编辑配置文件
-  [saas@local-66 ~]$ vim /usr/local/filebeat/filebeat.yml
+  [emon@emon ~]$ vim /usr/local/filebeat/filebeat.yml
   ```
   
   ```bash
@@ -1378,12 +1378,12 @@ Available Commands:
 
   ```bash
   # 执行配置文件，注意--path.config和-c参数的不同之处
-  [saas@local-66 ~]$ /usr/local/filebeat/filebea --path.config /usr/local/filebeat -e
+  [emon@emon ~]$ /usr/local/filebeat/filebea --path.config /usr/local/filebeat -e
   ```
 
   ```bash
   # 配置supervisor启动
-  [saas@local-66 ~]$ sudo vim /etc/program/huiba-site-filebeat.ini 
+  [emon@emon ~]$ sudo vim /etc/program/huiba-site-filebeat.ini 
   ```
 
   ```bash
