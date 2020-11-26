@@ -2871,7 +2871,7 @@ pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1
 | ----------------------------- | -------- |
 | pip install <package name>    | 安装套件 |
 | pip install -U <package name> | 更新套件 |
-| pip uninstall <package name>  | 搜索套件 |
+| pip uninstall <package name>  | 卸载套件 |
 | pip search <package name>     | 搜索套件 |
 | pip help                      | 显示说明 |
 
@@ -2882,7 +2882,7 @@ pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1
 | pip3 install <package name>           | 安装套件     |
 | pip3 install -U <package name>        | 更新套件     |
 | pip3 install --upgrade <package name> | 更新套件     |
-| pip3 uninstall <package name>         | 搜索套件     |
+| pip3 uninstall <package name>         | 卸载套件     |
 | pip3 search <package name>            | 搜索套件     |
 | pip3 help                             | 显示说明     |
 | pip3 show <package name>              | 显示套件详情 |
