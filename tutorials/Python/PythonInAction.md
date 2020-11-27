@@ -62,6 +62,13 @@
 
 如果不需要启动就切换到base，可以配置如下：
 
+```bash
+# 配置后会保存在文件 [emon@emon ~]$ vim .condarc 中
+[emon@emon ~]$ conda config --set auto_activate_base false
+[emon@emon ~]$ conda config --show|grep activate
+auto_activate_base: False
+```
+
 4、更新
 
 ```bash
@@ -105,4 +112,71 @@ unset __conda_setup
 ```bash
 [emon@emon ~]$ rm -rf ~/.condarc ~/.conda ~/.continuum
 ```
+
+6、配置
+
+- 查看配置帮助
+
+```bash
+[emon@emon ~]$ conda config -h
+```
+
+- 查看所有配置
+
+```bash
+[emon@emon ~]$ conda config --show
+```
+
+- 查看配置源
+
+```bash
+[emon@emon ~]$ conda config --show-sources
+==> /home/emon/.condarc <==
+auto_activate_base: False
+```
+
+
+
+7、conda命令
+
+| 命令                                    | 说明                                 |
+| --------------------------------------- | ------------------------------------ |
+| conda-env list 或者 conda info --envs   | 查看已有虚拟环境                     |
+| which python                            | 进入虚拟环境后，最好检查下当前环境   |
+| conda list                              | 查看环境下已有的安装包               |
+| conda create -n py39 python=3.9         | 创建名称为 py39 的虚拟环境           |
+| conda remove -n py39 --all              | 删除py39虚拟环境                     |
+| conda activate py39                     | 激活py39虚拟环境                     |
+| conda deactivate                        | 退出虚拟环境                         |
+| conda create -n py39latest --clone py39 | 将py39重命名为py39latest             |
+| conda remove -n py39 --all              | 再删除py39虚拟环境，达到重命名的效果 |
+
+
+
+# 安装其他包
+
+## 1、安装Scrapy
+
+1. 安装
+
+```bash
+[emon@emon ~]$ conda install scrapy
+```
+
+2. 验证
+
+- 查看命令
+
+```bash
+[emon@emon ~]$ scrapy
+Scrapy 2.4.0 - no active project
+```
+
+- 执行简单shell
+
+```bash
+[emon@emon ~]$ scrapy shell 'http://www.huiba123.com'
+```
+
+
 
