@@ -127,12 +127,37 @@ unset __conda_setup
 [emon@emon ~]$ conda config --show
 ```
 
-- 查看配置源
+- 配置国内源
+
+```bash
+[emon@emon ~]$ conda config --set show_channel_urls yes
+[emon@emon ~]$ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+[emon@emon ~]$ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+[emon@emon ~]$ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+[emon@emon ~]$ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+```
+
+- 查看配置
 
 ```bash
 [emon@emon ~]$ conda config --show-sources
 ==> /home/emon/.condarc <==
 auto_activate_base: False
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+  - defaults
+show_channel_urls: true
+```
+
+- 删除配置源
+
+```bash
+[emon@emon ~]$ conda config --remove channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+[emon@emon ~]$ conda config --remove channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+[emon@emon ~]$ conda config --remove channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+[emon@emon ~]$ conda config --remove channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
 ```
 
 
@@ -141,6 +166,7 @@ auto_activate_base: False
 
 | 命令                                    | 说明                                 |
 | --------------------------------------- | ------------------------------------ |
+| conda info                              | 查看conda信息                        |
 | conda-env list 或者 conda info --envs   | 查看已有虚拟环境                     |
 | which python                            | 进入虚拟环境后，最好检查下当前环境   |
 | conda list                              | 查看环境下已有的安装包               |
@@ -150,6 +176,10 @@ auto_activate_base: False
 | conda deactivate                        | 退出虚拟环境                         |
 | conda create -n py39latest --clone py39 | 将py39重命名为py39latest             |
 | conda remove -n py39 --all              | 再删除py39虚拟环境，达到重命名的效果 |
+| conda install <pkg>                     | 安装包                               |
+| conda uninstall <pkg>                   | 卸载包                               |
+| conda update conda <pkg>                | 更新包                               |
+| conda update --all                      | 更新所有包                           |
 
 
 
