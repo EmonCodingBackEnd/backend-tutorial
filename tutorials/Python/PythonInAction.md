@@ -191,6 +191,8 @@ show_channel_urls: true
 
 ```bash
 [emon@emon ~]$ conda install scrapy
+或者指定安装渠道：
+[emon@emon ~]$ conda install -c conda-forge scrapy
 ```
 
 2. 验证
