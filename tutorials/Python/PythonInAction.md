@@ -212,3 +212,11 @@ Scrapy 2.4.0 - no active project
 
 
 
+## 三、python3.3以后自带的venv环境管理工具
+
+| 命令                         | 说明         |
+| ---------------------------- | ------------ |
+| python3 -m venv env_name     | 创建虚拟环境 |
+| source env_name/bin/activate | 激活环境     |
+| deactivate                   | 退出环境     |
+
