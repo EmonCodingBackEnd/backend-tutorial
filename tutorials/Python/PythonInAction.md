@@ -183,9 +183,9 @@ show_channel_urls: true
 
 
 
-# 安装其他包
+## conda虚拟环境下安装其他包
 
-## 1、安装Scrapy
+### 1、安装Scrapy
 
 1. 安装
 
@@ -212,11 +212,56 @@ Scrapy 2.4.0 - no active project
 
 
 
-## 三、python3.3以后自带的venv环境管理工具
+# 三、python3.3以后自带的venv环境管理工具
 
 | 命令                         | 说明         |
 | ---------------------------- | ------------ |
 | python3 -m venv env_name     | 创建虚拟环境 |
 | source env_name/bin/activate | 激活环境     |
 | deactivate                   | 退出环境     |
+
+## venv虚拟环境下用pip安装其他包
+
+### 1、安装Scrapy
+
+1. 安装
+
+```bash
+(firstenv) [emon@emon ~]$ pip install Scrapy
+```
+
+2. 验证
+
+- 查看命令
+
+```bash
+(firstenv) [emon@emon ~]$ scrapy
+Scrapy 2.4.1 - no active project
+```
+
+- 执行简单shell
+
+```bash
+(firstenv) [emon@emon ~]$ scrapy shell 'http://www.huiba123.com'
+```
+
+执行报错：
+
+>  ModuleNotFoundError: No module named '_sqlite3'
+
+解决：
+
+```bash
+# 安装依赖
+(firstenv) [emon@emon ~]$ sudo yum install -y sqlite-devel
+# 重新编译
+(firstenv) [emon@emon Python-3.7.7]$ ./configure --enable-optimizations --enable-loadable-sqlite-extensions --prefix=/usr/local/Python/Python3.7.7
+# 清理之前的安装
+(firstenv) [emon@emon Python-3.7.7]$ rm -rf /usr/local/Python/Python-3.7.7/
+# 安装
+(firstenv) [emon@emon Python-3.7.7]$ make
+(firstenv) [emon@emon Python-3.7.7]$ make install
+# 解决后再次执行
+(firstenv) [emon@emon ~]$ scrapy shell 'http://www.huiba123.com'
+```
 
