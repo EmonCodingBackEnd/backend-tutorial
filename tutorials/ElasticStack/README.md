@@ -546,6 +546,34 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 导致安装失败，加上sudo适用root安装即可。另外，安装后需要**重启**。
 
+#### 1.6.2、pinyin分词插件
+
+1. 插件地址：[拼音分词插件](https://github.com/medcl/elasticsearch-analysis-pinyin)
+2. 安装
+
+```bash
+[emon@emon ~]$ sudo /usr/local/es/bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+```
+
+说明：如果无法下载报错：
+
+> -> Installing https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+> -> Downloading https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+> -> Failed installing https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+> -> Rolling back https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+> -> Rolled back https://github.com/medcl/elasticsearch-analysis-pinyin/releases/download/v7.6.2/elasticsearch-analysis-pinyin-7.6.2.zip
+> Exception in thread "main" java.net.UnknownHostException: github-production-release-asset-2e65be.s3.amazonaws.com
+> 	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:567)
+> 	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:339)
+
+可以找一个可以下载的服务器，或者通过：[GitHub代下载服务-永久免费](http://gitd.cc/) 下载后拷贝过来，再安装！
+
+```bash
+[emon@emon ~]$ sudo /usr/local/es/bin/elasticsearch-plugin install file:///usr/local/src/elasticsearch-analysis-pinyin-7.6.2.zip
+```
+
+
+
 ### 1.7、X-Pack
 
 X-Pack是`Elastic Stack`的一个扩展，提供了安全性、警报、监视、报告、机器学习和许多其他功能。默认情况下，当你安装Elasticsearch后，X-Pack也安装了。
