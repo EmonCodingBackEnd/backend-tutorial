@@ -10,10 +10,12 @@
 
 下载地址： <https://www.mongodb.com/download-center/community>
 
+下载地址列表：https://www.mongodb.com/download-center/community/releases/archive
+
 ![1568993780255](images/1568993780255.png)
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.2.0.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.4.1.tgz
 ```
 
 ## 2、创建安装目录
@@ -25,13 +27,13 @@
 ## 3、解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/mongodb-linux-x86_64-rhel70-4.2.0.tgz -C /usr/local/MongoDB/
+[emon@emon ~]$ tar -zxvf /usr/local/src/mongodb-linux-x86_64-rhel70-4.4.1.tgz -C /usr/local/MongoDB/
 ```
 
 ## 4、创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/MongoDB/mongodb-linux-x86_64-rhel70-4.2.0/ /usr/local/mongodb
+[emon@emon ~]$ ln -s /usr/local/MongoDB/mongodb-linux-x86_64-rhel70-4.4.1/ /usr/local/mongodb
 ```
 
 ## 5、配置环境变量
