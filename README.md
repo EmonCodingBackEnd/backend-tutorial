@@ -28,6 +28,8 @@
 
 # 目录
 
+- [Insight感悟](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Insight)
+
 - [Java](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Java)
 - [Linux](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Linux)
     - [阿里云服务器ECS安装记录](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Linux/Ali%20Cloud)
