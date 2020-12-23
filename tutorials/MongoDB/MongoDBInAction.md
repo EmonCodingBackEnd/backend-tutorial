@@ -391,7 +391,7 @@ mongo
 - 命令行下添加用户
 
 ```bash
-> admin
+> use admin
 > db.createUser({
 	user: "root",
 	pwd: "root123",
