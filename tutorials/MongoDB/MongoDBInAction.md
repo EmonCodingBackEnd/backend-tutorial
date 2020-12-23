@@ -138,7 +138,63 @@ bind_ip=0.0.0.0
 [emon@emon ~]$ sudo systemctl stop mongod
 ```
 
+9. 设置用户名密码
 
+- 命令行下添加用户
+
+```bash
+> admin
+> db.createUser({
+	user: "root",
+	pwd: "root123",
+	roles: [{role:"root", db:"admin"}]
+})
+```
+
+- 查看用户
+
+```bash
+> show users
+```
+
+- 修改配置
+
+```bash
+# 打开配置，修改如下
+[emon@emon ~]$ vim /usr/local/mongodb/conf/mongodb.conf
+```
+
+```bash
+# 是否认证
+auth=true
+```
+
+- 重启服务
+
+```bash
+[emon@emon ~]$ sudo systemctl restart mongod
+```
+
+- 登录数据库
+
+```bash
+# 方式一
+use admin
+db.auth('root', 'root123')
+# 方式二
+mongo admin -u root -p root123
+```
+
+- 配置一个仅能访问test数据库的用户
+
+```bash
+> use test
+> db.createUser({
+	user: "test",
+	pwd: "test123",
+	roles: [{role:"readWrite", db:"test"}]
+})
+```
 
 # 二、命令
 
@@ -183,13 +239,32 @@ bind_ip=0.0.0.0
 mongo
 ```
 
-- 显示所有数据库
+### 1、数据库操作
+
+- 创建数据库或切换数据库
+
+语法格式： `use <dbname>`
+
+在MongoDB中，集合只有在内容插入后才会创建！
+
+```bash
+> use test
+> db.test.insert({"name":"菜鸟教程"})
+```
+
+- 删除数据库
+
+语法格式： `db.dropDatabase()`
+
+```bash
+# 删除当前数据库
+> db.dropDatabase()
+```
+
+- 查看所有数据库
 
 ```bash
 > show dbs
-admin     0.000GB
-config    0.000GB
-local     0.000GB
 ```
 
 **说明：**
@@ -206,31 +281,7 @@ local     0.000GB
 > db
 ```
 
-- 切换数据库
 
-```bash
-> use <dbname>
-```
-
-### 1、数据库操作
-
-- 创建数据库
-
-语法格式： `use <dbname>`
-
-在MongoDB中，集合只有在内容插入后才会创建！
-
-```bash
-> use <dbname>
-> db.<dbname>.insert({"name":"菜鸟教程"})
-```
-
-- 删除数据库
-
-```bash
-# 删除当前数据库
-> db.dropDatabase()
-```
 
 ### 2、集合操作
 
@@ -242,11 +293,125 @@ local     0.000GB
 
 `name`: 要创建的集合名词
 
-`options`: 可选参数，指定有关内存大小及索引的选项
+`options`: 可选参数，指定有关内存大小及索引的选项，描述如下：
+
+| 字段   | 类型 | 描述                                                         |
+| ------ | ---- | ------------------------------------------------------------ |
+| capped | 布尔 | （可选）如果为true，则创建固定集合。固定集合是指有固定大小的集合，当达到最大值时，它会自动覆盖最早的文档。当该值为true时，必须指定size参数。 |
+| size   | 数值 | （可选）为固定集合指定一个最大值，即字节数。如果capped为true，也需要指定该字段。 |
+| max    | 数值 | （可选）指定固定集合中包含文档的最大数量。                   |
+
+在插入文档时，MongoDB首先检查固定集合的size字段，然后检查max字段。
 
 ```bash
-
+> use test
+> db.createCollection("runoob")
 ```
+
+- 查看集合
+
+```bash
+> show collections
+# 或者
+> show tables
+```
+
+- 自动创建集合
+
+在MongoDB中，你不需要创建集合。当你插入文档时，MongoDB会自动创建集合。
+
+```bash
+# 如下命令会自动创建col集合
+> db.col.insert({"name":"菜鸟教程"})
+```
+
+- 删除集合
+
+语法格式： `db.<colname>.drop()`
+
+如果成功删除则返回true；否则返回false
+
+```bash
+# 删除col集合
+> db.col.drop()
+```
+
+
+
+### 3、文档操作
+
+- 插入单个文档
+
+语法格式：
+
+插入一个文档： `db.<colname>.insertOne(doc,{writeConcern:<value>})`
+
+参数说明：
+
+`doc`: 要写入的文档
+
+`writeConcern`: 写入策略，默认为1，即要求确认写操作，0是不要求。
+
+返回结果：
+
+`acknowledged`: 如果writeConcern值为1，则返回true；否则返回false
+
+`insertedId`: 文档的_id
+
+```bash
+> db.col.insertOne(
+{title:"MongoDB教程",description:"MongoDB是一个NoSQL数据库",by:"菜鸟教程",url:"http://www.runoob.com",tags:["mongodb","database","NoSQL"],likes:100}
+)
+```
+
+- 插入多个文档
+
+插入多个文档：`db.<colname>.insertMany([<doc1>,<doc2>,...]{writeConcern:<value>,ordered:<bool>})`
+
+参数说明：
+
+`doc`: 要写入的文档
+
+`writeConcern`: 写入策略，默认为1，即要求确认写操作，0是不要求。
+
+`ordered`: 指定是否按顺序写入，默认true，按顺序写入。
+
+返回结果：
+
+`acknowledged`: 如果writeConcern值为1，则返回true；否则返回false
+
+`insertedIds`: 多个文档的_ids
+
+```bash
+> db.col.insertMany([
+{item:"journal", qty: 25, tags: ["black", "red"], size: { h:14, w: 21, uom: "cm"}},
+{item:"mat", qty: 85, tags: ["gray"], size: { h:27.9, w: 35.5, uom: "cm"}}
+])
+```
+
+- 查询文档
+
+```bash
+> db.col.find({})
+```
+
+- 更新单个文档
+
+语法格式：
+
+ `db.<colname>.updateOne(<filter>, <update>, <options>)`
+
+或者：
+
+`db.<colname>replaceOne(<filter>, <update>, <options>)`
+
+```bash
+> db.col.updateOne({item:"mat"},{$set:{"size.w":36.5,status:"P"},$currentDate:{lastModified:true}})
+```
+
+- 更新多个文档
+
+语法格式： `db.<colname>.updateMany(<filter>, <update>, {upsert:<boolean>,writeConcern:<value>,collation:<doc>,arrayFilters:[<filterdocument1>,...],hint:<doc|string>})`
 
 
 
