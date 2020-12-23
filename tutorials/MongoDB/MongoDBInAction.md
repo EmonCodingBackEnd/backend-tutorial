@@ -138,64 +138,6 @@ bind_ip=0.0.0.0
 [emon@emon ~]$ sudo systemctl stop mongod
 ```
 
-9. 设置用户名密码
-
-- 命令行下添加用户
-
-```bash
-> admin
-> db.createUser({
-	user: "root",
-	pwd: "root123",
-	roles: [{role:"root", db:"admin"}]
-})
-```
-
-- 查看用户
-
-```bash
-> show users
-```
-
-- 修改配置
-
-```bash
-# 打开配置，修改如下
-[emon@emon ~]$ vim /usr/local/mongodb/conf/mongodb.conf
-```
-
-```bash
-# 是否认证
-auth=true
-```
-
-- 重启服务
-
-```bash
-[emon@emon ~]$ sudo systemctl restart mongod
-```
-
-- 登录数据库
-
-```bash
-# 方式一
-use admin
-db.auth('root', 'root123')
-# 方式二
-mongo admin -u root -p root123
-```
-
-- 配置一个仅能访问test数据库的用户
-
-```bash
-> use test
-> db.createUser({
-	user: "test",
-	pwd: "test123",
-	roles: [{role:"readWrite", db:"test"}]
-})
-```
-
 # 二、命令
 
 ## 2.1、 概念对比
@@ -412,6 +354,116 @@ mongo
 - 更新多个文档
 
 语法格式： `db.<colname>.updateMany(<filter>, <update>, {upsert:<boolean>,writeConcern:<value>,collation:<doc>,arrayFilters:[<filterdocument1>,...],hint:<doc|string>})`
+
+
+
+# 八、用户与安全
+
+## 8.1、MongoDB数据库默认角色
+
+- 数据库用户角色
+  - read
+  - readWrite
+- 数据库管理角色
+  - dbAdmin
+  - dbOwner
+  - userAdmin
+- 集群管理角色
+  - clusterAdmin
+  - clusterManager
+  - clusterMonitor
+  - hostManager
+- 备份恢复角色
+  - backup
+  - restore
+- 所有数据库角色
+  - readAnyDatabase
+  - readWriteAnyDatabase
+  - userAdminAnyDatabase
+  - dbAdminAnyDatabase
+- 超级用户角色
+  - root
+
+
+
+## 8.2、设置用户名密码
+
+- 命令行下添加用户
+
+```bash
+> admin
+> db.createUser({
+	user: "root",
+	pwd: "root123",
+	roles: [{role:"root", db:"admin"}]
+})
+```
+
+- 查看用户
+
+```bash
+> show users
+```
+
+- 修改配置
+
+```bash
+# 打开配置，修改如下
+[emon@emon ~]$ vim /usr/local/mongodb/conf/mongodb.conf
+```
+
+```bash
+# 是否认证
+auth=true
+```
+
+- 重启服务
+
+```bash
+[emon@emon ~]$ sudo systemctl restart mongod
+```
+
+- 登录数据库
+
+```bash
+# 方式一
+use admin
+db.auth('root', 'root123')
+# 方式二
+mongo admin -u root -p root123
+```
+
+- 配置一个仅能访问test数据库的用户
+
+```bash
+> use test
+> db.createUser({
+	user: "test",
+	pwd: "test123",
+	roles: [{role:"readWrite", db:"test"}]
+})
+```
+
+- 查看当前库下的用户
+
+```bash
+> show users
+```
+
+- 修改用户密码
+
+```bash
+> db.updateUser('root', {pwd:'root@123'})
+```
+
+- 删除用户
+
+```bash
+> db.dropUser('root')
+```
+
+
+
 
 
 
