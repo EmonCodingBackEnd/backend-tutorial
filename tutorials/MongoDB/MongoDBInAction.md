@@ -216,7 +216,7 @@ local     0.000GB
 
 - 创建数据库
 
-语法格式： use <dbname>
+语法格式： `use <dbname>`
 
 在MongoDB中，集合只有在内容插入后才会创建！
 
@@ -236,7 +236,7 @@ local     0.000GB
 
 - 创建集合
 
-语法格式： db.createCollection(name, options)
+语法格式：` db.createCollection(name, options)`
 
 参数说明：
 
