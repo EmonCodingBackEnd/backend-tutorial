@@ -58,13 +58,13 @@ export PATH=/usr/local/mongodb/bin:$PATH
 5. 数据库目录规划
 
 ```bash
-[emon@emon ~]$ mkdir -p /usr/local/mongodb/{db,log,conf}
+[emon@emon ~]$ mkdir -p /usr/local/mongodb/{conf,data/27017,log}
 ```
 
 6. 配置文件
 
 ```bash
-[emon@emon ~]$ vim /usr/local/mongodb/conf/mongodb.conf
+[emon@emon ~]$ vim /usr/local/mongodb/conf/27017.conf
 ```
 
 ```bash
@@ -75,17 +75,17 @@ bind_ip=0.0.0.0
 # 日志文件
 logpath=/usr/local/mongodb/log/27017.log
 # 数据文件存放目录，默认： /data/db/
-dbpath=/usr/local/mongodb/data/27017
+dbpath=/usr/local/mongodb/data/27017/
 # 日志追加
 logappend=true
 # 启动的进程ID
 pidfilepath=/usr/local/mongodb/data/27017/27017.pid
-# 以守护程序的方式启动，即在后台运行
-fork=true
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
 # oplog窗口大小
 oplogSize=5120
 # 复制集名称
-# replSet=hbscrm
+# replSet=emon
 # 是否认证
 auth=true
 ```
@@ -95,18 +95,18 @@ auth=true
 - 启动
 
 ```bash
-[emon@emon ~]$ mongod --config /usr/local/mongodb/conf/mongodb.conf 
+[emon@emon ~]$ mongod --config /usr/local/mongodb/conf/27017.conf
 或
-[emon@emon ~]$ mongod -f /usr/local/mongodb/conf/mongodb.conf 
+[emon@emon ~]$ mongod -f /usr/local/mongodb/conf/27017.conf
 ```
 
 - 停止
 
 ```bash
-[emon@emon ~]$ mongod --config /usr/local/mongodb/conf/mongodb.conf --shutdown
+[emon@emon ~]$ mongod --config /usr/local/mongodb/conf/27017.conf --shutdown
 ```
 
-8. 设置启动项
+8. 设置启动项（**注意：如果通过该方式，配置文件中的 fork=true**）
 
 ```bash
 [emon@emon ~]$ sudo vim /usr/lib/systemd/system/mongod.service
@@ -118,9 +118,9 @@ auth=true
     After=network.target remote-fs.target nss-lookup.target
 [Service]
     Type=forking
-    ExecStart=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/mongodb.conf
+    ExecStart=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27017.conf
     ExecReload=/bin/kill -s HUP $MAINPID
-    ExecStop=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/mongodb.conf --shutdown
+    ExecStop=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27017.conf --shutdown
     PrivateTmp=true
 [Install]
     WantedBy=multi-user.target
@@ -143,6 +143,18 @@ auth=true
 ```bash
 [emon@emon ~]$ sudo systemctl stop mongod
 ```
+
+9. 设置supervisor启动（**注意：如果通过该方式，配置文件中的 fork=false**）
+
+```ini
+
+```
+
+
+
+
+
+
 
 # 二、命令
 
@@ -480,6 +492,20 @@ mongo admin -u root -p root123
 下载地址：https://robomongo.org/download
 
 ## 2、启动并连接
+
+
+
+# 九十九、用户信息
+
+## 1、mongodb用户
+
+| 用户名 | 密码      |
+| ------ | --------- |
+| root   | root123   |
+| test   | test123   |
+| flyin  | flyin!123 |
+
+
 
 
 
