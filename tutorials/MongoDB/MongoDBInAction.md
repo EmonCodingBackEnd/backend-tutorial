@@ -68,20 +68,26 @@ export PATH=/usr/local/mongodb/bin:$PATH
 ```
 
 ```bash
-# 数据文件存放目录，默认： /data/db/
-dbpath=/usr/local/mongodb/db
-# 日志文件
-logpath=/usr/local/mongodb/log/mongodb.log
 # 端口，默认27017，MongoDB的默认服务TCP端口
 port=27017
-# 以守护程序的方式启动，即在后台运行
-fork=true
-# 日志追加
-logappend=true
-# 是否认证
-auth=false
 # 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
 bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/mongodb/log/27017.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/mongodb/data/27017
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/mongodb/data/27017/27017.pid
+# 以守护程序的方式启动，即在后台运行
+fork=true
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+# replSet=hbscrm
+# 是否认证
+auth=true
 ```
 
 7. 启动与停止
