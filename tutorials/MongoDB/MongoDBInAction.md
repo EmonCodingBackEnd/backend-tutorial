@@ -405,6 +405,8 @@ ObjectId使用12字节的存储空间，每一个字节是两位十六进制数�
 
 ## 3.3、文档操作
 
+### 3.3.1、创建文档
+
 - 插入单个文档
 
 语法格式：
@@ -501,6 +503,7 @@ db.collection.insertMany(
 执行命令：
 
 ```js
+> use test
 > db.accounts.insertMany(
     [
         {
@@ -564,6 +567,7 @@ db.collection.insert(
 执行命令：
 
 ```js
+> use test
 > db.accounts.insert(
 	{
         name: "george",
@@ -591,6 +595,55 @@ WriteResult({ "nInserted" : 1 })
 ```
 
 `nInserted`: 写入的文档的数量
+
+**三种创建文档命令的区别**：
+
+>insertOne和insertMany命令不支持db.collection.explain()命令
+>
+>insert支持db.collection.explain()命令
+
+
+
+- 插入或者更新文档
+
+描述：当db.collection.save()命令处理一个新文档时，会调用db.collection.save()命令。
+
+语法格式：
+
+```js
+db.collection.save(
+   <document>,
+   {
+     writeConcern: <document>
+   }
+)
+```
+
+参数说明：
+
+`collection`: 集合名称
+
+`document`: 要写入的文档
+
+`writeConcern`: 定义了本次文档创建操作的安全写级别，简单来说，安全写级别用来判断一次数据库写入操作是否成功。如果不提供writeConsern文档，MongoDB使用默认的安全写级别。
+
+执行命令：
+
+```js
+> use test
+> db.accounts.save(
+	{
+        name: "liming",
+        balance: 1000
+    }
+)
+```
+
+执行结果：
+
+```js
+WriteResult({ "nInserted" : 1 })
+```
 
 
 
