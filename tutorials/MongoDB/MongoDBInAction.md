@@ -490,7 +490,9 @@ db.collection.insertMany(
 
 参数说明：
 
-`document`: 要写入的文档
+`collection`: 集合名称
+
+`document`: 要写入的文档或文档数组
 
 `writeConcern`: 定义了本次文档创建操作的安全写级别，简单来说，安全写级别用来判断一次数据库写入操作是否成功。如果不提供writeConsern文档，MongoDB使用默认的安全写级别。
 
@@ -532,6 +534,65 @@ db.collection.insertMany(
 **总结**：
 
 在执行db.collection.insertMany命令时，默认的`{ordered: true}` 在遇到错误时，操作便会退出，剩余的文档无论正确与否，都不会被写入；如果是 `{ordered: false}` 在遇到错误时，剩余正确的文档也会被写入。
+
+
+
+- 插入文档（单个或者多个）
+
+语法格式：
+
+```js
+db.collection.insert(
+   <document or array of documents>,
+   {
+     writeConcern: <document>,
+     ordered: <boolean>
+    }
+)
+```
+
+参数说明：
+
+`collection`: 集合名称
+
+`document`: 要写入的文档或文档数组
+
+`writeConcern`: 定义了本次文档创建操作的安全写级别，简单来说，安全写级别用来判断一次数据库写入操作是否成功。如果不提供writeConsern文档，MongoDB使用默认的安全写级别。
+
+`ordered`: 指定是否按顺序写入，默认true，按顺序写入；如果将ordered参赛设置为false，MongoDB可以打乱文档写入顺序，以便优化写入操作的性能。
+
+执行命令：
+
+```js
+> db.accounts.insert(
+	{
+        name: "george",
+        balance: 1000
+    }
+)
+> db.accounts.insert(
+	[
+        {
+            name: "charlie",
+            balance: 500
+        },
+        {
+            name: "david",
+            balance: 200
+        }
+    ]
+)
+```
+
+执行结果:
+
+```js
+WriteResult({ "nInserted" : 1 })
+```
+
+`nInserted`: 写入的文档的数量
+
+
 
 - 查询文档
 
