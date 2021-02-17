@@ -560,20 +560,21 @@ mongo admin -u root -p root123
 
 
 
+# 九、MongDB的操作工具
 
-# 九、Robo 3T连接
+## 9.1、Robo 3T连接
 
-## 1、下载
+1. 下载
 
 下载地址：https://robomongo.org/download
 
-## 2、启动并连接
+2. 启动并连接
 
-# 十、Mongo Express
+## 9.2、Mongo Express
 
 Mongo Express是一个基于网络的MongoDB数据库管理界面
 
-## 1、Docker安装MongoExpress
+### 9.2.1、安装MongoExpress（Docker版）
 
 1. 下载mongo-express镜像
 
@@ -598,6 +599,22 @@ Mongo Express是一个基于网络的MongoDB数据库管理界面
 
 ```bash
 [emon@emon ~]$ sudo systemctl restart docker
+```
+
+## 9.3、 Mongo Shell（Docker版）
+
+Mongo Shell是用来操作MongoDB的javascript客户端界面
+
+- 运行mongo shell
+
+```bash
+[emon@emon ~]$ docker exec -it mymongo mongo
+```
+
+- 退出mongo shell
+
+```bash
+> exit
 ```
 
 
