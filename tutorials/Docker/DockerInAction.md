@@ -627,7 +627,7 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 - 启动容器
 
 ```shell
-[emon@emon ~]$ docker start <container_id>
+[emon@emon ~]$ docker start <container_id|container_name>
 ```
 
 - 新建并启动容器：守护态运行(Daemonized)【推荐的启动方式】
@@ -673,7 +673,7 @@ net.ipv4.ip_forward=1
 首先向容器发送SIGTERM信号，等待一段超时时间（默认为10秒）后，再发送SIGKILL信号来终止容器：
 
 ```shell
-[emon@emon ~]$ docker stop <container_id>
+[emon@emon ~]$ docker stop <container_id|container_name>
 ```
 
 [docker kill 命令会直接发送SIGKILL信号来强制终止容器。]
@@ -683,7 +683,7 @@ net.ipv4.ip_forward=1
 此外，docker restart命令会将一个运行态的容器先终止，然后再重新启动它：
 
 ```shell
-[emon@emon ~]$ docker restart <container_id>
+[emon@emon ~]$ docker restart <container_id|container_name>
 ```
 
 ## 4、进入容器
@@ -705,7 +705,7 @@ docker attach [--detach-keys[=[]]][--no-stdin] [--sig-proxy[=true]] CONTAINER
 | --sig-proxy        | true   | 是否代理收到的系统信号给应用进程                    |
 
 ```shell
-[emon@emon ~]$ docker attach <container_id>
+[emon@emon ~]$ docker attach <container_id|container_name>
 ```
 
 但是使用attach命令有时候不方便。当多个窗口同时用attach命令连接到同一个容器的时候，所有窗口都会同步显示。当某个窗口因命令阻塞时，其他窗口也无法执行操作了。
@@ -726,7 +726,7 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 2. 进入容器
 
 ```shell
-[emon@emon ~]$ docker exec -it <container_id> /bin/bash
+[emon@emon ~]$ docker exec -it <container_id|container_name> /bin/bash
 ```
 
 - 使用nsenter工具
@@ -756,7 +756,7 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]。
 2. 删除停止状态的容器
 
 ```shell
-[emon@emon ~]$ docker rm <container_id>
+[emon@emon ~]$ docker rm <container_id|container_name>
 ```
 
 - 删除运行状态的容器
@@ -831,25 +831,25 @@ docker import [-c|--change[=[]]][-m|--message[=MESSAGE]] file|URL|-[REPOSITORY[:
 - 查看指定时间后的日志，只显示最后100行
 
 ```bash
-docker logs -f -t --since="2021-02-17" --tail=100 <container_id>
+docker logs -f -t --since="2021-02-17" --tail=100 <container_id|container_name>
 ```
 
 - 查看最近30分钟的日志
 
 ```bash
-docker logs --since 30 <container_id>
+docker logs --since 30 <container_id|container_name>
 ```
 
 - 查看某个时间之后的日志
 
 ```bash
-docker logs -t --since="2021-02-17T13:05:30" <container_id>
+docker logs -t --since="2021-02-17T13:05:30" <container_id|container_name>
 ```
 
 - 实时查看
 
 ```bash
-docker logs -f <container_id>
+docker logs -f <container_id|container_name>
 ```
 
 # 五、仓库

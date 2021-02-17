@@ -212,6 +212,30 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 [emon@emon ~]$ docker ps
 ```
 
+5. 查看数据库服务器日志
+
+```bash
+[emon@emon ~]$ docker logs -f mymongo
+```
+
+6. 停止和再启动
+
+- 停止MongoDB
+
+```bash
+[emon@emon ~]$ docker stop mymongo
+```
+
+- 再次启动MoongoDB
+
+```bash
+[emon@emon ~]$ docker start mymongo
+```
+
+
+
+6. Mongo Express是一个基于网络的MongoDB数据库管理界面
+
 
 
 # 二、命令
