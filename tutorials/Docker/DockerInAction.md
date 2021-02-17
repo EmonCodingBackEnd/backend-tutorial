@@ -140,6 +140,7 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 ```shell
 [emon@emon ~]$ vim .bashrc
 alias docker="sudo /usr/bin/docker"
+alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
 ```
 
 	使之生效：
@@ -601,6 +602,12 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 ```shell
 [emon@emon ~]$ docker ps --format "table{{.ID}}:{{.Command}}"
+```
+
+3. 一个比较好用的格式
+
+```bash
+[emon@emon ~]$ docker ps --format "table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"
 ```
 
 [更多用法](https://www.cnblogs.com/fuyuteng/p/8847331.html)

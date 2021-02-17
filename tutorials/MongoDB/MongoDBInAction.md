@@ -20,7 +20,7 @@
 
 *MongoDB有三种模式：standalone，replica set， shareded cluster*
 
-## 1.1 standalone安装
+## 1.1、standalone安装
 
 1. 创建安装目录
 
@@ -144,15 +144,73 @@ auth=true
 [emon@emon ~]$ sudo systemctl stop mongod
 ```
 
-9. 设置supervisor启动（**注意：如果通过该方式，配置文件中的 fork=false**）
+9. 设置supervisor启动（**注意：如果通过该方式，配置文件中的 fork=false**）【推荐】
 
 ```ini
-
+[program:mongo]
+command=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27017.conf
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/etc/supervisor/supervisor.d/mongo.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
 ```
 
+- 加载
 
+```bash
+[emon@emon ~]$ sudo supervisorctl update
+```
 
+- 启动mongodb
 
+```bash
+[emon@emon ~]$ sudo supervisorctl start mongo
+```
+
+- 停止mongodb
+
+```bash
+[emon@emon ~]$ sudo supervisorctl stop mongo
+```
+
+## 1.2、docker安装
+
+1. 下载MongoDB的官方docker镜像
+
+```bash
+[emon@emon ~]$ docker pull mongo:4
+```
+
+2. 查看下载的镜像
+
+```bash
+[emon@emon ~]$ docker images
+```
+
+3. 启动一个MongoDB服务器容器
+
+```bash
+[emon@emon ~]$ docker run  --name mymongo -v /data/MongoDB/data/:/data/db -d mongo:4
+```
+
+- `--name mymongo` --> 容器名称
+- `-v /data/MongoDB/data/:/data/db` --> 挂在数据目录
+- `-d` -- > 后台运行容器
+
+4. 查看docker容器状态
+
+```bash
+[emon@emon ~]$ docker ps
+```
 
 
 
