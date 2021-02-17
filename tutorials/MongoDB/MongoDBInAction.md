@@ -430,13 +430,17 @@ db.collection.insertOne(
 
 ```js
 > use test
-> db.accounts.insertOne(
-    {
-      _id: "account1",
-      name: "alice",
-      balance: 100
-    }
-)
+> try {
+    db.accounts.insertOne(
+        {
+            _id: "account1",
+            name: "alice",
+            balance: 100
+        }
+    )
+} catch(e) {
+    print(e)
+}
 ```
 
 执行结果：
@@ -455,32 +459,79 @@ db.collection.insertOne(
 
 命令中的collection代指集合名称，比如这里的 `accounts`。
 
+**Example**:
+
+省略创建文档中的_id字段：
+
+```js
+> db.accounts.insertOne(
+	{
+        name: "bob",
+        balance: 50
+    }
+)
+```
+
 
 
 - 插入多个文档
 
-插入多个文档：`db.<colname>.insertMany([<doc1>,<doc2>,...]{writeConcern:<value>,ordered:<bool>})`
+语法格式：
+
+```js
+db.collection.insertMany(
+   [ <document 1> , <document 2>, ... ],
+   {
+      writeConcern: <document>,
+      ordered: <boolean>
+   }
+)
+```
 
 参数说明：
 
-`doc`: 要写入的文档
+`document`: 要写入的文档
 
-`writeConcern`: 写入策略，默认为1，即要求确认写操作，0是不要求。
+`writeConcern`: 定义了本次文档创建操作的安全写级别，简单来说，安全写级别用来判断一次数据库写入操作是否成功。如果不提供writeConsern文档，MongoDB使用默认的安全写级别。
 
-`ordered`: 指定是否按顺序写入，默认true，按顺序写入。
+`ordered`: 指定是否按顺序写入，默认true，按顺序写入；如果将ordered参赛设置为false，MongoDB可以打乱文档写入顺序，以便优化写入操作的性能。
 
-返回结果：
+执行命令：
+
+```js
+> db.accounts.insertMany(
+    [
+        {
+            name: "charlie",
+            balance: 500
+        },
+        {
+            name: "david",
+            balance: 200
+        }
+    ]
+)
+```
+
+执行结果：
+
+```js
+{
+	"acknowledged" : true,
+	"insertedIds" : [
+		ObjectId("602d136cebecf117915b0975"),
+		ObjectId("602d136cebecf117915b0976")
+	]
+}
+```
 
 `acknowledged`: 如果writeConcern值为1，则返回true；否则返回false
 
 `insertedIds`: 多个文档的_ids
 
-```bash
-> db.col.insertMany([
-{item:"journal", qty: 25, tags: ["black", "red"], size: { h:14, w: 21, uom: "cm"}},
-{item:"mat", qty: 85, tags: ["gray"], size: { h:27.9, w: 35.5, uom: "cm"}}
-])
-```
+**总结**：
+
+在执行db.collection.insertMany命令时，默认的`{ordered: true}` 在遇到错误时，操作便会退出，剩余的文档无论正确与否，都不会被写入；如果是 `{ordered: false}` 在遇到错误时，剩余正确的文档也会被写入。
 
 - 查询文档
 
