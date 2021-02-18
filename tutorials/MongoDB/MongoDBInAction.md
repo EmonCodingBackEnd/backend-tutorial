@@ -304,9 +304,37 @@ ObjectId使用12字节的存储空间，每一个字节是两位十六进制数�
 | 第8-9字节   | 进程PID              |
 | 第10-12字节 | 计数器               |
 
+- 生成主键ObjectId
+
+```js
+> ObjectId()
+ObjectId("602d2112ebecf117915b097b")
+```
+
+- 提取ObjectId的创建时间
+
+```js
+> ObjectId("602d2112ebecf117915b097b").getTimestamp()
+ISODate("2021-02-17T13:58:42Z")
+```
+
+- 复合主键
+
+```js
+> use test
+> db.accounts.insert(
+	{
+        _id: {accountNo: "001", type: "savings"},
+        name: "irene",
+        balance: 80
+    }
+)
+WriteResult({ "nInserted" : 1 })
+```
 
 
-# 三、数据库操作
+
+# 三、数据定义语言（DDL）
 
 ## 3.1、 数据库操作
 
@@ -403,11 +431,13 @@ ObjectId使用12字节的存储空间，每一个字节是两位十六进制数�
 > db.col.drop()
 ```
 
-## 3.3、文档操作
 
-### 3.3.1、创建文档
 
-- 插入单个文档
+# 四、数据操纵语言（DML）
+
+## 4.1、创建文档
+
+### 4.1.1、插入单个文档
 
 语法格式：
 
@@ -476,7 +506,7 @@ db.collection.insertOne(
 
 
 
-- 插入多个文档
+### 4.1.2、插入多个文档
 
 语法格式：
 
@@ -604,7 +634,7 @@ WriteResult({ "nInserted" : 1 })
 
 
 
-- 插入或者更新文档
+### 4.1.3、插入或者更新文档
 
 描述：当db.collection.save()命令处理一个新文档时，会调用db.collection.save()命令。
 
@@ -645,13 +675,11 @@ db.collection.save(
 WriteResult({ "nInserted" : 1 })
 ```
 
+`nInserted`: 写入的文档的数量
 
 
-- 查询文档
 
-```bash
-> db.col.find({})
-```
+## 4.2、更新文档
 
 - 更新单个文档
 
@@ -670,6 +698,115 @@ WriteResult({ "nInserted" : 1 })
 - 更新多个文档
 
 语法格式： `db.<colname>.updateMany(<filter>, <update>, {upsert:<boolean>,writeConcern:<value>,collation:<doc>,arrayFilters:[<filterdocument1>,...],hint:<doc|string>})`
+
+
+
+## 4.3、删除文档
+
+
+
+
+
+# 五、数据查询语言（DQL）
+
+语法格式：
+
+`db.collection.find(query, projection)`
+
+参数说明：
+
+| 参数       | 类型     | 描述                                 |
+| ---------- | -------- | ------------------------------------ |
+| query      | document | 可选，筛选条件，默认:{}              |
+| projection | document | 可选，对读取结果的投射，指定返回字段 |
+
+## 5.1、常规查询
+
+- 查询全部文档
+
+```js
+> db.accounts.find()
+```
+
+- 查询全部文档，以良好格式输出
+
+```js
+> db.accounts.find().pretty()
+```
+
+- 匹配查询：读取alice的银行账户文档
+
+```js
+> db.accounts.find({name: "alice"})
+```
+
+- 匹配查询：读取alice的余额为100元的银行账户文档
+
+```js
+> db.accounts.find({name: "alice", balance: 100})
+```
+
+- 匹配查询：读取银行账户类型为储蓄账户的文档
+
+```js
+> db.accounts.find({"_id.type": "savings"})
+```
+
+**总结**：
+
+在find语句里，如果是顶级字段，不加引号和加引号都行；如果是内嵌文档字段，那么整个字段都是要用引号括起来的。
+
+
+
+## 5.2、比较操作符（Comparison Query Operators）
+
+语法格式：
+
+```js
+{ <field>: { $<operator>: <value> } }
+```
+
+### $eq
+
+匹配字段值相等的文档
+
+- 读取alice的银行账户文档
+
+```js
+> db.accounts.find({name:{$eq:"alice"}})
+```
+
+### $ne
+
+匹配字段值不等的文档
+
+- 读取不属于alice的银行账户文档
+
+```js
+> db.accounts.find({name:{$ne:"alice"}})
+```
+
+### $gt
+
+匹配字段值大于查询值的文档
+
+### $gte
+
+匹配字段值大于或等于查询值的文档
+
+### $lt
+
+匹配字段值小于查询值的文档
+
+### $lte
+
+匹配字段值小于或等于查询值的文档
+
+
+
+
+
+
 
 
 
