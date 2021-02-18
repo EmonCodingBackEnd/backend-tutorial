@@ -1020,7 +1020,59 @@ WriteResult({ "nInserted" : 1 })
 
 
 
-## 5.3、字段操作符
+## 5.4、字段操作符（Element Query Operators）
+
+### $exists
+
+语法格式：
+
+```js
+{ field: { $exists: <boolean> } }
+```
+
+匹配包含查询字段的文档
+
+- 查询包含账户类型字段的银行账户文档
+
+```js
+> db.accounts.find({"_id.type":{$exists:true}})
+```
+
+- 精确查找，优化**会检不包含指定字段的文档**的问题
+
+```js
+> db.accounts.find({"_id.type":{$ne:"checking", $exists:true}})
+```
+
+### $type
+
+语法格式：
+
+```js
+{ field: { $type: <BSON type> } }
+// 或者
+{ field: { $type: [ <BSON type1> , <BSON type2>, ... ] } }
+```
+
+匹配字段类型符合查询值的文档
+
+- 查询文档主键是字符串的银行账户文档
+
+```js
+> db.accounts.find({_id:{$type:"string"}})
+```
+
+- 查询文档主键是对象主键或者是复合主键的银行账户文档
+
+```js
+> db.accounts.find({_id:{$type:["objectId", "object"]}})
+```
+
+- 查询用户姓名是`null`的银行账户文档
+
+```js
+> db.accounts.find({name:{$type: "null"}})
+```
 
 
 
