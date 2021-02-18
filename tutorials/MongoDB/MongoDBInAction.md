@@ -760,13 +760,13 @@ WriteResult({ "nInserted" : 1 })
 
 ## 5.2、比较操作符（Comparison Query Operators）
 
+### $eq
+
 语法格式：
 
 ```js
-{ <field>: { $<operator>: <value> } }
+{ <field>: { $eq: <value> } }
 ```
-
-### $eq
 
 匹配字段值相等的文档
 
@@ -778,6 +778,12 @@ WriteResult({ "nInserted" : 1 })
 
 ### $ne
 
+语法格式：
+
+```js
+{ <field>: { $ne: <value> } }
+```
+
 匹配字段值不等的文档
 
 - 查询不属于alice的银行账户文档
@@ -786,13 +792,19 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find({name:{$ne:"alice"}})
 ```
 
-- 查询银行账户类型不是储蓄账户的文档，*会检索出不包含指定字段的文档*
+- 查询银行账户类型不是储蓄账户的文档，**会检索出不包含指定字段的文档**
 
 ```js
 > db.accounts.find({"_id.type":{$ne:"savings"}})
 ```
 
 ### $gt
+
+语法格式：
+
+```js
+{ <field>: { $gt: <value> } }
+```
 
 匹配字段值大于查询值的文档
 
@@ -804,9 +816,21 @@ WriteResult({ "nInserted" : 1 })
 
 ### $gte
 
+语法格式：
+
+```js
+{ <field>: { $gte: <value> } }
+```
+
 匹配字段值大于或等于查询值的文档
 
 ### $lt
+
+语法格式：
+
+```js
+{ <field>: { $lt: <value> } }
+```
 
 匹配字段值小于查询值的文档
 
@@ -817,6 +841,12 @@ WriteResult({ "nInserted" : 1 })
 ```
 
 ### $lte
+
+语法格式：
+
+```js
+{ <field>: { $lte: <value> } }
+```
 
 匹配字段值小于或等于查询值的文档
 
@@ -838,6 +868,12 @@ WriteResult({ "nInserted" : 1 })
 
 ### $nin
 
+语法格式：
+
+```js
+{ <field>: { $nin: [<value1>, <value2> ... <valueN>] } }
+```
+
 匹配字段值与任何查询值都不相等的文档
 
 - 查询除了alice和charlie之外的其他用户的银行账户文档
@@ -846,7 +882,7 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find({name:{$nin:["alice", "charlie"]}})
 ```
 
-- 查询账户类型不是储蓄账户的银行账户文档，*会检索出不包含指定字段的文档*
+- 查询账户类型不是储蓄账户的银行账户文档，**会检索出不包含指定字段的文档**
 
 ```js
 > db.accounts.find({"_id.type":{$nin:["savings"]}})
@@ -856,9 +892,63 @@ WriteResult({ "nInserted" : 1 })
 
 ## 5.3、逻辑操作符（Logical Query Operators）
 
+### $not
+
+语法格式：
+
+```js
+{ field: { $not: { <operator-expression> } } }
+```
+
+匹配筛选条件不成立的文档
+
+- 读取余额不小于500的银行账户文档
+
+```js
+> db.accounts.find({balance:{$not:{$lt:500}}})
+```
+
+- 查询账户类型不是储蓄账户的银行账户文档，**会检索出不包含指定字段的文档**
+
+```js
+> db.accounts.find({"_id.type":{$not:{$eq:"savings"}}})
+```
 
 
-# 八、用户与安全
+
+### $and
+
+语法格式：
+
+```js
+{ $and: [ { <expression1> }, { <expression2> } , ... , { <expressionN> } ] }
+```
+
+匹配多个筛选条件全部成立的文档
+
+### $or
+
+语法格式：
+
+```js
+
+```
+
+匹配至少一个筛选条件成立的文档
+
+### $nor
+
+语法格式：
+
+```js
+
+```
+
+匹配多个筛选条件全部不成立的文档
+
+
+
+# 八、数据控制语言（DCL）
 
 ## 8.1、MongoDB数据库默认角色
 
