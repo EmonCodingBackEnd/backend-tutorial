@@ -718,7 +718,7 @@ WriteResult({ "nInserted" : 1 })
 | 参数       | 类型     | 描述                                 |
 | ---------- | -------- | ------------------------------------ |
 | query      | document | 可选，筛选条件，默认:{}              |
-| projection | document | 可选，对读取结果的投射，指定返回字段 |
+| projection | document | 可选，对查询结果的投射，指定返回字段 |
 
 ## 5.1、常规查询
 
@@ -734,19 +734,19 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find().pretty()
 ```
 
-- 匹配查询：读取alice的银行账户文档
+- 匹配查询：查询alice的银行账户文档
 
 ```js
 > db.accounts.find({name: "alice"})
 ```
 
-- 匹配查询：读取alice的余额为100元的银行账户文档
+- 匹配查询：查询alice的余额为100元的银行账户文档
 
 ```js
 > db.accounts.find({name: "alice", balance: 100})
 ```
 
-- 匹配查询：读取银行账户类型为储蓄账户的文档
+- 匹配查询：查询银行账户类型为储蓄账户的文档
 
 ```js
 > db.accounts.find({"_id.type": "savings"})
@@ -770,7 +770,7 @@ WriteResult({ "nInserted" : 1 })
 
 匹配字段值相等的文档
 
-- 读取alice的银行账户文档
+- 查询alice的银行账户文档
 
 ```js
 > db.accounts.find({name:{$eq:"alice"}})
@@ -780,15 +780,27 @@ WriteResult({ "nInserted" : 1 })
 
 匹配字段值不等的文档
 
-- 读取不属于alice的银行账户文档
+- 查询不属于alice的银行账户文档
 
 ```js
 > db.accounts.find({name:{$ne:"alice"}})
 ```
 
+- 查询银行账户类型不是储蓄账户的文档，*会检索出不包含指定字段的文档*
+
+```js
+> db.accounts.find({"_id.type":{$ne:"savings"}})
+```
+
 ### $gt
 
 匹配字段值大于查询值的文档
+
+- 查询余额大于500的银行账户文档
+
+```js
+> db.accounts.find({balance:{$gt:500}})
+```
 
 ### $gte
 
@@ -798,15 +810,51 @@ WriteResult({ "nInserted" : 1 })
 
 匹配字段值小于查询值的文档
 
+- 查询用户名字排在fred之前的银行账户文档
+
+```js
+> db.accounts.find({name:{$lt:"fred"}})
+```
+
 ### $lte
 
 匹配字段值小于或等于查询值的文档
 
+### $in
+
+语法格式：
+
+```js
+{ <field>: { $in: [<value1>, <value2> ... <valueN>] } }
+```
+
+匹配字段值与任一查询值相等的文档
+
+- 查询alice和charlie的银行账户文档
+
+```js
+> db.accounts.find({name:{$in:["alice", "charlie"]}})
+```
+
+### $nin
+
+匹配字段值与任何查询值都不相等的文档
+
+- 查询除了alice和charlie之外的其他用户的银行账户文档
+
+```js
+> db.accounts.find({name:{$nin:["alice", "charlie"]}})
+```
+
+- 查询账户类型不是储蓄账户的银行账户文档，*会检索出不包含指定字段的文档*
+
+```js
+> db.accounts.find({"_id.type":{$nin:["savings"]}})
+```
 
 
 
-
-
+## 5.3、逻辑操作符（Logical Query Operators）
 
 
 
@@ -815,7 +863,7 @@ WriteResult({ "nInserted" : 1 })
 ## 8.1、MongoDB数据库默认角色
 
 - 数据库用户角色
-  - `read`: 允许用户读取指定数据库
+  - `read`: 允许用户查询指定数据库
   - `readWrite`:允许用户读写指定数据库
 - 数据库管理角色
   - `dbAdmin`: 允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
