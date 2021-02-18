@@ -756,6 +756,106 @@ WriteResult({ "nInserted" : 1 })
 
 在find语句里，如果是顶级字段，不加引号和加引号都行；如果是内嵌文档字段，那么整个字段都是要用引号括起来的。
 
+### 文档游标
+
+`db.collection.find()`返回一个文档集合游标，在不迭代游标的情况下，只列出前20个文档。
+
+```js
+> var myCursor = db.accounts.find();
+> myCursor[1]
+{
+	"_id" : ObjectId("602d00d3ebecf117915b0974"),
+	"name" : "bob",
+	"balance" : 50
+}
+```
+
+游标被遍历完后，或者在10分钟后，游标便会自动关闭。可以使用`noCursorTimeout()`函数来保持游标不关闭。
+
+```js
+> var myCursor = db.accounts.find().noCursorTimeout();
+> myCursor.close();
+```
+
+- 游标函数
+
+| 函数名                         | 描述                                             |
+| ------------------------------ | ------------------------------------------------ |
+| cursor.hasNext()               | 是否还有元素                                     |
+| cursor.next()                  | 下一个元素                                       |
+| cursor.forEach(<function>)     | 遍历                                             |
+| cursor.limit(<number>)         | 返回游标限制条数的数量，从第一条开始，0表示全部  |
+| cursor.skip(<offset>)          | 跳过游标中几条文档，从第一条开始，0表示不跳过    |
+| cursor.count(<applySkipLimit>) | applySkipLimit默认false，表示忽略limit和skip效果 |
+| cursor.sort(<document>)        | 参数document定义了排序要求，1-正向；-1-逆向      |
+
+- 遍历游标示例
+
+```js
+> var myCursor = db.accounts.find({name:"david"});
+> while(myCursor.hasNext()) {
+	printjson(myCursor.next());
+}
+```
+
+- 遍历游标示例2
+
+```js
+> var myCursor = db.accounts.find({name:"david"});
+> myCursor.forEach(printjson)
+```
+
+- 获取一条文档
+
+```js
+> db.accounts.find({name:"david"}).limit(1)
+```
+
+- 跳过一条文档
+
+```js
+> db.accounts.find({name:"david"}).skip(1)
+```
+
+- 统计数量
+
+```js
+> db.accounts.find({name:"david"}).count()
+2
+> db.accounts.find({name:"david"}).limit(1).count()
+2
+> db.accounts.find({name:"david"}).skip(1).count()
+2
+> db.accounts.find({name:"david"}).limit(1).count(true)
+1
+> db.accounts.find({name:"david"}).skip(1).count(true)
+1
+```
+
+- 在不提供筛选条件时，`cursor.count()`会从集合的元数据Metadata中取得结果
+
+```js
+> db.accounts.find().count()
+```
+
+**数据库结构较为复杂时，元数据中的文档数量可能不准确，应尽量避免不带筛选条件的统计，而使用聚合管道来计算文档数量**
+
+- 游标排序
+
+```js
+> db.accounts.find().sort({balance:-1, name:1})
+```
+
+- 集合函数执行顺序
+
+`cursor.sort()`->`cursor.skip()`->`cursor.limit()`
+
+```js
+> db.accounts.find().limit(5).skip(3).sort({balance:-1,name:1})
+```
+
+### 文档投影
+
 
 
 ## 5.2、比较操作符（Comparison Query Operators）
@@ -1074,7 +1174,122 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find({name:{$type: "null"}})
 ```
 
+- 也可以使用对应的BSON类型序号作为$type操作符的参数
 
+```js
+> db.accounts.find({_id:{$type: 2}})
+```
+
+
+
+## 5.5、数组操作符
+
+数据准备：
+
+```js
+> db.accounts.insert([
+    {
+        name: "jack",
+        balance: 2000,
+        contact: ["11111111", "Alabama", "US"]
+    },
+    {
+        name: "karen",
+        balance: 2500,
+        contact: [["22222222", "33333333"], "Beijing", "China"]
+    }
+])
+```
+
+### $all
+
+语法格式：
+
+```js
+{ <field>: { $all: [ <value1> , <value2> ... ] } }
+```
+
+匹配数组字段中包含所有查询值的文档
+
+- 查询联系地址位于中国北京的银行账户文档
+
+```js
+> db.accounts.find({contact: {$all: ["China", "Beijing"]}})
+```
+
+- 查询联系电话包含 222222 和 333333 的银行账户文档
+
+```js
+> db.accounts.find({contact: {$all: [["22222222","33333333"]]}})
+```
+
+### $elemMatch
+
+语法格式：
+
+```js
+{ <field>: { $elemMatch: { <query1>, <query2>, ... } } }
+```
+
+匹配数组字段中至少存在一个值满足筛选条件的文档
+
+- 查询联系电话范围在 10000000 至 20000000 之间的银行账户文档
+
+```js
+> db.accounts.find({contact:{$elemMatch:{$gt: "10000000", $lt: "20000000"}}})
+```
+
+- 混合使用`$all`与`$elemMatch`，查询包含一个在 10000000 至 20000000 之间，和一个在 20000000 至   30000000 之间的联系电话的银行账户文档
+
+```js
+> db.accounts.find({
+    contact: {$all:[
+        {$elemMatch: {$gt: "10000000", $lt: "20000000"}},
+        {$elemMatch: {$gt: "20000000", $lt: "30000000"}}
+    ]}
+})
+```
+
+
+
+## 5.6、运算操作符（Evaluation Query Operators）
+
+### $regex
+
+语法格式：
+
+```js
+{ <field>: { $regex: /pattern/, $options: '<options>' } }
+{ <field>: { $regex: 'pattern', $options: '<options>' } }
+{ <field>: { $regex: /pattern/<options> } }
+// 或者
+{ <field>: /pattern/<options> }
+```
+
+参数说明：
+
+v8.41`正则表达式库。
+
+`options`：的可能值解释如下：
+
+| Option | Description                   |
+| ------ | ----------------------------- |
+| i      | 忽略大小写                    |
+| m      | 匹多行配                      |
+| x      | 忽略空白符                    |
+| s      | 允许`.`匹配所有字符，包含`\n` |
+
+- 在和$in 操作符一起使用时，只能使用 `/pattern/<options>` 格式
+
+```js
+> db.accounts.find({name: {$in: [/^c/, /^j/]}})
+```
+
+- 查询用户姓名包含LIE（不区分大小写）的银行账户文档
+
+```js
+> db.accounts.find({name: {$regex: /LIE/, $options: "i"}})
+```
 
 # 八、数据控制语言（DCL）
 
