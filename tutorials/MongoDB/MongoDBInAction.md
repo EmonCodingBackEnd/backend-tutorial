@@ -914,8 +914,6 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find({"_id.type":{$not:{$eq:"savings"}}})
 ```
 
-
-
 ### $and
 
 语法格式：
@@ -926,25 +924,103 @@ WriteResult({ "nInserted" : 1 })
 
 匹配多个筛选条件全部成立的文档
 
+- 查询余额大于100并且用户姓名排在fred之后的银行账户文档
+
+```js
+> db.accounts.find({
+    $and: [
+        {balance: {$gt:100}},
+        {name:{$gt:"fred"}}
+    ]
+})
+```
+
+- 当筛选条件应用在不同字段上时，可以省略`$and`操作符
+
+```js
+> db.accounts.find({balance: {$gt:100},name:{$gt:"fred"}})
+```
+
+- 当筛选条件应用在同一个字段上时，也可以简化命令
+
+```js
+> db.accounts.find({balance:{$gt:100, $lt:500}})
+```
+
 ### $or
 
 语法格式：
 
 ```js
-
+{ $or: [ { <expression1> }, { <expression2> }, ... , { <expressionN> } ] }
 ```
 
-匹配至少一个筛选条件成立的文档
+匹配至少一个条件成立的文档
+
+- 查询属于alice或者charlie的银行账户文档
+
+```js
+> db.accounts.find({
+    $or: [
+        {name: {$eq:"alice"}},
+        {name:{$eq:"charlie"}}
+    ]
+})
+```
+
+- 当所有筛选条件使用的都是`$eq`操作符时，`$or`和`$in`的效果是相同的
+
+```js
+> db.accounts.find({name: {$in: ["alice", "charlie"]}})
+```
+
+- 读取余额小于100或者大于5003 银行账户文档
+
+```js
+> db.accounts.find({
+    $or: [
+        {balance: {$lt: 100}},
+        {balance: {$gt: 500}}
+    ]
+})
+```
 
 ### $nor
 
 语法格式：
 
 ```js
-
+{ $nor: [ { <expression1> }, { <expression2> }, ... , { <expressionN> } ] }
 ```
 
 匹配多个筛选条件全部不成立的文档
+
+- 查询不属于alice和charlie且余额不小于100的银行账户文档
+
+```js
+> db.accounts.find({
+    $nor: [
+        {name: "alice"},
+        {name: "charlie"},
+        {balance: {$lt: 100}}
+    ]
+})
+```
+
+- 查询账户类型不是储蓄账户且余额大于500的银行账户文档，**会检索出不包含指定字段的文档**
+
+```js
+> db.accounts.find({
+    $nor: [
+        {"_id.type": "savings"},
+        {balance: {$gt: 500}}
+    ]
+})
+```
+
+
+
+## 5.3、字段操作符
 
 
 
