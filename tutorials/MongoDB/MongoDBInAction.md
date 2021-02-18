@@ -856,9 +856,80 @@ WriteResult({ "nInserted" : 1 })
 
 ### 文档投影
 
+不适用投影时，`db.collection.find()`返回符合条件的完整文档，而使用投影可以有选择的返回文档中的部分字段。
+
+语法格式：
+
+```js
+// db.collection.find(<query>, <projection>)
+{field: inclusion}
+```
+
+参数说明：
+
+`inclusion`： 1-表示返回字段，0-表示不返回字段。**投影中除了主键之外，不能混用包含和不包含两种条件**
+
+- 仅返回银行账户文档中的用户姓名
+
+```js
+> db.accounts.find({}, {name: 1})
+```
+
+- 默认都会返回`_id`字段，可以指定不返回
+
+```js
+> db.accounts.find({}, {name: 1, _id:0})
+```
+
+- 不返回银行账户文档中的用户姓名，也不返回主键
+
+```js
+> db.accounts.find({}, {name: 0, _id:0})
+```
+
+#### $slice
+
+该操作符可以返回数组字段中的部分元素
+
+- 仅返回数组第一个元素
+
+```js
+> db.accounts.find({}, {_id:0, name:1, contact:{$slice:1}})
+```
+
+- 仅返回数组的最后一个元素
+
+```js
+> db.accounts.find({}, {_id:0, name:1, contact:{$slice:-1}})
+```
+
+- 返回数组指定范围的元素
+
+```js
+> db.accounts.find({}, {_id:0, name:1, contact:{$slice:[1,2]}})
+```
+
+#### $elemMatch和$
+
+该操作符可以返回数组字段中满足筛选条件的第一个元素
+
+```js
+> db.accounts.find({}, {
+_id:0, name:1, contact:{$elemMatch:{$gt:"Alabama"}}
+})
+
+// $操作符，依赖于<query>
+> db.accounts.find({contact:{$gt:"Alabama"}}, {_id:0, name:1, "contact.$":1})
+```
+
+
+
+
+
 
 
 ## 5.2、比较操作符（Comparison Query Operators）
+
 
 ### $eq
 
