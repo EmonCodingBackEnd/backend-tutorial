@@ -1349,6 +1349,26 @@ db.<collection>.update(
 )
 ```
 
+参数说明：
+
+| 参数    | 类型                 | 描述                                    |
+| ------- | -------------------- | --------------------------------------- |
+| query   | document             | 可选，筛选条件，默认:{}                 |
+| update  | document or pipeline | 1、更新操作符；2、更新文档；3、聚合管道 |
+| options | document             | 更新操作的参数                          |
+
+## 6.1、常规更新
+
+- 更新整篇文档
+
+如果<update>文档不包含任何更新操作符，db.<collection>.update()将会使用<update>文档直接替换集合中符合<query>文档筛选条件的文档。
+
+```js
+# 特别注意：指定的文档会替换原文档；如果指定的文档在原文档已存在，则覆盖；如果不存在，则添加；如果原文档比指定文档多，则去掉。
+# 该方法默认仅更新第一个文档；如果指定了options选项{multi:true}会报错：multi update is not supported for replacement-style update
+> db.accounts.update({_id:"account1"}, {name:"alice",balance:123})
+```
+
 
 
 
