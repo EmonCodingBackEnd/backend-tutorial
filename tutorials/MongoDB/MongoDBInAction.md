@@ -435,14 +435,12 @@ WriteResult({ "nInserted" : 1 })
 
 # 四、数据操纵语言之创建文档（DML）
 
-## 4.1、创建文档
-
-### 4.1.1、插入单个文档
+## 4.1、插入单个文档
 
 语法格式：
 
 ```js
-db.collection.insertOne(
+db.<collection>.insertOne(
    <document>,
    {
       writeConcern: <document>
@@ -506,12 +504,12 @@ db.collection.insertOne(
 
 
 
-### 4.1.2、插入多个文档
+## 4.2、插入多个文档
 
 语法格式：
 
 ```js
-db.collection.insertMany(
+db.<collection>.insertMany(
    [ <document 1> , <document 2>, ... ],
    {
       writeConcern: <document>,
@@ -634,14 +632,14 @@ WriteResult({ "nInserted" : 1 })
 
 
 
-### 4.1.3、插入或者更新文档
+## 4.3、插入或者更新文档
 
 描述：当db.collection.save()命令处理一个新文档时，会调用db.collection.save()命令。
 
 语法格式：
 
 ```js
-db.collection.save(
+db.<collection>.save(
    <document>,
    {
      writeConcern: <document>
@@ -679,39 +677,11 @@ WriteResult({ "nInserted" : 1 })
 
 
 
-## 4.2、更新文档
-
-- 更新单个文档
-
-语法格式：
-
- `db.<colname>.updateOne(<filter>, <update>, <options>)`
-
-或者：
-
-`db.<colname>replaceOne(<filter>, <update>, <options>)`
-
-```bash
-> db.col.updateOne({item:"mat"},{$set:{"size.w":36.5,status:"P"},$currentDate:{lastModified:true}})
-```
-
-- 更新多个文档
-
-语法格式： `db.<colname>.updateMany(<filter>, <update>, {upsert:<boolean>,writeConcern:<value>,collation:<doc>,arrayFilters:[<filterdocument1>,...],hint:<doc|string>})`
-
-
-
-## 4.3、删除文档
-
-
-
-
-
 # 五、数据查询语言（DQL）
 
 语法格式：
 
-`db.collection.find(query, projection)`
+`db.<collection>.find(query, projection)`
 
 参数说明：
 
@@ -921,10 +891,6 @@ _id:0, name:1, contact:{$elemMatch:{$gt:"Alabama"}}
 // $操作符，依赖于<query>
 > db.accounts.find({contact:{$gt:"Alabama"}}, {_id:0, name:1, "contact.$":1})
 ```
-
-
-
-
 
 
 
@@ -1365,6 +1331,23 @@ v8.41`正则表达式库。
 
 
 # 六、数据操纵语言之更新文档（DML）
+
+语法格式：
+
+```js
+db.<collection>.update(
+   <query>,
+   <update>,
+   {
+     upsert: <boolean>,
+     multi: <boolean>,
+     writeConcern: <document>,
+     collation: <document>,
+     arrayFilters: [ <filterdocument1>, ... ],
+     hint:  <document|string>        // Available starting in MongoDB 4.2
+   }
+)
+```
 
 
 
