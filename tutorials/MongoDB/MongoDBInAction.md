@@ -564,7 +564,7 @@ db.<collection>.insertMany(
 
 **总结**：
 
-在执行db.collection.insertMany命令时，默认的`{ordered: true}` 在遇到错误时，操作便会退出，剩余的文档无论正确与否，都不会被写入；如果是 `{ordered: false}` 在遇到错误时，剩余正确的文档也会被写入。
+在执行`db.<collection>.insertMany`命令时，默认的`{ordered: true}` 在遇到错误时，操作便会退出，剩余的文档无论正确与否，都不会被写入；如果是 `{ordered: false}` 在遇到错误时，剩余正确的文档也会被写入。
 
 
 
@@ -634,7 +634,7 @@ WriteResult({ "nInserted" : 1 })
 
 ## 4.3、插入或者更新文档
 
-描述：当db.collection.save()命令处理一个新文档时，会调用db.collection.save()命令。
+描述：当`db.<collection>.save()`命令处理一个新文档时，会调用`db.<collection>.save()`命令。
 
 语法格式：
 
