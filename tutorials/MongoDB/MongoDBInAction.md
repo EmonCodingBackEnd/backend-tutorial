@@ -1359,17 +1359,191 @@ db.<collection>.update(
 
 ## 6.1、常规更新
 
-- 更新整篇文档
+- 更新整篇文档（在`<update>`文档不包含任何更新操作符的情况下，称为：`replacement-style update`）
 
-如果`<update>`文档不包含任何更新操作符，`db.<collection>.update()`将会使用`<update>`文档直接替换集合中符合`<query>`文档筛选条件的文档。
+  - `<update>`会替换原文档；如果字段在原文档已存在，则覆盖；如果不存在，则添加；如果原文档比指定文档多，则去掉。
+  - 该方法默认仅更新第一个文档；如果指定了options选项{multi:true}会报错
+
+  >multi update is not supported for replacement-style update
+
+  - 文档主键_id是不可以更改的，如果指定的文档包含_id，值要和被更新文档主键值一样
 
 ```js
-# 特别注意：指定的文档会替换原文档；如果指定的文档在原文档已存在，则覆盖；如果不存在，则添加；如果原文档比指定文档多，则去掉。
-# 该方法默认仅更新第一个文档；如果指定了options选项{multi:true}会报错：multi update is not supported for replacement-style update
 > db.accounts.update({_id:"account1"}, {name:"alice",balance:123})
 ```
 
+- 更新特定字段（在`<update>`文档包含更新操作符）
 
+
+
+## 6.2、文档更新操作符
+
+### $set 更新或新增字段
+
+语法格式：
+
+```js
+{ $set: { <field1>: <value1>, ... } }
+```
+
+- 更新jack的银行账户和开户信息
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $set: {
+            balance: 3000,
+            info: {
+                dateOpened: new Date("2021-02-26T23:10:30Z"),
+                branch: "branch1"
+            }
+        }
+    }
+)
+```
+
+- 更新或新增内嵌文档的字段，更新jack的银行账户的开户时间
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $set: {
+            "info.dateOpened": new Date("2021-02-26T23:15:36Z")
+        }
+    }
+)
+```
+
+- 更新或新增数组内的字段，更新jack的联系电话
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $set: {
+            "contact.0": "66666666"
+        }
+    }
+)
+```
+
+- 新增数组内的字段，添加加jack的联系方式
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $set: {
+            "contact.3": "new contact"
+        }
+    }
+)
+```
+
+- 新增数组内的字段，**跳跃式**添加加jack的联系方式
+
+**如果向现有数组字段范围以外位置处添加新值，数组字段的长度会扩大，未被赋值的数组成员将被设置为null。**
+
+```js
+> db.accounts.find({name:"jack"}).pretty()
+{
+	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17a"),
+	"name" : "jack",
+	"balance" : 3000,
+	"contact" : [
+		"66666666",
+		"Alabama",
+		"US",
+		"new contact"
+	],
+	"info" : {
+		"dateOpened" : ISODate("2021-02-26T23:15:36Z"),
+		"branch" : "branch1"
+	}
+}
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $set: {
+            "contact.5": "another new contact"
+        }
+    }
+)
+> db.accounts.find({name:"jack"}, {contact:1}).pretty()
+{
+	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17a"),
+	"contact" : [
+		"66666666",
+		"Alabama",
+		"US",
+		"new contact",
+		null,
+		"another new contact"
+	]
+}
+```
+
+
+
+### $unset 删除字段
+
+语法格式：
+
+```js
+{ $unset: { <field1>: "", ... }}
+```
+
+
+
+### $rename 重命名字段
+
+语法格式：
+
+```js
+
+```
+
+
+
+### $inc 加减字段值
+
+语法格式：
+
+```js
+
+```
+
+
+
+### $mul 相乘字段值
+
+语法格式：
+
+```js
+
+```
+
+
+
+### $min 比较减小字段值
+
+语法格式
+
+```js
+
+```
+
+
+
+### $max 比较增大字段值
+
+语法格式：
+
+```js
+
+```
 
 
 
