@@ -1613,6 +1613,8 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 { $rename: { <field1>: <newName1>, <field2>: <newName2>, ... } }
 ```
 
+**注意：$rename无法对数组文档进行操作**
+
 - 如果$rename命令要重命名的字段并不存在，那么文档内容不会被改变
 
 ```js
@@ -1644,7 +1646,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 
 - 重命名内嵌文档的字段，更新账户余额和开户地点字段在文档中的位置
 
-  - 数据初始化：更新karen的银行账户的开户时间和联系方式
+  - 数据准备：更新karen的银行账户的开户时间和联系方式
 
   ```js
   > db.accounts.find({name:"karen"}).pretty()
@@ -1738,17 +1740,56 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 
   
 
-  
-
-
-
 ### $inc 加减字段值
 
 语法格式：
 
 ```js
-
+{ $inc: <field1>: <amount1>, ... } }
 ```
+
+**注意：只能使用在数字字段上**
+
+- 更新david的账户余额
+
+```js
+> db.accounts.update(
+    {name: "david"},
+    {
+        $inc: {
+            balance: -0.5
+        }
+    }
+)
+```
+
+- 如果被更新的字段不存在
+
+```js
+> db.accounts.find({name:"david"}).pretty()
+{
+	"_id" : ObjectId("602d1d49ebecf117915b0979"),
+	"name" : "david",
+	"balance" : 99.75
+}
+> db.accounts.update(
+    {name: "david"},
+    {
+        $inc: {
+            notYetExist: 10
+        }
+    }
+)
+> db.accounts.find({name:"david"}).pretty()
+{
+	"_id" : ObjectId("602d1d49ebecf117915b0979"),
+	"name" : "david",
+	"balance" : 99.75,
+	"notYetExist" : 10
+}
+```
+
+**注意：如果更新的字段不存在，会添加新字段，且值是更新的值**
 
 
 
@@ -1757,18 +1798,152 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 语法格式：
 
 ```js
-
+{ $mul: <field1>: <number1>, ... } }
 ```
+
+**注意：只能使用在数字字段上**
+
+```js
+> db.accounts.update(
+    {name: "david"},
+    {
+        $mul: {
+            balance: 0.5
+        }
+    }
+)
+```
+
+- 如果被更新的字段不存在
+
+```js
+> db.accounts.find({name:"david"}).pretty()
+{
+	"_id" : ObjectId("602d1d49ebecf117915b0979"),
+	"name" : "david",
+	"balance" : 99.75,
+	"notYetExist" : 10
+}
+> db.accounts.update(
+    {name: "david"},
+    {
+        $mul: {
+            notYetExistEither: 20
+        }
+    }
+)
+> db.accounts.find({name:"david"}).pretty()
+{
+	"_id" : ObjectId("602d1d49ebecf117915b0979"),
+	"name" : "david",
+	"balance" : 99.75,
+	"notYetExist" : 10,
+	"notYetExistEither" : 0
+}
+```
+
+**注意：如果更新的字段不存在，会添加新字段，且值是0**
 
 
 
 ### $min 比较减小字段值
 
-语法格式
+语法格式：
 
 ```js
-
+{ $min: { <field1>: <value1>, ... } }
 ```
+
+- 更新karen的账户余额，比较之后更新较小的那一个为新值
+
+```js
+> db.accounts.find({name: "karen"}, {name: 1, info: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"info" : {
+		"dateOpened" : ISODate("2021-02-27T08:51:55Z"),
+		"balance" : 2500
+	}
+}
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $min: {
+            "info.balance": 5000
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+- 更新karen的开户时间
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $min: {
+            "info.dateOpened": ISODate("2021-02-27T11:00:00Z")
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+- 如果被更新的字段不存在
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $min: {
+            notYetExist: 10
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+**注意：如果更新的字段不存在，会添加新字段，且值是更新的值**
+
+- 如果被更新的字段类型和更新值类型不一致，则按照BSON数据类型排序后更新，对$max效果一样
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $min: {
+            "info.balance": null
+        }
+    }
+)
+```
+
+**特殊说明**：
+
+>$min和$max命令会按照BSON数据类型排序规则进行比较，
+>
+>最小： Null
+>
+>​			Numbers(ints, longs, doubles, decimals)
+>
+>​			Symbol, String
+>
+>​			Object
+>
+>​			Array
+>
+>​			BigData
+>
+>​			ObjectId
+>
+>​			Boolean
+>
+>​			Date
+>
+>​			Timestamp
+>
+>最大：Regular Expression
 
 
 
@@ -1777,10 +1952,60 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 语法格式：
 
 ```js
-
+{ $max: { <field1>: <value1>, ... } }
 ```
 
+- 更新karen的账户余额，比较之后更新较大的那一个为新值
 
+```js
+> db.accounts.find({name: "karen"}, {name: 1, info: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"info" : {
+		"dateOpened" : ISODate("2021-02-27T08:51:55Z"),
+		"balance" : 2500
+	}
+}
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $max: {
+            "info.balance": 5000
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+- 更新karen的开户时间
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $max: {
+            "info.dateOpened": ISODate("2021-02-27T11:00:00Z")
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+- 如果被更新的字段不存在
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $max: {
+            notYetExistEither: 20
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+**注意：如果更新的字段不存在，会添加新字段，且值是更新的值**
 
 # 七、数据操纵语言之删除文档（DML）
 
