@@ -1429,7 +1429,7 @@ db.<collection>.update(
 )
 ```
 
-- 新增数组内的字段，添加加jack的联系方式
+- 新增数组内的字段，添加jack的联系方式
 
 ```js
 > db.accounts.update(
@@ -2006,6 +2006,156 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
 
 **注意：如果更新的字段不存在，会添加新字段，且值是更新的值**
+
+
+
+## 6.3、数组更新操作符
+
+### $addToSet 向数组中添加元素
+
+语法格式：
+
+```js
+{ $addToSet: { <field1>: <value1>, ... } }
+```
+
+- 向karen的账户文档中添加联系方式
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $addToSet: {
+            contact: "China"
+        }
+    }
+)
+```
+
+**注意：如果要插入的值已经存在数组字段中，则$addToSet不会再添加重复值**
+
+- 向karen的账户文档中添加新的联系方式
+
+```js
+> db.accounts.find({name: "karen"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		}
+	]
+}
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $addToSet: {
+            contact: {
+                "secondaryEmail": "yyy@gmail.com",
+                "primaryEmail": "xxx@gmail.com"
+            }
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.accounts.find({name: "karen"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		{
+			"secondaryEmail" : "yyy@gmail.com",
+			"primaryEmail" : "xxx@gmail.com"
+		}
+	]
+}
+```
+
+**注意：使用$addToSet插入数组和文档时，插入值中的字段顺序也和已有值重复的时候，才算作重复值忽略，否则插入成功**
+
+- 向karen的账户文档中添加多个联系方式
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $addToSet: {
+            contact: ["contact1", "contact2"]
+        }
+    }
+)
+```
+
+**总结**：这种会将数组插入被更新的数组字段中，成为内嵌数组。
+
+- 向karen的账户文档中，插入非内嵌的多个联系方式
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $addToSet: {
+            contact: {
+                $each: ["contact1", "contact2"]
+            }
+        }
+    }
+)
+```
+
+
+
+### $pop 从数组中删除第一个或最后一个元素
+
+语法格式：
+
+```js
+{ $pop: { <field>: <-1 | 1>, ... } }
+```
+
+- 从karen的账户文档中删除最后一个联系方式
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pop: {
+            contact: 1
+        }
+    }
+)
+```
+
+- 从karen的账户文档中删除第一个联系方式
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pop: {
+            contact: -1
+        }
+    }
+)
+```
+
+
 
 # 七、数据操纵语言之删除文档（DML）
 
