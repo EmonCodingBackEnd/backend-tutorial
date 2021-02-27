@@ -808,7 +808,7 @@ WriteResult({ "nInserted" : 1 })
 > db.accounts.find().count()
 ```
 
-**数据库结构较为复杂时，元数据中的文档数量可能不准确，应尽量避免不带筛选条件的统计，而使用聚合管道来计算文档数量**
+**注意：数据库结构较为复杂时，元数据中的文档数量可能不准确，应尽量避免不带筛选条件的统计，而使用聚合管道来计算文档数量**
 
 - 游标排序
 
@@ -1444,7 +1444,7 @@ db.<collection>.update(
 
 - 新增数组内的字段，**跳跃式**添加加jack的联系方式
 
-**如果向现有数组字段范围以外位置处添加新值，数组字段的长度会扩大，未被赋值的数组成员将被设置为null。**
+**注意：如果向现有数组字段范围以外位置处添加新值，数组字段的长度会扩大，未被赋值的数组成员将被设置为null。**
 
 ```js
 > db.accounts.find({name:"jack"}).pretty()
@@ -1494,6 +1494,114 @@ db.<collection>.update(
 ```js
 { $unset: { <field1>: "", ... }}
 ```
+
+**说明**： `<field1>: ""`的值`""`对操作结果不影响，只是为了满足json格式。
+
+- 删除jack的银行账户余额和开户地点
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $unset: {
+            balance: "",
+            "info.branch": ""
+        }
+    }
+)
+```
+
+- 删除jack的银行开户时间
+
+```js
+> db.accounts.find({name:"jack"}).pretty()
+{
+	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17a"),
+	"name" : "jack",
+	"contact" : [
+		"66666666",
+		"Alabama",
+		"US",
+		"new contact",
+		null,
+		"new contact"
+	],
+	"info" : {
+		"dateOpened" : ISODate("2021-02-26T23:15:36Z")
+	}
+}
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $unset: {
+            "info.dateOpened": "this can be any value"
+        }
+    }
+)
+> db.accounts.find({name:"jack"}).pretty()
+{
+	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17a"),
+	"name" : "jack",
+	"contact" : [
+		"66666666",
+		"Alabama",
+		"US",
+		"new contact",
+		null,
+		"new contact"
+	],
+	"info" : {
+		
+	}
+}
+> db.accounts.find({name:"jack"}).pretty()
+{
+	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17a"),
+	"name" : "jack",
+	"contact" : [
+		"66666666",
+		"Alabama",
+		"US",
+		"new contact",
+		null,
+		"new contact"
+	],
+	"info" : {
+		
+	}
+}
+```
+
+**注意：删除了info字段的最后一个子字段，info字段还在。**
+
+- 如果$unset命令中的字段根本不存在，那么文档内容将保持不变
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $unset: {
+            notExist: ""
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+- 删除数组内的字段，删除jack的联系电话
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $unset: {
+            "contact.0": ""
+        }
+    }
+)
+```
+
+**注意：删除数组内的字段后，只是把该字段置为null，并不会改变数组长度。**
 
 
 
