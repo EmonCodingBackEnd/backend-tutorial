@@ -2479,9 +2479,176 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 ### $push 向数组字段中添加元素
 
+语法格式：
 
+```js
+{ $push: { <field1>: <value1>, ... } }
+```
 
+和$addToSet命令相似，但$push命令的功能更加强大。
 
+- 和$addToSet相似的地方
+
+```js
+# 把整个文档作为数组元素
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $push: {newArray: "new element"}
+    }
+)
+# 把整个数组拉平后作为数组元素
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $push: {
+            newArray: { $each: [2,3,4]}
+        }
+    }
+)
+```
+
+- 和$addToSet不同的地方，`$push`和`$each`操作符还可以和更多的操作符搭配使用，实现比$addToSet更复杂的操作
+  - 使用`$position`操作符将元素插入到数组的指定位置
+
+  ```js
+  > db.accounts.find({name: "lawrence"}, {name: 1, newArray: 1, _id: 0}).pretty()
+  { "name" : "lawrence", "newArray" : [ "new element", 2, 3, 4 ] }
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: ["pos1", "pos2"],
+                  $position: 0
+              }
+          }
+      }
+  )
+  # 插入成功
+  WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+  > db.accounts.find({name: "lawrence"}, {name: 1, newArray: 1, _id: 0}).pretty()
+  {
+  	"name" : "lawrence",
+  	"newArray" : [
+  		"pos1",
+  		"pos2",
+  		"new element",
+  		2,
+  		3,
+  		4
+  	]
+  }
+  # $position的值-1表示插入最后一个元素之前，-2表示最后2个元素之前，以此类推。
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: ["pos3", "pos4"],
+                  $position: -1
+              }
+          }
+      }
+  )
+  ```
+
+  - 使用$sort对数组进行排序；1-正序；-1-倒序；
+
+  ```js
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: ["sort1"],
+                  $sort: 1
+              }
+          }
+      }
+  )
+  # 插入内嵌文档并排序
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: [{key: "sort", value: 100}, {key:"sort", value: 200}],
+                  $sort: {value: -1}
+              }
+          }
+      }
+  ]
+  # 如果不想插入任何元素，只是想对文档中的数组字段进行排序
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: [],
+                  $sort: -1
+              }
+          }
+      }
+  )
+  ```
+
+  - 使用$slice来截取部分数组
+
+  ```js
+  # $slice: -8 表示倒数8个元素作为保留
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: ["slice1"],
+                  $slice: -8
+              }
+          }
+      }
+  )
+  # 如果不想插入元素，只想截取文档中的数组字段
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: [],
+                  $slice: 6
+              }
+          }
+      }
+  )
+  ```
+
+  - `$position`,`$sort`,`$slice`可以一起使用
+
+  这三个操作符的执行顺序是：`$position` -> `$sort` -> `$slice`
+
+  写在命令中的操作符顺序并不重要，并不会影响命令的执行顺序
+
+  ```js
+  > db.accounts.update(
+  	{name: "lawrence"},
+      {
+          $push: {
+              newArray: {
+                  $each: ["push1", "push2"],
+                  $position: 2,
+                  $sort: -1,
+                  $slice: 5
+              }
+          }
+      }
+  )
+  ```
+
+  
+
+  
+
+  
 
 # 七、数据操纵语言之删除文档（DML）
 
