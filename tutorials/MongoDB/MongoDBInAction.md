@@ -2217,9 +2217,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 			"secondaryEmail" : "yyy@gmail.com",
 			"primaryEmail" : "xxx@gmail.com"
 		},
-		[
-			"contact2"
-		],
+		[ ],
 		"contact1"
 	]
 }
@@ -2295,6 +2293,189 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
     }
 )
 ```
+
+
+
+### $pullAll 和 $pull 对比
+
+语法格式：
+
+```js
+{ $pullAll: { <field1>: [ <value1>, <value2> ...], ... } }
+```
+
+**注意：使用$pullAll时，如果要删除的数组元素本身也是一个数组，则该数组元素的值和排列顺序都必须和被删除的数组元素完全一样。**
+
+**注意：使用$pullAll时，如果要删除的数组元素本身也是一个文档，则该数组元素的值和排列顺序都必须和被删除的数组元素完全一样。**
+
+相当于：
+
+```js
+{ $pull: { <field1>: { $in: [ <value1>, <value2> ...], ... }}}
+```
+
+**注意：使用$pull时，如果要删除的数组元素本身也是一个数组，则该数组元素的值和排列顺序都必须和被删除的数组元素完全一样。**
+
+**注意：使用$pull时，如果要删除的数组元素本身也是一个文档，则该数组元素的值不需要完全匹配，排列顺序也不需要完全匹配。**
+
+- 删除本身也是数组的数组元素
+
+```js
+> db.accounts.find({name: "lawrence"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "lawrence",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		{
+			"secondaryEmail" : "yyy@gmail.com",
+			"primaryEmail" : "xxx@gmail.com"
+		},
+		[ ],
+		"contact1"
+	]
+}
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pullAll: {
+            contact: [
+                ["33333333", "22222222"]
+            ]
+        }
+    }
+)
+# 没有删除任何元素
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pull: {
+            contact: [
+                "33333333", "22222222"
+            ]
+        }
+    }
+)
+# 没有删除任何元素
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+- 删除本身是文档的数组元素
+
+```js
+> db.accounts.find({name: "lawrence"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "lawrence",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		{
+			"secondaryEmail" : "yyy@gmail.com",
+			"primaryEmail" : "xxx@gmail.com"
+		},
+		[ ],
+		"contact1"
+	]
+}
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pullAll: {
+            contact: [
+                {"primaryEmail": "xxx@gmail.com"}
+            ]
+        }
+    }
+)
+# 没有删除任何元素
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pullAll: {
+            contact: [
+                {secondaryEmail : "yyy@gmail.com", "primaryEmail": "xxx@gmail.com"}
+            ]
+        }
+    }
+)
+# 删除成功顺序满足的数组元素
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+```js
+> db.accounts.find({name: "lawrence"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "lawrence",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		[ ],
+		"contact1"
+	]
+}
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pull: {
+            contact: {secondaryEmail : "yyy@gmail.com"}
+        }
+    }
+)
+# 数组元素内容部分匹配，成功删除
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+# 恢复被删掉的数组元素
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $addToSet: {
+            contact: {
+                primaryEmail: "xxx@gmail.com",
+                secondaryEmail: "yyy@gmail.com"
+            }
+        }
+    }
+)
+
+> db.accounts.update(
+	{name: "lawrence"},
+    {
+        $pull: {
+            contact: {secondaryEmail : "yyy@gmail.com", "primaryEmail": "xxx@gmail.com"}
+        }
+    }
+)
+# 数组元素排列顺序部分匹配，成功删除
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+
 
 
 
