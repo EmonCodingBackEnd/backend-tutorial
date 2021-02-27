@@ -2644,11 +2644,153 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
   )
   ```
 
-  
+### 更新数组中特定元素
 
-  
+语法格式：
 
-  
+```js
+db.collection.update(
+    { <array>: <query selector> },
+    { <update operator>: { "<array>.$": value } }
+)
+```
+
+参数说明：
+
+$是数组中第一个符合筛选条件的数组元素的占位符，搭配更新操作符使用，可以对满足筛选条件的数组元素进行更新。
+
+```js
+> db.accounts.update(
+	{name: "lawrence", newArray: "pos2"},
+    {
+        $set: {
+            "newArray.$": "updated"
+        }
+    }
+)
+```
+
+### 更新数组中的所有元素
+
+语法格式：
+
+```js
+{ <update operator>: { "<array>.$[]": value } }
+```
+
+参数说明：
+
+$[]指代数组字段中的所有元素，搭配更新操作符使用，可以对数组中的所有元素进行更新。
+
+```js
+> db.accounts.update(
+	{name: "lawrence"},
+	{
+        $set: {
+            "contact.0.$[]": "88888888"
+        }
+    }
+)
+```
+
+## 6.4、更新文档选项
+
+### 6.4.1、更新多个文档选项
+
+语法格式：
+
+```js
+{ multi: <boolean> }
+```
+
+参数说明：
+
+是否更新多个文档，默认： false
+
+```js
+# 默认只更新一个文档
+> db.accounts.update(
+	{},
+    {
+        $set: {
+            currency: "USD"
+        }
+    }
+)
+# 指定更新多个文档
+> db.accounts.update(
+	{},
+    {
+        $set: {
+            currency: "USD"
+        }
+    },
+    {
+        multi: true
+    }
+)
+```
+
+**注意：MongoDB只能保证`单个`文档操作的原子性，不能保证`多个`文档操作的原子性**
+
+更新多个文档的操作虽然在单一线程中执行，但是线程在执行过程中可能被挂起，以便其他线程也有机会对数据进行操作。
+
+如果需要保证多个文档操作时的原子性，就需要使用MongoDB4.0版本引入的事务功能进行操作。
+
+### 6.4.2、更新或者创建文档
+
+在默认情况下，如果update命令中的筛选条件没有匹配任何文档，则不会进行任何操作。
+
+将upsert的选项设置为true，如果update命令中的筛选条件没有匹配任何文档，则会创建新文档。
+
+```js
+# 对于匹配不到的文档，则新增；如果筛选条件比较确定，则条件也会作为字段插入文档
+> db.accounts.update(
+	{name: "maggie"},
+    {
+        $set: { balance: 700 }
+    },
+    { upsert: true }
+)
+> db.accounts.find({name: "maggie"})
+{ "_id" : ObjectId("603a5ee25bf5ade50b06a390"), "name" : "maggie", "balance" : 700 }
+
+# 如果无法从筛选条件中推断出确定的字段值，则新创建的文档不包含筛选条件涉及的字段
+> db.accounts.update(
+	{balance: {$gt: 20000}},
+    {
+        $set: {name: "nick"}
+    },
+    {upsert: true}
+)
+> db.accounts.find({name: "nick"})
+{ "_id" : ObjectId("603a60065bf5ade50b06a3dc"), "name" : "nick" }
+```
+
+
+
+## 6.5、另一个更新文档的命令
+
+语法格式：
+
+```js
+db.<collection>.save(<document>)
+```
+
+- 更新已存在文档或者创建新文档
+
+```js
+> db.accounts.find({_id: "account1"})
+{ "_id" : "account1", "name" : "alice", "balance" : 123, "currency" : "USD" }
+
+>  db.accounts.save({_id: "account1", name: "alice", balance: 100})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.accounts.find({_id: "account1"})
+{ "_id" : "account1", "name" : "alice", "balance" : 100 }
+```
+
+
 
 # 七、数据操纵语言之删除文档（DML）
 
