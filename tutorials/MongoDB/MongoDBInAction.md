@@ -2155,6 +2155,147 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 )
 ```
 
+- 从karen的账户文档中删除第六个联系方式的第一个元素
+
+```js
+> db.accounts.find({name: "karen"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		{
+			"secondaryEmail" : "yyy@gmail.com",
+			"primaryEmail" : "xxx@gmail.com"
+		},
+		[
+			"contact1",
+			"contact2"
+		],
+		"contact1"
+	]
+}
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pop: {
+            "contact.5": -1
+        }
+    }
+)
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pop: {
+            "contact.5": -1
+        }
+    }
+)
+> db.accounts.find({name: "karen"}, {name: 1, contact: 1, _id: 0}).pretty()
+{
+	"name" : "karen",
+	"contact" : [
+		[
+			"22222222",
+			"33333333"
+		],
+		"Beijing",
+		"China",
+		{
+			"primaryEmail" : "xxx@gmail.com",
+			"secondaryEmail" : "yyy@gmail.com"
+		},
+		{
+			"secondaryEmail" : "yyy@gmail.com",
+			"primaryEmail" : "xxx@gmail.com"
+		},
+		[
+			"contact2"
+		],
+		"contact1"
+	]
+}
+```
+
+**总结：使用$pop删除数组元素，哪怕数组元素的最后一个元素都被删除了，也会保留数组结构。**
+
+
+
+### $pull 从数组字段中删除特定元素
+
+语法格式：
+
+```js
+{ $pull: { <field1>: <value|condition>, ... } }
+```
+
+数据准备：复制karen的账户文档，并修改用户姓名为lawrence
+
+```js
+> db.accounts.find({name:"karen"}, {_id: 0}).forEach(function(doc){
+    var newDoc = doc;
+    newDoc.name = "lawrence";
+    db.accounts.insert(newDoc);
+})
+```
+
+- 从karen的联系方式中删去包含'hi'字母的元素
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pull: {
+            contact: {
+                $elemMatch: {$regex: /hi/}
+            }
+        }
+    }
+)
+# 结果：没有更新到任何数据
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+**总结**： $pull操作符本身是只能作用在数组元素上的，我们不需要额外使用$elemMatch操作符。
+
+```js
+> db.accounts.update(
+	{name: "karen"},
+    {
+        $pull: {
+            contact: {
+				$regex: /hi/
+            }
+        }
+    }
+)
+```
+
+- 如果数组元素本身就是一个内嵌数组，我们也可以使用$elemMatch来对这些内嵌数组进行筛选
+
+```js
+> db.accounts.update(
+    {name: "karen"},
+    {
+        $pull: {
+            contact: {
+                $elemMatch: {
+                    $eq: "22222222"
+                }
+            }
+        }
+    }
+)
+```
+
 
 
 # 七、数据操纵语言之删除文档（DML）
