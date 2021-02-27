@@ -1610,8 +1610,135 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 语法格式：
 
 ```js
-
+{ $rename: { <field1>: <newName1>, <field2>: <newName2>, ... } }
 ```
+
+- 如果$rename命令要重命名的字段并不存在，那么文档内容不会被改变
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $rename: {
+            "notExist": "name"
+        }
+    }
+)
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+```
+
+- 如果新的字段名已经存在，那么原有的这个字段会被覆盖
+
+```js
+> db.accounts.update(
+	{name: "jack"},
+    {
+        $rename: {
+            "name": "contact"
+        }
+    }
+)
+```
+
+**说明**:当$rename命令中的新字段存在的时候，$rename命令会先$unset旧字段，然后再$set新字段。
+
+- 重命名内嵌文档的字段，更新账户余额和开户地点字段在文档中的位置
+
+  - 数据初始化：更新karen的银行账户的开户时间和联系方式
+
+  ```js
+  > db.accounts.find({name:"karen"}).pretty()
+  {
+  	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17b"),
+  	"name" : "karen",
+  	"balance" : 2500,
+  	"contact" : [
+  		[
+  			"22222222",
+  			"33333333"
+  		],
+  		"Beijing",
+  		"China"
+  	]
+  }
+  > db.accounts.update(
+  	{name: "karen"},
+      {
+          $set: {
+              info: {
+                  dateOpened: new Date("2021-02-27T08:51:55Z"),
+                  branch: "branch1"
+              },
+              "contact.3": {
+                  primaryEmail: "xxx@gmail.com",
+                  secondaryEmail: "yyy@gmail.com"
+              }
+          }
+      }
+  )
+  > db.accounts.find({name:"karen"}).pretty()
+  {
+  	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17b"),
+  	"name" : "karen",
+  	"balance" : 2500,
+  	"contact" : [
+  		[
+  			"22222222",
+  			"33333333"
+  		],
+  		"Beijing",
+  		"China",
+  		{
+  			"primaryEmail" : "xxx@gmail.com",
+  			"secondaryEmail" : "yyy@gmail.com"
+  		}
+  	],
+  	"info" : {
+  		"dateOpened" : ISODate("2021-02-27T08:51:55Z"),
+  		"branch" : "branch1"
+      }
+  }
+  ```
+
+  - 更新账户余额和开户地点字段在文档中的位置
+
+  ```js
+  > db.accounts.update(
+  	{name: "karen"},
+      {
+          $rename: {
+              "info.branch": "branch",
+              "balance": "info.balance"
+          }
+      }
+  )
+  > db.accounts.find({name:"karen"}).pretty()
+  {
+  	"_id" : ObjectId("602e3b5f4da3eca7f2dcc17b"),
+  	"name" : "karen",
+  	"contact" : [
+  		[
+  			"22222222",
+  			"33333333"
+  		],
+  		"Beijing",
+  		"China",
+  		{
+  			"primaryEmail" : "xxx@gmail.com",
+  			"secondaryEmail" : "yyy@gmail.com"
+  		}
+  	],
+  	"info" : {
+  		"dateOpened" : ISODate("2021-02-27T08:51:55Z"),
+  		"balance" : 2500
+  	},
+  	"branch" : "branch1"
+  }
+  ```
+
+  
+
+  
 
 
 
