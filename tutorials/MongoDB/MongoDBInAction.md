@@ -2864,9 +2864,258 @@ db.collection.remove(
 
 **总结**：如果集合中的文档数量很多，使用remove命令删除所有文档的效率不高；这种情况下，更加有效率的方法，是使用drop命令删除集合，然后再创建空集合并创建索引。
 
-# 八、数据控制语言（DCL）
 
-## 8.1、MongoDB数据库默认角色
+
+# 八、聚合操作
+
+语法格式：
+
+```js
+db.<collection>.aggregate(<pipeline>, <options>)
+```
+
+| 参数    | 类型     | 描述                                       |
+| ------- | -------- | ------------------------------------------ |
+| pipline | array    | 定义了操作中使用的聚合管道阶段和聚合操作符 |
+| options | document | 声明了一些聚合操作的控制项                 |
+
+## 8.1、聚合表达式
+
+### 字段路径表达式
+
+| 表达式                 | 含义                           |
+| ---------------------- | ------------------------------ |
+| `$<field>`             | 使用$指定字段路径              |
+| `$<field>.<sub-field>` | 使用$和.来指定内嵌文档字段路径 |
+
+- 示例
+
+```js
+$name
+$info.dateOpened
+```
+
+### 系统变量表达式
+
+| 表达式       | 含义                 |
+| ------------ | -------------------- |
+| $$<variable> | 使用$$来指示系统变量 |
+
+- 示例
+
+```js
+$$CURRENT - 指示管道中当前操作的文档
+$$CURRENT.<field>和$<field>是等效的
+```
+
+### 常量表达式
+
+| 表达式            | 含义            |
+| ----------------- | --------------- |
+| $literal: <value> | 指示常量<value> |
+
+- 示例
+
+```js
+$literal: "$name" - 指示常量字符串"$name"，这里的$被当做常量处理，而不是字段路径表达式
+```
+
+
+
+## 8.2、聚合管道阶段
+
+语法格式：
+
+```js
+{ <operator>: [<argument1>, <argument2> ... ] }
+{ <operator>: <argument> }
+```
+
+| 聚合操作符 | 作用                     |
+| ---------- | ------------------------ |
+| $project   | 对输入文档进行再次投影   |
+| $match     | 对输入文档进行筛选       |
+| $limit     | 筛选出管道内前N篇文档    |
+| $skip      | 跳过管道内前N篇文档      |
+| $unwind    | 展开输入文档中的数组字段 |
+| $sort      | 对输入文档进行排序       |
+| $lookup    | 对输入文档进行查询操作   |
+| $group     | 对输入文档进行分组       |
+| $out       | 将管道中的文档输出       |
+
+### $project
+
+数据准备：
+
+```js
+> db.accounts.insertMany([
+    {
+        name: {firstName: "alice", lastName: "wong"},
+        balance: 50
+    },
+    {
+        name: {firstName: "bob", lastName: "yang"},
+        balance: 20
+    }
+])
+```
+
+- 对账户文档进行重新投影
+
+```js
+> db.accounts.aggregate([
+    {
+        $project: {
+            _id: 0,
+            balance: 1,
+            clientName: "$name.firstName",
+            nameArray: ["$name.firstName", "$name.middleName", "$name.lastName"]
+        }
+    }
+])
+```
+
+### $match
+
+- 对银行账户文档进行筛选
+
+```js
+> db.accounts.aggregate([
+    {
+        $match: {
+            "name.firstName": "alice"
+        }
+    }
+])
+```
+
+- 稍微复杂点的筛选
+
+```js
+> db.accounts.aggregate([
+    {
+        $match: {
+            $or: [
+                {balance: {$gt: 40, $lt: 80}},
+                {"name.lastName": "yang"}
+            ]
+        }
+    }
+])
+```
+
+- 将筛选和投影结合
+
+```js
+> db.accounts.aggregate([
+    {
+        $match: {
+            $or: [
+                {balance: {$gt: 40, $lt: 80}},
+                {"name.lastName": "yaang"}
+            ]
+        }
+    },
+    {
+        $project: {
+            _id: 0
+        }
+    }
+])
+```
+
+**总结**：应该尽量在聚合管道的开始阶段使用$match，减少后续阶段处理的文档数量，优化聚合操作的性能。
+
+### $limit和$skip
+
+- 筛选第一篇银行账户文档
+
+```js
+> db.accounts.aggregate([
+    {
+        $limit: 1
+    }
+])
+```
+
+- 跳过第一篇银行账户文档
+
+```js
+> db.accounts.aggregate([
+    {
+        $skip: 1
+    }
+])
+```
+
+### $unwind
+
+数据准备：向现有的银行账户文档中加入数组字段
+
+```js
+> db.accounts.update(
+	{"name.firstName": "alice"},
+    {
+        $set: {
+            currency: ["CNY", "USD"]
+        }
+    }
+)
+> db.accounts.update(
+	{"name.firstName": "bob"},
+    {
+        $set: {
+            currency: "GBP"
+        }
+    }
+)
+```
+
+- 将文档中的数组货币种类展开
+
+```js
+> db.accounts.aggregate([
+    {
+        $unwind: {
+            path: "$currency"
+        }
+    }
+])
+```
+
+- 展开数组时添加元素位置
+
+```js
+> db.accounts.aggregate([
+    {
+        $unwind: {
+            path: "$currency",
+            includeArrayIndex: "ccyIndex"
+        }
+    }
+])
+```
+
+
+
+
+
+
+
+## 8.3、聚合操作符
+
+语法格式：
+
+```js
+{ <operator>: [<argument1>, <argument2> ... ] }
+{ <operator>: <argument> }
+```
+
+
+
+# 八十、数据控制语言（DCL）
+
+## 1、MongoDB数据库默认角色
 
 - 数据库用户角色
   - `read`: 允许用户查询指定数据库
@@ -2893,7 +3142,7 @@ db.collection.remove(
 
 
 
-## 8.2、设置用户名密码
+## 2、设置用户名密码
 
 1. 先添加用户
 
@@ -2969,9 +3218,9 @@ auth=true
 
 
 
-# 九、MongDB的操作工具
+# 九十、MongDB的操作工具
 
-## 9.1、Robo 3T连接
+## 1、Robo 3T连接
 
 1. 下载
 
@@ -2979,11 +3228,11 @@ auth=true
 
 2. 启动并连接
 
-## 9.2、Mongo Express
+## 2、Mongo Express
 
 Mongo Express是一个基于网络的MongoDB数据库管理界面
 
-### 9.2.1、安装MongoExpress（Docker版）
+### 2.1、安装MongoExpress（Docker版）
 
 1. 下载mongo-express镜像
 
@@ -3010,7 +3259,7 @@ Mongo Express是一个基于网络的MongoDB数据库管理界面
 [emon@emon ~]$ sudo systemctl restart docker
 ```
 
-## 9.3、 Mongo Shell（Docker版）
+## 3、 Mongo Shell（Docker版）
 
 Mongo Shell是用来操作MongoDB的javascript客户端界面
 
