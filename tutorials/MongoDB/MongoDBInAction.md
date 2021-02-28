@@ -3377,7 +3377,9 @@ $group: {
 ])
 ```
 
-### $out 将聚合管道中的文档写入一个新集合
+### $out 
+
+- 将聚合管道中的文档写入一个新集合
 
 ```js
 > db.transactions.aggregate([
@@ -3393,11 +3395,47 @@ $group: {
 ])
 ```
 
+- 将聚合管道中的文档写入一个已经存在的集合
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$symbol",
+            totalNotional: {$sum: {$multiply: ["$price", "$qty"]}}
+        }
+    },
+    {
+        $out: "output"
+    }
+])
+```
+
+**总结：**会覆盖更新。
+
+## 8.3、聚合选项
+
+### allowDiskUse:` <boolean>`
+
+每一个聚合管道阶段使用的内存不能超过100MB，如果数据量较大，为了防止聚合管道阶段超出内存上限并抛出错误，可以启用allowDistKsu选项来使用硬盘。
+
+allowDiskUse启用后，聚合阶段可以在内存容量不足时，将操作数据写入临时文件中；临时文件会被写入dbPath下的_tmp文件夹，dbPath默认值是`/data/db`。
+
+- 使用示例
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$currency"
+        }
+    }
+], {allowDiskUse:true})
+```
 
 
 
-
-## 8.3、聚合操作符
+## 8.4、聚合操作符
 
 语法格式：
 
