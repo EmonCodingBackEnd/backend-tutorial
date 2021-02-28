@@ -3346,6 +3346,55 @@ $group: {
 ])
 ```
 
+- 适用聚合操作符针对所有文档统计，并不分组
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: null,
+            totalQty: {$sum: "$qty"},
+            totalNational: {$sum: {$multiply:["$price", "$qty"]}},
+            avgPrice: {$avg: "$price"},
+            count: {$sum: 1},
+            maxNational: {$max: {$multiply: ["$price", "$qty"]}},
+            minNational: {$min: {$multiply: ["$price", "$qty"]}}
+        }
+    }
+])
+```
+
+- 使用聚合操作符创建数组字段
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$currency",
+            symbols: {$push: "$symbol"}
+        }
+    }
+])
+```
+
+### $out 将聚合管道中的文档写入一个新集合
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$currency",
+            symbols: {$push: "$symbol"}
+        }
+    },
+    {
+		$out: "output"
+    }
+])
+```
+
+
+
 
 
 ## 8.3、聚合操作符
