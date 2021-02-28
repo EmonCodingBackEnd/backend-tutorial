@@ -336,7 +336,7 @@ WriteResult({ "nInserted" : 1 })
 
 # 三、数据定义语言（DDL）
 
-## 3.1、 数据库操作
+## 3.1、数据库操作
 
 - 创建数据库或切换数据库
 
@@ -422,7 +422,11 @@ WriteResult({ "nInserted" : 1 })
 
 - 删除集合
 
-语法格式： `db.<colname>.drop()`
+语法格式： 
+
+```js
+db.<collection>.drop({writeConcern: <document>})
+```
 
 如果成功删除则返回true；否则返回false
 
@@ -1355,7 +1359,7 @@ db.<collection>.update(
 | ------- | -------------------- | --------------------------------------- |
 | query   | document             | 可选，筛选条件，默认:{}                 |
 | update  | document or pipeline | 1、更新操作符；2、更新文档；3、聚合管道 |
-| options | document             | 更新操作的参数                          |
+| options | document             | 可选，更新操作的控制项                  |
 
 ## 6.1、常规更新
 
@@ -2794,9 +2798,71 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 # 七、数据操纵语言之删除文档（DML）
 
+语法格式：
 
+```js
+db.collection.remove(
+   <query>,
+   <justOne>
+)
+# 和
+db.collection.remove(
+   <query>,
+   {
+     justOne: <boolean>,
+     writeConcern: <document>,
+     collation: <document>
+   }
+)
+```
 
+| 参数    | 类型     | 描述                                |
+| ------- | -------- | ----------------------------------- |
+| query   | document | 可选，筛选条件，默认:{}             |
+| justOne | boolean  | 可选，默认false；是否仅删除一个文档 |
+| options | document | 可选，删除操作的控制项              |
 
+- 删除文档
+
+```js
+# 查看银行账户文档
+> db.accounts.find({}, {
+    name: 1, balance: 1, _id:0
+}).sort({balance: 1})
+# 删除余额为50的银行账户文档
+> db.accounts.remove({balance: 50})
+```
+
+- 删除余额为50的银行账户文档
+
+```js
+> db.accounts.remove({balance: 50})
+```
+
+**注意：在默认情况下，remove命令会删除所有符合筛选条件的文档。如果只想删除满足筛选条件的第一篇文档，可以通过 justOne 选项**
+
+- 删除第一篇余额小于100的银行账户文档
+
+```js
+> db.accounts.remove(
+    { balance: {$lt: 100} },
+    { justOne: true }
+)
+```
+
+- 删除集合中所有文档
+
+```js
+> db.accounts.remove({})
+```
+
+- 删除整个集合
+
+```js
+> db.accounts.drop()
+```
+
+**总结**：如果集合中的文档数量很多，使用remove命令删除所有文档的效率不高；这种情况下，更加有效率的方法，是使用drop命令删除集合，然后再创建空集合并创建索引。
 
 # 八、数据控制语言（DCL）
 
