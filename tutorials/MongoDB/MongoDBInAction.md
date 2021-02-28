@@ -2931,17 +2931,17 @@ $literal: "$name" - 指示常量字符串"$name"，这里的$被当做常量处�
 { <operator>: <argument> }
 ```
 
-| 聚合操作符 | 作用                     |
-| ---------- | ------------------------ |
-| $project   | 对输入文档进行再次投影   |
-| $match     | 对输入文档进行筛选       |
-| $limit     | 筛选出管道内前N篇文档    |
-| $skip      | 跳过管道内前N篇文档      |
-| $unwind    | 展开输入文档中的数组字段 |
-| $sort      | 对输入文档进行排序       |
-| $lookup    | 对输入文档进行查询操作   |
-| $group     | 对输入文档进行分组       |
-| $out       | 将管道中的文档输出       |
+| 聚合管道阶段 | 作用                     |
+| ------------ | ------------------------ |
+| $project     | 对输入文档进行再次投影   |
+| $match       | 对输入文档进行筛选       |
+| $limit       | 筛选出管道内前N篇文档    |
+| $skip        | 跳过管道内前N篇文档      |
+| $unwind      | 展开输入文档中的数组字段 |
+| $sort        | 对输入文档进行排序       |
+| $lookup      | 对输入文档进行查询操作   |
+| $group       | 对输入文档进行分组       |
+| $out         | 将管道中的文档输出       |
 
 ### $project
 
@@ -3268,6 +3268,79 @@ $lookup: {
                 }
             ],
             as: "forexData"
+        }
+    }
+])
+```
+
+### $group
+
+语法格式：
+
+```js
+$group: {
+    _id: <expression>,
+    <field1>: { <accumulator1>: <expression1> },
+    ...
+}
+```
+
+`_id`: 定义分组规则
+
+`<field1>`:  可以使用聚合操作符来定义新字段
+
+数据准备：增加一个集合用来存储股票交易记录
+
+```js
+> db.transactions.insertMany([
+    {
+        symbol: "600519",
+        qty: 100,
+        price: 567.4,
+        currency: "CNY"
+    },
+    {
+        symbol: "AMZN",
+        qty: 1,
+        price: 1377.5,
+        currency: "USD"
+    },
+    {
+        symbol: "AAPL",
+        qty: 2,
+        price: 150.7,
+        currency: "USD"
+    }
+])
+```
+
+- 按照交易货币来分组交易记录
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$currency"
+        }
+    }
+])
+```
+
+**总结：**在不适用聚合操作符的情况下，$group可以返回管道文档中某个字段的所有不重复的值。
+
+- 适用聚合操作符计算分组聚合值
+
+```js
+> db.transactions.aggregate([
+    {
+        $group: {
+            _id: "$currency",
+            totalQty: {$sum: "$qty"},
+            totalNational: {$sum: {$multiply:["$price", "$qty"]}},
+            avgPrice: {$avg: "$price"},
+            count: {$sum: 1},
+            maxNational: {$max: {$multiply: ["$price", "$qty"]}},
+            minNational: {$min: {$multiply: ["$price", "$qty"]}}
         }
     }
 ])
