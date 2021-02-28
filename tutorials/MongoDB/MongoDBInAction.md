@@ -3071,7 +3071,7 @@ $literal: "$name" - 指示常量字符串"$name"，这里的$被当做常量处�
 )
 ```
 
-- 将文档中的数组货币种类展开
+- 将文档中的货币种类数组展开
 
 ```js
 > db.accounts.aggregate([
@@ -3096,9 +3096,182 @@ $literal: "$name" - 指示常量字符串"$name"，这里的$被当做常量处�
 ])
 ```
 
+- 再添加几篇文档
 
+```js
+> db.accounts.insertMany([
+    {
+        name: {firstName: "charlie", lastName: "gordon"},
+        balance: 100
+    },
+    {
+        name: {firstName: "david", lastName: "wu"},
+        balance: 200,
+        currency: []
+    },
+    {
+        name: {firstName: "eddie", lastName: "kim"},
+        balance: 100,
+        currency: null
+    }
+])
+```
 
+- 添加几篇文档后，将文档中的货币种类数组展开
 
+```js
+> db.accounts.aggregate([
+    {
+        $unwind: {
+            path: "$currency",
+            preserveNullAndEmptyArrays: true
+        }
+    }
+])
+```
+
+**注意：preserveNullAndEmptyArrays默认false，设置true才可以保留空数组的文档数据**
+
+### $sort
+
+- 对银行账户文档进行排序
+
+```js
+> db.accounts.aggregate([
+    {
+        $sort: {
+            balance: 1,
+            "name.lastName": -1
+        }
+    }
+])
+```
+
+### $lookup
+
+语法格式：
+
+```js
+# 简单条件
+$lookup: {
+    from: <collection to join>,
+    localField: <field from the input documents>,
+    foreignField: <field from the documents of the "from" collection>,
+    as: <output array field>
+}
+# 复杂条件
+$lookup: {
+    from: <collection to join>,
+    let: { <var_1>: <expression>, ..., <var_n>: <expression> },
+	pipline: [ <pipeline to execute on the collection to join> ],
+    as: <output array field>
+}
+```
+
+参数说明：
+
+`from`: 同一个数据库中的另一个查询集合
+
+`localField`: 管道文档中用来进行查询的字段
+
+`foreignField`: 查询集合中的查询字段
+
+`as`: 写入管道文档中的查询结果数组字段
+
+`let`:  对查询集合中的文档使用聚合阶段进行处理时，如果需要参考管道文档中的字段，则必须使用let参数对字段进行声明。
+
+`pipeline`: 对查询集合中的文档使用聚合阶段进行处理。
+
+数据准备：增加一个集合用来存储外汇数据
+
+```js
+> db.forex.insertMany([
+    {ccy: "USD", rate: 6.91, date: new Date("2018-12-21")},
+    {ccy: "GBP", rate: 8.72, date: new Date("2018-08-21")},
+    {ccy: "CNY", rate: 1.0, date: new Date("2018-12-21")}
+])
+```
+
+- 将查询到的外汇汇率写入银行账户文档
+
+```js
+> db.accounts.aggregate([
+    {
+		$lookup: {
+            from: "forex", 
+            localField: "currency", 
+            foreignField: "ccy",
+            as: "forexData"
+        }
+    }
+])
+```
+
+- 如果localField是一个数组字段，需要按数组元素分开多个结果
+
+```js
+> db.accounts.aggregate([
+    {
+        $unwind: {
+            path: "$currency"
+        }
+    },
+    {
+        $lookup: {
+            from: "forex",
+            localField: "currency",
+            foreignField: "ccy",
+            as: "forexData"
+        }
+    }
+])
+```
+
+- 将特定日期外汇汇率写入银行账户文档
+
+```js
+> db.accounts.aggregate([
+    {
+        $lookup: {
+            from: "forex",
+            pipeline: [
+                {
+                    $match: {
+                        date: new Date("2018-12-21")
+                    }
+                }
+            ],
+            as: "forexData"
+        }
+    }
+])
+```
+
+- 将特定日期外汇汇率写入余额大于100的银行账户文档
+
+```js
+> db.accounts.aggregate([
+    {
+        $lookup: {
+            from: "forex",
+            let: { bal: "$balance"},
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and: [
+                                { $eq: ["$date", new Date("2018-12-21")]},
+                                { $gt: ["$$bal", 100]}
+                            ]
+                        }
+                    }
+                }
+            ],
+            as: "forexData"
+        }
+    }
+])
+```
 
 
 
