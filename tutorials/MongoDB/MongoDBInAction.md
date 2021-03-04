@@ -1291,7 +1291,95 @@ _id:0, name:1, contact:{$elemMatch:{$gt:"Alabama"}}
 })
 ```
 
+- 一个特殊用法记录
 
+  - 数据准备
+
+  ```js
+  > db.crm_cust_track.insert([
+      {
+          cust_name: "小李",
+          track_event_type: 2,
+          todo_info: {
+              track_channel: 1,
+              remind_status: 1,
+              todo_user_info: [
+                  {
+                      user_id: "jack",
+                      todo_status: 0
+                  },
+                  {
+                      user_id: "karen",
+                      todo_status: 1
+                  }
+              ]
+          }
+      },
+      {
+          cust_name: "小张",
+          track_event_type: 2,
+          todo_info: {
+              track_channel: 1,
+              remind_status: 1,
+              todo_user_info: [
+                  {
+                      user_id: "jack",
+                      todo_status: 1
+                  }
+              ]
+          }
+      }
+  ])
+  ```
+
+  - 查询待办事项跟踪人是jack且跟踪状态是0的
+
+  ```js
+  > db.crm_cust_track.find({
+      "todo_info.todo_user_info": {
+          $elemMatch: {
+              "user_id": "jack",
+              "todo_status": 0
+          }
+      }
+  });
+  ```
+
+  - 更新某一个数组元素对象的某一个值，注意$[uf]定义了一个变量uf，然后在arrayFilters中使用了
+
+  ```js
+  > db.crm_cust_track.update(
+  	{
+          _id: ObjectId("6040f07c39ace0514f614b09"),
+          "todo_info.todo_user_info": {
+              $elemMatch: {
+                  "user_id": "jack",
+                  "todo_status": 0
+              }
+          }   
+      },
+      {
+          $set: {
+              "todo_info.todo_user_info.$[uf].todo_status": 0
+          }
+      },
+      {
+      	arrayFilters: [{"uf.user_id": "jack"}], multi:true
+      }
+  );
+  ```
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
 
 ## 5.6、运算操作符（Evaluation Query Operators）
 
