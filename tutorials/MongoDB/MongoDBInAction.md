@@ -3603,11 +3603,12 @@ db.<collection>.explain().<method(...)>
 
 **说明**：可以使用explain()进行分析的命令包括`aggregate()`,`count()`,`distinct()`,`find()`,`group()`,`remove()`,`update()`
 
-| winningPlan.stage          | 效率倒序   |
+| winningPlan.stage          | 含义       |
 | -------------------------- | ---------- |
 | COLLSCAN                   | 全集合扫描 |
 | IXSCAN->FETCH              | 索引扫描   |
 | IXSCAN->PROJECTION_COVERED | 投影覆盖   |
+| SORT                       | 全集合扫描 |
 
 
 
@@ -3821,6 +3822,102 @@ db.<collection>.explain().<method(...)>
 	"ok" : 1
 }
 ```
+
+- 使用已经创建索引的字段进行排序
+
+```js
+> db.accountsWithIndex.explain().find().sort({name: 1, balance: -1})
+{
+	"queryPlanner" : {
+		"plannerVersion" : 1,
+		"namespace" : "test.accountsWithIndex",
+		"indexFilterSet" : false,
+		"parsedQuery" : {
+			
+		},
+		"queryHash" : "DC9EFEDE",
+		"planCacheKey" : "DC9EFEDE",
+		"winningPlan" : {
+			"stage" : "FETCH",
+			"inputStage" : {
+				"stage" : "IXSCAN",
+				"keyPattern" : {
+					"name" : 1,
+					"balance" : -1
+				},
+				"indexName" : "name_1_balance_-1",
+				"isMultiKey" : false,
+				"multiKeyPaths" : {
+					"name" : [ ],
+					"balance" : [ ]
+				},
+				"isUnique" : false,
+				"isSparse" : false,
+				"isPartial" : false,
+				"indexVersion" : 2,
+				"direction" : "forward",
+				"indexBounds" : {
+					"name" : [
+						"[MinKey, MaxKey]"
+					],
+					"balance" : [
+						"[MaxKey, MinKey]"
+					]
+				}
+			}
+		},
+		"rejectedPlans" : [ ]
+	},
+	"serverInfo" : {
+		"host" : "debc519d5126",
+		"port" : 27017,
+		"version" : "4.4.3",
+		"gitVersion" : "913d6b62acfbb344dde1b116f4161360acd8fd13"
+	},
+	"ok" : 1
+}
+```
+
+- 使用未创建索引的字段进行排序
+
+```js
+> db.accountsWithIndex.explain().find().sort({name: 1, balance: 1})
+{
+	"queryPlanner" : {
+		"plannerVersion" : 1,
+		"namespace" : "test.accountsWithIndex",
+		"indexFilterSet" : false,
+		"parsedQuery" : {
+			
+		},
+		"queryHash" : "797A24CD",
+		"planCacheKey" : "797A24CD",
+		"winningPlan" : {
+			"stage" : "SORT",
+			"sortPattern" : {
+				"name" : 1,
+				"balance" : 1
+			},
+			"memLimit" : 104857600,
+			"type" : "simple",
+			"inputStage" : {
+				"stage" : "COLLSCAN",
+				"direction" : "forward"
+			}
+		},
+		"rejectedPlans" : [ ]
+	},
+	"serverInfo" : {
+		"host" : "debc519d5126",
+		"port" : 27017,
+		"version" : "4.4.3",
+		"gitVersion" : "913d6b62acfbb344dde1b116f4161360acd8fd13"
+	},
+	"ok" : 1
+}
+```
+
+## 9.4、索引的删除
 
 
 
