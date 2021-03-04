@@ -3540,7 +3540,287 @@ allowDiskUse启用后，聚合阶段可以在内存容量不足时，将操作�
 
 # 九、索引
 
+数据准备：
 
+```js
+> db.accountsWithIndex.insertMany([
+    {
+        name: "alice", balance: 50, currnecy: ["GBP", "USD"]
+    },
+    {
+        name: "bob", balance: 20, currency: ["AUD", "USD"]
+    },
+    {
+        name: "bob", balance: 300, currency: ["CNY"]
+	}    
+])
+```
+
+## 9.1、索引分类：
+
+| 索引分类名称 | 索引含义                             |
+| ------------ | ------------------------------------ |
+| 单键索引     | 一个字段的索引                       |
+| 复合键索引   | 多个字段的索引，仅支持前缀匹配       |
+| 多键索引     | 针对数组字段的索引                   |
+| 复合多键索引 | 针对数组的元素对象的多个字段创建索引 |
+
+## 9.2、索引的创建
+
+- 创建一个单建索引
+
+```js
+> db.accountsWithIndex.createIndex({name: 1})
+```
+
+- 列出集合中已经存在的索引
+
+```js
+> db.accountsWithIndex.getIndexes();
+```
+
+- 创建一个复合键索引
+
+```js
+> db.accountsWithIndex.createIndex({name: 1, balance: -1})
+```
+
+- 创建一个多键索引
+
+```js
+> db.accountsWithIndex.createIndex({currency: 1})
+```
+
+**说明**：数组字段中的每一个元素，都会在多键索引中创建一个键。
+
+## 9.3、索引的效果
+
+语法格式：
+
+```js
+db.<collection>.explain().<method(...)>
+```
+
+**说明**：可以使用explain()进行分析的命令包括`aggregate()`,`count()`,`distinct()`,`find()`,`group()`,`remove()`,`update()`
+
+| winningPlan.stage          | 效率倒序   |
+| -------------------------- | ---------- |
+| COLLSCAN                   | 全集合扫描 |
+| IXSCAN->FETCH              | 索引扫描   |
+| IXSCAN->PROJECTION_COVERED | 投影覆盖   |
+
+
+
+- 使用没有创建索引的字段进行搜索
+
+```js
+> db.accountsWithIndex.explain().find({balance: 100})
+{
+	"queryPlanner" : {
+		"plannerVersion" : 1,
+		"namespace" : "test.accountsWithIndex",
+		"indexFilterSet" : false,
+		"parsedQuery" : {
+			"balance" : {
+				"$eq" : 100
+			}
+		},
+		"queryHash" : "88DDD986",
+		"planCacheKey" : "9238DC63",
+		"winningPlan" : {
+			"stage" : "COLLSCAN",
+			"filter" : {
+				"balance" : {
+					"$eq" : 100
+				}
+			},
+			"direction" : "forward"
+		},
+		"rejectedPlans" : [ ]
+	},
+	"serverInfo" : {
+		"host" : "debc519d5126",
+		"port" : 27017,
+		"version" : "4.4.3",
+		"gitVersion" : "913d6b62acfbb344dde1b116f4161360acd8fd13"
+	},
+	"ok" : 1
+}
+```
+
+**注意**：重点是`winningPlan`字段，表示MongoDB挑选中的优胜执行计划是什么。上面结果是`COLLSCAN`是全集合扫描，效率很低的，应该尽量避免。
+
+- 使用一级创建索引的字段进行搜索
+
+```js
+> db.accountsWithIndex.explain().find({name: "alice"})
+{
+	"queryPlanner" : {
+		"plannerVersion" : 1,
+		"namespace" : "test.accountsWithIndex",
+		"indexFilterSet" : false,
+		"parsedQuery" : {
+			"name" : {
+				"$eq" : "alice"
+			}
+		},
+		"queryHash" : "01AEE5EC",
+		"planCacheKey" : "0BE5F32C",
+		"winningPlan" : {
+			"stage" : "FETCH",
+			"inputStage" : {
+				"stage" : "IXSCAN",
+				"keyPattern" : {
+					"name" : 1
+				},
+				"indexName" : "name_1",
+				"isMultiKey" : false,
+				"multiKeyPaths" : {
+					"name" : [ ]
+				},
+				"isUnique" : false,
+				"isSparse" : false,
+				"isPartial" : false,
+				"indexVersion" : 2,
+				"direction" : "forward",
+				"indexBounds" : {
+					"name" : [
+						"[\"alice\", \"alice\"]"
+					]
+				}
+			}
+		},
+		"rejectedPlans" : [
+			{
+				"stage" : "FETCH",
+				"inputStage" : {
+					"stage" : "IXSCAN",
+					"keyPattern" : {
+						"name" : 1,
+						"balance" : -1
+					},
+					"indexName" : "name_1_balance_-1",
+					"isMultiKey" : false,
+					"multiKeyPaths" : {
+						"name" : [ ],
+						"balance" : [ ]
+					},
+					"isUnique" : false,
+					"isSparse" : false,
+					"isPartial" : false,
+					"indexVersion" : 2,
+					"direction" : "forward",
+					"indexBounds" : {
+						"name" : [
+							"[\"alice\", \"alice\"]"
+						],
+						"balance" : [
+							"[MaxKey, MinKey]"
+						]
+					}
+				}
+			}
+		]
+	},
+	"serverInfo" : {
+		"host" : "debc519d5126",
+		"port" : 27017,
+		"version" : "4.4.3",
+		"gitVersion" : "913d6b62acfbb344dde1b116f4161360acd8fd13"
+	},
+	"ok" : 1
+}
+```
+
+- 仅返回创建了索引的字段
+
+```js
+> db.accountsWithIndex.explain().find({name: "alice"}, {_id: 0, name: 1})
+{
+	"queryPlanner" : {
+		"plannerVersion" : 1,
+		"namespace" : "test.accountsWithIndex",
+		"indexFilterSet" : false,
+		"parsedQuery" : {
+			"name" : {
+				"$eq" : "alice"
+			}
+		},
+		"queryHash" : "3066FB64",
+		"planCacheKey" : "A8F8C110",
+		"winningPlan" : {
+			"stage" : "PROJECTION_COVERED",
+			"transformBy" : {
+				"_id" : 0,
+				"name" : 1
+			},
+			"inputStage" : {
+				"stage" : "IXSCAN",
+				"keyPattern" : {
+					"name" : 1
+				},
+				"indexName" : "name_1",
+				"isMultiKey" : false,
+				"multiKeyPaths" : {
+					"name" : [ ]
+				},
+				"isUnique" : false,
+				"isSparse" : false,
+				"isPartial" : false,
+				"indexVersion" : 2,
+				"direction" : "forward",
+				"indexBounds" : {
+					"name" : [
+						"[\"alice\", \"alice\"]"
+					]
+				}
+			}
+		},
+		"rejectedPlans" : [
+			{
+				"stage" : "PROJECTION_COVERED",
+				"transformBy" : {
+					"_id" : 0,
+					"name" : 1
+				},
+				"inputStage" : {
+					"stage" : "IXSCAN",
+					"keyPattern" : {
+						"name" : 1,
+						"balance" : -1
+					},
+					"indexName" : "name_1_balance_-1",
+					"isMultiKey" : false,
+					"multiKeyPaths" : {
+						"name" : [ ],
+						"balance" : [ ]
+					},
+					"isUnique" : false,
+					"isSparse" : false,
+					"isPartial" : false,
+					"indexVersion" : 2,
+					"direction" : "forward",
+					"indexBounds" : {
+						"name" : [
+							"[\"alice\", \"alice\"]"
+						],
+						"balance" : [
+							"[MaxKey, MinKey]"
+						]
+					}
+				}
+			}
+		]
+	},
+	"serverInfo" : {
+		"host" : "debc519d5126",
+		"port" : 27017,
+		"version" : "4.4.3",
+		"gitVersion" : "913d6b62acfbb344dde1b116f4161360acd8fd13"
+	},
+	"ok" : 1
+}
+```
 
 
 
