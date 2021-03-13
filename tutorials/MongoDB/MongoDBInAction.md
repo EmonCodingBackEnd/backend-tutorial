@@ -55,7 +55,7 @@ export PATH=/usr/local/mongodb/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-5. 数据库目录规划
+5. 数据目录规划
 
 ```bash
 [emon@emon ~]$ mkdir -p /usr/local/mongodb/{conf,data/27017,log}
@@ -84,6 +84,9 @@ pidfilepath=/usr/local/mongodb/data/27017/27017.pid
 fork=false
 # oplog窗口大小
 oplogSize=5120
+# 日志控制，0-关闭，不收集任何数据；1-收集慢查询数据，默认是100毫秒；2-收集所有数据
+profile=2
+slowms=100
 # 复制集名称
 # replSet=emon
 # 是否认证
@@ -91,6 +94,12 @@ auth=true
 ```
 
 7. 启动与停止
+
+- mongod命令查询
+
+```bash
+[emon@emon ~]$ mongod --help
+```
 
 - 启动
 
@@ -146,8 +155,12 @@ auth=true
 
 9. 设置supervisor启动（**注意：如果通过该方式，配置文件中的 fork=false**）【推荐】
 
+```bash
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/mongo-27017.ini 
+```
+
 ```ini
-[program:mongo]
+[program:mongo-27017]
 command=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27017.conf
 autostart=false                 ; 在supervisord启动的时候也自动启动
 startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
@@ -159,7 +172,7 @@ redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
 environment=JAVA_HOME="/usr/local/java"
-stdout_logfile=/etc/supervisor/supervisor.d/mongo.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stdout_logfile=/etc/supervisor/supervisor.d/mongo-27017.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
 stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
 killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
 ```
@@ -184,10 +197,40 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 10. 打开命令行
 
+- mongo命令查询
+
+```bash
+[emon@emon ~]$ mongo --help
+MongoDB shell version v4.4.1
+usage: mongo [options] [db address] [file names (ending in .js)]
+db address can be:
+  foo                   foo database on local machine
+  192.168.0.5/foo       foo database on 192.168.0.5 machine
+  192.168.0.5:9999/foo  foo database on 192.168.0.5 machine on port 9999
+  mongodb://192.168.0.5:9999/foo  connection string URI can also be used
+Options:
+  --host arg                           server to connect to
+  --port arg                           port to connect to
+Authentication Options:
+  -u [ --username ] arg                username for authentication
+  -p [ --password ] arg                password for authentication
+```
+
 - 无密码打开命令行
 
 ```bash
+# 方式一
 [emon@emon ~]$ mongo
+# 方式二
+[emon@emon ~]$ mongo admin
+# 方式三
+[emon@emon ~]$ mongo localhost/admin
+# 方式四
+[emon@emon ~]$ mongo localhost:27017/admin
+# 方式五
+[emon@emon ~]$ mongo mongodb://localhost:27017/admin
+# 方式六
+[emon@emon ~]$ mongo --host localhost --port 27017 admin
 ```
 
 - 密码打开命令行
@@ -253,6 +296,252 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```bash
 [emon@emon ~]$ docker start mymongo
 ```
+
+
+
+## 1.3、单点复制集安装
+
+本安装基于`standalone`安装：
+
+1. 调整节点配置，打开复制集名称，关闭认证
+
+```bash
+[emon@emon ~]$ vim /usr/local/mongodb/conf/27017.conf 
+```
+
+```bash
+# 端口，默认27017，MongoDB的默认服务TCP端口
+port=27017
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
+bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/mongodb/log/27017.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/mongodb/data/27017/
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/mongodb/data/27017/27017.pid
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+replSet=emon
+# 是否认证
+auth=false
+```
+
+2. 启动并配置单点复制集
+
+- 通过supervisor重启
+- 命令配置单点复制集
+
+```bash
+[root@emon ~]# mongo 127.0.0.1:27017/admin
+```
+
+```js
+> config={
+    _id:"emon",
+    members: [
+        {_id:0,host:"0.0.0.0:27017"}
+    ]
+}
+> rs.initiate(config)
+```
+
+
+
+## 1.3、复制集安装
+
+本安装基于`standalone`安装：
+
+1. 数据目录规划
+
+```bash
+[emon@emon ~]$ mkdir -pv /usr/local/mongodb/{conf,data/27017,data/27018,data/27019,log}
+```
+
+2. 调整第一个节点的配置，打开复制集名称，关闭认证
+
+```bash
+[emon@emon ~]$ vim /usr/local/mongodb/conf/27017.conf 
+```
+
+```bash
+# 端口，默认27017，MongoDB的默认服务TCP端口
+port=27017
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
+bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/mongodb/log/27017.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/mongodb/data/27017/
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/mongodb/data/27017/27017.pid
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+replSet=emon
+# 是否认证
+auth=false
+```
+
+3. 增加第二个数据节点
+
+- mongo配置
+
+```bash
+[emon@emon ~]$ cp /usr/local/mongodb/conf/27017.conf /usr/local/mongodb/conf/27018.conf 
+[emon@emon ~]$ vim /usr/local/mongodb/conf/27018.conf 
+```
+
+```ini
+# 端口，默认27018，MongoDB的默认服务TCP端口
+port=27018
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
+bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/mongodb/log/27018.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/mongodb/data/27018/
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/mongodb/data/27018/27018.pid
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+replSet=emon
+# 是否认证
+auth=false
+```
+
+- supervisor配置
+
+```bash
+[emon@emon ~]$ sudo cp /etc/supervisor/supervisor.d/mongo-27017.ini /etc/supervisor/supervisor.d/mongo-27018.ini 
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/mongo-27018.ini 
+```
+
+```ini
+[program:mongo-27018]
+command=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27018.conf
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/etc/supervisor/supervisor.d/mongo-27018.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+- 加载
+
+```bash
+[emon@emon ~]$ sudo supervisorctl update
+```
+
+4. 增加第三个节点，arbiter节点
+
+- mongo配置
+
+```bash
+[emon@emon ~]$ cp /usr/local/mongodb/conf/27017.conf /usr/local/mongodb/conf/27019.conf
+[emon@emon ~]$ vim /usr/local/mongodb/conf/27019.conf 
+```
+
+```bash
+# 端口，默认27019，MongoDB的默认服务TCP端口
+port=27019
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
+bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/mongodb/log/27019.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/mongodb/data/27019/
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/mongodb/data/27019/27019.pid
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+replSet=emon
+# 是否认证
+auth=false
+```
+
+- supervisor配置
+
+```bash
+[emon@emon ~]$ sudo cp /etc/supervisor/supervisor.d/mongo-27017.ini /etc/supervisor/supervisor.d/mongo-27019.ini
+[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/mongo-27019.ini
+```
+
+```ini
+[program:mongo-27019]
+command=/usr/local/mongodb/bin/mongod -f /usr/local/mongodb/conf/27019.conf
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/etc/supervisor/supervisor.d/mongo-27019.log ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动>创建目录（supervisord 会自动创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+- 加载
+
+```bash
+[emon@emon ~]$ sudo supervisorctl update
+```
+
+5. 启动并配置复制集
+
+- 通过supervisor重启第一个节点，启动第二和第三个节点。
+- 命令配置复制集
+
+```bash
+[root@emon ~]# mongo 127.0.0.1:27017/admin
+```
+
+```js
+> config={
+    _id:"emon",
+    members: [
+        {_id:0,host:"0.0.0.0:27017",priority:1000},
+        {_id:1,host:"0.0.0.0:27018"},
+        {_id:2,host:"0.0.0.0:27019",arbiterOnly:true}
+    ]
+}
+> rs.initiate(config)
+```
+
+
+
+
 
 # 二、Mongo数据库介绍
 
