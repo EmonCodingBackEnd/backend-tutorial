@@ -4218,6 +4218,69 @@ db.<collection>.explain().<method(...)>
 
 
 
+# 10、MongoDB管理工具
+
+## 10.1、安装Database Tools
+
+安装文件下载地址：[Linux版Database Tools](https://docs.mongodb.com/database-tools/installation/installation/)
+
+下载版本选择页面：https://www.mongodb.com/try/download/database-tools?tck=docs_databasetools
+
+使用文档：https://docs.mongodb.com/database-tools/
+
+- 下载
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel70-x86_64-100.3.0.tgz
+```
+
+- 安装目录创建
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/mongodb/tools
+```
+
+- 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/mongodb-database-tools-rhel70-x86_64-100.3.0.tgz -C /usr/local/MongoDB/
+```
+
+- 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/MongoDB/mongodb-database-tools-rhel70-x86_64-100.3.0/ /usr/local/mongodbtools
+```
+
+- 配置环境变量
+
+修改mongodb的环境变量文件，如下：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/mongodb.sh 
+export PATH=/usr/local/mongodb/bin:/usr/local/mongodbtools/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+
+
+
+
+## 10.2、明文格式导入导出
+
+
+
+## 10.3、二进制格式导入导出
+
+
+
+
+
 # 八十、数据控制语言（DCL）
 
 ## 80.1、角色管理
@@ -4442,6 +4505,12 @@ db.getUsers()
 db.changeUserPassword("testReader", "password")
 ```
 
+- 修改用户密码
+
+```js
+db.updateUser('root', {pwd:'root@123'})
+```
+
 
 
 ### 80.2.4、授权角色到用户
@@ -4487,9 +4556,7 @@ db.dropUser("testReader")
 
 
 
-
-
-## 2、设置用户名密码
+## 80.3、设置用户名密码
 
 1. 先添加用户
 
@@ -4543,29 +4610,16 @@ auth=true
 })
 ```
 
-- 查看当前库下的用户
+- 配置一个仅能访问test数据库的备份用户
 
-```bash
-> show users
+```js
+> use test
+> db.createUser({
+	user: "backup",
+	pwd: "test123",
+	roles: [{role:"read", db:"test"}]
+})
 ```
-
-- 修改用户密码
-
-```bash
-> db.updateUser('root', {pwd:'root@123'})
-```
-
-- 删除用户
-
-```bash
-> db.dropUser('root')
-```
-
-
-
-## 3、创建用户
-
-
 
 
 
