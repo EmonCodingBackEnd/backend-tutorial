@@ -4220,30 +4220,152 @@ db.<collection>.explain().<method(...)>
 
 # 八十、数据控制语言（DCL）
 
-## 1、MongoDB数据库默认角色
+## 80.1、角色管理
+
+### 80.1.1、MongoDB数据库默认角色
 
 - 数据库用户角色
-  - `read`: 允许用户查询指定数据库
-  - `readWrite`:允许用户读写指定数据库
+  - `read`
+  
+  >读取当前数据库中所有非系统集合
+  
+  - `readAnyDatabase`
+  
+  > 读取任何数据库中所有非系统集合，仅在admin数据库有效
+  
+  - `readWrite`
+  
+  >读写当前数据库中所有非系统集合
+  
+  - `readWriteAnyDatabase`
+  
+  > 读写任何数据库可中所有非系统集合，仅在admin数据库有效
+  
 - 数据库管理角色
-  - `dbAdmin`: 允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
+  - `dbAdmin`
+  
+  > 管理当前数据库
+  
+  - `dbAdminAnyDatabase`
+  
+  > 管理任何数据库，仅在admin数据库有效
+  
   - `dbOwner`: 
-  - `userAdmin`: 允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户
+  - `userAdmin`
+  
+  > 管理当前数据库中的用户和角色
+  
+  - `userAdminAnyDatabase`
+  
+  > 管理任何数据库中的用户和角色，仅在admin数据库有效
+  
 - 集群管理角色
   - `clusterAdmin`: 只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。
   - `clusterManager`: 
   - clusterMonitor
   - hostManager
+  
 - 备份恢复角色
   - backup
   - restore
+  
 - 所有数据库角色
   - `readAnyDatabase`: 只在admin数据库中可用，赋予用户所有数据库的读权限
   - `readWriteAnyDatabase`: 只在admin数据库中可用，赋予用户所有数据库的读写权限
   - `userAdminAnyDatabase`: 只在admin数据库中可用，赋予用户所有数据库的userAdmin权限
   - `dbAdminAnyDatabase`: 只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。
+  
 - 超级用户角色
+  
   - `root`: 只在admin数据库中可用。超级账号，超级权限
+
+
+
+### 80.1.2、创建角色
+
+语法格式：
+
+```js
+db.createRole(role, writeConcern)
+```
+
+| 参数         | 类型     | 描述   |
+| ------------ | -------- | ------ |
+| role         | document |        |
+| writeConcern | document | 可选项 |
+
+- 创建角色
+
+```js
+> use test;
+> db.createRole(
+	{
+        role: "readAccounts",
+        privileges: [
+            {
+                resource: {db: "test", collection: "accounts"}, 
+                actions: ["find"]
+            }
+        ],
+        roles: []
+    }
+)
+> db.createUser(
+	{
+        user: "accountsReader",
+        pwd: "passwd",
+        roles: ["readAccounts"]
+    }
+)
+```
+
+
+
+
+
+## 80.2、用户管理
+
+### 80.2.1、创建用户
+
+语法格式：
+
+```js
+db.createUser(user, writeConcern)
+```
+
+参数说明：
+
+| 参数         | 类型     | 描述   |
+| ------------ | -------- | ------ |
+| user         | document |        |
+| writeConcern | document | 可选项 |
+
+- 创建一个只能读取test数据库的用户
+
+```js
+> use test;
+> db.createUser(
+	{
+        user: "testReader",
+        pwd: "passwd",
+        roles: [{role: "read", db: "test"}]
+    }
+)
+```
+
+
+
+### 80.2.2、删除用户
+
+
+
+### 80.2.3、查询用户
+
+
+
+### 80.2.4、修改密码
+
+
 
 
 
@@ -4318,6 +4440,10 @@ auth=true
 ```bash
 > db.dropUser('root')
 ```
+
+
+
+## 3、创建用户
 
 
 
