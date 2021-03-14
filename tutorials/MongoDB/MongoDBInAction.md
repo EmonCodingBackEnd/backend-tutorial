@@ -4417,7 +4417,7 @@ db.getUsers(<options>)
 - 查看用户密码
 
 ```js
-db.getUser("accountsReader")
+db.getUser("testReader")
 ```
 
 - 查看用户列表
@@ -4435,6 +4435,32 @@ db.getUsers()
 
 
 ### 80.2.3、修改密码
+
+- 修改用户密码
+
+```js
+db.changeUserPassword("testReader", "password")
+```
+
+
+
+### 80.2.4、授权角色到用户
+
+- 为用户添加新角色，不会影响之前的角色
+
+```js
+db.grantRolesToUser("testReader", ["readWrite", {role:"read",db:"stock"}])
+```
+
+
+
+### 80.2.5、移除用户的某个角色
+
+- 移除掉用的某个角色
+
+```js
+db.revokeRolesFromUser("testReader", ["readWrite",{db:"stock",role:"read"}])
+```
 
 
 
