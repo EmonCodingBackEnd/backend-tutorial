@@ -221,13 +221,13 @@ Authentication Options:
 ```bash
 # 方式一
 [emon@emon ~]$ mongo
-# 方式二
+# 方式二【单机推荐】
 [emon@emon ~]$ mongo admin
 # 方式三
 [emon@emon ~]$ mongo localhost/admin
 # 方式四
 [emon@emon ~]$ mongo localhost:27017/admin
-# 方式五
+# 方式五【复制集推荐】
 [emon@emon ~]$ mongo mongodb://localhost:27017/admin
 # 方式六
 [emon@emon ~]$ mongo --host localhost --port 27017 admin
@@ -243,6 +243,12 @@ Authentication Options:
 # 方式二
 # 如果密码包含特殊字符，比如！，需要在密码前后带上单引号 '包含特殊字符的密码'
 [emon@emon ~]$ mongo admin -u root -p root123
+# 方式三【单机推荐】
+[emon@emon ~]$ mongo -u root -p root123 admin
+# 方式四【复制集推荐】
+[emon@emon ~]$ mongo mongodb://root:root123@localhost:27017/admin
+# 方式五
+[emon@emon ~]$ mongo --host localhost --port 27017 -uroot -proot123 admin
 ```
 
 
