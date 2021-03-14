@@ -4267,9 +4267,25 @@ export PATH=/usr/local/mongodb/bin:/usr/local/mongodbtools/bin:$PATH
 
 
 
+**说明**：数据库管理工具提供的命令，需要在系统命令行下执行，而不是`mongo` shell下执行。
+
 
 
 ## 10.2、明文格式导入导出
+
+### 10.2.1、`mongoexport`导出
+
+语法格式：
+
+```bash
+mongoexport --collection=<coll> <options> <connection-string>
+```
+
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=csv --fields name,balance --out /usr/local/mongodb/bak/accounts.csv -u backup -p test123
+```
+
+
 
 
 
