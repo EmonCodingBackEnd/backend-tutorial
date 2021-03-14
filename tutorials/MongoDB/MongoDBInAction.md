@@ -4236,9 +4236,7 @@ db.<collection>.explain().<method(...)>
 
 - 安装目录创建
 
-```bash
-[emon@emon ~]$ mkdir /usr/local/mongodb/tools
-```
+说明：使用之前的安装目录。
 
 - 解压安装
 
