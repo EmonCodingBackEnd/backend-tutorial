@@ -4321,6 +4321,48 @@ db.createRole(role, writeConcern)
 
 
 
+### 80.1.3、查询角色
+
+- 查询单个角色
+
+```js
+db.getRole("readAccounts")
+```
+
+- 查询所有角色（非内建)
+
+```js
+db.getRoles()
+```
+
+- 查询所有角色（内建）
+
+```js
+db.getRoles({showBuiltinRoles:true})
+```
+
+- 查询所有角色（非内建+内建）
+
+```js
+show roles
+```
+
+
+
+### 80.1.4、删除角色
+
+- 删除单个角色
+
+```js
+db.dropRole("readAccounts")
+```
+
+- 删除所有非内建的角色
+
+```js
+db.dropAllRoles()
+```
+
 
 
 ## 80.2、用户管理
@@ -4355,15 +4397,67 @@ db.createUser(user, writeConcern)
 
 
 
-### 80.2.2、删除用户
+
+### 80.2.2、查询用户
+
+语法格式：
+
+```js
+# 查询单个
+db.getUser(username, args)
+# 查询列表
+db.getUsers(<options>)
+```
+
+| 参数     | 类型     | 描述   |
+| -------- | -------- | ------ |
+| username | string   | 用户名 |
+| args     | document | 可选项 |
+
+- 查看用户密码
+
+```js
+db.getUser("accountsReader")
+```
+
+- 查看用户列表
+
+```js
+db.getUsers()
+```
+
+- 显示用户
+
+```js
+> show users
+```
 
 
 
-### 80.2.3、查询用户
+### 80.2.3、修改密码
 
 
 
-### 80.2.4、修改密码
+### 80.2.4、删除用户
+语法格式：
+
+```bash
+db.dropUser(username, writeConcern)
+```
+
+参数说明：
+
+| 参数         | 类型     | 描述   |
+| ------------ | -------- | ------ |
+| username     | string   | 用户名 |
+| writeConcern | document | 可选项 |
+
+- 删除用户
+
+```js
+db.dropUser("testReader")
+```
+
 
 
 
@@ -4375,7 +4469,7 @@ db.createUser(user, writeConcern)
 
 - 命令行下添加用户
 
-```bash
+```js
 > use admin
 > db.createUser({
 	user: "root",
