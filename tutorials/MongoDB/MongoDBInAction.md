@@ -568,6 +568,13 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 > rs.initiate(config)
 ```
 
+- 其他一些命令：
+
+```js
+# 如果碰到副节点执行命令报错：uncaught exception: Error: not master and slaveOk=false
+rs.secondaryOk()
+```
+
 
 
 
