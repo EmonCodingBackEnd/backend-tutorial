@@ -557,12 +557,12 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ```js
 // 备注： 0.0.0.0 需要更改为具体ip地址，比如 192.168.5.116
-> config={}
+> config={
     _id:"emon",
     members: [
-        {_id:0,host:"0.0.0.0:27017",priority:1000},
-        {_id:1,host:"0.0.0.0:27018"},
-        {_id:2,host:"0.0.0.0:27019",arbiterOnly:true}
+        {_id:0,host:"repo.emon.vip:27017",priority:1000},
+        {_id:1,host:"repo.emon.vip:27018"},
+        {_id:2,host:"repo.emon.vip:27019",arbiterOnly:true}
     ]
 }
 > rs.initiate(config)
@@ -4651,7 +4651,7 @@ auth=true
 > use test
 > db.createUser({
 	user: "backup",
-	pwd: "test123",
+	pwd: "backup123",
 	roles: [{role:"read", db:"test"}]
 })
 ```
