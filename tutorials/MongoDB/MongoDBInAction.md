@@ -573,6 +573,12 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```js
 # 如果碰到副节点执行命令报错：uncaught exception: Error: not master and slaveOk=false
 rs.secondaryOk()
+# 删除复制集成员
+rs.remove("repo.emon.vip:27018")
+# 添加复制集成员
+rs.add({host: "repo.emon.vip:27018"}) 或者  rs.add("repo.emon.vip:27018")
+# 添加投票节点
+rs.addArb("repo.emon.vip:27019") 或者 rs.add({host:"repo.emon.vip:27019",arbiterOnly:true})
 ```
 
 
