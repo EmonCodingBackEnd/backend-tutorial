@@ -348,15 +348,36 @@ auth=false
 ```
 
 ```js
-// 备注： 0.0.0.0 需要更改为具体ip地址，比如 192.168.5.116
 > config={
     _id:"emon",
     members: [
-        {_id:0,host:"0.0.0.0:27017"}
+        {_id:0,host:"repo.emon.vip:27017"}
     ]
 }
 > rs.initiate(config)
 ```
+
+> **说明**：上面的 `config.members.host` 如果是 `"0.0.0.0:27017"`，复制集初始化或者重配置时，会报错：
+>
+> 	emon:PRIMARY> rs.reconfig(config)
+> 	{
+> 		"operationTime" : Timestamp(1615793576, 1),
+> 		"ok" : 0,
+> 		"errmsg" : "No host described in new configuration with {version: 3, term: 3} for replica set emon maps to this node",
+> 		"code" : 74,
+> 		"codeName" : "NodeNotFound",
+> 		"$clusterTime" : {
+> 			"clusterTime" : Timestamp(1615793576, 1),
+> 			"signature" : {
+> 				"hash" : BinData(0,"lN8xHWICFER0gK33zL86lfAAltA="),
+> 				"keyId" : NumberLong("6939150936686198788")
+> 			}
+> 		}
+> 	}
+> 可以替换`config.members.host`为具体IP地址，或者`/etc/hosts`下配置的本地DNS域名，比如：
+>
+> [emon@emon ~]$ cat /etc/hosts|grep repo
+> 127.0.0.1   repo.emon.vip
 
 
 
