@@ -309,7 +309,30 @@ Authentication Options:
 
 本安装基于`standalone`安装：
 
-1. 调整节点配置，打开复制集名称，关闭认证
+**说明**：复制集开启认证，不同于standalone模式；使用`keyFile`的配置，而不是`auth`方式的配置。
+
+1. 生成复制集所需的keyFile文件
+
+```bash
+[emon@emon ~]$ openssl rand --help
+Usage: rand [options] num
+where options are
+-out file             - write to file
+-engine e             - use engine e, possibly a hardware device.
+-rand file:file:... - seed PRNG from files
+-base64               - base64 encode output
+-hex                  - hex encode output
+[emon@emon ~]$ openssl rand -base64 128 > /usr/local/mongodb/conf/keyFile
+# 复制集对keyFile的要求是：
+# 1-以base64编码集中的字符进行编写，即字符串只能包含a-z,A-Z,+,/，=
+# 2-长度不能够超过1000字节
+# 3-权限最多到600
+[emon@emon ~]$ chmod 600 /usr/local/mongodb/conf/keyFile 
+```
+
+
+
+2. 调整节点配置
 
 ```bash
 [emon@emon ~]$ vim /usr/local/mongodb/conf/27017.conf 
@@ -334,8 +357,8 @@ fork=false
 oplogSize=5120
 # 复制集名称
 replSet=emon
-# 是否认证
-auth=false
+# 复制集认证文件
+keyFile=/usr/local/mongodb/conf/keyFile
 ```
 
 2. 启动并配置单点复制集
@@ -379,7 +402,9 @@ auth=false
 > [emon@emon ~]$ cat /etc/hosts|grep repo
 > 127.0.0.1   repo.emon.vip
 
+- 在数据库`admin`添加用户【必须】
 
+- 使用上一步添加的用户登录认证，并进行后续操作，配置完成。
 
 ## 1.3、复制集安装
 
