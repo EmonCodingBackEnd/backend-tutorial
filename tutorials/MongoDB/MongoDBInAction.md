@@ -408,7 +408,7 @@ keyFile=/usr/local/mongodb/conf/keyFile
 
 ## 1.3、复制集安装
 
-本安装基于`standalone`安装：
+本安装基于`单点复制集`安装：
 
 1. 数据目录规划
 
@@ -416,7 +416,7 @@ keyFile=/usr/local/mongodb/conf/keyFile
 [emon@emon ~]$ mkdir -pv /usr/local/mongodb/{conf,data/27017,data/27018,data/27019,log}
 ```
 
-2. 调整第一个节点的配置，打开复制集名称，关闭认证
+2. 第一个节点无需任何改动
 
 ```bash
 [emon@emon ~]$ vim /usr/local/mongodb/conf/27017.conf 
@@ -441,8 +441,8 @@ fork=false
 oplogSize=5120
 # 复制集名称
 replSet=emon
-# 是否认证
-auth=false
+# 复制集认证文件
+keyFile=/usr/local/mongodb/conf/keyFile
 ```
 
 3. 增加第二个数据节点
@@ -473,8 +473,8 @@ fork=false
 oplogSize=5120
 # 复制集名称
 replSet=emon
-# 是否认证
-auth=false
+# 复制集认证文件
+keyFile=/usr/local/mongodb/conf/keyFile
 ```
 
 - supervisor配置
@@ -536,8 +536,8 @@ fork=false
 oplogSize=5120
 # 复制集名称
 replSet=emon
-# 是否认证
-auth=false
+# 复制集认证文件
+keyFile=/usr/local/mongodb/conf/keyFile
 ```
 
 - supervisor配置
@@ -573,7 +573,7 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 5. 启动并配置复制集
 
-- 通过supervisor重启第一个节点，启动第二和第三个节点。
+- 通过supervisor启动第二和第三个节点。
 - 命令配置复制集
 
 ```bash
@@ -590,8 +590,11 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
         {_id:2,host:"repo.emon.vip:27019",arbiterOnly:true}
     ]
 }
-> rs.initiate(config)
+> rs.reconfig(config)
 ```
+
+- 在数据库`admin`添加用户【必须】（备注：在单点复制集操作过，这里不需要再操作了）
+- 使用上一步添加的用户登录认证，并进行后续操作，配置完成
 
 - 其他一些命令：
 
@@ -605,8 +608,6 @@ rs.add({host: "repo.emon.vip:27018"}) 或者  rs.add("repo.emon.vip:27018")
 # 添加投票节点
 rs.addArb("repo.emon.vip:27019") 或者 rs.add({host:"repo.emon.vip:27019",arbiterOnly:true})
 ```
-
-
 
 
 
