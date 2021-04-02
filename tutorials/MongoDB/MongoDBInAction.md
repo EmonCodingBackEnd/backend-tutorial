@@ -3084,10 +3084,16 @@ $[]指代数组字段中的所有元素，搭配更新操作符使用，可以�
 
 - 一个特殊用法记录
 
-  - 数据准备
+  - 数据准备，<font style="color:red;font-weight:bold;">**注意**: 在MongoShell中NumberLong类型要传入字符串，而不能是数字，因为可能发生精度丢失，在代码中使用驱动类操作没有问题。</font>
 
+  > 比如：NumberLong(274203105319862325) 会变成 NumberLong(274203105319862336)
+  >
+  > 再比如：NumberLong(274203106074836992) 不会丢失精度
+  >
+  > 简单规则： 任何小于 288230376151711680 数字，与该数字按位与操作后等于数字本身的，都是正常数据，否则会在MongoShell发送精度丢失
+  
   ```js
-  > db.crm_cust_track.insert([
+  > db.accounts.insert([
       {
           cust_name: "小李",
           track_event_type: 2,
@@ -3096,12 +3102,14 @@ $[]指代数组字段中的所有元素，搭配更新操作符使用，可以�
               remind_status: 1,
               todo_user_info: [
                   {
-                      user_id: "jack",
-                      todo_status: 0
+                      user_id: NumberLong("274203105319862325"),
+                      user_name: "jack",
+                      todo_status: 1
                   },
                   {
-                      user_id: "karen",
-                      todo_status: 1
+                      user_id: NumberLong("274203106074836992"),
+                      user_name: "karen",
+                      todo_status: 0
                   }
               ]
           }
@@ -3114,28 +3122,40 @@ $[]指代数组字段中的所有元素，搭配更新操作符使用，可以�
               remind_status: 1,
               todo_user_info: [
                   {
-                      user_id: "jack",
-                      todo_status: 1
+                    user_id: NumberLong("274203105319862281"),
+                    user_name: "jack",
+                    todo_status: 1
                   }
               ]
           }
       }
   ])
   ```
-
+  
   - 查询待办事项跟踪人是jack且跟踪状态是0的
-
+  
   ```js
-  > db.crm_cust_track.find({
+  # 正确用法
+  > db.accounts.find({
       "todo_info.todo_user_info": {
           $elemMatch: {
-              "user_id": "jack",
-              "todo_status": 0
+              "user_id": NumberLong("274203105319862325"),
+              "user_name": "jack",
+              "todo_status": 1
           }
       }
-  });
+  });  
+  # 错误用法，注意NumberLong的参数不是字符串，会丢失精度，导致匹配不到数据
+  db.accounts.find({
+      "todo_info.todo_user_info": {
+          $elemMatch: {
+              "user_id": NumberLong(274203105319862325),
+              "user_name": "jack",
+              "todo_status": 1
+          }
+      }
+  });  
   ```
-
   - 更新某一个数组元素对象的某一个值，注意$[uf]定义了一个变量uf，然后在arrayFilters中使用了
 
   ```js
@@ -3150,7 +3170,7 @@ $[]指代数组字段中的所有元素，搭配更新操作符使用，可以�
           }   
       },
       {
-          $set: {
+        $set: {
               "todo_info.todo_user_info.$[uf].todo_status": 0
           }
       },
@@ -3159,8 +3179,6 @@ $[]指代数组字段中的所有元素，搭配更新操作符使用，可以�
       }
   );
   ```
-
-  
 
 ## 6.4、更新文档选项
 
