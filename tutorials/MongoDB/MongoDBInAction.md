@@ -1589,7 +1589,7 @@ _id:0, name:1, contact:{$elemMatch:{$gt:"Alabama"}}
     {
         name: "jack",
         balance: 2000,
-        contact: ["11111111", "Alabama", "US"]
+        contact: ["11111111", "22222222", "Alabama", "US"]
     },
     {
         name: "karen",
@@ -1637,7 +1637,7 @@ _id:0, name:1, contact:{$elemMatch:{$gt:"Alabama"}}
 > db.accounts.find({contact:{$elemMatch:{$gt: "10000000", $lt: "20000000"}}})
 ```
 
-- 混合使用`$all`与`$elemMatch`，查询包含一个在 10000000 至 20000000 之间，和一个在 20000000 至   30000000 之间的联系电话的银行账户文档
+- 混合使用`$all`与`$elemMatch`，查询数组存在匹配 10000000 至 20000000 之间元素，且存在匹配 20000000 至   30000000 之间的元素，以上两者都满足的联系电话的银行账户文档
 
 ```js
 > db.accounts.find({
