@@ -6,7 +6,7 @@
 
 # git-tutorial
 
-git-tutorial
+![img](images/1e604237a1a9f574c12380e83c8145ad.png)
 
 
 # 一、Git简介
@@ -577,6 +577,43 @@ git log master..develop
 git log --left-right master...develop
 ```
 
+- 重命名分支(-m 等效于 --move)【一般不推荐使用】
+
+```bash
+git branch -m <oldbranch> <newbranch>
+```
+
+- 强制重命名分支(-M 等效于 --move --force)【一般不推荐使用】
+
+```bash
+git branch -M <oldbranch> <newbranch>
+```
+
+- 指明当前本地分支跟踪远程主机B的远程分支C(u表示upstream-branch)
+
+```bash
+git branch -u origin/master master
+```
+
+- 设置默认分支
+
+```bash
+git remote set-head origin -a
+```
+
+- 来自于github的默认分支main变更为master之后的提示：
+
+`main` is now named `master`
+
+if you have a local clone, you can update it by running:
+
+```bash
+git branch -m main master
+git fetch origin
+git branch -u origin/master master
+git remote set-head origin -a
+```
+
 ## 1、聊一聊`git remote prune origin`
 
 在你经常使用的命令当中有一个`git branch  -a`用来查看所有的分支，包括本地和远程的。但是时间长了你会发现有些分支在远程其实早就被删除了，但是在你本地依然可以看见这些被删除的分支。
@@ -975,7 +1012,11 @@ git bisect reset [<commit id>]
 git bisect log
 ```
 
+## 7.9 git项目地址查询
 
+```bash
+git remote -v
+```
 
 # 八、Git Flow——以发布为中心的开发模式
 
