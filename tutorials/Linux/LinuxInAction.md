@@ -4744,11 +4744,11 @@ echo 'emon123' | sudo -S supervisorctl restart $MODULE
 
 ## 4、MySQL用户
 
-| 用户名     | 密码           |
-| ---------- | -------------- |
-| root       | root123        |
-| springboot | SpringBoot@123 |
-|            |                |
+| 用户名 | 密码      |
+| ------ | --------- |
+| root   | root123   |
+| flyin  | Flyin@123 |
+|        |           |
 
 ## 5、Git用户
 
