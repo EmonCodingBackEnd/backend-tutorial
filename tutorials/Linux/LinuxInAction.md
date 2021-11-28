@@ -1658,10 +1658,16 @@ nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
 [emon@emon ~]$ sudo nginx -s reload
 ```
 
-- 停止
+- 停止（等待正在执行的任务）
 
 ```bash
 [emon@emon ~]$ sudo nginx -s quit
+```
+
+- 停止（不等待正在执行的任务）
+
+```bash
+[emon@emon ~]$ sudo nginx -s stop
 ```
 
 12. 开放端口
