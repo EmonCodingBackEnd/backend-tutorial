@@ -1685,6 +1685,33 @@ success
 
 http://192.168.1.116/
 
+14.如何切割nginx日志文件？
+
+- 脚本编写
+
+```bash
+#!/bin/bash
+LOG_PATH="/usr/local/nginx/logs"
+RECORD_TIME=$(date -d "yesterday" +%Y-%m-%d+%H:%M)
+PID=/usr/local/nginx/logs/nginx.pid
+mv $LOG_PATH/access.log $LOG_PATH/access.${RECORD_TIME}.log
+mv $LOG_PATH/error.log $LOG_PATH/error.${RECORD_TIME}.log
+#向Nginx主进程发送信号，用于重新打开日志文件
+kill -USR1 `cat $PID`
+```
+
+- 配置脚本可执行权限
+
+```bash
+[emon@emon ~]$ chmod +x /usr/local/nginx/sbin/cut_my_log.sh 
+```
+
+- 使用root权限执行
+
+```bash
+[emon@emon ~]$ sudo /usr/local/nginx/sbin/cut_my_log.sh 
+```
+
 ## 8、安装MySQL
 
 ### 8.1、安装MySQL5.7版本
