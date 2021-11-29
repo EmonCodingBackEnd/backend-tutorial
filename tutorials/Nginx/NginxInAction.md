@@ -168,3 +168,72 @@ location /hello {
 ```
 
 用户访问的时候请求路径为：`url:port/hello/files/img/face.png`，如此相当于为目录`emon`做一个自定义的别名。
+
+## 2.2、location的匹配规则
+
+- `空格`：默认匹配，普通匹配
+
+```bash
+location / {
+	root /home;
+}
+```
+
+- `=`：精确匹配
+
+```bash
+location = /emon/img/face1.png {
+	root /home;
+}
+```
+
+- `~*`：匹配正则表达式，不区分大小写
+
+```bash
+# 符合图片的显示
+location ~* .(GIF|jpg|png|jpeg) {
+	root /home;
+}
+```
+
+- `~`：匹配正则表达式，区分大小写
+
+```bash
+#GIF必须大写才能匹配到
+location ~ .(GIF|jpg|png|jpeg) {
+	root /home;
+}	
+```
+
+- `^~`：以某个字符路径开头
+
+```bash
+location ^~ /emon/img {
+	root /home;
+}
+```
+
+## 2.3、Nginx跨域配置支持
+
+```bash
+#允许跨域请求的域，*代表所有
+add_header 'Access-Control-Allow-Origin' *;
+#允许带上cookie请求
+add_header 'Access-Control-Allow-Credentials' 'true';
+#允许请求的方法，比如 GET/POST/PUT/DELETE
+add_header 'Access-Control-Allow-Methods' *;
+#允许请求的header
+add_header 'Access-Control-Allow-Headers' *;
+```
+
+## 2.3、Nginx防盗链配置支持
+
+```bash
+#对源站点验证
+valid_referers *.emon.vip;
+#非法引入会进入下方判断
+if ($invalid_referer) {
+	return 404;
+}
+```
+
