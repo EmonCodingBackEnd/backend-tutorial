@@ -248,11 +248,11 @@ if ($invalid_referer) {
 ```
 
 ```bash
-#配置上游服务器
+#配置上游服务器，weight=1是默认值，越大权重越高
 upstream tomcats {
     server 127.0.0.1:8080;
-    server 127.0.0.1:8080;
-    server 127.0.0.1:8080;
+    server 127.0.0.1:8080 weight=2;
+    server 127.0.0.1:8080 weight=5;
 }
 
 server {
@@ -282,6 +282,69 @@ server {
 - 在浏览器访问
 
 http://www.tomcats.com/
+
+
+
+2.upstream指令参数
+
+指令参数包含：
+
+- max_conns
+
+  - 默认值0，不限制
+
+  ```bash
+  upstream tomcats {
+  	server 192.168.1.66:8080 max_conns=2;
+      server 127.0.0.1:8080 max_conns=2;
+      server 127.0.0.1:8080 max_conns=5;
+  }
+  ```
+
+- slow_start
+
+  - 注意：仅商业版可用
+
+  - 默认值0，表示关闭！在指定的时间里，逐步提高服务的权重，到配置的权重值。
+
+  ```bash
+  #至少配置2个及以上的服务，才可用，普通版报错： nginx: [emerg] invalid parameter "slow_start=60s"
+  upstream tomcats {
+      server 192.168.1.66:8080 weight=6 slow_start=60s;
+      server 127.0.0.1:8080 weight=2;
+      server 127.0.0.1:8080 weight=2;
+  }
+  ```
+
+- down
+
+  - 表示该服务已下线，不可用
+
+  ```bash
+  upstream tomcats {
+      server 192.168.1.66:8080 down;
+      server 127.0.0.1:8080 weight=2;
+      server 127.0.0.1:8080 weight=2;
+  }
+  ```
+
+- backup
+
+  - 备用机，没有可用服务器时，会被启用
+
+  ```bash
+  upstream tomcats {
+      server 192.168.1.66:8080 backup;
+      server 127.0.0.1:8080 weight=2;
+      server 127.0.0.1:8080 weight=2;
+  }
+  ```
+
+- max_fails 和 fail_timeout
+  - max_fails：最大失败次数，抵达最大失败次数会被下线
+  - fail_timeout：限定时间内满足了最大失败次数，会断开为该服务提供请求；时间过后会再次派发请求，如果在新的限定时间内还是达到最大失败次数，会再次断开为该服务提供请求；如此循环往复！
+
+
 
 
 
