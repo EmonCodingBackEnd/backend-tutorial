@@ -291,6 +291,7 @@ http://www.tomcats.com/
 
 - max_conns
 
+  - 限制每台server的连接数，用于保护避免过载，可起到限流作用。
   - 默认值0，不限制
 
   ```bash
@@ -303,9 +304,11 @@ http://www.tomcats.com/
 
 - slow_start
 
-  - 注意：仅商业版可用
+  - 注意：仅商业版付费可用；
 
   - 默认值0，表示关闭！在指定的时间里，逐步提高服务的权重，到配置的权重值。
+  - 该参数不能使用`hash`和`random load balancing`中。
+  - 如果在upstream中只有一台server，则该参数失效。
 
   ```bash
   #至少配置2个及以上的服务，才可用，普通版报错： nginx: [emerg] invalid parameter "slow_start=60s"
@@ -318,7 +321,7 @@ http://www.tomcats.com/
 
 - down
 
-  - 表示该服务已下线，不可用
+  - 用于标记服务节点不可用；
 
   ```bash
   upstream tomcats {
@@ -330,7 +333,9 @@ http://www.tomcats.com/
 
 - backup
 
-  - 备用机，没有可用服务器时，会被启用
+  - 表示当前服务器节点是备用机，只有在其他的服务器都宕机以后，自己才会加入到集群中，被用户访问到。
+
+  - 该参数不能使用`hash`和`random load balancing`中。
 
   ```bash
   upstream tomcats {
@@ -341,8 +346,26 @@ http://www.tomcats.com/
   ```
 
 - max_fails 和 fail_timeout
-  - max_fails：最大失败次数，抵达最大失败次数会被下线
-  - fail_timeout：限定时间内满足了最大失败次数，会断开为该服务提供请求；时间过后会再次派发请求，如果在新的限定时间内还是达到最大失败次数，会再次断开为该服务提供请求；如此循环往复！
+
+  - max_fails：表示失败几次，则标记server已宕机，剔除上游服务。
+
+  - fail_timeout：表示失败的重试时间。
+
+    - 比如`max_fails=2 fail_timeout=15s`
+
+    则代表在15秒内请求某一个server失败达到2次以后，则认为该server已经挂了或者宕机了，随后再过15秒，这15秒内不会有新的请求到达该服务，而是会请求到正常运作的server，15秒后会再有新请求尝试连接到挂掉的server，如果还是失败，重复上一个过程，直到恢复。
+
+    也可描述为：限定时间内满足了最大失败次数，会断开为该服务提供请求；时间过后会再次派发请求，如果在新的限定时间内还是达到最大失败次数，会再次断开为该服务提供请求；如此循环往复！
+
+  ```bash
+  upstream tomcats {
+      server 192.168.1.66:8080 max_fails=2 fail_timeout=1s;
+      server 127.0.0.1:8080 weight=2;
+      server 127.0.0.1:8080 weight=2;
+  }
+  ```
+
+  
 
 
 
