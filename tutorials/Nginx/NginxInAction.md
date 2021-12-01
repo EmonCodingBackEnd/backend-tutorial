@@ -226,7 +226,7 @@ add_header 'Access-Control-Allow-Methods' *;
 add_header 'Access-Control-Allow-Headers' *;
 ```
 
-## 2.3、Nginx防盗链配置支持
+## 2.4、Nginx防盗链配置支持
 
 ```bash
 #对源站点验证
@@ -236,4 +236,52 @@ if ($invalid_referer) {
 	return 404;
 }
 ```
+
+## 2.5、upstream
+
+1. 以3台tomcat服务器为例，演示upstream
+
+- 配置Nginx的vhost
+
+```bash
+[emon@emon ~]$ vim /usr/local/nginx/conf/vhost/tomcates_upstream.conf 
+```
+
+```bash
+#配置上游服务器
+upstream tomcats {
+    server 127.0.0.1:8080;
+    server 127.0.0.1:8080;
+    server 127.0.0.1:8080;
+}
+
+server {
+    listen 80;
+    server_name www.tomcats.com;
+
+    location / {
+        proxy_pass http://tomcats;
+    }
+}
+```
+
+- 加载Nginx配置
+
+```bash
+[emon@emon ~]$ sudo nginx -s reload
+```
+
+- 配置本地DNS
+
+```bash
+10.0.0.116		www.tomcats.com
+```
+
+其中，10.0.0.116是Nginx所在服务器的ip地址。
+
+- 在浏览器访问
+
+http://www.tomcats.com/
+
+
 
