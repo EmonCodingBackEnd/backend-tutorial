@@ -545,3 +545,53 @@ http://www.tomcats.com/static/cache.html
 
 
 
+## 2.7、Nginx的反向代理缓存
+
+1. 上传图片资源
+
+上传几张图片到`/usr/local/nginx/html/img`目录。
+
+2. 配置
+
+```bash
+#配置上游服务器，weight=1是默认值，越大权重越高
+upstream tomcats {
+    server 127.0.0.1:8080;
+}
+
+# proxy_cache_path 设置缓存保存的目录
+# keys_zone 设置共享内存以及空间大小
+# max_size 设置缓存大小
+# inactive 超过此时间，则缓存自动清理
+# use_temp_path 关闭临时目录
+proxy_cache_path /usr/local/nginx/upstream_cache keys_zone=mycache:5m max_size=1g inactive=30s use_temp_path=off;
+
+server {
+    listen 80;
+    server_name www.tomcats.com 10.0.0.116;
+
+    # 开启并且使用缓存
+    proxy_cache mycache;
+    # 针对200和304状态码的缓存设置过期时间
+    proxy_cache_valid 200 304 8h;
+
+    location / {
+        proxy_pass http://tomcats;
+    }
+
+    location /static {
+        alias /usr/local/nginx/html;
+    }
+}
+```
+
+```bash
+[emon@emon ~]$ sudo nginx -s reload
+```
+
+3. 访问图片并查看`/usr/local/nginx/upstream_cache`目录
+
+http://www.tomcats.com/static/img/zx.jpg
+
+
+
