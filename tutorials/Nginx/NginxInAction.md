@@ -239,7 +239,7 @@ if ($invalid_referer) {
 
 ## 2.5、upstream
 
-1. 以3台tomcat服务器为例，演示upstream
+### 2.5.1、3台tomcat演示upstream
 
 - 配置Nginx的vhost
 
@@ -285,7 +285,7 @@ http://www.tomcats.com/
 
 
 
-2.upstream指令参数
+### 2.5.2、upstream指令参数
 
 指令参数包含：
 
@@ -365,9 +365,183 @@ http://www.tomcats.com/
   }
   ```
 
-  
 
 
+
+### 2.5.3、Keepalived提高吞吐量
+
+`keepalived`：设置长连接处理的数量
+
+`proxy_http_version`：设置长连接http版本为1.1
+
+`proxy_set_header`：清除connection header信息
+
+```bash
+upstream tomcats {
+    server 127.0.0.1:8080;
+
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name www.tomcats.com;
+
+    location / {
+        proxy_pass http://tomcats;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
+```
+
+
+
+### 2.5.4、负载均衡 ip_hash
+
+**负载均衡ip_hash**
+
+`ip_hash`可以保证用户访问可以请求到上游服务中的固定的服务器，前提是用户ip没有发生更改。
+
+使用`ip_hash`的注意点：不能把后台服务器直接移除，只能标记 `down`。
+
+```bash
+upstream tomcats {
+    ip_hash;
+
+    server 127.0.0.1:8080;
+    server 127.0.0.1:8080 down;
+    server 127.0.0.1:8080;
+}
+```
+
+普通hash负载均衡是有弊端的：
+
+![image-20211202092759226](images/image-20211202092759226.png)
+
+为了避免普通hash的缺点，可以采用一致性哈希算法。
+
+### 2.5.5、一致性哈希算法
+
+如果把对服务器的数量取模，变成对2^32取模，就可以避免由于服务器数量的变化，带来的影响了。
+
+[一致性哈希算法的基本概念](https://www.zsythink.net/archives/1182)
+
+### 2.5.6、负载均衡 url_hash
+
+根据每次请求的url地址，hash后访问到固定的服务器节点。
+
+```bash
+upstream tomcats {
+	# url hash
+    hash $request_uri;
+
+    server 127.0.0.1:8080;
+    server 127.0.0.1:8080 down;
+    server 127.0.0.1:8080;
+}
+```
+
+
+
+### 2.5.7、负载均衡least_conn
+
+least_conn会路由到当前最小链接的服务上。
+
+```bash
+upstream tomcats {
+	# 最少连接数
+	least_conn
+	
+    server 127.0.0.1:8080;
+    server 127.0.0.1:8080 down;
+    server 127.0.0.1:8080;
+}
+```
+
+
+
+## 2.6、Nginx的缓存
+
+1. 浏览器缓存：
+
+- 加速用户访问，提升单个用户（浏览器访问者）体验，缓存在本地。
+
+2. Nginx缓存
+
+ - 缓存在Nginx端，提升所有访问到Nginx这一段的用户
+ - 提升访问上游（upstream）服务器的速度
+ - 用户访问仍然会产生请求流量
+
+3. 控制浏览器缓存
+
+- 编辑一个测试缓存的html文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/nginx/html/cache.html 
+```
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to imooc!</h1>
+</body>
+</html>
+```
+
+- 配置反向代理
+
+```bash
+[emon@emon ~]$ vim /usr/local/nginx/conf/vhost/tomcates_upstream.conf 
+```
+
+```bash
+#配置上游服务器，weight=1是默认值，越大权重越高
+upstream tomcats {
+    server 127.0.0.1:8080;
+}
+
+server {
+    listen 80;
+    server_name www.tomcats.com 10.0.0.116;
+
+    location / {
+        proxy_pass http://tomcats;
+    }
+
+    location /static {
+        alias /usr/local/nginx/html;
+        #expires 30s; #表示30秒之后过期
+        #expires @22h30m; #表示到晚上22点30分过期
+        #expires -1h; #提前过期，表示距离访问时间1小时之前已失效
+        #expires epoch; #表示不设置缓存
+        #expires off; #默认值，关闭Nginx端缓存属性返回，并不影响浏览器端缓存，只是不在返回Cache-Control等属性
+        expires max; #永不过期，会设置一个很长的缓存时间
+    }
+}
+```
+
+```bash
+[emon@emon ~]$ sudo nginx -s reload
+```
+
+- 访问
+
+注意，如果要观察到304状态码，在浏览器回车访问即可，通过右键重新加载或者Ctrl+R是忽略缓存重新请求的。
+
+http://www.tomcats.com/static/cache.html
 
 
 
