@@ -54,20 +54,29 @@ server {
 }
 ```
 
-
+### 1.2.2、Nginx配置https域名证书
 
 ```nginx
 server {
     listen       80;
     listen       443 ssl;
     server_name  edeninterface.ishanshan.com;
+    
+    # 开启ssl
+    ssl on;
+    # 配置ssl证书
     ssl_certificate      /usr/local/openresty/nginx/conf/https/_.ishanshan.com_bundle.crt;
+    # 配置证书秘钥
     ssl_certificate_key  /usr/local/openresty/nginx/conf/https/_.ishanshan.com.key;
+    # ssl会话cache
     ssl_session_cache    shared:SSL:1m;
+    # ssl会话超时时间
     ssl_session_timeout  5m;
+
+    # 配置加密套件，写法遵循 openssl 标准
+    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers  HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers  on;
-    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
     #charset koi8-r;
 
     #access_log  logs/host.access.log  main;
@@ -592,6 +601,79 @@ server {
 3. 访问图片并查看`/usr/local/nginx/upstream_cache`目录
 
 http://www.tomcats.com/static/img/zx.jpg
+
+
+
+## 2.8、Keepalived安装部署
+
+1. 下载地址
+
+[下载地址](https://www.keepalived.org/download.html)
+
+```bash
+# 由于是https，直接获取时提示 “错误: 无法验证 www.keepalived.org 的”，需要加上 --no-check-certificate 选项
+[emon@emon ~]$ wget --no-check-certificate -cP /usr/local/src/ https://www.keepalived.org/software/keepalived-2.2.4.tar.gz
+```
+
+2. 依赖检查与安装
+
+```bash
+[emon@emon ~]$ yum list libnl libnl-devel
+[emon@emon ~]$ sudo yum -y install libnl libnl-devel
+```
+
+3. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Keepalived
+```
+
+4. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/keepalived-2.2.4.tar.gz -C /usr/local/Keepalived/
+```
+
+5. 执行配置脚本，并编译安装
+
+- 切换目录并执行配置脚本生成Makefile
+
+```bash
+[emon@emon ~]$ cd /usr/local/Keepalived/keepalived-2.2.4/
+[emon@emon keepalived-2.2.4]$ ./configure --prefix=/usr/local/Keepalived/keepalived2.2.4 --sysconf=/etc
+```
+
+命令解释： `--sysconf`指定核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了。
+
+- 编译
+
+```bash
+[emon@emon keepalived-2.2.4]$ make
+```
+
+- 安装
+
+```bash
+# 因为要在 /etc 目录下写入文件，所以使用 root 权限
+[emon@emon keepalived-2.2.4]$ sudo make install
+[emon@emon keepalived-2.2.4]$ cd
+[emon@emon ~]$ ls /usr/local/Keepalived/keepalived2.2.4/
+bin  sbin  share
+```
+
+6. 进入到`/etc/keepalived`，该目录下为keepalived核心配置文件
+
+```bash
+[emon@emon ~]$ ls /etc/keepalived/
+keepalived.conf  samples
+```
+
+如果忘记安装配置的目录，则通过如下命令找到：
+
+```bash
+[emon@emon ~]$ whereis keepalived
+keepalived: /etc/keepalived
+```
 
 
 
