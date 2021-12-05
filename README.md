@@ -29,7 +29,6 @@
 # 目录
 
 - [Insight感悟](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Insight)
-
 - [Java](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Java)
 - [Linux](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Linux)
     - [阿里云服务器ECS安装记录](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Linux/Ali%20Cloud)
@@ -44,6 +43,7 @@
 - [Git](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Git)
 - [MySQL](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/MySQL)
 - [Maven](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Maven/MavenInAction.md)
+- [Redis](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Redis)
 - [MongoDB](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/MongoDB)
 - [BigData](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData)
 - [ZooKeeper](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/ZooKeeper)
@@ -51,6 +51,7 @@
 - [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
 - [SkyWalking](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/SkyWalking)
 - [Python](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Python)
+- [BigData](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/BigData)
 
 
 
