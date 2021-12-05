@@ -687,7 +687,7 @@ keepalived: /etc/keepalived
 [emon@emon ~]$ ln -s /usr/local/Keepalived/keepalived2.2.4/ /usr/local/keepalived
 ```
 
-## 2.9、 Nginx的Keepalived配置
+## 2.9、Nginx的Keepalived配置
 
 1. 配置Nginx的keepalived
 
@@ -907,7 +907,78 @@ vrrp_instance VI_1 {
 [emon@emon ~]$ sudo systemctl restart keepalived
 ```
 
+## 2.10、Nginx的Keepalived双主热备
 
+- 修改其中一台服务器，即是主，也是备；另外一台也类似
+
+```bash
+[emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf
+```
+
+```bash
+! Configuration File for keepalived
+
+global_defs {
+    # 路由id：当前安装keepalived节点主机的标识符，全局唯一，备用节点不可与此同名
+    router_id LVS_KEEP_EMON_HOUSE_NEW
+}
+
+vrrp_script check_nginx_alive {
+    script "/etc/keepalived/check_nginx_alive_or_not.sh"
+    interval 2 # 每隔两秒运行上一行脚本
+    weight 10 # 如果脚本运行成功，则升级权重+10
+    # weight -10 # 如果脚本运行失败，则降低权重-10
+}
+
+# 计算机节点
+vrrp_instance VI_1 {
+    # 表示的状态，当前的Nginx的主节点，MASTER/BACKUP
+    state MASTER
+    # 当前实例绑定的网卡
+    interface ens33
+    # 保证主备节点一直
+    virtual_router_id 51
+    # 优先级/权重，谁的优先级高，在MASTER挂掉以后，就能成为MASTER
+    priority 100
+    # 主备之间同步检查的时间间隔，默认1s
+    advert_int 1
+    # 认证授权的密码，防止非法节点的接入
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    track_script {
+        check_nginx_alive # 追踪 nginx 脚本
+    }
+    virtual_ipaddress {
+        # 注意，主备两台机器的虚拟ip是一致的
+        192.168.1.111
+    }
+}
+
+# 计算机节点
+vrrp_instance VI_2 {
+    # 表示的状态，当前的Nginx的主节点，MASTER/BACKUP
+    state BACKUP
+    # 当前实例绑定的网卡
+    interface ens33
+    # 保证主备节点一直
+    virtual_router_id 52
+    # 优先级/权重，谁的优先级高，在MASTER挂掉以后，就能成为MASTER
+    priority 80
+    # 主备之间同步检查的时间间隔，默认1s
+    advert_int 1
+    # 认证授权的密码，防止非法节点的接入
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        # 注意，主备两台机器的虚拟ip是一致的
+        192.168.1.112
+    }
+}
+```
 
 
 
