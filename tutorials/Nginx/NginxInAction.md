@@ -699,8 +699,8 @@ keepalived: /etc/keepalived
 ! Configuration File for keepalived
 
 global_defs {
-    # 路由id：当前安装keepalived节点主机的标识符，全局唯一
-    router_id LVS_DEVEL
+    # 路由id：当前安装keepalived节点主机的标识符，全局唯一，备用节点不可与此同名
+    router_id LVS_KEEP_EMON_HOUSE_NEW
 }
 
 # 计算机节点
@@ -721,6 +721,7 @@ vrrp_instance VI_1 {
         auth_pass 1111
     }
     virtual_ipaddress {
+    	# 注意，主备两台机器的虚拟ip是一致的
         192.168.1.111
     }
 }
