@@ -817,3 +817,97 @@ emon      48894  14838  0 10:15 pts/2    00:00:00 grep --color=auto keepalived
 ```bash
 [emon@emon ~]$ sudo systemctl stop keepalived
 ```
+
+4. Keepalived检测Nginx的服务情况
+
+- 编写脚本
+
+```bash
+[emon@emon ~]$ sudo vim /etc/keepalived/check_nginx_alive_or_not.sh
+```
+
+```bash
+#!/bin/bash
+
+A=`ps -C nginx --no-header | wc -l`
+# 判断nginx是否宕机，如果宕机了，尝试重启
+if [ $A -eq 0 ];then
+    /usr/local/nginx/sbin/nginx
+    # 等待一小会再次检查nginx，如果没有启动成功，则停止keepalived，使其启动备用机
+    sleep 3
+    if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then
+        killall keepalived
+    fi
+fi
+```
+
+- 修改权限
+
+```bash
+[emon@emon ~]$ sudo chmod +x /etc/keepalived/check_nginx_alive_or_not.sh 
+```
+
+- 执行
+
+```bash
+[emon@emon ~]$ sudo /etc/keepalived/check_nginx_alive_or_not.sh
+```
+
+5. 配置Keepalived监听Nginx的脚本
+
+```bash
+[emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf
+```
+
+```bash
+! Configuration File for keepalived
+
+global_defs {
+    # 路由id：当前安装keepalived节点主机的标识符，全局唯一，备用节点不可与此同名
+    router_id LVS_KEEP_EMON_HOUSE_NEW
+}
+
+vrrp_script check_nginx_alive {
+    script "/etc/keepalived/check_nginx_alive_or_not.sh"
+    interval 2 # 每隔两秒运行上一行脚本
+    weight 10 # 如果脚本运行成功，则升级权重+10
+    # weight -10 # 如果脚本运行失败，则降低权重-10
+}
+
+# 计算机节点
+vrrp_instance VI_1 {
+    # 表示的状态，当前的Nginx的主节点，MASTER/BACKUP
+    state MASTER
+    # 当前实例绑定的网卡
+    interface ens33
+    # 保证主备节点一直
+    virtual_router_id 51
+    # 优先级/权重，谁的优先级高，在MASTER挂掉以后，就能成为MASTER
+    priority 100
+    # 主备之间同步检查的时间间隔，默认1s
+    advert_int 1
+    # 认证授权的密码，防止非法节点的接入
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    track_script {
+        check_nginx_alive # 追踪 nginx 脚本
+    }
+    virtual_ipaddress {
+        # 注意，主备两台机器的虚拟ip是一致的
+        192.168.1.111
+    }
+}
+```
+
+- 重启使配置生效
+
+```bash
+[emon@emon ~]$ sudo systemctl restart keepalived
+```
+
+
+
+
+
