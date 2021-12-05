@@ -524,7 +524,7 @@ upstream tomcats {
 
 server {
     listen 80;
-    server_name www.tomcats.com 10.0.0.116;
+    server_name www.tomcats.com;
 
     location / {
         proxy_pass http://tomcats;
@@ -643,7 +643,7 @@ http://www.tomcats.com/static/img/zx.jpg
 [emon@emon keepalived-2.2.4]$ ./configure --prefix=/usr/local/Keepalived/keepalived2.2.4 --sysconf=/etc
 ```
 
-命令解释： `--sysconf`指定核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了。
+命令解释： `--sysconf`指定核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了。在`/var/log/message`中会报错！
 
 - 编译
 
@@ -654,7 +654,7 @@ http://www.tomcats.com/static/img/zx.jpg
 - 安装
 
 ```bash
-# 因为要在 /etc 目录下写入文件，所以使用 root 权限
+# 因为要在 /etc 目录下写入目录和文件，所以使用 root 权限
 [emon@emon keepalived-2.2.4]$ sudo make install
 [emon@emon keepalived-2.2.4]$ cd
 [emon@emon ~]$ ls /usr/local/Keepalived/keepalived2.2.4/
@@ -675,5 +675,144 @@ keepalived.conf  samples
 keepalived: /etc/keepalived
 ```
 
+- 备份主配置文件`/etc/keepalived/keepalived.conf`
 
+```bash
+[emon@emon ~]$ sudo cp -a /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
+```
 
+7. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Keepalived/keepalived2.2.4/ /usr/local/keepalived
+```
+
+## 2.9、 Nginx的Keepalived配置
+
+1. 配置Nginx的keepalived
+
+```bash
+[emon@emon ~]$ sudo vim /etc/keepalived/keepalived.conf
+```
+
+```bash
+! Configuration File for keepalived
+
+global_defs {
+    # 路由id：当前安装keepalived节点主机的标识符，全局唯一
+    router_id LVS_DEVEL
+}
+
+# 计算机节点
+vrrp_instance VI_1 {
+    # 表示的状态，当前的Nginx的主节点，MASTER/BACKUP
+    state MASTER
+    # 当前实例绑定的网卡，通过 ip addr 查看自己的ip是对应哪一个网卡
+    interface ens33
+    # 保证主备节点一直
+    virtual_router_id 51
+    # 优先级/权重，谁的优先级高，在MASTER挂掉以后，就能成为MASTER
+    priority 100
+    # 主备之间同步检查的时间间隔，默认1s
+    advert_int 1
+    # 认证授权的密码，防止非法节点的接入
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.111
+    }
+}
+```
+
+2. 启动keepalived
+
+- 启动
+
+```bash
+[emon@emon ~]$ sudo /usr/local/keepalived/sbin/keepalived 
+```
+
+- 查看启动日志，如果启动失败，可以识别错误信息
+
+```bash
+[emon@emon ~]$ sudo tailf /var/log/messages
+```
+
+```bash
+Dec  5 10:10:51 emon Keepalived[48643]: Starting Keepalived v2.2.4 (08/21,2021)
+Dec  5 10:10:51 emon Keepalived[48643]: Running on Linux 3.10.0-1062.el7.x86_64 #1 SMP Wed Aug 7 18:08:02 UTC 2019 (built for Linux 3.10.0)
+Dec  5 10:10:51 emon Keepalived[48643]: Command line: '/usr/local/keepalived/sbin/keepalived'
+Dec  5 10:10:51 emon Keepalived[48643]: Configuration file /etc/keepalived/keepalived.conf
+Dec  5 10:10:51 emon Keepalived[48644]: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Dec  5 10:10:51 emon Keepalived[48644]: Starting VRRP child process, pid=48645
+Dec  5 10:10:51 emon Keepalived[48644]: Startup complete
+Dec  5 10:10:51 emon Keepalived_vrrp[48645]: (VI_1) Entering BACKUP STATE (init)
+Dec  5 10:10:55 emon Keepalived_vrrp[48645]: (VI_1) Entering MASTER STATE
+```
+
+- 查看 ip addr，可以看到虚拟ip地址 192.168.1.111
+
+```bash
+[emon@emon ~]$ ip addr
+```
+
+```bash
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:0c:29:57:cc:44 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.116/24 brd 192.168.1.255 scope global noprefixroute ens33
+       valid_lft forever preferred_lft forever
+    inet 192.168.1.111/32 scope global ens33
+       valid_lft forever preferred_lft forever
+    inet6 2409:8a28:c92:f6d0:e9a:4886:6539:52b6/64 scope global noprefixroute dynamic 
+       valid_lft 86262sec preferred_lft 14262sec
+    inet6 fe80::4964:c0da:32bd:1d54/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+
+- 查看keepalived启动的进程信息
+
+```bash
+[emon@emon ~]$ ps -ef|grep keepalived
+```
+
+```bash
+[emon@emon ~]$ ps -ef|grep keepalived
+root      48644      1  0 10:10 ?        00:00:00 /usr/local/keepalived/sbin/keepalived
+root      48645  48644  0 10:10 ?        00:00:00 /usr/local/keepalived/sbin/keepalived
+emon      48894  14838  0 10:15 pts/2    00:00:00 grep --color=auto keepalived
+```
+
+3. 加入到系统服务中管控启动
+
+- 设置启动项
+
+```bash
+[emon@emon ~]$ sudo cp /usr/local/Keepalived/keepalived-2.2.4/keepalived/etc/init.d/keepalived /etc/init.d/
+[emon@emon ~]$ sudo cp /usr/local/Keepalived/keepalived-2.2.4/keepalived/etc/sysconfig/keepalived /etc/sysconfig/
+```
+
+- 加载启动项
+
+```bash
+[emon@emon ~]$ sudo systemctl daemon-reload
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ sudo systemctl start keepalived
+```
+
+- 查看
+
+```bash
+[emon@emon ~]$ sudo systemctl status keepalived
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ sudo systemctl stop keepalived
+```
