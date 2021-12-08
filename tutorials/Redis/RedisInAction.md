@@ -48,7 +48,11 @@ localhost:6379> flushdb [ASYNC]
 localhost:6379> flushall
 ```
 
+- 清屏
 
+```bash
+localhost:6379> clear
+```
 
 ## 1.2、Redis的数据类型
 
