@@ -173,3 +173,12 @@ localhost:6379> mset <key> <value> [<key> <value> ...]
 ```bash
 localhost:6379> mget <key> [<key> ...]
 ```
+
+- 连续设置，如果存在则不设置
+
+```bash
+# 特殊：如连续设置的key，有任何一个已经存在，则整体都会被忽略！0-表示全部被忽略，1-表示全部成功！
+localhost:6379> msetnx <key> <value> [<key> <value> ...]
+(integer) 1
+```
+
