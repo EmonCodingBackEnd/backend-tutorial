@@ -460,3 +460,25 @@ localhost:6379> zrangebyscore key min max [WITHSCORES] [LIMIT offset count]
 localhost:6379> zrem key member [member ...]
 ```
 
+## 1.3、Redis的发布（pub）与订阅（sub）
+
+- 订阅
+
+```bash
+localhost:6379> subscribe channel [channel ...]
+```
+
+- 发布
+
+```bash
+localhost:6379> publish channel message
+```
+
+- 批量订阅
+
+```bash
+localhost:6379> psubscribe pattern [pattern ...]
+```
+
+
+
