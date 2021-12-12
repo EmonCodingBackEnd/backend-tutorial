@@ -412,11 +412,136 @@ hbase(main):014:0> exit
 
 ## 5、安装Hadoop
 
+1. 下载
+
 Hadoop生态圈的软件下载地址：
 
 https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 
 **注意**：无法避开收费墙下载，暂时无解
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Hadoop
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -xzvf /usr/local/src/hadoop-2.6.0-cdh5.15.1.tar.gz -C /usr/local/Hadoop/
+```
+
+- hadoop软件包常见目录说明
+
+  - `bin`： hadoop客户端名单
+
+  - `etc/hadoop`： hadoop相关的配置文件存放目录
+
+  - `sbin`： 启动hadoop相关进程的脚本
+
+  - `share`： 常用例子
+
+- 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/ /usr/local/hadoop
+```
+
+5. 配置环境变量
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/hadoop.sh
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$HADOOP_HOME/bin:$PATH
+```
+
+使之生效：
+
+```
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 配置
+
+- 确保JAVA_HOME指定到JDK8，查看配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hadoop-env.sh 
+```
+
+可以看到`export JAVA_HOME=${JAVA_HOME}`，所以，如果JAVA_HOME环境变量是正确的即可。
+
+- 配置`core-site.xml`
+
+```bash
+# 在打开的文件中<configuration>节点内添加属性
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/core-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://0.0.0.0:8020</value>
+    </property>
+</configuration>
+```
+
+- 配置`hdfs-site.xml`
+
+```bash
+# 修改副本数量
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+</configuration>
+```
+
+- 修改临时目录位置
+
+```bash
+# 创建临时目录
+[emon@emon ~]$ mkdir /usr/local/hadoop/tmp
+# 修改临时目录
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/usr/local/hadoop/tmp</value>
+    </property>
+</configuration>
+```
+
+- 修改从节点
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/slaves 
+```
+
+```bash
+#localhost
+emon
+```
+
+7. 启动HDFS
+
+启动HDFS：第一次执行的时候一定要格式化文件系统，不要重复执行。
+
+
 
 
 
