@@ -483,7 +483,8 @@ export PATH=$HADOOP_HOME/bin:$PATH
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://0.0.0.0:8020</value>
+        <!-- <value>hdfs://0.0.0.0:8020</value> 也是可以的 -->
+        <value>hdfs://emon:8020</value>
     </property>
 </configuration>
 ```
@@ -537,9 +538,158 @@ export PATH=$HADOOP_HOME/bin:$PATH
 emon
 ```
 
+**注意**：emon是主机名，可以在`/etc/hosts`配置，比如：`127.0.0.1   emon`
+
 7. 启动HDFS
 
-启动HDFS：第一次执行的时候一定要格式化文件系统，不要重复执行。
+- 启动HDFS：第一次执行的时候一定要格式化文件系统，不要重复执行。
+
+```bash
+[emon@emon ~]$ ll /usr/local/hadoop/tmp/
+总用量 0
+
+[emon@emon ~]$ hdfs namenode -format
+STARTUP_MSG: Starting NameNode
+STARTUP_MSG:   user = emon
+STARTUP_MSG:   host = localhost/127.0.0.1
+STARTUP_MSG:   args = [-format]
+STARTUP_MSG:   version = 2.6.0-cdh5.15.1
+...
+... 省略 ...
+...
+21/12/12 21:36:53 INFO namenode.FSNamesystem: Retry cache will use 0.03 of total heap and retry cache entry expiry time is 600000 millis
+21/12/12 21:36:53 INFO util.GSet: Computing capacity for map NameNodeRetryCache
+21/12/12 21:36:53 INFO util.GSet: VM type       = 64-bit
+21/12/12 21:36:53 INFO util.GSet: 0.029999999329447746% max memory 889 MB = 273.1 KB
+21/12/12 21:36:53 INFO util.GSet: capacity      = 2^15 = 32768 entries
+21/12/12 21:36:53 INFO namenode.FSNamesystem: ACLs enabled? false
+21/12/12 21:36:53 INFO namenode.FSNamesystem: XAttrs enabled? true
+21/12/12 21:36:53 INFO namenode.FSNamesystem: Maximum size of an xattr: 16384
+21/12/12 21:36:53 INFO namenode.FSImage: Allocated new BlockPoolId: BP-156337236-127.0.0.1-1639316213819
+21/12/12 21:36:53 INFO common.Storage: Storage directory /usr/local/hadoop/tmp/dfs/name has been successfully formatted.
+21/12/12 21:36:53 INFO namenode.FSImageFormatProtobuf: Saving image file /usr/local/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
+21/12/12 21:36:53 INFO namenode.FSImageFormatProtobuf: Image file /usr/local/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 320 bytes saved in 0 seconds .
+21/12/12 21:36:53 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
+21/12/12 21:36:53 INFO util.ExitUtil: Exiting with status 0
+21/12/12 21:36:53 INFO namenode.NameNode: SHUTDOWN_MSG: 
+/************************************************************
+SHUTDOWN_MSG: Shutting down NameNode at localhost/127.0.0.1
+************************************************************/
+
+[emon@emon ~]$ ll /usr/local/hadoop/tmp/
+总用量 0
+drwxrwxr-x. 3 emon emon 18 12月 12 21:36 dfs
+```
+
+- 启动集群
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/start-dfs.sh 
+```
+
+第一次启动的日志，`core-site.xml`配置的是`<value>hdfs://0.0.0.0:8020</value>`
+
+```bash
+21/12/12 22:22:04 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Starting namenodes on [0.0.0.0]
+The authenticity of host '0.0.0.0 (0.0.0.0)' can't be established.
+ECDSA key fingerprint is SHA256:W3BcZcYnY/kGTM4trOACHTRqYeRHSDQL0ND8JYDUAmg.
+ECDSA key fingerprint is MD5:b8:de:82:bf:7a:c7:55:50:b2:e9:cf:a7:77:a7:2e:96.
+Are you sure you want to continue connecting (yes/no)? yes
+0.0.0.0: Warning: Permanently added '0.0.0.0' (ECDSA) to the list of known hosts.
+0.0.0.0: starting namenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-namenode-emon.out
+emon: starting datanode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-datanode-emon.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-secondarynamenode-emon.out
+21/12/12 22:24:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+```
+
+第二次启动的日志，`core-site.xml`配置的是`<value>hdfs://emon:8020</value>`
+
+```bash
+21/12/12 22:51:03 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Starting namenodes on [emon]
+emon: starting namenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-namenode-emon.out
+emon: starting datanode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-datanode-emon.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-secondarynamenode-emon.out
+21/12/12 22:51:18 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+```
+
+
+
+- 验证1
+
+```bash
+[emon@emon ~]$ jps
+100336 SecondaryNameNode
+99658 NameNode
+99980 DataNode
+```
+
+- 验证2
+
+**注意**：确保防火墙停止，或者50070端口是放开的！
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --state
+not running
+```
+
+访问地址：http://repo.emon.vip:50070
+
+8. 停止HDFS
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/stop-dfs.sh 
+```
+
+第一次停止的日志，`core-site.xml`配置的是`<value>hdfs://0.0.0.0:8020</value>`
+
+```bash
+21/12/12 22:46:41 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Stopping namenodes on [0.0.0.0]
+0.0.0.0: stopping namenode
+emon: stopping datanode
+Stopping secondary namenodes [0.0.0.0]
+0.0.0.0: stopping secondarynamenode
+21/12/12 22:47:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+```
+
+第一次停止的日志，`core-site.xml`配置的是`<value>hdfs://emon:8020</value>`
+
+```bash
+21/12/12 22:53:41 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Stopping namenodes on [emon]
+emon: stopping namenode
+emon: stopping datanode
+Stopping secondary namenodes [0.0.0.0]
+0.0.0.0: stopping secondarynamenode
+21/12/12 22:54:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+```
+
+9. 另外一种启动方式
+
+> start-dfs.sh = 
+>
+> ​					hadoop-daemons.sh start namenode
+>
+> ​					hadoop-daemons.sh start datanode
+>
+> ​					hadoop-daemons.sh start secondarynamenode
+
+> ​	stop-dfs.sh = 
+>
+> ​					hadoop-daemons.sh stop namenode
+>
+> ​					hadoop-daemons.sh stop datanode
+>
+> ​					hadoop-daemons.sh stop secondarynamenode
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh start namenode
+[emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode
+```
 
 
 
