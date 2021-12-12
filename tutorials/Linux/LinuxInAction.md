@@ -2569,6 +2569,12 @@ export PATH=$GIT_HOME/bin:$PATH
 
 10. 配置SSH信息
 
+拾遗补漏：known_hosts和authorized_keys文件
+
+known_hosts是自己访问其他机器时，如果访问成功，会加入该文件一行记录；
+
+authorized_keys作用时，把本机的ssh公钥放到对方机器的该文件内，可以免密访问对方机器。
+
 - 检查SSH keys是否存在：
 
 ```bas
