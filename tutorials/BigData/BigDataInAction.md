@@ -408,60 +408,21 @@ hbase(main):014:0> exit
 
 ## 4、安装Scala
 
-1. 下载
+[Scala安装教程](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Scala/ScalaInAction.md)
 
-官网地址：https://www.scala-lang.org/
+## 5、安装Hadoop
 
-下载地址：https://www.scala-lang.org/download/
+Hadoop生态圈的软件下载地址：
 
-```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://downloads.lightbend.com/scala/2.12.10/scala-2.12.10.tgz
-```
+https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 
-2. 创建安装目录
+**注意**：无法避开收费墙下载，暂时无解
 
-```bash
-[emon@emon ~]$ mkdir /usr/local/Scala
-```
 
-3. 解压安装
 
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/scala-2.12.10.tgz -C /usr/local/Scala/
-```
+## 6、安装Spark
 
-4. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/Scala/scala-2.12.10/ /usr/local/scala
-```
-
-5. 配置环境变量
-
-在`/etc/profile.d`目录创建`scala.sh`文件：
-
-```
-[emon@emon ~]$ sudo vim /etc/profile.d/scala.sh
-export SCALA_HOME=/usr/local/scala
-export PATH=$SCALA_HOME/bin:$PATH
-```
-
-使之生效：
-
-```
-[emon@emon ~]$ source /etc/profile
-```
-
-6. 校验
-
-```bash
-[emon@emon Scala]$ scala -version
-Scala code runner version 2.12.10 -- Copyright 2002-2019, LAMP/EPFL and Lightbend, Inc.
-```
-
-## 5、安装Spark
-
-### 5.1、基本安装
+### 6.1、基本安装
 
 1. 下载
 
@@ -531,7 +492,7 @@ export PATH=$SPARK_HOME/bin:$PATH
 log4j.logger.org.apache.spark.repl.Main=INFO
 ```
 
-### 5.2、local模式
+### 6.2、local模式
 
 - 进入local模式
 
@@ -584,7 +545,7 @@ http://192.168.1.116:4040
 scala> :quit
 ```
 
-### 5.2、Standalone模式
+### 6.2、Standalone模式
 
 
 
