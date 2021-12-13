@@ -479,8 +479,7 @@ export PATH=$HADOOP_HOME/bin:$PATH
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <!-- <value>hdfs://0.0.0.0:8020</value> 也是可以的 -->
-        <value>hdfs://emon:8020</value>
+		<value>hdfs://0.0.0.0:8020</value>
     </property>
 </configuration>
 ```
@@ -600,18 +599,6 @@ Starting secondary namenodes [0.0.0.0]
 21/12/12 22:24:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
-第二次启动的日志，`core-site.xml`配置的是`<value>hdfs://emon:8020</value>`
-
-```bash
-21/12/12 22:51:03 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-Starting namenodes on [emon]
-emon: starting namenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-namenode-emon.out
-emon: starting datanode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-datanode-emon.out
-Starting secondary namenodes [0.0.0.0]
-0.0.0.0: starting secondarynamenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-secondarynamenode-emon.out
-21/12/12 22:51:18 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-```
-
 
 
 - 验证1
@@ -652,18 +639,6 @@ Stopping secondary namenodes [0.0.0.0]
 21/12/12 22:47:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
-第一次停止的日志，`core-site.xml`配置的是`<value>hdfs://emon:8020</value>`
-
-```bash
-21/12/12 22:53:41 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-Stopping namenodes on [emon]
-emon: stopping namenode
-emon: stopping datanode
-Stopping secondary namenodes [0.0.0.0]
-0.0.0.0: stopping secondarynamenode
-21/12/12 22:54:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-```
-
 9. 另外一种启动方式
 
 > start-dfs.sh = 
@@ -685,6 +660,9 @@ Stopping secondary namenodes [0.0.0.0]
 ```bash
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh start namenode
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode
+
+[emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
+[emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
 ```
 
 ## 6、安装Spark
