@@ -283,10 +283,6 @@ Topic:test-kafka-topic	PartitionCount:1	ReplicationFactor:1	Configs:
 [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-kafka-topic --from-beginning
 ```
 
-
-
-
-
 ## 3、安装HBase（使用外部的ZooKeeper）
 
 1. 下载
@@ -691,10 +687,6 @@ Stopping secondary namenodes [0.0.0.0]
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode
 ```
 
-
-
-
-
 ## 6、安装Spark
 
 ### 6.1、基本安装
@@ -824,9 +816,95 @@ scala> :quit
 
 
 
+# 二、各组件常用命令
 
+## 1、hdfs常用命令
 
+- 查看文件
 
+```bash
+[emon@emon ~]$ hadoop fs -ls /
+```
 
+- 存放文件
 
+```bash
+[emon@emon ~]$ echo "this is a test txt" > test.txt 
+[emon@emon ~]$ hadoop fs -put test.txt /
+```
+
+- 查看文件内容
+
+```bash
+[emon@emon ~]$ hadoop fs -cat /test.txt
+或者
+[emon@emon ~]$ hadoop fs -text /test.txt
+```
+
+- 从本地拷贝文件到hdfs
+
+```bash
+[emon@emon ~]$ echo "this is a copy txt" > copy.txt
+[emon@emon ~]$ hadoop fs -copyFromLocal copy.txt /
+```
+
+- 从本地移动文件到hdfs
+
+```bash
+[emon@emon ~]$ echo "this is a move txt" > move.txt
+[emon@emon ~]$ hadoop fs -moveFromLocal move.txt /
+```
+
+- 获取文件
+
+```bash
+[emon@emon ~]$ hadoop fs -get /move.txt
+```
+
+- 创建目录
+
+```bash
+[emon@emon ~]$ hadoop fs -mkdir /hdfs-test
+```
+
+- 移动文件到目录或改名
+
+```bash
+[emon@emon ~]$ hadoop fs -mv /test.txt /hdfs-test
+```
+
+- 拷贝文件到新文件
+
+```bash
+[emon@emon ~]$ hadoop fs -cp /hdfs-test/test.txt /hdfs-test/test.txt.bak
+```
+
+- 合并文件
+
+```bash
+# 把hdfs的/hdfs-test目录下所有文件合并到本地目录下t.txt文件中
+[emon@emon ~]$ hadoop fs -getmerge /hdfs-test ./t.txt
+```
+
+- 删除文件
+
+```bash
+[emon@emon ~]$ hadoop fs -rm /copy.txt
+Deleted /copy.txt
+```
+
+- 删除空目录
+
+```bash
+# 仅能删除空目录
+[emon@emon ~]$ hadoop fs -rmdir /hdfs-test
+```
+
+- 删除目录
+
+```bash
+[emon@emon ~]$ hadoop fs -rmr /hdfs-test
+rmr: DEPRECATED: Please use 'rm -r' instead.
+Deleted /hdfs-test
+```
 
