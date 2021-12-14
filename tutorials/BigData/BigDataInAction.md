@@ -665,6 +665,86 @@ Stopping secondary namenodes [0.0.0.0]
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
 ```
 
+**备注**：如果`/usr/local/hadoop/etc/hadoop/slaves`配置了主机名，但主机名在`/etc/hosts`定义为`127.0.0.1  emon`会有本地可以查看文件内容，但JavaAPI无法执行open出hdfs文件内容的问题；但如果主机名要配置为`192.168.1.116    emon`这样时，在公司和家里切换麻烦，写了如下切换的脚本。
+
+```bash
+[emon@emon ~]$ vim bin/switchHadoopIP.sh 
+```
+
+```bash
+#!/bin/bash
+
+# 启动或停止hadoop函数
+function mgr() {
+    startOrStop=$1
+    nodeName=$2
+    echo -e "\e[1;34m 开始 $startOrStop Hadoop HDFS $nodeName \e[0m"
+    /usr/local/hadoop/sbin/hadoop-daemon.sh $startOrStop $nodeName
+    result=$?
+    if [ $result -ne 0 ]; then
+        echo -e "\e[1;31m $startOrStop Hadoop HDFS $nodeName 失败！\e[0m"
+        exit 0;
+    else
+        echo -e "\e[1;34m 成功$startOrStop Hadoop HDFS $nodeName \e[0m"
+    fi
+}
+
+if [ $# -ne 1 ]; then
+    echo -e "\e[1;36m Usage: ./switchHadoopIp.sh env\e[0m"
+    echo -e "\e[1;34m env: 表示IP环境 【必须】\e[0m"
+    exit 0
+fi
+
+house="192.168.1.116   emon"
+company="10.0.0.116      emon"
+
+ENV_NAME=$1
+# 以变量作为key，获取其变量值
+ENV_VALUE=$(eval echo '$'$ENV_NAME)
+
+if [[ -z $ENV_VALUE ]]; then
+    echo -e "\e[1;34m env: "$ENV_NAME" 未定义\e[0m"
+    exit 0
+fi
+
+# 更换主机对应IP地址
+echo -e "\e[1;34m 开始执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
+echo 'emon123' | sudo -S sed -i 's/^[^#]*emon$/'"$ENV_VALUE"'/g' /etc/hosts
+if [ $? -ne 0 ]; then
+    echo -e "\e[1;31m 执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")失败！\e[0m"
+    exit 0
+else
+    echo -e "\e[1;34m 成功执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
+fi
+
+echo -e "\e[1;34m 执行后 /etc/hosts 文件内容如下\e[0m"
+cat /etc/hosts
+
+mgr stop datanode
+
+mgr stop namenode
+
+sleep 3
+
+mgr start namenode
+
+mgr start datanode
+
+echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
+```
+
+- 切换到house环境
+
+```bash
+[emon@emon ~]$ ~/bin/switchHadoopIP.sh house
+```
+
+- 切换到company环境
+
+```bash
+[emon@emon ~]$ ~/bin/switchHadoopIP.sh company
+```
+
 ## 6、安装Spark
 
 ### 6.1、基本安装
