@@ -884,6 +884,12 @@ scala> :quit
 [emon@emon ~]$ hadoop fs -ls /
 ```
 
+- 递归查看文件
+
+```bash
+[emon@emon ~]$ hadoop fs -ls -R /hdfsapi/test
+```
+
 - 存放文件
 
 ```bash
