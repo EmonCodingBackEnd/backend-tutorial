@@ -884,6 +884,15 @@ scala> :quit
 [emon@emon ~]$ hadoop fs -ls /
 ```
 
+- 查看文件2
+
+```bash
+# 如果写入文件时不指定 /，等于于写入了 /user/emon
+[emon@emon ~]$ hadoop fs -ls 
+# 等效于
+[emon@emon ~]$ hadoop fs -ls /user/emon
+```
+
 - 递归查看文件
 
 ```bash
