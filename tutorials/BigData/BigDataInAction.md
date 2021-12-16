@@ -745,6 +745,51 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 [emon@emon ~]$ ~/bin/switchHadoopIP.sh company
 ```
 
+9. Hadoop学习碰到的问题
+
+- 问题1
+
+  - 问题描述
+
+  ```tex
+  [ERROR] method:org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:425)
+  Failed to locate the winutils binary in the hadoop binary path
+  java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+  ```
+
+  - 问题原因
+
+  原因：window本地无法获取hadoop的配置
+
+  - 解决办法
+
+  下载： https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/ 并解压到本地 【废弃】
+
+  下载： https://github.com/srccodes/hadoop-common-2.2.0-bin/tree/master/bin 并解压到本地
+
+  ```bash
+  # dirPathOfBinParent 是指 hadoop-common-2.2.0-bin 解压后的包含bin的那个目录路径
+  System.setProperty("hadoop.home.dir", "dirPathOfBinParent");
+  ```
+
+- 问题2
+
+  - 问题描述
+
+  ```bash
+  Exception in thread "main" java.lang.UnsatisfiedLinkError: org.apache.hadoop.io.nativeio.NativeIO$Windows.access0(Ljava/lang/String;I)Z
+  ```
+
+  - 问题原因
+
+  ```tex
+  出现原因：在新版本的windows系统中，会取消部分文件，某些功能无法支持。本地的NativeIO无法写入，我们需要再写一个NativeIO的类，放入代码片段的包中；
+  ```
+
+  - 解决办法
+
+  **留白留白留白留白留白**
+
 ## 6、安装Spark
 
 ### 6.1、基本安装
@@ -938,6 +983,8 @@ scala> :quit
 
 ```bash
 [emon@emon ~]$ hadoop fs -mkdir /hdfs-test
+# 递归创建
+[emon@emon ~]$ hadoop fs -mkdir -p /wordcount/input
 ```
 
 - 移动文件到目录或改名
