@@ -414,7 +414,8 @@ hbase(main):014:0> exit
 | ----------------------------- | -------------------------- |
 | /usr/local/hadoop/tmp         | 存放hadoop的hdfs数据的目录 |
 | /usr/local/hadoop/custom/data | 测试数据                   |
-| /usr/localhost/custom/lib     | 自己的jar存在的位置        |
+| /usr/localhost/custom/lib     | jar库文件                  |
+| /usr/localhost/custom/shell   | 脚本文件                   |
 
 ### 5.1、基本安装
 
