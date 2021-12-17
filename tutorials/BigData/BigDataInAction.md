@@ -408,6 +408,14 @@ hbase(main):014:0> exit
 
 ## 5、安装Hadoop
 
+目录规划：
+
+| 目录                          | 作用                       |
+| ----------------------------- | -------------------------- |
+| /usr/local/hadoop/tmp         | 存放hadoop的hdfs数据的目录 |
+| /usr/local/hadoop/custom/data | 测试数据                   |
+| /usr/localhost/custom/lib     | 自己的jar存在的位置        |
+
 ### 5.1、基本安装
 
 1. 下载
@@ -678,7 +686,7 @@ Stopping secondary namenodes [0.0.0.0]
 [emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
 ```
 
-```bash
+```xml
 <configuration>
     <property>
         <name>mapreduce.framework.name</name>
@@ -693,13 +701,18 @@ Stopping secondary namenodes [0.0.0.0]
 [emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/yarn-site.xml 
 ```
 
-```bash
+```xml
 <configuration>
 
 <!-- Site specific YARN configuration properties -->
     <property>
         <name>yarn.nodemanager.aux-services</name>
         <value>mapreduce_shuffle</value>
+    </property>
+    <!-- 配置该属性为了解决错误 Caused by: java.io.IOException: Exceeded MAX_FAILED_UNIQUE_FETCHES; bailing-out. -->
+    <property>
+        <name>yarn.nodemanager.local-dirs</name>
+        <value>/usr/local/hadoop/tmp/nm-local-dir</value>        
     </property>
 </configuration>
 ```
@@ -719,15 +732,32 @@ emon: Warning: Permanently added the ECDSA host key for IP address '192.168.1.11
 emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/yarn-emon-nodemanager-emon.out
 ```
 
-- 验证
+- 验证1
 
 ```bash
 115040 DataNode
+38644 ResourceManager
 37142 NodeManager
 114943 NameNode
 ```
 
+- 验证2
 
+访问地址：http://repo.emon.vip:8088
+
+3. 停止YARN
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/stop-yarn.sh 
+```
+
+```bash
+stopping yarn daemons
+no resourcemanager to stop
+emon: stopping nodemanager
+emon: nodemanager did not stop gracefully after 5 seconds: killing with kill -9
+no proxyserver to stop
+```
 
 ### 5.8、Hadoop环境切换
 
