@@ -711,8 +711,8 @@ pasv_max_port=62000
    								<td><a href="#" target="_blank" onclick="jump(8081)">nexus</a></td>
    							</tr>
    							<tr>
-   								<td>jenkins</td><td>8088</td>
-   								<td><a href="#" target="_blank" onclick="jump(8088)">jenkins</a></td>
+   								<td>jenkins</td><td>8082</td>
+   								<td><a href="#" target="_blank" onclick="jump(8082)">jenkins</a></td>
    							</tr>
    							<tr>
    								<td>eureka</td><td>8761</td>
@@ -4424,7 +4424,7 @@ success
 JENKINS_JAVA_OPTIONS="-XX:MaxPermSize=512m -Djava.awt.headless=true"
 
 # 默认的8080端口，与tomcat冲突
-JENKINS_PORT="8088"
+JENKINS_PORT="8082"
 ```
 
 4. 检测依赖环境
@@ -4453,7 +4453,7 @@ candidates="
 
 5. 开放端口
 
-此处使用了之前开通的8080-8090端口的8088端口，无需再次开通。
+此处使用了之前开通的8080-8090端口的8082端口，无需再次开通。
 
 6. 启动
 
@@ -4466,7 +4466,7 @@ candidates="
 
 7. 访问
 
-http://192.168.1.116:8088
+http://192.168.1.116:8082
 
 首次进入页面需要输入初始密码，该密码在`/var/lib/jenkins/secrets/initialAdminPassword`文件里面，复制密码，粘贴登录。
 
@@ -4506,7 +4506,7 @@ rm -rf /etc/localtime
 
 9. Jenkins URL
 
-http://192.168.1.116:8088/
+http://192.168.1.116:8082/
 
 ### 13.2、插件安装
 

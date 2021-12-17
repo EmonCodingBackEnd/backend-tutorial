@@ -408,6 +408,8 @@ hbase(main):014:0> exit
 
 ## 5、安装Hadoop
 
+### 5.1、基本安装
+
 1. 下载
 
 Hadoop生态圈的软件下载地址：
@@ -458,7 +460,9 @@ export PATH=$HADOOP_HOME/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-6. 配置
+### 5.2、HDFS配置
+
+1. 配置
 
 - 确保JAVA_HOME指定到JDK8，查看配置
 
@@ -535,9 +539,9 @@ emon
 
 **注意**：emon是主机名，可以在`/etc/hosts`配置，比如：`127.0.0.1   emon`
 
-7. 启动HDFS
+2. 启动HDFS
 
-- 启动HDFS：第一次执行的时候一定要格式化文件系统，不要重复执行。
+- 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
 
 ```bash
 [emon@emon ~]$ ll /usr/local/hadoop/tmp/
@@ -576,7 +580,7 @@ SHUTDOWN_MSG: Shutting down NameNode at localhost/127.0.0.1
 drwxrwxr-x. 3 emon emon 18 12月 12 21:36 dfs
 ```
 
-- 启动集群
+- 启动HDFS
 
 ```bash
 [emon@emon ~]$ /usr/local/hadoop/sbin/start-dfs.sh 
@@ -599,8 +603,6 @@ Starting secondary namenodes [0.0.0.0]
 21/12/12 22:24:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
-
-
 - 验证1
 
 ```bash
@@ -621,7 +623,7 @@ not running
 
 访问地址：http://repo.emon.vip:50070
 
-8. 停止HDFS
+3. 停止HDFS
 
 ```bash
 [emon@emon ~]$ /usr/local/hadoop/sbin/stop-dfs.sh 
@@ -639,7 +641,7 @@ Stopping secondary namenodes [0.0.0.0]
 21/12/12 22:47:00 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
-9. 另外一种启动方式
+4. 另外一种启动方式
 
 > start-dfs.sh = 
 >
@@ -664,6 +666,70 @@ Stopping secondary namenodes [0.0.0.0]
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 [emon@emon ~]$ /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
 ```
+
+### 5.3、YARN配置
+
+1. 配置
+
+- 配置`mapred-site.xml`
+
+```bash
+[emon@emon ~]$ cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
+```
+
+```bash
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+</configuration>
+```
+
+- 配置`yarn-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/yarn-site.xml 
+```
+
+```bash
+<configuration>
+
+<!-- Site specific YARN configuration properties -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+</configuration>
+```
+
+2. 启动
+
+- 启动YARN
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/start-yarn.sh 
+```
+
+```bash
+starting yarn daemons
+starting resourcemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/yarn-emon-resourcemanager-emon.out
+emon: Warning: Permanently added the ECDSA host key for IP address '192.168.1.116' to the list of known hosts.
+emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/yarn-emon-nodemanager-emon.out
+```
+
+- 验证
+
+```bash
+115040 DataNode
+37142 NodeManager
+114943 NameNode
+```
+
+
+
+### 5.8、Hadoop环境切换
 
 **备注**：如果`/usr/local/hadoop/etc/hadoop/slaves`配置了主机名，但主机名在`/etc/hosts`定义为`127.0.0.1  emon`会有本地可以查看文件内容，但JavaAPI无法执行open出hdfs文件内容的问题；但如果主机名要配置为`192.168.1.116    emon`这样时，在公司和家里切换麻烦，写了如下切换的脚本。
 
@@ -745,7 +811,7 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 [emon@emon ~]$ ~/bin/switchHadoopIP.sh company
 ```
 
-9. Hadoop学习碰到的问题
+### 5.9、Hadoop学习碰到的问题
 
 - 问题1
 
