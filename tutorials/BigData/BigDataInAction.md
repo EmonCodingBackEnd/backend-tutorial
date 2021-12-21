@@ -410,12 +410,12 @@ hbase(main):014:0> exit
 
 目录规划：
 
-| 目录                          | 作用                       |
-| ----------------------------- | -------------------------- |
-| /usr/local/hadoop/tmp         | 存放hadoop的hdfs数据的目录 |
-| /usr/local/hadoop/custom/data | 测试数据                   |
-| /usr/localhost/custom/lib     | jar库文件                  |
-| /usr/localhost/custom/shell   | 脚本文件                   |
+| 目录                           | 作用                       |
+| ------------------------------ | -------------------------- |
+| /usr/local/hadoop/tmp          | 存放hadoop的hdfs数据的目录 |
+| /usr/local/hadoop/custom/data  | 测试数据                   |
+| /usr/local/hadoop/custom/lib   | jar库文件                  |
+| /usr/local/hadoop/custom/shell | 脚本文件                   |
 
 ### 5.1、基本安装
 
@@ -449,7 +449,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 
   - `share`： 常用例子
 
-- 创建软连接
+4. 创建软连接
 
 ```bash
 [emon@emon ~]$ ln -s /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/ /usr/local/hadoop
@@ -773,16 +773,23 @@ no proxyserver to stop
 
 # 启动或停止hadoop函数
 function mgr() {
-    startOrStop=$1
-    nodeName=$2
-    echo -e "\e[1;34m 开始 $startOrStop Hadoop HDFS $nodeName \e[0m"
-    /usr/local/hadoop/sbin/hadoop-daemon.sh $startOrStop $nodeName
+    cmd=$1
+    startOrStop=$2
+    nodeName=$3
+    echo -e "\e[1;34m 开始执行命令 $cmd $startOrStop $nodeName \e[0m"
+    if [ -n $nodeName ]; then
+        $cmd $startOrStop $nodeName
+    elif [ -n $startOrStop ]; then
+        $cmd $startOrStop
+    else
+        $cmd
+    fi
     result=$?
     if [ $result -ne 0 ]; then
-        echo -e "\e[1;31m $startOrStop Hadoop HDFS $nodeName 失败！\e[0m"
+        echo -e "\e[1;31m 执行命令 $cmd $startOrStop $nodeName 失败！\e[0m"
         exit 0;
     else
-        echo -e "\e[1;34m 成功$startOrStop Hadoop HDFS $nodeName \e[0m"
+        echo -e "\e[1;34m 执行命令 $cmd $startOrStop $nodeName 成功！\e[0m"
     fi
 }
 
@@ -817,15 +824,21 @@ fi
 echo -e "\e[1;34m 执行后 /etc/hosts 文件内容如下\e[0m"
 cat /etc/hosts
 
-mgr stop datanode
+mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 
-mgr stop namenode
+mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
 
 sleep 3
 
-mgr start namenode
+mgr /usr/local/hadoop/sbin/hadoop-daemon.sh start namenode
 
-mgr start datanode
+mgr /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode
+
+sleep 5
+
+mgr /usr/local/hadoop/sbin/stop-yarn.sh
+
+mgr /usr/local/hadoop/sbin/start-yarn.sh
 
 echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
 ```
@@ -887,9 +900,106 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
   **留白留白留白留白留白**
 
-## 6、安装Spark
+
+
+## 6、安装hive
 
 ### 6.1、基本安装
+
+1. 下载
+
+Hadoop生态圈的软件下载地址：
+
+https://archive.cloudera.com/cdh5/cdh/5/ （已无法下载）
+
+**注意**：无法避开收费墙下载，暂时无解
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Hive
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/hive-1.1.0-cdh5.15.1.tar.gz -C /usr/local/Hive/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Hive/hive-1.1.0-cdh5.15.1/ /usr/local/hive
+```
+
+5. 配置环境变量
+
+```
+[emon@emon ~]$ sudo vim /etc/profile.d/hive.sh
+export HIVE_HOME=/usr/local/hive
+export PATH=$HIVE_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+### 6.2、配置
+
+1. 配置
+
+- `hive-env.sh`
+
+```bash
+[emon@emon ~]$ cp /usr/local/hive/conf/hive-env.sh.template /usr/local/hive/conf/hive-env.sh
+[emon@emon ~]$ vim /usr/local/hive/conf/hive-env.sh
+```
+
+```bash
+# 修改HADOOP_HOME
+HADOOP_HOME=/usr/local/hadoop
+```
+
+- `hive-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hive/conf/hive-site.xml
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+		<value>jdbc:mysql://emon:3306/hivedb?createDatabaseIfNotExist=true</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+		<value>com.mysql.jdbc.Driver</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+		<value>flyinr</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+		<value>Flyin@123</value>
+    </property>
+</configuration>
+```
+
+
+
+
+
+
+
+## 7、安装Spark
+
+### 7.1、基本安装
 
 1. 下载
 
@@ -959,7 +1069,7 @@ export PATH=$SPARK_HOME/bin:$PATH
 log4j.logger.org.apache.spark.repl.Main=INFO
 ```
 
-### 6.2、local模式
+### 7.2、local模式
 
 - 进入local模式
 
@@ -1012,7 +1122,7 @@ http://192.168.1.116:4040
 scala> :quit
 ```
 
-### 6.2、Standalone模式
+### 7.2、Standalone模式
 
 
 
