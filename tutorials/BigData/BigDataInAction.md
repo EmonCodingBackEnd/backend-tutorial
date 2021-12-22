@@ -902,7 +902,7 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
 
 
-## 6、安装hive
+## 6、安装Hive
 
 ### 6.1、基本安装
 
@@ -982,7 +982,7 @@ HADOOP_HOME=/usr/local/hadoop
     </property>
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-		<value>flyinr</value>
+		<value>flyin</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionPassword</name>
@@ -991,11 +991,149 @@ HADOOP_HOME=/usr/local/hadoop
 </configuration>
 ```
 
+- 拷贝mysql驱动包到`$HIVE_HOME/lib`目录
+
+```bash
+[emon@emon ~]$ cp /usr/local/src/mysql-connector-java-5.1.27-bin.jar /usr/local/hive/lib/
+```
+
+2. 启动hive命令行
+
+```sql
+# 进入CLI
+[emon@emon ~]$ hive
+......
+Logging initialized using configuration in jar:file:/usr/local/Hive/hive-1.1.0-cdh5.15.1/lib/hive-common-1.1.0-cdh5.15.1.jar!/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+hive> show databases;
+OK
+default
+hive> create database test_db;
+OK
+Time taken: 0.12 seconds
+hive> show databases;
+OK
+default
+test_db
+```
+
+3. MySQL库情况
+
+```sql
+[emon@emon ~]$ mysql -uflyin -pFlyin@123 -hemon
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| architectdb        |
+| flyindb            |
+| hivedb             |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+7 rows in set (0.01 sec)
+
+mysql> use hivedb;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++--------------------+
+| Tables_in_hivedb   |
++--------------------+
+| cds                |
+| database_params    |
+| dbs                |
+| func_ru            |
+| funcs              |
+| global_privs       |
+| part_col_stats     |
+| partitions         |
+| roles              |
+| sds                |
+| sequence_table     |
+| serdes             |
+| skewed_string_list |
+| tab_col_stats      |
+| tbls               |
+| version            |
++--------------------+
+16 rows in set (0.00 sec)
+
+mysql> select * from dbs where name='default' \G;
+*************************** 1. row ***************************
+          DB_ID: 1
+           DESC: Default Hive database
+DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
+           NAME: default
+     OWNER_NAME: public
+     OWNER_TYPE: ROLE
+1 row in set (0.00 sec)
+```
 
 
 
+### 6.9、Hive学习碰到的问题
 
+- 问题1
 
+  - 如果在hive命令行执行卡主，一定要看hive日志，默认`/tmp/${user.name}`，比如我这里的`/tmp/emon`目录下
+
+  ```bash
+  [emon@emon ~]$ tailf /tmp/emon/hive.log
+  ```
+
+- 问题2
+
+  - 问题描述
+
+  ```bash
+  # 如果碰到如下问题，请修改mysql中hive数据库的编码
+  hive> create table helloworld(id int, name string) row format delimited fields terminated by '\t';
+  FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. MetaException(message:An exception was thrown while adding/validating class(es) : Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+  com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+  ```
+
+  - 问题原因
+
+  编码问题导致的 **Row size too large**
+
+  - 解决办法
+
+  ```bash
+  # 修改mysql中hive对应数据库编码，这里是 hivedb
+  mysql> alter database hivedb character set latin1;
+  Query OK, 1 row affected (0.00 sec)
+  
+  mysql> flush privileges;
+  Query OK, 0 rows affected (0.00 sec)
+  
+  ```
+
+  ># 还没完，如果已经碰到了上面的错误，在后续级联删除hive库时，会碰到卡主的情况，日志显示错误：
+  >
+  >Specified key was too long; max key length is 3072 bytes
+  >
+  ># 怎么办？
+  
+  第一步：在mysql命令行下，检查hive对应数据库中的tbls表：
+  
+  ```sql
+  mysql> show create table tbls;
+  ```
+  
+  如果发现编码还是`utf8mb4_unicode_ci`，而不是`latin1`，那就是原因了。
+  
+  第二步：删除hive对应数据库重新创建
+  
+  ```sql
+  mysql> create database hivedb character set latin1;
+  ```
+  
+  OK！
 
 ## 7、安装Spark
 
@@ -1235,3 +1373,172 @@ rmr: DEPRECATED: Please use 'rm -r' instead.
 Deleted /hdfs-test
 ```
 
+## 2、hive
+
+**基本概念定义**
+
+| 符号   | 含义        |
+| ------ | ----------- |
+| hive>  | hive命令行  |
+| mysql> | mysql命令行 |
+
+
+
+### 2.1、Hive数据抽象/结构
+
+- database：HDFS一个目录
+  - table：HDFS一个目录
+    - data：文件
+    - partition：分桶，HDFS一个目录
+      - data：文件
+      - bucket：分桶，HDFS一个目录
+
+
+
+### 2.2、数据定义语言（DDL）
+
+**DDL：Hive Data Definition Language**
+
+#### 2.2.1、数据库操作
+
+- 清屏
+
+```sql
+hive (default)> !clear;
+```
+
+- 创建数据库
+
+语法格式：
+
+```sql
+CREATE [REMOTE] (DATABASE|SCHEMA) [IF NOT EXISTS] database_name
+  [COMMENT database_comment]
+  [LOCATION hdfs_path]
+  [MANAGEDLOCATION hdfs_path]
+  [WITH DBPROPERTIES (property_name=property_value, ...)];
+```
+
+示例1：使用默认hdfs路径
+
+```sql
+hive> create database if not exists hive;
+```
+
+```bash
+mysql> select * from dbs where name='hive' \G;
+*************************** 1. row ***************************
+          DB_ID: 6
+           DESC: NULL
+DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse/hive.db
+           NAME: hive
+     OWNER_NAME: emon
+     OWNER_TYPE: USER
+1 row in set (0.00 sec)
+```
+
+示例2：指定hdfs路径
+
+```sql
+hive> create database if not exists hive2 location '/test/location';
+```
+
+```sql
+mysql> select * from dbs where name='hive2' \G;
+*************************** 1. row ***************************
+          DB_ID: 7
+           DESC: NULL
+DB_LOCATION_URI: hdfs://0.0.0.0:8020/test/location
+           NAME: hive2
+     OWNER_NAME: emon
+     OWNER_TYPE: USER
+1 row in set (0.00 sec)
+```
+
+示例3：
+
+```sql
+hive> create database if not exists hive3 with dbproperties('creator'='lm');
+```
+
+```sql
+hive> desc database extended hive3;
+OK
+hive3		hdfs://0.0.0.0:8020/user/hive/warehouse/hive3.db	emon	USER	{creator=lm}
+Time taken: 0.019 seconds, Fetched: 1 row(s)
+```
+
+- 删除数据库
+
+语法格式：
+
+```sql
+DROP (DATABASE|SCHEMA) [IF EXISTS] database_name [RESTRICT|CASCADE];
+```
+
+示例1：如果数据库有表，会报错无法删除 `message:Database test_db is not empty. One or more tables exist`
+
+```sql
+hive (default)> drop database if exists hive3;
+```
+
+示例2：如果数据库有表，可以级联删除，而不会报错！
+
+```sql
+hive (test_db)> drop database if exists test_db cascade;
+```
+
+- 查看所有数据库
+
+语法格式：
+
+```sql
+SHOW (DATABASES|SCHEMAS) [LIKE 'identifier_with_wildcards'];
+```
+
+示例1：
+
+```sql
+hive (default)> show databases;
+```
+
+示例2：
+
+```sql
+hive (default)> show databases like 'hive*';
+```
+
+- 查询数据库详情
+
+语法格式：
+
+```sql
+DESCRIBE DATABASE [EXTENDED] db_name;
+```
+
+示例1：默认
+
+```sql
+hive> desc database hive3;
+OK
+hive3		hdfs://0.0.0.0:8020/user/hive/warehouse/hive3.db	emon	USER	
+Time taken: 0.026 seconds, Fetched: 1 row(s)
+```
+
+示例2：显示扩展信息
+
+```sql
+hive> desc database extended hive3;
+OK
+hive3		hdfs://0.0.0.0:8020/user/hive/warehouse/hive3.db	emon	USER	{creator=lm}
+Time taken: 0.019 seconds, Fetched: 1 row(s)
+```
+
+- 设置显示当前库
+
+```sql
+hive> set hive.cli.print.current.db;
+hive.cli.print.current.db=false
+hive> set hive.cli.print.current.db=true;
+hive (default)> 
+```
