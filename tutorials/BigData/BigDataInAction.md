@@ -1656,6 +1656,30 @@ deptno int
 ) row format delimited fields terminated by '\t';
 ```
 
+示例2：
+
+```sql
+hive (default)> create table dept(
+deptno int,
+dname string,
+loc string
+) row format delimited fields terminated by '\t';
+```
+
+示例3：
+
+```sql
+hive (default)> create table emp1 as select * from emp;
+```
+
+示例4：
+
+```sql
+hive (default)> create table emp2 as select empno, ename, job, deptno from emp;
+```
+
+
+
 - 修改表名字
 
 语法格式：
@@ -1719,7 +1743,7 @@ hive (default)> desc formatted emp;
 数据准备：注意，分隔符是`\t`，使用`cat -A file`时应该可以看到`^I`字符表示的tab，如果不是，导入时会出现NULL数据。
 
 ```bash
-[emon@emon ~]$ vim /usr/local/hadoop/custom/data/copy.txt 
+[emon@emon ~]$ vim /usr/local/hadoop/custom/data/emp.txt 
 ```
 
 ```tex
@@ -1740,7 +1764,18 @@ hive (default)> desc formatted emp;
 8888	HIVE	PROGRAM	7839	1988-1-23	10300.00		
 ```
 
-#### 2.3.1、加载文件到表
+```sql
+[emon@emon ~]$ vim /usr/local/hadoop/custom/data/dept.txt 
+```
+
+```sql
+10	ACCOUNTING	NEW YORK
+20	RESEARCH	DALLAS
+30	SALES	CHICAGO
+40	OPERATIONS	BOSTON
+```
+
+- 加载文件到表
 
 语法格式：
 
@@ -1748,9 +1783,129 @@ hive (default)> desc formatted emp;
 LOAD DATA [LOCAL] INPATH 'filepath' [OVERWRITE] INTO TABLE tablename [PARTITION (partcol1=val1, partcol2=val2 ...)]
 ```
 
+语法说明：
+
+`local`：本地系统，如果没有local那么就是指的HDFS的路径。
+
+`overwrite`：是否数据覆盖，如果没有那么就是数据追加。
+
 示例1：
 
 ```sql
 hive (default)> load data local inpath '/usr/local/hadoop/custom/data/emp.txt' overwrite into table emp;
+hive (default)> load data local inpath '/usr/local/hadoop/custom/data/dept.txt' overwrite into table dept;
+```
+
+示例2：
+
+```sql
+# 注意，文件被使用后会删除
+hive (default)> load data inpath 'hdfs://emon:8020/data/emp.txt' overwrite into table emp;
+```
+
+- 基于查询覆盖已存在表数据
+
+语法格式：
+
+```sql
+INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;
+INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;
+```
+
+示例1：table必须先存在
+
+```sql
+hive (default)> insert overwrite table emp1 if not exists select * from emp;
+```
+
+示例2：table必须先存在
+
+```sql
+hive (default)> insert into table emp1 select * from emp;
+```
+
+- 基于查询写数据到本地或者HDFS文件系统
+
+语法格式：
+
+```sql
+INSERT OVERWRITE [LOCAL] DIRECTORY directory1
+  [ROW FORMAT row_format] [STORED AS file_format] (Note: Only available starting with Hive 0.11.0)
+  SELECT ... FROM ...
+```
+
+示例1：
+
+```sql
+hive (default)> insert overwrite local directory '/tmp/hive/' row format delimited fields terminated by '\t' select empno, ename, sal, deptno from emp;
+```
+
+
+
+### 2.4、数据查询语言（DQL）
+
+**Hive Data Query Language**
+
+- 查询
+
+语法格式：
+
+```sql
+[WITH CommonTableExpression (, CommonTableExpression)*]    (Note: Only available starting with Hive 0.13.0)
+SELECT [ALL | DISTINCT] select_expr, select_expr, ...
+  FROM table_reference
+  [WHERE where_condition]
+  [GROUP BY col_list]
+  [ORDER BY col_list]
+  [CLUSTER BY col_list
+    | [DISTRIBUTE BY col_list] [SORT BY col_list]
+  ]
+ [LIMIT [offset,] rows]
+```
+
+示例1：
+
+```sql
+hive> select * from emp;
+```
+
+示例2：
+
+```sql
+hive> select ename, empno, deptno from emp where deptno=10 limit 1;
+```
+
+示例3：
+
+```sql
+hive> select deptno, avg(sal) avg_sal from emp group by deptno having avg_sal>2000;
+```
+
+示例4：
+
+```sql
+hive> select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
+```
+
+
+
+- 执行计划
+
+语法格式：
+
+```sql
+EXPLAIN [EXTENDED|CBO|AST|DEPENDENCY|AUTHORIZATION|LOCKS|VECTORIZATION|ANALYZE] query
+```
+
+示例1：
+
+```sql
+hive> explain select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
+```
+
+示例2：
+
+```sql
+hive> explain extended select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
 ```
 
