@@ -109,6 +109,18 @@ Swap:          5.0G          0B        5.0G
 [root@emon ~]# nmcli con modify house +ipv4.dns 211.140.188.188
 ```
 
+4. 编辑网卡会话
+
+```bash
+[root@emon ~]# nmtui
+```
+
+5. 删除网卡会话
+
+```bash
+[root@emon ~]# nmcliconn delete company
+```
+
 ### 2.2、使用系统镜像文件配置本地yum源
 
 如果本地安装了Git Bash，或者可以使用scp命令，使用scp传输到系统的`/usr/local/src`目录即可。

@@ -417,7 +417,7 @@ hbase(main):014:0> exit
 | /usr/local/hadoop/custom/lib   | jar库文件                  |
 | /usr/local/hadoop/custom/shell | 脚本文件                   |
 
-### 5.1、基本安装
+### 5.1、Hadoop单节点
 
 1. 下载
 
@@ -759,6 +759,24 @@ emon: stopping nodemanager
 emon: nodemanager did not stop gracefully after 5 seconds: killing with kill -9
 no proxyserver to stop
 ```
+
+### 5.4、Hadoop集群
+
+1. Hadoop集群规划
+
+- 节点情况
+  - HDFS
+    - NN：NameNode
+    - DN：DataNode
+  - YARN
+    - RM：ResourceManager
+    - NM：NodeManager
+
+| 机器名 | IP1-家庭      | IP2-公司   | 部署内容       |
+| ------ | ------------- | ---------- | -------------- |
+| emon   | 192.168.1.116 | 10.0.0.116 | NN、DN、RM、NM |
+| emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM         |
+| emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM         |
 
 ### 5.8、Hadoop环境切换
 
