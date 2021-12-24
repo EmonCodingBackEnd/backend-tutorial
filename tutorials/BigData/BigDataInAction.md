@@ -1641,6 +1641,10 @@ constraint_specification:
     [, CONSTRAINT constraint_name CHECK [check_expression] ENABLE|DISABLE NOVALIDATE RELY/NORELY ]
 ```
 
+语法说明：
+
+`EXTERNAL`：外部表，默认是内部表
+
 示例1：
 
 ```sql
@@ -1678,7 +1682,38 @@ hive (default)> create table emp1 as select * from emp;
 hive (default)> create table emp2 as select empno, ename, job, deptno from emp;
 ```
 
+示例5：外部表
 
+```sql
+hive (default)> create external table emp_external(
+empno int,
+ename string,
+job string,
+mgr int,
+hiredate string,
+sal double,
+comm double,
+deptno int
+) row format delimited fields terminated by '\t'
+location '/external/emp';
+```
+
+示例6：外部表，带分区
+
+```sql
+hive (default)> create external table trackinfo(
+ip string,
+url string,
+sessionId string,    
+time string,
+country string,
+province string,
+city string,
+pageId string
+) partitioned by (day string)
+row format delimited fields terminated by '\t'
+location '/project/trackinfo';
+```
 
 - 修改表名字
 
@@ -1701,6 +1736,12 @@ hive (default)> alter table emp rename to emp2;
 ```sql
 DROP TABLE [IF EXISTS] table_name [PURGE];     -- (Note: PURGE available in Hive 0.14.0 and later)
 ```
+
+语法说明：
+
+> 内部表删除：HDFS上的数据被删除，并且MySQL中对应的Meta也被删除
+>
+> 外部表删除：仅删除MySQL中对应的Meta，但不会删除HDFS上的数据
 
 示例1：
 
@@ -1735,6 +1776,13 @@ hive> desc extended emp;
 ```sql
 hive (default)> desc formatted emp;
 ```
+
+**说明**：格式化查询时，输出内容中`# Detailed Table Information`信息包含的`Table Type`的值含义如下：
+
+| 字段                                   | 含义   |
+| -------------------------------------- | ------ |
+| Table Type:         	MANAGED_TABLE  | 内部表 |
+| Table Type:         	EXTERNAL_TABLE | 外部表 |
 
 ### 2.3、数据操作语言之创建（DML）
 
@@ -1799,8 +1847,15 @@ hive (default)> load data local inpath '/usr/local/hadoop/custom/data/dept.txt' 
 示例2：
 
 ```sql
-# 注意，文件被使用后会删除
+# 注意，HDFS文件被使用后会删除
 hive (default)> load data inpath 'hdfs://emon:8020/data/emp.txt' overwrite into table emp;
+```
+
+示例3：加载到带分区的表
+
+```sql
+# 注意，HDFS文件被使用后会删除
+hive (default)> load data inpath 'hdfs://emon:8020/project/input/etl' overwrite into table trackinfo partition(day='2013-07-21');
 ```
 
 - 基于查询覆盖已存在表数据
@@ -1822,6 +1877,13 @@ hive (default)> insert overwrite table emp1 if not exists select * from emp;
 
 ```sql
 hive (default)> insert into table emp1 select * from emp;
+```
+
+示例3：
+
+```sql
+hive> insert overwrite table trackinfo_province_stat partition(day='2013-07-21')
+select province,count(*) as cnt from trackinfo where day='2013-07-21' group by province;
 ```
 
 - 基于查询写数据到本地或者HDFS文件系统
@@ -1887,7 +1949,11 @@ hive> select deptno, avg(sal) avg_sal from emp group by deptno having avg_sal>20
 hive> select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
 ```
 
+示例5：对带分区的表，指定查询分区
 
+```sql
+hive> select * from trackinfo where day='2013-07-21' limit 5;
+```
 
 - 执行计划
 
