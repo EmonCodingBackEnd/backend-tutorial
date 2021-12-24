@@ -83,7 +83,34 @@ Mem:           1.8G        149M        1.4G        9.5M        204M        1.5G
 Swap:          5.0G          0B        5.0G
 ```
 
+### 1.3、修改主机名
 
+- 第一步
+
+```bash
+[root@emon ~]# hostnamectl set-hostname emon2
+```
+
+- 第二步：验证
+
+```bash
+[root@emon ~]# cat /etc/hostname
+emon2
+[root@emon ~]# hostname
+emon2
+```
+
+- 第三步：配置
+
+```bash
+[root@emon ~]# vim /etc/hosts
+```
+
+```bash
+127.0.0.1   emon2
+```
+
+- 第四部：退出Shell，重新登录即可
 
 ## 2、基础配置
 
