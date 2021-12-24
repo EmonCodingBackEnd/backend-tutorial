@@ -789,6 +789,15 @@ no proxyserver to stop
 ```bash
 #!/bin/bash
 
+source /home/emon/bin/switchHosts.sh
+
+if [ $? -ne 0 ]; then
+    echo -e "\e[1;31m 失败！\e[0m"
+    exit 0
+else
+    echo -e "\e[1;34m 成功！\e[0m"
+fi
+
 # 启动或停止hadoop函数
 function mgr() {
     cmd=$1
@@ -810,37 +819,6 @@ function mgr() {
         echo -e "\e[1;34m 执行命令 $cmd $startOrStop $nodeName 成功！\e[0m"
     fi
 }
-
-if [ $# -ne 1 ]; then
-    echo -e "\e[1;36m Usage: ./switchHadoopIp.sh env\e[0m"
-    echo -e "\e[1;34m env: 表示IP环境 【必须】\e[0m"
-    exit 0
-fi
-
-house="192.168.1.116   emon"
-company="10.0.0.116      emon"
-
-ENV_NAME=$1
-# 以变量作为key，获取其变量值
-ENV_VALUE=$(eval echo '$'$ENV_NAME)
-
-if [[ -z $ENV_VALUE ]]; then
-    echo -e "\e[1;34m env: "$ENV_NAME" 未定义\e[0m"
-    exit 0
-fi
-
-# 更换主机对应IP地址
-echo -e "\e[1;34m 开始执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
-echo 'emon123' | sudo -S sed -i 's/^[^#]*emon$/'"$ENV_VALUE"'/g' /etc/hosts
-if [ $? -ne 0 ]; then
-    echo -e "\e[1;31m 执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")失败！\e[0m"
-    exit 0
-else
-    echo -e "\e[1;34m 成功执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
-fi
-
-echo -e "\e[1;34m 执行后 /etc/hosts 文件内容如下\e[0m"
-cat /etc/hosts
 
 mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 

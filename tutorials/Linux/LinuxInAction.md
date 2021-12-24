@@ -316,6 +316,62 @@ set pastetoggle=<F9>
 127.0.0.1   emon
 ```
 
+### 2.8、切换主机脚本
+
+- 编辑脚本
+
+```bash
+[emon@emon ~]$ vim ~/bin/switchHosts.sh
+```
+
+```bash
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo -e "\e[1;36m Usage: ./switchHadoopIp.sh env\e[0m"
+    echo -e "\e[1;34m env: 表示IP环境 【必须】\e[0m"
+    exit 0
+fi
+
+house="192.168.1.116   emon"
+company="10.0.0.116      emon"
+
+ENV_NAME=$1
+# 以变量作为key，获取其变量值
+ENV_VALUE=$(eval echo '$'$ENV_NAME)
+
+if [[ -z $ENV_VALUE ]]; then
+    echo -e "\e[1;34m env: "$ENV_NAME" 未定义\e[0m"
+    exit 0
+fi
+
+# 更换主机对应IP地址
+echo -e "\e[1;34m 开始执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
+echo 'emon123' | sudo -S sed -i 's/^[^#]*emon/'"$ENV_VALUE"'/g' /etc/hosts
+if [ $? -ne 0 ]; then
+    echo -e "\e[1;31m 执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")失败！\e[0m"
+    exit 0
+else
+    echo -e "\e[1;34m 成功执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
+fi
+
+echo -e "\e[1;34m 执行后 /etc/hosts 文件内容如下\e[0m"
+cat /etc/hosts
+```
+
+- 修改权限
+
+```bash
+[emon@emon ~]$ chmod u+x ~/bin/switchHosts.sh 
+```
+
+- 执行切换
+
+```bash
+```
+
+
+
 ## 3、一些说明
 
 关于软件端口访问，如果防火墙开启(`systemctl start firewalld`)，且需要外部环境访问，那么可以开放端口(`firewalld-cmd`命令)，如果不需要外部访问，只需要在本机内访问，通过`127.0.0.1`方式访问即可。如果防火墙关闭(`systemctl stop firewalld`)，那么外部与本机都可以直接通过IP地址访问。
