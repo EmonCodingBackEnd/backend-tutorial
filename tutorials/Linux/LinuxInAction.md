@@ -368,9 +368,8 @@ cat /etc/hosts
 - 执行切换
 
 ```bash
+[emon@emon ~]$ ~/bin/switchHosts.sh 
 ```
-
-
 
 ## 3、一些说明
 
