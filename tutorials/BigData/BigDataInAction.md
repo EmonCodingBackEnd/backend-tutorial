@@ -856,13 +856,13 @@ The key's randomart image is:
 
 **2.JDK安装**
 
-每一台服务器都需要安装JDK。
+<font color="gree">每一台服务器都需要安装Hadoop。</font>
 
 [安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
 
 **3.安装Hadoop**
 
-每一台服务器都需要安装Hadoop。
+<font color="gree">每一台服务器都需要安装Hadoop。</font>
 
 [安装Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#5%E5%AE%89%E8%A3%85hadoop)
 
@@ -877,6 +877,8 @@ The key's randomart image is:
 
 
 #### 5.4.3、配置
+
+<font color="gree">每一台服务器都需要安装Hadoop。</font>
 
 - 配置`core-site.xml`
 
