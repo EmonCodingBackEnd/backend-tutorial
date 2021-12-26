@@ -778,6 +778,35 @@ no proxyserver to stop
 | emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM         |
 | emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM         |
 
+- hostname配置情况
+
+```bash
+[emon@emon ~]$ sudo vim /etc/hosts
+192.168.1.116 emon
+192.168.1.117 emon2
+192.168.1.118 emon3
+```
+
+```bash
+[emon@emon2 ~]$ sudo vim /etc/hosts
+192.168.1.116 emon
+192.168.1.117 emon2
+192.168.1.118 emon3
+```
+
+```bash
+[emon@emon3 ~]$ sudo vim /etc/hosts
+192.168.1.116 emon
+192.168.1.117 emon2
+192.168.1.118 emon3
+```
+
+
+
+
+
+
+
 ### 5.8、Hadoop环境切换
 
 **备注**：如果`/usr/local/hadoop/etc/hadoop/slaves`配置了主机名，但主机名在`/etc/hosts`定义为`127.0.0.1  emon`会有本地可以查看文件内容，但JavaAPI无法执行open出hdfs文件内容的问题；但如果主机名要配置为`192.168.1.116    emon`这样时，在公司和家里切换麻烦，写了如下切换的脚本。

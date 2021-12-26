@@ -333,12 +333,17 @@ if [ $# -ne 1 ]; then
     exit 0
 fi
 
-house="192.168.1.116   emon"
-company="10.0.0.116      emon"
+house="192.168.1.116      emon"
+houses="192.168.1.116      emon,192.168.1.117      emon2,192.168.1.118      emon3"
+company="10.0.0.116         emon"
+companys="10.0.0.116         emon,10.0.0.117         emon2,10.0.0.118         emon3"
 
 ENV_NAME=$1
 # 以变量作为key，获取其变量值
 ENV_VALUE=$(eval echo '$'$ENV_NAME)
+# 以逗号分隔，转换为数组
+IFS=","
+ENV_VALUE=($ENV_VALUE)
 
 if [[ -z $ENV_VALUE ]]; then
     echo -e "\e[1;34m env: "$ENV_NAME" 未定义\e[0m"
@@ -346,8 +351,14 @@ if [[ -z $ENV_VALUE ]]; then
 fi
 
 # 更换主机对应IP地址
+#echo 'emon123' | sudo -S sed -i 's/^[^#]*emon\d?/'"$ENV_VALUE"'/g' /etc/hosts
+echo 'emon123' | sudo -S sed -i '/^[^#]*emon/d' /etc/hosts
 echo -e "\e[1;34m 开始执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")\e[0m"
-echo 'emon123' | sudo -S sed -i 's/^[^#]*emon/'"$ENV_VALUE"'/g' /etc/hosts
+for ip in "${ENV_VALUE[@]}"
+do
+    echo 'emon123' | sudo -S sed -i '$a \'"$ip" /etc/hosts
+done
+
 if [ $? -ne 0 ]; then
     echo -e "\e[1;31m 执行更换主机IP到环境 " $ENV_NAME"("$ENV_VALUE")失败！\e[0m"
     exit 0
