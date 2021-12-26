@@ -803,7 +803,7 @@ no proxyserver to stop
 
 #### 5.4.2、前置安装
 
-**配置SSH免密登录**
+**1.配置SSH免密登录**
 
 - 检查SSH keys是否存在：（每一台服务器都需要做）
 
@@ -838,12 +838,135 @@ The key's randomart image is:
 +----[SHA256]-----+
 ```
 
-- 拷贝公钥到其他服务器：（仅emon服务器需要做）
+- 拷贝emon服务器公钥到其他服务器：（仅emon服务器需要做）
 
 ```bash
 [emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
 [emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
 [emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
+```
+
+- 验证从emon服务器登录到emon、emon2、emon3免密登录
+
+```bash
+[emon@emon ~]$ ssh emon
+[emon@emon ~]$ ssh emon2
+[emon@emon ~]$ ssh emon3
+```
+
+**2.JDK安装**
+
+每一台服务器都需要安装JDK。
+
+[安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
+
+**3.安装Hadoop**
+
+每一台服务器都需要安装Hadoop。
+
+[安装Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#5%E5%AE%89%E8%A3%85hadoop)
+
+- 确保JAVA_HOME指定到JDK8，查看配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hadoop-env.sh 
+```
+
+可以看到`export JAVA_HOME=${JAVA_HOME}`，所以，如果JAVA_HOME环境变量是正确的即可。
+
+
+
+#### 5.4.3、配置
+
+- 配置`core-site.xml`
+
+```bash
+# 在打开的文件中<configuration>节点内添加属性
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/core-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+		<value>hdfs://0.0.0.0:8020</value>
+    </property>
+</configuration>
+```
+
+- 配置`hdfs-site.xml`
+
+<center><font color="red">单节点参考hdfs-site.xml.singlebak；集群参考hdfs-site.xml.clusterbak</font></center>
+
+```bash
+# 修改副本数量，由于默认副本系统是3，也可以不用修改了
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/usr/local/hadoop/tmp/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/usr/local/hadoop/tmp/dfs/data</value>
+    </property>
+</configuration>
+```
+
+- 修改从节点
+
+<center><font color="red">单节点参考slaves.singlebak；集群参考slaves.clusterbak</font></center>
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/slaves 
+#localhost
+emon
+emon2
+emon3
+```
+
+- 配置`mapred-site.xml`
+
+```bash
+[emon@emon ~]$ cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
+```
+
+```xml
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+</configuration>
+```
+
+- 配置`yarn-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/yarn-site.xml 
+```
+
+```xml
+<configuration>
+
+<!-- Site specific YARN configuration properties -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <!-- 配置该属性为了解决错误 Caused by: java.io.IOException: Exceeded MAX_FAILED_UNIQUE_FETCHES; bailing-out. -->
+    <property>
+        <name>yarn.nodemanager.local-dirs</name>
+        <value>/usr/local/hadoop/tmp/nm-local-dir</value>        
+    </property>
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>emon</value>
+    </property>
 ```
 
 
