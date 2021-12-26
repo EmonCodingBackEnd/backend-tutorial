@@ -69,6 +69,7 @@ Type in expressions for evaluation. Or try :help.
 
 scala> 1+2
 res0: Int = 3
+scala> :quit
 ```
 
 
