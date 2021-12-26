@@ -2680,6 +2680,8 @@ known_hosts是自己访问其他机器时，如果访问成功，会加入该文
 
 authorized_keys作用时，把本机的ssh公钥放到对方机器的该文件内，可以免密访问对方机器。
 
+通过命令`ssh-copy-id -i ~/.ssh/id_rsa.pub emon`可把公钥拷贝到当前服务器的authorized_keys，可免密登录了。`ssh emon`。
+
 - 检查SSH keys是否存在：
 
 ```bas

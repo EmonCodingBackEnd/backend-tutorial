@@ -762,7 +762,7 @@ no proxyserver to stop
 
 ### 5.4、Hadoop集群
 
-1. Hadoop集群规划
+#### 5.4.1、Hadoop集群规划
 
 - 节点情况
   - HDFS
@@ -801,9 +801,50 @@ no proxyserver to stop
 192.168.1.118 emon3
 ```
 
+#### 5.4.2、前置安装
 
+**配置SSH免密登录**
 
+- 检查SSH keys是否存在：（每一台服务器都需要做）
 
+```bash
+[emon@emon ~]$ ls -a ~/.ssh
+```
+
+- 如果不存在，生成SSH keys：（每一台服务器都需要做）
+
+```bash
+[emon@emon ~]$ ssh-keygen -t rsa -b 4096 -C "[邮箱]"
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/emon/.ssh/id_rsa):`[默认]` 
+Created directory '/home/emon/.ssh'.
+Enter passphrase (empty for no passphrase): `[输入口令，其他用户切换到emon会提示输入]`
+Enter same passphrase again: `[确认口令]`
+Your identification has been saved in /home/emon/.ssh/id_rsa.
+Your public key has been saved in /home/emon/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:IRg9u6Ha0s6oUfHDqGjS2Tn4UWS+kRO2mDYyWP9wjHQ liming20110711@163.com
+The key's randomart image is:
++---[RSA 4096]----+
+|    ..           |
+|     oo          |
+|  o o Eo.        |
+| o B @o= .       |
+|. = %.XoS        |
+|.+ B.O.+         |
+|=.++= o          |
+|o.o+oo           |
+|...o+            |
++----[SHA256]-----+
+```
+
+- 拷贝公钥到其他服务器：（仅emon服务器需要做）
+
+```bash
+[emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
+[emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
+[emon@emon ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
+```
 
 
 
