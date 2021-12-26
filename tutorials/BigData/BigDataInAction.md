@@ -492,7 +492,7 @@ export PATH=$HADOOP_HOME/bin:$PATH
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-		<value>hdfs://0.0.0.0:8020</value>
+		<value>hdfs://emon:8020</value>
     </property>
 </configuration>
 ```
@@ -805,6 +805,8 @@ no proxyserver to stop
 
 **1.配置SSH免密登录**
 
+<font color="gree">每一台服务器都需要安装Hadoop。</font>
+
 - 检查SSH keys是否存在：（每一台服务器都需要做）
 
 ```bash
@@ -891,7 +893,7 @@ The key's randomart image is:
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-		<value>hdfs://0.0.0.0:8020</value>
+		<value>hdfs://emon:8020</value>
     </property>
 </configuration>
 ```
@@ -934,10 +936,10 @@ emon3
 
 ```bash
 [emon@emon ~]$ cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
 ```
 
 ```xml
-[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
 <configuration>
     <property>
         <name>mapreduce.framework.name</name>
@@ -969,9 +971,43 @@ emon3
         <name>yarn.resourcemanager.hostname</name>
         <value>emon</value>
     </property>
+</configuration>
 ```
 
+#### 5.4.4、格式化HDFS
 
+- 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
+
+```bash
+[emon@emon ~]$ hdfs namenode -format
+# 或者
+[emon@emon ~]$ hadoop namenode -format
+```
+
+- 启动HDFS
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/start-dfs.sh 
+```
+
+- 验证1
+
+```bash
+# jps查看进程
+[emon@emon ~]$ jps
+14707 Jps
+13909 NameNode
+14232 DataNode
+14589 SecondaryNameNode
+# 查看hdfs路径
+[emon@emon ~]$ hadoop fs -ls  /
+# 上传文件
+[emon@emon ~]$ hadoop fs -put /usr/local/hadoop/README.txt /
+```
+
+- 验证2
+
+http://repo.emon.vip:50070
 
 ### 5.8、Hadoop环境切换
 
