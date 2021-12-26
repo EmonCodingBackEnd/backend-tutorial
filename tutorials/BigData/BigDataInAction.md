@@ -595,8 +595,6 @@ drwxrwxr-x. 3 emon emon 18 12月 12 21:36 dfs
 [emon@emon ~]$ /usr/local/hadoop/sbin/start-dfs.sh 
 ```
 
-第一次启动的日志，`core-site.xml`配置的是`<value>hdfs://0.0.0.0:8020</value>`
-
 ```bash
 21/12/12 22:22:04 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 Starting namenodes on [0.0.0.0]
@@ -803,7 +801,7 @@ no proxyserver to stop
 
 #### 5.4.2、前置安装
 
-**1.配置SSH免密登录**
+##### 1.配置SSH免密登录
 
 <font color="gree">每一台服务器都需要安装Hadoop。</font>
 
@@ -856,13 +854,13 @@ The key's randomart image is:
 [emon@emon ~]$ ssh emon3
 ```
 
-**2.JDK安装**
+##### 2.JDK安装
 
 <font color="gree">每一台服务器都需要安装Hadoop。</font>
 
 [安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
 
-**3.安装Hadoop**
+##### 3.安装Hadoop
 
 <font color="gree">每一台服务器都需要安装Hadoop。</font>
 
@@ -974,7 +972,9 @@ emon3
 </configuration>
 ```
 
-#### 5.4.4、格式化HDFS
+#### 5.4.4、格式化与启动
+
+##### 1.格式化HDFS
 
 - 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
 
@@ -984,7 +984,55 @@ emon3
 [emon@emon ~]$ hadoop namenode -format
 ```
 
-- 启动HDFS
+```bash
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+21/12/26 17:38:12 INFO namenode.NameNode: STARTUP_MSG: 
+/************************************************************
+STARTUP_MSG: Starting NameNode
+STARTUP_MSG:   user = emon
+STARTUP_MSG:   host = emon/192.168.1.116
+STARTUP_MSG:   args = [-format]
+STARTUP_MSG:   version = 2.6.0-cdh5.15.1
+STARTUP_MSG:   classpath =......
+......省略......
+21/12/26 17:38:12 INFO namenode.NameNode: Caching file names occuring more than 10 times
+21/12/26 17:38:12 INFO snapshot.SnapshotManager: Loaded config captureOpenFiles: false, skipCaptureAccessTimeOnlyChange: false, snapshotDiffAllowSnapRootDescendant: true
+21/12/26 17:38:12 INFO util.GSet: Computing capacity for map cachedBlocks
+21/12/26 17:38:12 INFO util.GSet: VM type       = 64-bit
+21/12/26 17:38:12 INFO util.GSet: 0.25% max memory 889 MB = 2.2 MB
+21/12/26 17:38:12 INFO util.GSet: capacity      = 2^18 = 262144 entries
+21/12/26 17:38:12 INFO namenode.FSNamesystem: dfs.namenode.safemode.threshold-pct = 0.9990000128746033
+21/12/26 17:38:12 INFO namenode.FSNamesystem: dfs.namenode.safemode.min.datanodes = 0
+21/12/26 17:38:12 INFO namenode.FSNamesystem: dfs.namenode.safemode.extension     = 30000
+21/12/26 17:38:12 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.window.num.buckets = 10
+21/12/26 17:38:12 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.num.users = 10
+21/12/26 17:38:12 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.windows.minutes = 1,5,25
+21/12/26 17:38:12 INFO namenode.FSNamesystem: Retry cache on namenode is enabled
+21/12/26 17:38:12 INFO namenode.FSNamesystem: Retry cache will use 0.03 of total heap and retry cache entry expiry time is 600000 millis
+21/12/26 17:38:12 INFO util.GSet: Computing capacity for map NameNodeRetryCache
+21/12/26 17:38:12 INFO util.GSet: VM type       = 64-bit
+21/12/26 17:38:12 INFO util.GSet: 0.029999999329447746% max memory 889 MB = 273.1 KB
+21/12/26 17:38:12 INFO util.GSet: capacity      = 2^15 = 32768 entries
+21/12/26 17:38:12 INFO namenode.FSNamesystem: ACLs enabled? false
+21/12/26 17:38:12 INFO namenode.FSNamesystem: XAttrs enabled? true
+21/12/26 17:38:12 INFO namenode.FSNamesystem: Maximum size of an xattr: 16384
+21/12/26 17:38:12 INFO namenode.FSImage: Allocated new BlockPoolId: BP-2013064118-192.168.1.116-1640511492651
+21/12/26 17:38:12 INFO common.Storage: Storage directory /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name has been successfully formatted.
+21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Saving image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
+21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 320 bytes saved in 0 seconds .
+21/12/26 17:38:12 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
+21/12/26 17:38:12 INFO util.ExitUtil: Exiting with status 0
+21/12/26 17:38:12 INFO namenode.NameNode: SHUTDOWN_MSG: 
+/************************************************************
+SHUTDOWN_MSG: Shutting down NameNode at emon/192.168.1.116
+************************************************************/
+```
+
+##### 2.启动HDFS
+
+- 启动
 
 ```bash
 [emon@emon ~]$ /usr/local/hadoop/sbin/start-dfs.sh 
@@ -1005,9 +1053,49 @@ emon3
 [emon@emon ~]$ hadoop fs -put /usr/local/hadoop/README.txt /
 ```
 
+**说明：**执行上传文件时如果报错：
+
+>21/12/26 17:42:50 INFO hdfs.DFSClient: Exception in createBlockOutputStream
+>java.io.IOException: Bad connect ack with firstBadLink as 192.168.1.118:50010
+
+请检查emon2和emon3是否防火墙已关闭！`[emon@emon2 ~]$]$ sudo systemctl status firewalld`
+
 - 验证2
 
 http://repo.emon.vip:50070
+
+##### 3.启动YARN
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/sbin/start-yarn.sh
+```
+
+- 验证1
+
+```bash
+[emon@emon Hadoop]$ jps
+19472 SecondaryNameNode
+20480 NodeManager
+18792 NameNode
+19115 DataNode
+19998 ResourceManager
+20846 Jps
+```
+
+- 验证2
+
+http://repo.emon.vip:8088
+
+- 验证3
+
+```bash
+# 执行一个PI求解的任务
+[emon@emon ~]$ hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.15.1.jar pi 2 3
+```
+
+
+
+
 
 ### 5.8、Hadoop环境切换
 
