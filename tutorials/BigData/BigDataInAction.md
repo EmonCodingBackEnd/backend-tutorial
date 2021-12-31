@@ -448,7 +448,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -xzvf /usr/local/src/hadoop-2.6.0-cdh5.15.1.tar.gz -C /usr/local/Hadoop/
+[emon@emon ~]$ tar -xzvf /usr/local/src/hadoop-2.6.0-cdh5.16.2.tar.gz -C /usr/local/Hadoop/
 ```
 
 - hadoop软件包常见目录说明
@@ -464,7 +464,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/ /usr/local/hadoop
+[emon@emon ~]$ ln -s /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/ /usr/local/hadoop
 ```
 
 5. 配置环境变量
@@ -547,11 +547,15 @@ emon
 - 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
 
 ```bash
+[emon@emon ~]$ hdfs namenode -format
+```
+
+```bash
 STARTUP_MSG: Starting NameNode
 STARTUP_MSG:   user = emon
 STARTUP_MSG:   host = emon/192.168.1.116
 STARTUP_MSG:   args = [-format]
-STARTUP_MSG:   version = 2.6.0-cdh5.15.1
+STARTUP_MSG:   version = 2.6.0-cdh5.16.2
 STARTUP_MSG:   classpath =......
 ......省略......
 21/12/26 19:24:01 INFO namenode.NameNode: Caching file names occuring more than 10 times
@@ -596,10 +600,10 @@ SHUTDOWN_MSG: Shutting down NameNode at emon/192.168.1.116
 ```bash
 21/12/26 19:25:51 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 Starting namenodes on [emon]
-emon: starting namenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-namenode-emon.out
-emon: starting datanode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-datanode-emon.out
+emon: starting namenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/logs/hadoop-emon-namenode-emon.out
+emon: starting datanode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/logs/hadoop-emon-datanode-emon.out
 Starting secondary namenodes [0.0.0.0]
-0.0.0.0: starting secondarynamenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/hadoop-emon-secondarynamenode-emon.out
+0.0.0.0: starting secondarynamenode, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/logs/hadoop-emon-secondarynamenode-emon.out
 21/12/26 19:26:06 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
@@ -710,8 +714,8 @@ not running
 
 ```bash
 starting yarn daemons
-starting resourcemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/yarn-emon-resourcemanager-emon.out
-emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/logs/yarn-emon-nodemanager-emon.out
+starting resourcemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/logs/yarn-emon-resourcemanager-emon.out
+emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/logs/yarn-emon-nodemanager-emon.out
 ```
 
 **说明：**启动日志参见`/usr/local/hadoop/logs`
@@ -990,7 +994,7 @@ STARTUP_MSG: Starting NameNode
 STARTUP_MSG:   user = emon
 STARTUP_MSG:   host = emon/192.168.1.116
 STARTUP_MSG:   args = [-format]
-STARTUP_MSG:   version = 2.6.0-cdh5.15.1
+STARTUP_MSG:   version = 2.6.0-cdh5.16.2
 STARTUP_MSG:   classpath =......
 ......省略......
 21/12/26 17:38:12 INFO namenode.NameNode: Caching file names occuring more than 10 times
@@ -1015,9 +1019,9 @@ STARTUP_MSG:   classpath =......
 21/12/26 17:38:12 INFO namenode.FSNamesystem: XAttrs enabled? true
 21/12/26 17:38:12 INFO namenode.FSNamesystem: Maximum size of an xattr: 16384
 21/12/26 17:38:12 INFO namenode.FSImage: Allocated new BlockPoolId: BP-2013064118-192.168.1.116-1640511492651
-21/12/26 17:38:12 INFO common.Storage: Storage directory /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name has been successfully formatted.
-21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Saving image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
-21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 320 bytes saved in 0 seconds .
+21/12/26 17:38:12 INFO common.Storage: Storage directory /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/tmp/dfs/name has been successfully formatted.
+21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Saving image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
+21/12/26 17:38:12 INFO namenode.FSImageFormatProtobuf: Image file /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 320 bytes saved in 0 seconds .
 21/12/26 17:38:12 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
 21/12/26 17:38:12 INFO util.ExitUtil: Exiting with status 0
 21/12/26 17:38:12 INFO namenode.NameNode: SHUTDOWN_MSG: 
@@ -1094,7 +1098,7 @@ http://repo.emon.vip:8088
 
 ```bash
 # 执行一个PI求解的任务
-[emon@emon ~]$ hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.15.1.jar pi 2 3
+[emon@emon ~]$ hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.16.2.jar pi 2 3
 ```
 
 - 停止
@@ -1254,13 +1258,13 @@ https://archive.cloudera.com/cdh5/cdh/5/ （已无法下载）
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/hive-1.1.0-cdh5.15.1.tar.gz -C /usr/local/Hive/
+[emon@emon ~]$ tar -zxvf /usr/local/src/hive-1.1.0-cdh5.16.2.tar.gz -C /usr/local/Hive/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Hive/hive-1.1.0-cdh5.15.1/ /usr/local/hive
+[emon@emon ~]$ ln -s /usr/local/Hive/hive-1.1.0-cdh5.16.2/ /usr/local/hive
 ```
 
 5. 配置环境变量
@@ -1334,7 +1338,7 @@ HADOOP_HOME=/usr/local/hadoop
 # 进入CLI
 [emon@emon ~]$ hive
 ......
-Logging initialized using configuration in jar:file:/usr/local/Hive/hive-1.1.0-cdh5.15.1/lib/hive-common-1.1.0-cdh5.15.1.jar!/hive-log4j.properties
+Logging initialized using configuration in jar:file:/usr/local/Hive/hive-1.1.0-cdh5.16.2/lib/hive-common-1.1.0-cdh5.16.2.jar!/hive-log4j.properties
 WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
 hive> show databases;
 OK
