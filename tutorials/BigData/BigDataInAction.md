@@ -8,7 +8,7 @@
 
 # 一、基础软件安装
 
-## 1、安装ZooKeeper（Apache版）
+## 1、安装ZooKeeper
 
 1. 下载
 
@@ -18,9 +18,11 @@
 
 版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
 
-```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
-```
+> wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
+
+这里以cdh版学习：
+
+**注意**：无法避开收费墙下载，暂时无解
 
 2. 创建安装目录
 
@@ -31,7 +33,7 @@
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.7.0-bin.tar.gz -C /usr/local/ZooKeeper/
+[emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
 ```
 
 4. 创建软连接
@@ -629,6 +631,13 @@ not running
 ```
 
 访问地址：http://repo.emon.vip:50070
+
+- 验证3
+
+```bash
+# 执行一个PI求解的任务
+[emon@emon ~]$ hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.16.2.jar pi 2 3
+```
 
 3. 停止HDFS
 

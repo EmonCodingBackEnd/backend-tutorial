@@ -589,8 +589,12 @@ export PATH=$MAVEN_HOME/bin:$PATH
     <localRepository>/usr/local/maven/repository</localRepository>
   ```
 
-  - 配置`mirror`
+  **说明：**需要修改`/usr/local/maven/repository`为`jenkins`用户权限。
 
+  > [emon@emon ~]$ sudo chown jenkins.jenkins /usr/local/maven/repository
+  
+  - 配置`mirror`
+  
   ```xml
     <mirrors>
       <!-- mirror
