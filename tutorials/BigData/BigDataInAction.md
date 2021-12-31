@@ -730,6 +730,20 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.15.1/
 [emon@emon ~]$ /usr/local/hadoop/sbin/stop-yarn.sh 
 ```
 
+4. 另外一种方式
+
+> start-yarn.sh=
+>
+> ​					yarn-daemon.sh start resourcemanager
+>
+> ​					yarn-daemon.sh start nodemanager
+
+> stop-yarn.sh=
+>
+> ​					yarn-daemon.sh stop resourcemanager
+>
+> ​					yarn-daemon.sh stop nodemanager
+
 ### 5.3、Hadoop集群
 
 #### 5.3.1、Hadoop集群规划
