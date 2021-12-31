@@ -36,10 +36,23 @@
 [emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
 ```
 
+**说明：**如果发生错误：
+
+> gzip: stdin: decompression OK, trailing garbage ignored
+>
+> tar: Child returned status 2
+> tar: Error is not recoverable: exiting now
+
+**解决方案：**
+先`gunzip *.tar.gz`
+再`tar xvf *.tar`
+也可以使用`tar xvf *.tar -C 自定义目录`指定解压位置。
+若文件为`.tgz`格式，用`mv`命令转成`.tar.gz`。
+
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/ZooKeeper/apache-zookeeper-3.7.0-bin/ /usr/local/zoo
+[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
 ```
 
 5. 配置环境变量
