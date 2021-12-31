@@ -563,6 +563,60 @@ export PATH=$MAVEN_HOME/bin:$PATH
 [emon@emon ~]$ mvn -v
 ```
 
+7. 配置
+
+- 创建repo存放目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/maven/repository
+```
+
+- 配置存放repo
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/maven/conf/settings.xml 
+  ```
+
+  - 配置`localRepository`
+
+  ```xml
+    <!-- localRepository
+     | The path to the local repository maven will use to store artifacts.
+     |
+     | Default: ${user.home}/.m2/repository
+    <localRepository>/path/to/local/repo</localRepository>
+    -->
+    <localRepository>/usr/local/maven/repository</localRepository>
+  ```
+
+  - 配置`mirror`
+
+  ```xml
+    <mirrors>
+      <!-- mirror
+       | Specifies a repository mirror site to use instead of a given repository. The repository that
+       | this mirror serves has an ID that matches the mirrorOf element of this mirror. IDs are used
+       | for inheritance and direct lookup purposes, and must be unique across the set of mirrors.
+       |
+      <mirror>
+        <id>mirrorId</id>
+        <mirrorOf>repositoryId</mirrorOf>
+        <name>Human Readable Name for this Mirror.</name>
+        <url>http://my.repository.com/repo/path</url>
+      </mirror>
+       -->
+      <mirror>
+          <id>nexus</id>
+          <mirrorOf>*,!cloudera</mirrorOf>
+          <name>nexus maven</name>
+          <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+          <!--<url>http://localhost:8081/repository/maven-public/</url>-->
+      </mirror>
+    </mirrors>
+  ```
+
+
+
 ## 4、安装vsftpd
 
 1. 检查是否安装

@@ -410,12 +410,14 @@ hbase(main):014:0> exit
 
 目录规划：
 
-| 目录                           | 作用                       |
-| ------------------------------ | -------------------------- |
-| /usr/local/hadoop/tmp          | 存放hadoop的hdfs数据的目录 |
-| /usr/local/hadoop/custom/data  | 测试数据                   |
-| /usr/local/hadoop/custom/lib   | jar库文件                  |
-| /usr/local/hadoop/custom/shell | 脚本文件                   |
+| 目录                            | 作用                       |
+| ------------------------------- | -------------------------- |
+| /usr/local/hadoop/tmp           | 存放hadoop的hdfs数据的目录 |
+| /usr/local/hadoop/custom/data   | 测试数据                   |
+| /usr/local/hadoop/custom/lib    | jar库文件                  |
+| /usr/local/hadoop/custom/shell  | 脚本文件                   |
+| /usr/local/hadoop/custom/source | 存放spark等等源码的目录    |
+|                                 |                            |
 
 ### 5.1、Hadoop单节点
 
