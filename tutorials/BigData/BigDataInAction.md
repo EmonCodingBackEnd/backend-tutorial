@@ -19,7 +19,7 @@
 版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.5/apache-zookeeper-3.5.5-bin.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
 ```
 
 2. 创建安装目录
@@ -31,13 +31,13 @@
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.5.5-bin.tar.gz -C /usr/local/ZooKeeper/
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.7.0-bin.tar.gz -C /usr/local/ZooKeeper/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/ZooKeeper/apache-zookeeper-3.5.5-bin/ /usr/local/zoo
+[emon@emon ~]$ ln -s /usr/local/ZooKeeper/apache-zookeeper-3.7.0-bin/ /usr/local/zoo
 ```
 
 5. 配置环境变量
@@ -46,7 +46,8 @@
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
-export PATH=/usr/local/zoo/bin:$PATH
+export ZK_HOME=/usr/local/zoo
+export PATH=$ZK_HOME/bin:$PATH
 ```
 
 使之生效：
@@ -90,6 +91,13 @@ admin.serverPort=8090
 
 ```bash
 [emon@emon ~]$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+44611 QuorumPeerMain
 ```
 
 - 停止
