@@ -8,7 +8,7 @@
 
 # 一、基础软件安装
 
-## 1、安装ZooKeeper
+## 1、安装ZooKeeper（Apache版）
 
 1. 下载
 
