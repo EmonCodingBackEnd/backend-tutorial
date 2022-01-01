@@ -96,7 +96,7 @@ export PATH=$ZK_HOME/bin:$PATH
 dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
 # [新增]
 dataLogDir=/usr/local/zoo/logs
-# [新增]修改默认的8080端口
+# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
 admin.serverPort=8090
 ```
 
