@@ -4689,7 +4689,7 @@ http://192.168.1.116:8082/
     
   - SSH Servers
     - SSH Servers
-      - Name： 192.168.1.116-SSH
+      - Name： repo.emon.vip-common
       - Hostname： emon
       - Username： emon
       - Remote Directory： /home/emon/saas
