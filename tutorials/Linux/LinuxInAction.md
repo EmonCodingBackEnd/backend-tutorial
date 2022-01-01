@@ -4686,14 +4686,18 @@ http://192.168.1.116:8082/
     - Passphrase： 私钥口令（SSH）/用户密码（用户名方式）
     - Path to key： 私钥文件路径
     - Key： 私钥文件内容
+    
   - SSH Servers
     - SSH Servers
       - Name： 192.168.1.116-SSH
-      - Hostname： 192.168.1.116
+      - Hostname： emon
       - Username： emon
       - Remote Directory： /home/emon/saas
       - Use password authentication,or use a different key[勾选]
         - Passphrase / Password： `[密码]`
+    
+    **说明：**Hostname对应的emon，是表示主机名emon，对应的是虚拟机当前的IP地址。
+    
   - 使用插件：在构建Job时，Post Steps可以勾选Send files or execute commands over SSH了。
 
 2. 安装`Maven Integration`

@@ -8,7 +8,7 @@
 
 # 一、基础软件安装
 
-## 1、安装ZooKeeper
+## 1、安装ZooKeeper（CDH版）
 
 1. 下载
 
@@ -429,7 +429,7 @@ hbase(main):014:0> exit
 
 [Scala安装教程](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Scala/ScalaInAction.md)
 
-## 5、安装Hadoop
+## 5、安装Hadoop（CDH版）
 
 目录规划：
 
@@ -442,7 +442,7 @@ hbase(main):014:0> exit
 | /usr/local/hadoop/custom/source | 存放spark等等源码的目录    |
 |                                 |                            |
 
-### 5.1、Hadoop单节点
+### 5.1、Hadoop单节点（CDH版）
 
 #### 5.1.1、安装
 
@@ -778,7 +778,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 >
 > ​					yarn-daemon.sh stop nodemanager
 
-### 5.3、Hadoop集群
+### 5.3、Hadoop集群（CDH版）
 
 #### 5.3.1、Hadoop集群规划
 
@@ -1259,7 +1259,7 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
 
 
-## 6、安装Hive
+## 6、安装Hive（CDH版）
 
 ### 6.1、基本安装
 
