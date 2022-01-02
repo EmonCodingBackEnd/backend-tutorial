@@ -8,151 +8,13 @@
 
 # 一、基础软件安装
 
-## 1、安装ZooKeeper（CDH版）
 
-1. 下载
 
-官网地址： https://zookeeper.apache.org/index.html
 
-下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
 
-版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
 
-> wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
 
-这里以cdh版学习：
 
-**注意**：无法避开收费墙下载，暂时无解
-
-2. 创建安装目录
-
-```bash
-[emon@emon ~]$ mkdir /usr/local/ZooKeeper
-```
-
-3. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
-```
-
-**说明：**如果发生错误：
-
-> gzip: stdin: decompression OK, trailing garbage ignored
->
-> tar: Child returned status 2
-> tar: Error is not recoverable: exiting now
-
-**解决方案：**
-先`gunzip *.tar.gz`
-再`tar xvf *.tar`
-也可以使用`tar xvf *.tar -C 自定义目录`指定解压位置。
-若文件为`.tgz`格式，用`mv`命令转成`.tar.gz`。
-
-4. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
-```
-
-5. 配置环境变量
-
-在`/etc/profile.d`目录创建`zoo.sh`文件：
-
-```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
-export ZK_HOME=/usr/local/zoo
-export PATH=$ZK_HOME/bin:$PATH
-```
-
-使之生效：
-
-```bash
-[emon@emon ~]$ source /etc/profile
-```
-
-6. 目录规划
-
-```bash
-[emon@emon ~]$ mkdir -p /usr/local/zoo/{data,logs}
-```
-
-7. 配置文件
-
-- 复制`zoo_sample.cfg`到`zoo.cfg`
-
-```bash
-[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
-```
-
-- 编辑`zoo.cfg`文件
-
-```bash
-[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
-```
-
-```bash
-# [修改]
-dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
-# [新增]
-dataLogDir=/usr/local/zoo/logs
-# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
-admin.serverPort=8090
-```
-
-8. 启动与停止
-
-- 启动（端口号2181）
-
-```bash
-[emon@emon ~]$ zkServer.sh start
-```
-
-- 校验
-
-```bash
-[emon@emon ~]$ jps
-44611 QuorumPeerMain
-```
-
-- 停止
-
-```bash
-[emon@emon ~]$ zkServer.sh stop
-```
-
-- 状态
-
-```bash
-[emon@emon ~]$ zkServer.sh status
-```
-
-9. 连接
-
-- 访问8090端口的服务
-
-```bash
-# 比如
-http://192.168.1.116:8090/commands/stat
-```
-
-- 远程连接
-
-```bash
-[emon@emon ~]$ zkCli.sh -server 192.168.1.116:2181
-```
-
-- 本地连接
-
-```bash
-[emon@emon ~]$ zkCli.sh
-```
-
-- 退出（在链接成功后，使用命令quit退出）
-
-```bash
-[zk: localhost:2181(CONNECTED) 0] quit
-```
 
 ## 2、安装kafka（使用外部的ZooKeeper）
 
@@ -1491,6 +1353,478 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
   ```
   
   OK！
+
+
+
+## 1、安装ZooKeeper（CDH版）
+
+1. 下载
+
+官网地址： https://zookeeper.apache.org/index.html
+
+下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
+
+版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
+
+> wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
+
+这里以cdh版学习：
+
+**注意**：无法避开收费墙下载，暂时无解
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/ZooKeeper
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
+```
+
+**说明：**如果发生错误：
+
+> gzip: stdin: decompression OK, trailing garbage ignored
+>
+> tar: Child returned status 2
+> tar: Error is not recoverable: exiting now
+
+**解决方案：**
+先`gunzip *.tar.gz`
+再`tar xvf *.tar`
+也可以使用`tar xvf *.tar -C 自定义目录`指定解压位置。
+若文件为`.tgz`格式，用`mv`命令转成`.tar.gz`。
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`zoo.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
+export ZK_HOME=/usr/local/zoo
+export PATH=$ZK_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -p /usr/local/zoo/{data,logs}
+```
+
+7. 配置文件
+
+- 复制`zoo_sample.cfg`到`zoo.cfg`
+
+```bash
+[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
+```
+
+- 编辑`zoo.cfg`文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
+```
+
+```bash
+# [修改]
+dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
+# [新增]
+dataLogDir=/usr/local/zoo/logs
+# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
+admin.serverPort=8090
+```
+
+8. 启动与停止
+
+- 启动（端口号2181）
+
+```bash
+[emon@emon ~]$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+44611 QuorumPeerMain
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ zkServer.sh stop
+```
+
+- 状态
+
+```bash
+[emon@emon ~]$ zkServer.sh status
+```
+
+9. 连接
+
+- 访问8090端口的服务
+
+```bash
+# 比如
+http://192.168.1.116:8090/commands/stat
+```
+
+- 远程连接
+
+```bash
+[emon@emon ~]$ zkCli.sh -server 192.168.1.116:2181
+```
+
+- 本地连接
+
+```bash
+[emon@emon ~]$ zkCli.sh
+```
+
+- 退出（在链接成功后，使用命令quit退出）
+
+```bash
+[zk: localhost:2181(CONNECTED) 0] quit
+```
+
+## 2、安装Flume（CDH版）
+
+1. 下载
+
+**注意**：无法避开收费墙下载，暂时无解
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Flume
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/flume-ng-1.6.0-cdh5.16.2.tar.gz -C /usr/local/Flume/
+```
+
+**特殊说明：**如下提示，对该包解压无需关注，不影响使用。
+
+> gzip: stdin: decompression OK, trailing garbage ignored
+> apache-flume-1.6.0-cdh5.16.2-bin/bin/
+> apache-flume-1.6.0-cdh5.16.2-bin/bin/flume-ng.cmd
+> apache-flume-1.6.0-cdh5.16.2-bin/bin/flume-ng
+> apache-flume-1.6.0-cdh5.16.2-bin/bin/flume-ng.ps1
+> tar: Child returned status 2
+> tar: Error is not recoverable: exiting now
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Flume/apache-flume-1.6.0-cdh5.16.2-bin/ /usr/local/flume
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`flume.sh`文件：
+
+```
+[emon@emon ~]$ sudo vim /etc/profile.d/flume.sh
+export FLUME_HOME=/usr/local/flume
+export PATH=$FLUME_HOME/bin:$PATH
+```
+
+使之生效：
+
+```
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config
+```
+
+7. 配置文件
+
+- 复制`flume-env.sh.template `到`flume-env.sh`
+
+```bash
+[emon@emon ~]$ cp /usr/local/flume/conf/flume-env.sh.template /usr/local/flume/conf/flume-env.sh
+```
+
+- 编辑`flume-env.sh`
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/conf/flume-env.sh
+```
+
+```bash
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+```
+
+8. 配置示例
+
+- 示例1：netcat=>控制台
+
+  - 配置
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/example.conf
+  ```
+
+  ```bash
+  # example.conf: A single-node Flume configuration
+  
+  # Name the components on this agent
+  a1.sources = r1
+  a1.sinks = k1
+  a1.channels = c1
+  
+  # Describe/configure the source
+  a1.sources.r1.type = netcat
+  a1.sources.r1.bind = 0.0.0.0
+  a1.sources.r1.port = 44444
+  
+  # Use a channel which buffers events in memory
+  a1.channels.c1.type = memory
+  # a1.channels.c1.capacity = 1000
+  # a1.channels.c1.transactionCapacity = 100
+  
+  # Describe the sink
+  a1.sinks.k1.type = logger
+  
+  # Bind the source and sink to the channel，特别注意第一个是channles第二个是channel不一样
+  a1.sources.r1.channels = c1
+  a1.sinks.k1.channel = c1
+  ```
+
+  - 启动
+
+  ```bash
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/example.conf --name a1 -Dflume.root.logger=INFO,console
+  ```
+
+  - 测试
+
+  ```bash
+  [emon@emon ~]$ telnet localhost 44444
+  Trying ::1...
+  Connected to localhost.
+  Escape character is '^]'.
+  lm
+  OK
+  ```
+
+  写入后，查看`flume-ng`的启动窗口输出情况。
+
+- 示例2：文件=>hdfs
+
+  - 配置
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume-exec-hdfs.conf 
+  ```
+
+  ```bash
+  #define agent
+  exec-hdfs-agent.sources = exec-source
+  exec-hdfs-agent.channels = exec-memory-channel
+  exec-hdfs-agent.sinks = hdfs-sink
+  
+  #define source
+  exec-hdfs-agent.sources.exec-source.type = exec
+  exec-hdfs-agent.sources.exec-source.command = tail -F /usr/local/flume/config/flumedata.log
+  exec-hdfs-agent.sources.exec-source.shell = /bin/sh -c
+  
+  #define channel
+  exec-hdfs-agent.channels.exec-memory-channel.type = memory
+  
+  #define sink
+  exec-hdfs-agent.sinks.hdfs-sink.type = hdfs
+  exec-hdfs-agent.sinks.hdfs-sink.hdfs.path = hdfs://emon:8020/data/flume/tail
+  exec-hdfs-agent.sinks.hdfs-sink.hdfs.fileType = DataStream
+  exec-hdfs-agent.sinks.hdfs-sink.hdfs.writeFormat = Text
+  exec-hdfs-agent.sinks.hdfs-sink.hdfs.batchSize = 10
+  
+  #bind source and sink to channel
+  exec-hdfs-agent.sources.exec-source.channels = exec-memory-channel
+  exec-hdfs-agent.sinks.hdfs-sink.channel = exec-memory-channel
+  ```
+
+  - 准备文件`flumedata.log`
+
+  ```bash
+  [emon@emon ~]$ touch /usr/local/flume/config/flumedata.log 
+  ```
+
+  - 启动
+
+  ```bash
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume-exec-hdfs.conf --name exec-hdfs-agent -Dflume.root.logger=INFO,console
+  ```
+
+  - 测试
+
+  ```bash
+  [emon@emon ~]$ echo aaa >> /usr/local/flume/config/flumedata.log 
+  ```
+
+  - 验证
+
+  ```bash
+  # 查看hdfs文件
+  [emon@emon ~]$ hadoop fs -ls -R /data/flume/
+  ```
+
+- 示例3：文件夹=>hdfs
+
+  - 配置
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume-spooling.conf
+  ```
+
+  ```bash
+  #define agent
+  spooling-hdfs-agent.sources = spooling-source
+  spooling-hdfs-agent.channels = spooling-memory-channel
+  spooling-hdfs-agent.sinks = hdfs-sink
+  
+  #define source
+  spooling-hdfs-agent.sources.spooling-source.type = spooldir
+  spooling-hdfs-agent.sources.spooling-source.spoolDir = /usr/local/flume/config/spool_data
+  #先不要添加这句话，后续添加
+  #spooling-hdfs-agent.sources.spooling-source.ignorePattern = ^(.)*\\.txt$
+  
+  #defing channel
+  spooling-hdfs-agent.channels.spooling-memory-channel.type = memory
+  
+  #define sink
+  spooling-hdfs-agent.sinks.hdfs-sink.type = hdfs
+  spooling-hdfs-agent.sinks.hdfs-sink.hdfs.path = hdfs://emon:8020/data/flume/spooling
+  spooling-hdfs-agent.sinks.hdfs-sink.hdfs.fileType = CompressedStream
+  spooling-hdfs-agent.sinks.hdfs-sink.hdfs.codeC = org.apache.hadoop.io.compress.GzipCodec
+  spooling-hdfs-agent.sinks.hdfs-sink.hdfs.filePrefix = events-
+  #表示不以大小为滚动标准
+  spooling-hdfs-agent.sinks.hdfs-sink.hdfs.rollSize = 0
+  spooling-hdfs-agent.sinks.hdfs-sink.rollCount = 1000000
+  spooling-hdfs-agent.sinks.hdfs-sink.rollInterval = 30
+  
+  #bind source and sink to channel
+  spooling-hdfs-agent.sources.spooling-source.channels = spooling-memory-channel
+  spooling-hdfs-agent.sinks.hdfs-sink.channel = spooling-memory-channel
+  ```
+
+  - 准备文件夹
+
+  ```bash
+  # 文件被put到hdfs后，文件会被重命名带 .COMPLETED 后缀
+  [emon@emon ~]$ mkdir /usr/local/flume/config/spool_data
+  ```
+
+  - 启动
+
+  ```bash
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume-spooling.conf --name spooling-hdfs-agent -Dflume.root.logger=INFO,console
+  ```
+
+  - 测试
+
+  ```bash
+  [emon@emon ~]$ echo "this is a test for flume spool" >> /usr/local/flume/config/1.log 
+  [emon@emon ~]$ echo "this is a test for flume spool" >> /usr/local/flume/config/2.txt
+  ```
+
+  - 验证
+
+  ```bash
+  # 查看hdfs文件
+  [emon@emon ~]$ hadoop fs -ls -R /data/flume/
+  ```
+
+- 示例4
+
+  - 配置
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/taildir-memory-logger.conf
+  ```
+
+  ```bash
+  a1.sources = r1
+  a1.channels = c1
+  a1.sinks = k1
+  
+  #define source
+  a1.sources.r1.type = TAILDIR
+  a1.sources.r1.channels = c1
+  a1.sources.r1.positionFile = /usr/local/flume/config/taildir_data/taildir_position.json
+  a1.sources.r1.filegroups = f1 f2
+  
+  a1.sources.r1.filegroups.f1 = /usr/local/flume/config/taildir_data/test1/example.log
+  a1.sources.r1.headers.f1.headerKey1 = value1
+  
+  a1.sources.r1.filegroups.f2 = /usr/local/flume/config/taildir_data/test2/.*log.*
+  a1.sources.r1.headers.f2.headerKey1 = value2
+  a1.sources.r1.headers.f2.headerKey2 = value2-2
+  
+  a1.sources.r1.fileHeader = true
+  
+  #Use a channel which buffers events in memory
+  a1.channels.c1.type = memory
+  a1.channels.c1.capacity = 1000
+  a1.channels.c1.transactionCapacity = 100
+  
+  #Describe the sink
+  a1.sinks.k1.type = logger
+  
+  #Bind the source and sink to the channel
+  a1.sources.r1.channels = c1
+  a1.sinks.k1.channel = c1
+  ```
+
+  - 准备
+
+  ```bash
+  [emon@emon ~]$ mkdir -p /usr/local/flume/config/taildir_data/{test1,test2}
+  ```
+
+  - 启动
+
+  ```bash
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/taildir-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
+  ```
+
+  - 测试
+
+  ```bash
+  [emon@emon ~]$ echo aaa >> /usr/local/flume/config/taildir_data/test1/example.log
+  [emon@emon ~]$ echo bbb >> /usr/local/flume/config/taildir_data/test1/example.log
+  [emon@emon ~]$ echo 111 >> /usr/local/flume/config/taildir_data/test2/1.log
+  [emon@emon ~]$ echo 222 >> /usr/local/flume/config/taildir_data/test2/2.log
+  ```
+
+  写入后，查看`flume-ng`的启动窗口输出情况。
+
+  
+
+  
+
 
 ## 7、安装Spark
 

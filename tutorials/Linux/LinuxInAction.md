@@ -3238,8 +3238,6 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```ini
 [program:sbd]
 command=/usr/local/java/bin/java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -Dspring.profiles.active=test spring-boot-demo.jar
-; SkyWalking版
-; command=/usr/local/java/bin/java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -javaagent:/home/emon/spring-boot-demo/agent/skywalking-agent.jar -DSW_AGENT_NAME=huiba-site-provider -DSW_AGENT_COLLECTOR_BACKEND_SERVICES=127.0.0.1:11800 -Dspring.profiles.active=test spring-boot-demo.jar
 directory=/home/emon/spring-boot-demo
 autostart=false                 ; 在supervisord启动的时候也自动启动
 startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
