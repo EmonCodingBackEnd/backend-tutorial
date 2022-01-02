@@ -1757,7 +1757,7 @@ export JAVA_HOME=${JAVA_HOME}
   [emon@emon ~]$ hadoop fs -ls -R /data/flume/
   ```
 
-- 示例4
+- 示例4：增量到hdfs【优秀】
 
   - 配置
 
@@ -1821,9 +1821,123 @@ export JAVA_HOME=${JAVA_HOME}
 
   写入后，查看`flume-ng`的启动窗口输出情况。
 
-  
+- 示例5：一个具有自定义拦截器功能的测试
 
+  - 配置1：flume01.conf
+
+  ```bash
+  # Name the components on this agent
+  a1.sources = r1
+  a1.channels = c1 c2
+  a1.sinks = k1 k2
   
+  # Describe/configure the source
+  a1.sources.r1.type = netcat
+  a1.sources.r1.bind = emon
+  a1.sources.r1.port = 44444
+  
+  a1.sources.r1.interceptors = i1
+  a1.sources.r1.interceptors.i1.type = com.coding.bigdata.flume.DomainInterceptor$Builder
+  
+  a1.sources.r1.selector.type = multiplexing
+  a1.sources.r1.selector.header = type
+  a1.sources.r1.selector.mapping.imooc = c1
+  a1.sources.r1.selector.mapping.other = c2
+  
+  # Use a channel which buffers events in memory
+  a1.channels.c1.type = memory
+  a1.channels.c2.type = memory
+  
+  # Describe the sink
+  a1.sinks.k1.type = avro
+  a1.sinks.k1.hostname = emon
+  a1.sinks.k1.port = 44445
+  
+  a1.sinks.k2.type = avro
+  a1.sinks.k2.hostname = emon
+  a1.sinks.k2.port = 44446
+  
+  # Bind the source and sink to the channel
+  a1.sources.r1.channels = c1 c2
+  a1.sinks.k1.channel = c1
+  a1.sinks.k2.channel = c2
+  ```
+
+  - 配置2：flume02.conf
+
+  ```bash
+  a2.sources = r1
+  a2.channels = c1
+  a2.sinks = k1
+  
+  # Describe/configure the source
+  a2.sources.r1.type = avro
+  a2.sources.r1.bind = emon
+  a2.sources.r1.port = 44445
+  
+  # Use a channel which buffers events in memory
+  a2.channels.c1.type = memory
+  
+  # Describe the sink
+  a2.sinks.k1.type = logger
+  
+  # Bind the source and sink to the channel
+  a2.sources.r1.channels = c1
+  a2.sinks.k1.channel = c1
+  ```
+
+  - 配置3：flume03.conf
+
+  ```bash
+  a3.sources = r1
+  a3.channels = c1
+  a3.sinks = k1
+  
+  # Describe/configure the source
+  a3.sources.r1.type = avro
+  a3.sources.r1.bind = emon
+  a3.sources.r1.port = 44446
+  
+  # Use a channel which buffers events in memory
+  a3.channels.c1.type = memory
+  
+  # Describe the sink
+  a3.sinks.k1.type = logger
+  
+  # Bind the source and sink to the channel
+  a3.sources.r1.channels = c1
+  a3.sinks.k1.channel = c1
+  ```
+
+  - 准备
+
+  ```bash
+  # 上传自定义拦截器的jar到 /usr/local/flume/lib 目录
+  ```
+
+  - 启动：先启动flume02.conf->flume03.conf->flume01.conf，必须flue01在后面，flume02和flume03的先后数据没关系
+
+  ```bash
+  [emon@emon ~]$ usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume02.conf --name a2 -Dflume.root.logger=INFO,console
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume03.conf --name a3 -Dflume.root.logger=INFO,console
+  
+  [emon@emon ~]$ usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume01.conf --name a1 -Dflume.root.logger=INFO,console
+  ```
+
+  - 测试
+
+  ```bash
+  [emon@emon ~]$ telnet localhost 44444
+  Trying ::1...
+  Connected to localhost.
+  Escape character is '^]'.
+  OK
+  imooc.com
+  OK
+  test.com
+  ```
+
+  写入后，查看`flume-ng`的启动窗口输出情况。
 
 
 ## 7、安装Spark
