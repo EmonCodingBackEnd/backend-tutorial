@@ -16,157 +16,7 @@
 
 
 
-## 2、安装kafka（使用外部的ZooKeeper）
 
-1. 下载
-
-官网地址：http://kafka.apache.org/
-
-下载地址：http://kafka.apache.org/downloads
-
-```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/kafka/2.3.0/kafka_2.12-2.3.0.tgz
-```
-
-2. 创建安装目录
-
-```bash
-[emon@emon ~]$ mkdir /usr/local/Kafka
-```
-
-3. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.3.0.tgz -C /usr/local/Kafka/
-```
-
-4. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.3.0/ /usr/local/kafka
-```
-
-5. 配置环境变量
-
-在`/etc/profile.d`目录创建`kafka.sh`文件：
-
-```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
-export PATH=/usr/local/kafka/bin:$PATH
-```
-
-使之生效：
-
-```bash
-[emon@emon ~]$ source /etc/profile
-```
-
-6. 目录规划
-
-```bash
-[emon@emon ~]$ mkdir -p /usr/local/kafka/logs
-```
-
-7. 配置文件
-
-- 编辑`server.properties`配置文件
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server.properties 
-```
-
-```bash
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
-```
-
-8. 编写启动停止脚本
-
-- 启动脚本
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh
-```
-
-```bash
-# 启动kafka
-/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
-```
-
-- 停止脚本
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/kafkaStop.sh
-```
-
-```bash
-# 关闭kafka
-/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
-```
-
-- 修改可执行权限
-
-```bash
-[emon@emon ~]$ chmod +x /usr/local/kafka/kafkaStart.sh 
-[emon@emon ~]$ chmod +x /usr/local/kafka/kafkaStop.sh 
-```
-
-9. 启动与停止
-
-- 启动
-
-```bash
-[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
-```
-
-- 停止
-
-```bash
-[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
-```
-
-10. 创建`topic`
-
-- 创建
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test-kafka-topic
-# 命令执行结果
-Created topic test-kafka-topic.
-```
-
-- 查看topic列表
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --list --zookeeper localhost:2181
-# 命令执行结果
-test-kafka-topic
-```
-
-- 查看单个topic详情
-
-```bash
-[emon@emon logs]$ kafka-topics.sh --describe --zookeeper localhost:2181 --topic test-kafka-topic
-# 命令执行结果
-Topic:test-kafka-topic	PartitionCount:1	ReplicationFactor:1	Configs:
-	Topic: test-kafka-topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
-```
-
-
-
-11. 测试生产者消费者
-
-- 生产者
-
-```bash
-[emon@emon ~]$ kafka-console-producer.sh --broker-list localhost:9092 --topic test-kafka-topic
-```
-
-- 消费者
-
-```bash
-[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-kafka-topic --from-beginning
-```
 
 ## 3、安装HBase（使用外部的ZooKeeper）
 
@@ -1938,6 +1788,163 @@ export JAVA_HOME=${JAVA_HOME}
   ```
 
   写入后，查看`flume-ng`的启动窗口输出情况。
+
+
+## 3、安装kafka（外部ZK）
+
+1. 下载
+
+官网地址：http://kafka.apache.org/
+
+下载地址：http://kafka.apache.org/downloads
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Kafka
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.0.tgz -C /usr/local/Kafka/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`kafka.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
+export KAFKA_HOME=/usr/local/kafka
+export PATH=$KAFKA_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -p /usr/local/kafka/logs
+```
+
+7. 配置文件
+
+- 编辑`server.properties`配置文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server.properties 
+```
+
+```bash
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+8. 编写启动停止脚本
+
+- 启动脚本
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh
+```
+
+```bash
+# 启动kafka
+/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+```
+
+- 停止脚本
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStop.sh
+```
+
+```bash
+# 关闭kafka
+/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
+```
+
+- 修改可执行权限
+
+```bash
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStart.sh 
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStop.sh 
+```
+
+9. 启动与停止
+
+- 启动
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
+```
+
+10. 创建`topic`
+
+- 创建
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092 --replication-factor 1 --partitions 1 --topic test
+# 命令执行结果
+Created topic test.
+```
+
+- 查看topic列表
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+# 命令执行结果
+test
+```
+
+- 查看单个topic详情
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
+# 命令执行结果
+Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+```
+
+11. 测试生产者消费者
+
+- 生产者
+
+```bash
+# 打开生产者命令行模式
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic test
+```
+
+- 消费者
+
+```bash
+# 打开消费者命令模式
+[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
+```
+
 
 
 ## 7、安装Spark
