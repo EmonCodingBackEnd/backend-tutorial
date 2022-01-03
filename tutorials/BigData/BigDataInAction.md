@@ -1789,8 +1789,9 @@ export JAVA_HOME=${JAVA_HOME}
 
   写入后，查看`flume-ng`的启动窗口输出情况。
 
-
 ## 3、安装kafka（外部ZK）
+
+### 3.1、Kafka单节点
 
 1. 下载
 
@@ -1944,6 +1945,141 @@ Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=107374
 # 打开消费者命令模式
 [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
 ```
+
+### 3.2、Kafka集群
+
+1. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -pv /usr/local/kafka/{logs9092,logs9093,logs9094}
+```
+
+2. 第一个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9092.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9092.properties 
+```
+
+```bash
+# [不变]
+broker.id=0
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9092
+# [新增]
+listeners=PLAINTEXT://:9092
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+3. 第二个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9093.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9093.properties 
+```
+
+```bash
+# [不变]
+broker.id=1
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9093
+# [新增]
+listeners=PLAINTEXT://:9093
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+4. 第三个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9094.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9094.properties 
+```
+
+```bash
+# [不变]
+broker.id=2
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9094
+# [新增]
+listeners=PLAINTEXT://:9094
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+5. 启动
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9092.properties
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9093.properties
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9094.properties
+```
+
+6. 创建`topic`
+
+- 创建
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092,emon:9093,emon:9094 --replication-factor 3 --partitions 1 --topic tests
+# 命令执行结果
+Created topic tests.
+```
+
+- 查看`topic`列表
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+```
+
+- 查看单个`topic`详情
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic tests
+# 命令执行结果
+Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=1073741824
+	Topic: tests	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
+```
+
+7. 测试生产者消费者
+
+- 生产者
+
+```bash
+# 打开生产者命令行模式
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic tests
+```
+
+- 消费者
+
+```bash
+# 打开消费者命令模式
+[emon@emon tests-0]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic tests --from-beginning
+```
+
+
+
 
 
 
