@@ -1676,6 +1676,10 @@ export JAVA_HOME=${JAVA_HOME}
   - 配置1：flume01.conf
 
   ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume01.conf
+  ```
+  
+  ```bash
   # Name the components on this agent
   a1.sources = r1
   a1.channels = c1 c2
@@ -1712,9 +1716,13 @@ export JAVA_HOME=${JAVA_HOME}
   a1.sinks.k1.channel = c1
   a1.sinks.k2.channel = c2
   ```
-
+  
   - 配置2：flume02.conf
-
+  
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume02.conf
+  ```
+  
   ```bash
   a2.sources = r1
   a2.channels = c1
@@ -1735,9 +1743,13 @@ export JAVA_HOME=${JAVA_HOME}
   a2.sources.r1.channels = c1
   a2.sinks.k1.channel = c1
   ```
-
+  
   - 配置3：flume03.conf
-
+  
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume03.conf
+  ```
+  
   ```bash
   a3.sources = r1
   a3.channels = c1
@@ -1758,24 +1770,24 @@ export JAVA_HOME=${JAVA_HOME}
   a3.sources.r1.channels = c1
   a3.sinks.k1.channel = c1
   ```
-
+  
   - 准备
-
+  
   ```bash
   # 上传自定义拦截器的jar到 /usr/local/flume/lib 目录
   ```
-
+  
   - 启动：先启动flume02.conf->flume03.conf->flume01.conf，必须flue01在后面，flume02和flume03的先后数据没关系
-
+  
   ```bash
-  [emon@emon ~]$ usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume02.conf --name a2 -Dflume.root.logger=INFO,console
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume02.conf --name a2 -Dflume.root.logger=INFO,console
   [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume03.conf --name a3 -Dflume.root.logger=INFO,console
   
-  [emon@emon ~]$ usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume01.conf --name a1 -Dflume.root.logger=INFO,console
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume01.conf --name a1 -Dflume.root.logger=INFO,console
   ```
-
+  
   - 测试
-
+  
   ```bash
   [emon@emon ~]$ telnet localhost 44444
   Trying ::1...
@@ -1786,8 +1798,74 @@ export JAVA_HOME=${JAVA_HOME}
   OK
   test.com
   ```
-
+  
   写入后，查看`flume-ng`的启动窗口输出情况。
+
+
+- 示例5：netcat=>kafka
+
+  - 配置1：flume-kafka.conf
+
+  ```bash
+  [emon@emon ~]$ vim /usr/local/flume/config/flume-kafka.conf
+  ```
+  
+  ```bash
+  # example.conf: A single-node Flume configuration
+  
+  # Name the components on this agent
+  a1.sources = r1
+  a1.sinks = k1
+  a1.channels = c1
+  
+  # Describe/configure the source
+  a1.sources.r1.type = netcat
+  a1.sources.r1.bind = 0.0.0.0
+  a1.sources.r1.port = 44444
+  
+  # Use a channel which buffers events in memory
+  a1.channels.c1.type = memory
+  # a1.channels.c1.capacity = 1000
+  # a1.channels.c1.transactionCapacity = 100
+  
+  # Describe the sink
+  a1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
+  a1.sinks.k1.kafka.topic = test
+  a1.sinks.k1.kafka.bootstrap.servers = emon:9092
+  a1.sinks.k1.kafka.flumeBatchSize = 20
+  a1.sinks.k1.kafka.producer.acks = 1
+  a1.sinks.k1.kafka.producer.linger.ms = 1
+  #a1.sinks.k1.kafka.producer.compression.type = snappy
+  
+  # Bind the source and sink to the channel
+  a1.sources.r1.channels = c1
+  a1.sinks.k1.channel = c1
+  ```
+  
+  - 准备
+
+  ```bash
+# 打开kafka消费者
+  [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
+  ```
+  
+  - 启动
+  
+  ```bash
+  [emon@emon ~]$ /usr/local/flume/bin/flume-ng agent --conf $FLUME_HOME/conf --conf-file $FLUME_HOME/config/flume-kafka.conf --name a1 -Dflume.root.logger=INFO,console
+  ```
+  
+  - 测试
+  
+  ```bash
+  [emon@emon ~]$ telnet localhost 44444
+  Trying ::1...
+  Connected to localhost.
+  Escape character is '^]'.
+  testflume01
+  ```
+  
+  写入后，查看`flume-ng`的启动窗口输出情况和`kafka消费者`窗口情况。`flume-ng`不会变化，但会转发消息到`kafka消费者`窗口。
 
 ## 3、安装kafka（外部ZK）
 
