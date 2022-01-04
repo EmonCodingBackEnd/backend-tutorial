@@ -577,7 +577,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
   [emon@emon ~]$ vim /usr/local/maven/conf/settings.xml 
   ```
 
-  - 配置`localRepository`
+  - 配置`localRepository`【多用户访问不建议配置】
 
   ```xml
     <!-- localRepository
