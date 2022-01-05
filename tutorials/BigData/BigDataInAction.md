@@ -8,53 +8,601 @@
 
 # 一、基础软件安装
 
-
-
-
-
-
-
-
-
-
-
-## 3、安装HBase（使用外部的ZooKeeper）
+## 1、安装ZooKeeper（CDH版）
 
 1. 下载
 
-官网地址：https://hbase.apache.org/
+官网地址： https://zookeeper.apache.org/index.html
 
-下载地址：https://hbase.apache.org/downloads.html
+下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
 
-```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/hbase/2.2.1/hbase-2.2.1-bin.tar.gz
-```
+版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
+
+> wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
+
+这里以cdh版学习：
+
+**注意**：无法避开收费墙下载，暂时无解
 
 2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/HBase
+[emon@emon ~]$ mkdir /usr/local/ZooKeeper
 ```
 
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/hbase-2.2.1-bin.tar.gz -C /usr/local/HBase/
+[emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
+```
+
+**说明：**如果发生错误：
+
+> gzip: stdin: decompression OK, trailing garbage ignored
+>
+> tar: Child returned status 2
+> tar: Error is not recoverable: exiting now
+
+**解决方案：**
+先`gunzip *.tar.gz`
+再`tar xvf *.tar`
+也可以使用`tar xvf *.tar -C 自定义目录`指定解压位置。
+若文件为`.tgz`格式，用`mv`命令转成`.tar.gz`。
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`zoo.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
+export ZK_HOME=/usr/local/zoo
+export PATH=$ZK_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -p /usr/local/zoo/{data,logs}
+```
+
+7. 配置文件
+
+- 复制`zoo_sample.cfg`到`zoo.cfg`
+
+```bash
+[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
+```
+
+- 编辑`zoo.cfg`文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
+```
+
+```bash
+# [修改]
+dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
+# [新增]
+dataLogDir=/usr/local/zoo/logs
+# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
+admin.serverPort=8090
+```
+
+8. 启动与停止
+
+- 启动（端口号2181）
+
+```bash
+[emon@emon ~]$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+44611 QuorumPeerMain
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ zkServer.sh stop
+```
+
+- 状态
+
+```bash
+[emon@emon ~]$ zkServer.sh status
+```
+
+9. 连接
+
+- 访问8090端口的服务
+
+```bash
+# 比如
+http://192.168.1.116:8090/commands/stat
+```
+
+- 远程连接
+
+```bash
+[emon@emon ~]$ zkCli.sh -server 192.168.1.116:2181
+```
+
+- 本地连接
+
+```bash
+[emon@emon ~]$ zkCli.sh
+```
+
+- 退出（在链接成功后，使用命令quit退出）
+
+```bash
+[zk: localhost:2181(CONNECTED) 0] quit
+```
+
+
+
+## 2、安装kafka（外部ZK）
+
+### 2.1、Kafka单节点
+
+1. 下载
+
+官网地址：http://kafka.apache.org/
+
+下载地址：http://kafka.apache.org/downloads
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Kafka
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.0.tgz -C /usr/local/Kafka/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/HBase/hbase-2.2.1/ /usr/local/hbase
+[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
 ```
 
 5. 配置环境变量
 
-在`/etc/profile.d`目录创建`hbase.sh`文件：
+在`/etc/profile.d`目录创建`kafka.sh`文件：
 
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
+export KAFKA_HOME=/usr/local/kafka
+export PATH=$KAFKA_HOME/bin:$PATH
 ```
-[emon@emon ~]$ sudo vim /etc/profile.d/hbase.sh
-export PATH=/usr/local/hbase/bin:$PATH
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -p /usr/local/kafka/logs
+```
+
+7. 配置文件
+
+- 编辑`server.properties`配置文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server.properties 
+```
+
+```bash
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+8. 编写启动停止脚本
+
+- 启动脚本
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh
+```
+
+```bash
+# 启动kafka
+/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+```
+
+- 停止脚本
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStop.sh
+```
+
+```bash
+# 关闭kafka
+/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
+```
+
+- 修改可执行权限
+
+```bash
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStart.sh 
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStop.sh 
+```
+
+9. 启动与停止
+
+- 启动
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
+```
+
+10. 创建`topic`
+
+- 创建
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092 --replication-factor 1 --partitions 1 --topic test
+# 命令执行结果
+Created topic test.
+```
+
+- 查看topic列表
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+# 命令执行结果
+test
+```
+
+- 查看单个topic详情
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
+# 命令执行结果
+Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+```
+
+11. 测试生产者消费者
+
+- 生产者
+
+```bash
+# 打开生产者命令行模式
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic test
+```
+
+- 消费者
+
+```bash
+# 打开消费者命令模式
+[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
+```
+
+### 2.2、Kafka集群
+
+1. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -pv /usr/local/kafka/{logs9092,logs9093,logs9094}
+```
+
+2. 第一个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9092.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9092.properties 
+```
+
+```bash
+# [不变]
+broker.id=0
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9092
+# [新增]
+listeners=PLAINTEXT://:9092
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+3. 第二个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9093.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9093.properties 
+```
+
+```bash
+# [不变]
+broker.id=1
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9093
+# [新增]
+listeners=PLAINTEXT://:9093
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+4. 第三个节点
+
+- 复制属性文件
+
+```bash
+[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9094.properties
+```
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server-9094.properties 
+```
+
+```bash
+# [不变]
+broker.id=2
+# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9094
+# [新增]
+listeners=PLAINTEXT://:9094
+# [修改]
+zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+```
+
+5. 启动
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9092.properties
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9093.properties
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9094.properties
+```
+
+6. 创建`topic`
+
+- 创建
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092,emon:9093,emon:9094 --replication-factor 3 --partitions 1 --topic tests
+# 命令执行结果
+Created topic tests.
+```
+
+- 查看`topic`列表
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+```
+
+- 查看单个`topic`详情
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic tests
+# 命令执行结果
+Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=1073741824
+	Topic: tests	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
+```
+
+
+
+## 3、安装Scala
+
+[Scala安装教程](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Scala/ScalaInAction.md)
+
+
+
+## 4、安装Spark
+
+### 4.1、Spark编译安装
+
+目录规划：
+
+| 目录                        | 作用      |
+| --------------------------- | --------- |
+| /usr/local/spark/custom/lib | jar库文件 |
+|                             |           |
+
+1. 下载源码
+
+官网地址：http://spark.apache.org/
+
+下载地址：http://spark.apache.org/downloads.html
+
+各个版本：https://archive.apache.org/dist/spark/
+
+![image-20220104094307878](images/image-20220104094307878.png)
+
+
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/spark/spark-3.0.3/spark-3.0.3.tgz --no-check-certificate
+```
+
+2. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Spark
+```
+
+3. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3.tgz -C /usr/local/Spark/
+```
+
+4. 编译
+
+参考文档：https://spark.apache.org/docs/3.0.3/building-spark.html
+
+> Spark源码编译的3大方式：
+>
+> 1、Maven编译
+>
+> 2、SBT编译
+>
+> 3、打包编译make-distribution.sh
+>
+> 切记：不同版本的Spark对环境的依赖不同，比如Spark3.0.3的版本依赖Maven3.6.3，JDK8和Scala2.12；具体参考官网！
+
+- 切换目录
+
+```bash
+[emon@emon ~]$ cd /usr/local/Spark/spark-3.0.3/
+```
+
+- 编辑`pom.xml`内容
+
+```bash
+# 在<repositories>元素最后一行
+[emon@emon spark-3.0.3]$ vim pom.xml 
+```
+
+```xml
+    <!--引入cdh的仓库，确保maven的镜像是放开cloudera的-->
+    <repository>
+        <id>cloudera</id>
+        <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+    </repository>
+```
+
+- 编译之前查看
+
+```bash
+[emon@emon spark-3.0.3]$ ./dev/make-distribution.sh --help
++++ dirname ./dev/make-distribution.sh
+++ cd ./dev/..
+++ pwd
++ SPARK_HOME=/usr/local/Spark/spark-3.0.3
++ DISTDIR=/usr/local/Spark/spark-3.0.3/dist
++ MAKE_TGZ=false
++ MAKE_PIP=false
++ MAKE_R=false
++ NAME=none
++ MVN=/usr/local/Spark/spark-3.0.3/build/mvn
++ ((  1  ))
++ case $1 in
++ exit_with_usage
++ set +x
+make-distribution.sh - tool for making binary distributions of Spark
+
+usage:
+make-distribution.sh [--name] [--tgz] [--pip] [--r] [--mvn <mvn-command>] <maven build options>
+See Spark's "Building Spark" doc for correct Maven options.
+```
+
+- 启动编译
+
+命令要求：基于`Maven 3.6.3`、`Java 8`、`Scala 2.12`
+
+```bash
+[emon@emon spark-3.0.3]$ ./dev/make-distribution.sh --name 2.6.0-cdh5.16.2 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-2.7 -Dhadoop.version=2.6.0-cdh5.16.2
+```
+
+命令解释：
+
+`--name`：指定编译后打包的名字，名称组成规则是 spark版本+bin+name，比如 `spark-3.0.3-bin-2.6.0-cdh5.16.2`
+
+`--tgz`：编译后是一个tgz包
+
+`-Phadoop-2.7`：表示使用hadoop-2.7这个profile
+
+`-Dhadoop.version`：指定hadoop的具体版本是`2.6.0-cdh5.16.2`
+
+`-Pyarn`：可运行在yarn上
+
+`-Phive`：指定hive
+
+编译问题：
+
+问题1：
+
+> Client.scala:298: value setRolledLogsIncludePattern is not a member of org.apache.hadoop.yarn.api.records.LogAggregationContext
+
+原因：Spark3.x对hadoop2.x支持有问题，需要手动修改源码：
+
+https://github.com/apache/spark/pull/16884/files
+
+问题2：如果有jar依赖找不到，请检查maven的资源库中，清理掉XXX.pom.lastUpdated重试。
+
+- 编译成功
+
+编译成功后，可以看到打包后的文件：spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz
+
+转存该文件并退出编译目录：
+
+```bash
+[emon@emon spark-3.0.3]$ mv spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz /usr/local/src/
+[emon@emon spark-3.0.3]$ cd
+```
+
+5. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz -C /usr/local/Spark/
+```
+
+6. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/Spark/spark-3.0.3-bin-2.6.0-cdh5.16.2/ /usr/local/spark
+```
+
+7. 配置环境变量
+
+在`/etc/profile.d`目录创建`spark.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
+export SPARK_HOME=/usr/local/spark
+export PATH=$SPARK_HOME/bin:$PATH
+# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ```
 
 使之生效：
@@ -63,83 +611,41 @@ export PATH=/usr/local/hbase/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-6. 目录规划
+8. 测试
+
+前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
+
+- 样例测试
 
 ```bash
-[emon@emon ~]$ mkdir -p /usr/local/hbase/data
+[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
 
-7. 配置文件
+- 自定义测试
 
-- 配置使用外部的`zookeeper`
+  - 上传自定义jar
 
-```bash
-[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-env.sh 
-```
+  `git clone git@github.com:EmonCodingBackEnd/backend-spark-learning.git`并打包`spark-ss`模块，上传jar到spark：
 
-```bash
-# [修改]
-export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
-```
+  ```bash
+  scp spark-ss-1.0-SNAPSHOT.jar emon@emon:/usr/local/spark/custom/lib
+  ```
 
-- 配置`hbase-site.xml`
+  - 模拟9527端口发送数据
 
-```bash
-[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-site.xml
-```
+  ```bash
+  # 命令回车后会进入输入状态，输入内容回车即可
+  nc -lk 9527
+  ```
 
-```xml
-<configuration>
-    <!-- hbase数据存放的目录，若用本地目录，必须带上file://,否则hbase启动不起来 -->
-    <property>
-        <name>hbase.rootdir</name>
-        <value>file:///usr/local/hbase/data</value>
-    </property>
+  - 执行
 
-    <!-- zk的位置 -->
-    <property>
-        <name>hbase.zookeeper.quorum</name>
-        <value>localhost</value>
-        <description>the pos of zk</description>
-    </property>
+  ```bash
+  [emon@emon ~]$ spark-submit --class com.coding.bigdata.ss.NetworkWordCountApp --master yarn /usr/local/spark/custom/lib/spark-ss-1.0-SNAPSHOT.jar 2
+  ```
 
-    <!-- 此处必须为true，不然hbase仍用自带的zk，若启动了外部的zookeeper，会导致冲突，hbase启动不起来 -->
-    <property>
-        <name>hbase.cluster.distributed</name>
-        <value>true</value>
-    </property>
-</configuration>
-```
+  - 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
 
-8. 启动与停止
-
-- 启动（端口号16000）
-
-```bash
-[emon@emon ~]$ start-hbase.sh 
-```
-
-- 停止
-
-```bash
-[emon@emon ~]$ stop-hbase.sh 
-```
-
-- 进入hbase命令行
-
-```bash
-[emon@emon ~]$ hbase shell
-```
-
-- 退出hbase命令行
-
-```bash
-hbase(main):014:0> exit
-```
-
-## 4、安装Scala
-
-[Scala安装教程](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Scala/ScalaInAction.md)
 
 ## 5、安装Hadoop（CDH版）
 
@@ -1206,153 +1712,11 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
 
 
 
-## 1、安装ZooKeeper（CDH版）
 
-1. 下载
 
-官网地址： https://zookeeper.apache.org/index.html
+## 7、安装Flume（CDH版）
 
-下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
-
-版本3.5.5带来的坑：https://blog.csdn.net/jiangxiulilinux/article/details/96433560
-
-> wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz --no-check-certificate
-
-这里以cdh版学习：
-
-**注意**：无法避开收费墙下载，暂时无解
-
-2. 创建安装目录
-
-```bash
-[emon@emon ~]$ mkdir /usr/local/ZooKeeper
-```
-
-3. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
-```
-
-**说明：**如果发生错误：
-
-> gzip: stdin: decompression OK, trailing garbage ignored
->
-> tar: Child returned status 2
-> tar: Error is not recoverable: exiting now
-
-**解决方案：**
-先`gunzip *.tar.gz`
-再`tar xvf *.tar`
-也可以使用`tar xvf *.tar -C 自定义目录`指定解压位置。
-若文件为`.tgz`格式，用`mv`命令转成`.tar.gz`。
-
-4. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
-```
-
-5. 配置环境变量
-
-在`/etc/profile.d`目录创建`zoo.sh`文件：
-
-```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
-export ZK_HOME=/usr/local/zoo
-export PATH=$ZK_HOME/bin:$PATH
-```
-
-使之生效：
-
-```bash
-[emon@emon ~]$ source /etc/profile
-```
-
-6. 目录规划
-
-```bash
-[emon@emon ~]$ mkdir -p /usr/local/zoo/{data,logs}
-```
-
-7. 配置文件
-
-- 复制`zoo_sample.cfg`到`zoo.cfg`
-
-```bash
-[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
-```
-
-- 编辑`zoo.cfg`文件
-
-```bash
-[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
-```
-
-```bash
-# [修改]
-dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
-# [新增]
-dataLogDir=/usr/local/zoo/logs
-# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
-admin.serverPort=8090
-```
-
-8. 启动与停止
-
-- 启动（端口号2181）
-
-```bash
-[emon@emon ~]$ zkServer.sh start
-```
-
-- 校验
-
-```bash
-[emon@emon ~]$ jps
-44611 QuorumPeerMain
-```
-
-- 停止
-
-```bash
-[emon@emon ~]$ zkServer.sh stop
-```
-
-- 状态
-
-```bash
-[emon@emon ~]$ zkServer.sh status
-```
-
-9. 连接
-
-- 访问8090端口的服务
-
-```bash
-# 比如
-http://192.168.1.116:8090/commands/stat
-```
-
-- 远程连接
-
-```bash
-[emon@emon ~]$ zkCli.sh -server 192.168.1.116:2181
-```
-
-- 本地连接
-
-```bash
-[emon@emon ~]$ zkCli.sh
-```
-
-- 退出（在链接成功后，使用命令quit退出）
-
-```bash
-[zk: localhost:2181(CONNECTED) 0] quit
-```
-
-## 2、安装Flume（CDH版）
+### 7.1、安装
 
 1. 下载
 
@@ -1427,7 +1791,7 @@ export PATH=$FLUME_HOME/bin:$PATH
 export JAVA_HOME=${JAVA_HOME}
 ```
 
-8. 配置示例
+### 7.2、配置示例
 
 - 示例1：netcat=>控制台
 
@@ -1867,278 +2231,7 @@ export JAVA_HOME=${JAVA_HOME}
   
    写入后，查看`flume-ng`的启动窗口输出情况和`kafka消费者`窗口情况。`flume-ng`不会变化，但会转发消息到`kafka消费者`窗口。
 
-## 3、安装kafka（外部ZK）
 
-### 3.1、Kafka单节点
-
-1. 下载
-
-官网地址：http://kafka.apache.org/
-
-下载地址：http://kafka.apache.org/downloads
-
-```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
-```
-
-2. 创建安装目录
-
-```bash
-[emon@emon ~]$ mkdir /usr/local/Kafka
-```
-
-3. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.0.tgz -C /usr/local/Kafka/
-```
-
-4. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
-```
-
-5. 配置环境变量
-
-在`/etc/profile.d`目录创建`kafka.sh`文件：
-
-```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
-export KAFKA_HOME=/usr/local/kafka
-export PATH=$KAFKA_HOME/bin:$PATH
-```
-
-使之生效：
-
-```bash
-[emon@emon ~]$ source /etc/profile
-```
-
-6. 目录规划
-
-```bash
-[emon@emon ~]$ mkdir -p /usr/local/kafka/logs
-```
-
-7. 配置文件
-
-- 编辑`server.properties`配置文件
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server.properties 
-```
-
-```bash
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-```
-
-8. 编写启动停止脚本
-
-- 启动脚本
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh
-```
-
-```bash
-# 启动kafka
-/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
-```
-
-- 停止脚本
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/kafkaStop.sh
-```
-
-```bash
-# 关闭kafka
-/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
-```
-
-- 修改可执行权限
-
-```bash
-[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStart.sh 
-[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStop.sh 
-```
-
-9. 启动与停止
-
-- 启动
-
-```bash
-[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
-```
-
-- 停止
-
-```bash
-[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
-```
-
-10. 创建`topic`
-
-- 创建
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092 --replication-factor 1 --partitions 1 --topic test
-# 命令执行结果
-Created topic test.
-```
-
-- 查看topic列表
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
-# 命令执行结果
-test
-```
-
-- 查看单个topic详情
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
-# 命令执行结果
-Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
-	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
-```
-
-11. 测试生产者消费者
-
-- 生产者
-
-```bash
-# 打开生产者命令行模式
-[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic test
-```
-
-- 消费者
-
-```bash
-# 打开消费者命令模式
-[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
-```
-
-### 3.2、Kafka集群
-
-1. 目录规划
-
-```bash
-[emon@emon ~]$ mkdir -pv /usr/local/kafka/{logs9092,logs9093,logs9094}
-```
-
-2. 第一个节点
-
-- 复制属性文件
-
-```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9092.properties
-```
-
-- 配置
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9092.properties 
-```
-
-```bash
-# [不变]
-broker.id=0
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9092
-# [新增]
-listeners=PLAINTEXT://:9092
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-```
-
-3. 第二个节点
-
-- 复制属性文件
-
-```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9093.properties
-```
-
-- 配置
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9093.properties 
-```
-
-```bash
-# [不变]
-broker.id=1
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9093
-# [新增]
-listeners=PLAINTEXT://:9093
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-```
-
-4. 第三个节点
-
-- 复制属性文件
-
-```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9094.properties
-```
-
-- 配置
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9094.properties 
-```
-
-```bash
-# [不变]
-broker.id=2
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9094
-# [新增]
-listeners=PLAINTEXT://:9094
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-```
-
-5. 启动
-
-```bash
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9092.properties
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9093.properties
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9094.properties
-```
-
-6. 创建`topic`
-
-- 创建
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092,emon:9093,emon:9094 --replication-factor 3 --partitions 1 --topic tests
-# 命令执行结果
-Created topic tests.
-```
-
-- 查看`topic`列表
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
-```
-
-- 查看单个`topic`详情
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic tests
-# 命令执行结果
-Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=1073741824
-	Topic: tests	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
-```
 
 7. 测试生产者消费者
 
@@ -2158,176 +2251,51 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 
 
 
-## 4、安装Spark
-
-### 4.1、Spark编译安装
-
-目录规划：
-
-| 目录                           | 作用                       |
-| ------------------------------ | -------------------------- |
-| /usr/local/spark/tmp           | 存放hadoop的hdfs数据的目录 |
-| /usr/local/spark/custom/data   | 测试数据                   |
-| /usr/local/spark/custom/lib    | jar库文件                  |
-| /usr/local/spark/custom/shell  | 脚本文件                   |
-| /usr/local/spark/custom/source | 存放spark等等源码的目录    |
-|                                |                            |
-
-1. 下载源码
-
-官网地址：http://spark.apache.org/
-
-下载地址：http://spark.apache.org/downloads.html
-
-各个版本：https://archive.apache.org/dist/spark/
-
-![image-20220104094307878](images/image-20220104094307878.png)
+## 8、安装HBase（外部ZK+CDH）
 
 
+
+
+
+
+
+## 50、安装HBase（外部ZK）
+
+1. 下载
+
+官网地址：https://hbase.apache.org/
+
+下载地址：https://hbase.apache.org/downloads.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/spark/spark-3.0.3/spark-3.0.3.tgz --no-check-certificate
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/hbase/2.2.1/hbase-2.2.1-bin.tar.gz
 ```
 
-2. 创建解压目录
+2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Spark
+[emon@emon ~]$ mkdir /usr/local/HBase
 ```
 
-3. 解压
+3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3.tgz -C /usr/local/Spark/
+[emon@emon ~]$ tar -zxvf /usr/local/src/hbase-2.2.1-bin.tar.gz -C /usr/local/HBase/
 ```
 
-4. 编译
-
-参考文档：https://spark.apache.org/docs/3.0.3/building-spark.html
-
-> Spark源码编译的3大方式：
->
-> 1、Maven编译
->
-> 2、SBT编译
->
-> 3、打包编译make-distribution.sh
->
-> 切记：不同版本的Spark对环境的依赖不同，比如Spark3.0.3的版本依赖Maven3.6.3，JDK8和Scala2.12；具体参考官网！
-
-- 切换目录
+4. 创建软连接
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Spark/spark-3.0.3/
+[emon@emon ~]$ ln -s /usr/local/HBase/hbase-2.2.1/ /usr/local/hbase
 ```
 
-- 编辑`pom.xml`内容
+5. 配置环境变量
 
-```bash
-# 在<repositories>元素最后一行
-[emon@emon spark-3.0.3]$ vim pom.xml 
+在`/etc/profile.d`目录创建`hbase.sh`文件：
+
 ```
-
-```xml
-    <!--引入cdh的仓库，确保maven的镜像是放开cloudera的-->
-    <repository>
-        <id>cloudera</id>
-        <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
-    </repository>
-```
-
-- 编译之前查看
-
-```bash
-[emon@emon spark-3.0.3]$ ./dev/make-distribution.sh --help
-+++ dirname ./dev/make-distribution.sh
-++ cd ./dev/..
-++ pwd
-+ SPARK_HOME=/usr/local/Spark/spark-3.0.3
-+ DISTDIR=/usr/local/Spark/spark-3.0.3/dist
-+ MAKE_TGZ=false
-+ MAKE_PIP=false
-+ MAKE_R=false
-+ NAME=none
-+ MVN=/usr/local/Spark/spark-3.0.3/build/mvn
-+ ((  1  ))
-+ case $1 in
-+ exit_with_usage
-+ set +x
-make-distribution.sh - tool for making binary distributions of Spark
-
-usage:
-make-distribution.sh [--name] [--tgz] [--pip] [--r] [--mvn <mvn-command>] <maven build options>
-See Spark's "Building Spark" doc for correct Maven options.
-```
-
-- 启动编译
-
-命令要求：基于`Maven 3.6.3`、`Java 8`、`Scala 2.12`
-
-```bash
-[emon@emon spark-3.0.3]$ ./dev/make-distribution.sh --name 2.6.0-cdh5.16.2 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-2.7 -Dhadoop.version=2.6.0-cdh5.16.2
-```
-
-命令解释：
-
-`--name`：指定编译后打包的名字，名称组成规则是 spark版本+bin+name，比如 `spark-3.0.3-bin-2.6.0-cdh5.16.2`
-
-`--tgz`：编译后是一个tgz包
-
-`-Phadoop-2.7`：表示使用hadoop-2.7这个profile
-
-`-Dhadoop.version`：指定hadoop的具体版本是`2.6.0-cdh5.16.2`
-
-`-Pyarn`：可运行在yarn上
-
-`-Phive`：指定hive
-
-编译问题：
-
-问题1：
-
-> Client.scala:298: value setRolledLogsIncludePattern is not a member of org.apache.hadoop.yarn.api.records.LogAggregationContext
-
-原因：Spark3.x对hadoop2.x支持有问题，需要手动修改源码：
-
-https://github.com/apache/spark/pull/16884/files
-
-问题2：如果有jar依赖找不到，请检查maven的资源库中，清理掉XXX.pom.lastUpdated重试。
-
-- 编译成功
-
-编译成功后，可以看到打包后的文件：spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz
-
-转存该文件并退出编译目录：
-
-```bash
-[emon@emon spark-3.0.3]$ mv spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz /usr/local/src/
-[emon@emon spark-3.0.3]$ cd
-```
-
-5. 解压安装
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz -C /usr/local/Spark/
-```
-
-6. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -s /usr/local/Spark/spark-3.0.3-bin-2.6.0-cdh5.16.2/ /usr/local/spark
-```
-
-7. 配置环境变量
-
-在`/etc/profile.d`目录创建`spark.sh`文件：
-
-```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
-export SPARK_HOME=/usr/local/spark
-export PATH=$SPARK_HOME/bin:$PATH
-# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
-export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+[emon@emon ~]$ sudo vim /etc/profile.d/hbase.sh
+export PATH=/usr/local/hbase/bin:$PATH
 ```
 
 使之生效：
@@ -2336,47 +2304,87 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 [emon@emon ~]$ source /etc/profile
 ```
 
-8. 测试
-
-前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
-
-- 样例测试
+6. 目录规划
 
 ```bash
-[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
+[emon@emon ~]$ mkdir -p /usr/local/hbase/data
 ```
 
-- 自定义测试
+7. 配置文件
 
-  - 上传自定义jar
+- 配置使用外部的`zookeeper`
 
-  `git clone git@github.com:EmonCodingBackEnd/backend-spark-learning.git`并打包`spark-ss`模块，上传jar到spark：
+```bash
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-env.sh 
+```
 
-  ```bash
-  scp spark-ss-1.0-SNAPSHOT.jar emon@emon:/usr/local/spark/custom/lib
-  ```
+```bash
+# [修改]
+export HBASE_MANAGES_ZK=true => export HBASE_MANAGES_ZK=false
+```
 
-  - 模拟9527端口发送数据
+- 配置`hbase-site.xml`
 
-  ```bash
-  # 命令回车后会进入输入状态，输入内容回车即可
-  nc -lk 9527
-  ```
+```bash
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-site.xml
+```
 
-  - 执行
+```xml
+<configuration>
+    <!-- hbase数据存放的目录，若用本地目录，必须带上file://,否则hbase启动不起来 -->
+    <property>
+        <name>hbase.rootdir</name>
+        <value>file:///usr/local/hbase/data</value>
+    </property>
 
-  ```bash
-  [emon@emon ~]$ spark-submit --class com.coding.bigdata.ss.NetworkWordCountApp --master yarn /usr/local/spark/custom/lib/spark-ss-1.0-SNAPSHOT.jar 2
-  ```
+    <!-- zk的位置 -->
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>localhost</value>
+        <description>the pos of zk</description>
+    </property>
 
-  - 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
+    <!-- 此处必须为true，不然hbase仍用自带的zk，若启动了外部的zookeeper，会导致冲突，hbase启动不起来 -->
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+</configuration>
+```
 
-  
+8. 启动与停止
+
+- 启动（端口号16000）
+
+```bash
+[emon@emon ~]$ start-hbase.sh 
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ stop-hbase.sh 
+```
+
+- 进入hbase命令行
+
+```bash
+[emon@emon ~]$ hbase shell
+```
+
+- 退出hbase命令行
+
+```bash
+hbase(main):014:0> exit
+```
 
 
-## 7、安装Spark
 
-### 7.1、基本安装
+
+
+## 51、安装Spark
+
+### 51.1、基本安装
 
 1. 下载
 
@@ -2446,7 +2454,7 @@ export PATH=$SPARK_HOME/bin:$PATH
 log4j.logger.org.apache.spark.repl.Main=INFO
 ```
 
-### 7.2、local模式
+### 51.2、local模式
 
 - 进入local模式
 
@@ -2499,7 +2507,7 @@ http://192.168.1.116:4040
 scala> :quit
 ```
 
-### 7.2、Standalone模式
+### 51.2、Standalone模式
 
 
 
