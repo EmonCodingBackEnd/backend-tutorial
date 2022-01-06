@@ -246,7 +246,7 @@ zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 
 ```bash
 # 关闭kafka
-/usr/local/kafka/bin/kafka-server-stop.sh -daemon /usr/local/kafka/config/server.properties
+/usr/local/kafka/bin/kafka-server-stop.sh
 ```
 
 - 修改可执行权限
@@ -396,12 +396,21 @@ listeners=PLAINTEXT://:9094
 zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 ```
 
-5. 启动
+5. 启动与停止
+
+- 启动
 
 ```bash
 [emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9092.properties
 [emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9093.properties
 [emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9094.properties
+```
+
+- 停止
+
+```bash
+# 关闭kafka
+[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-stop.sh
 ```
 
 6. 创建`topic`
@@ -427,6 +436,22 @@ Created topic tests.
 # 命令执行结果
 Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=1073741824
 	Topic: tests	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
+```
+
+7. 测试生产者消费者
+
+- 生产者
+
+```bash
+# 打开生产者命令行模式
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic tests
+```
+
+- 消费者
+
+```bash
+# 打开消费者命令模式
+[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic tests --from-beginning
 ```
 
 
@@ -2253,9 +2278,127 @@ export JAVA_HOME=${JAVA_HOME}
 
 ## 8、安装HBase（外部ZK+CDH）
 
+1. 下载
 
+**注意**：无法避开收费墙下载，暂时无解
 
+2. 创建安装目录
 
+```bash
+[emon@emon ~]$ mkdir /usr/local/HBase
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/hbase-1.2.0-cdh5.16.2.tar.gz -C /usr/local/HBase/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -s /usr/local/HBase/hbase-1.2.0-cdh5.16.2/ /usr/local/hbase
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`hbase.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/hbase.sh
+export HBASE_HOME=/usr/local/hbase
+export PATH=$HBASE_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir -p /usr/local/hbase/data
+```
+
+7. 配置文件
+
+- 配置`hbase-env.sh`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-env.sh 
+```
+
+```bash
+# [新增]
+JAVA_HOME=/usr/local/java
+```
+
+- 配置`hbase-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hbase/conf/hbase-site.xml 
+```
+
+```xml
+<configuration>
+    <!-- hbase数据存放的目录，若用本地目录，必须带上file://,否则hbase启动不起来 -->
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://emon:8020/hbase</value>
+        <!--<value>file:///usr/local/hbase/data</value>-->
+    </property>
+    <!-- 此处必须为true，不然hbase仍用自带的zk，若启动了外部的zookeeper，会导致冲突，hbase启动不起来 -->
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+    <!-- zk的位置 -->
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>emon</value>
+    </property>
+</configuration>
+```
+
+8. 启动与停止
+
+- 启动（端口号60010）
+
+```bash
+[emon@emon ~]$ start-hbase.sh
+```
+
+验证1：
+
+```bash
+[emon@emon ~]$ jps
+10849 HRegionServer
+10703 HMaster
+```
+
+验证2：
+
+http://emon:60010/
+
+- 停止
+
+```bash
+[emon@emon ~]$ stop-hbase.sh 
+```
+
+- 进入hbase命令行
+
+```bash
+[emon@emon ~]$ hbase shell
+```
+
+- 退出hbase命令行
+
+```bash
+hbase(main):014:0> exit
+```
 
 
 
