@@ -466,7 +466,7 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 
 ## 4、安装Spark
 
-### 4.1、Spark编译安装（外部HDFS）
+### 4.1、Spark编译安装（外部HDFS+外部Yarn）
 
 目录规划：
 

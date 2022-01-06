@@ -6,6 +6,8 @@
 
 # 一、安装
 
+[安装HBase（外部ZK+外部HDFS+CDH）](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#8%E5%AE%89%E8%A3%85hbase%E5%A4%96%E9%83%A8zk%E5%A4%96%E9%83%A8hdfscdh)
+
 # 二、常用命令
 
 ## 0、写在前面
@@ -39,6 +41,12 @@ HBase命名空间namespace是与关系数据库系统中的数据库类似的表
 
 ### 1.2、操作命令
 
+- 查看命名空间列表
+
+```bash
+list_namespace
+```
+
 - 创建命名空间
 
 ```bash
@@ -55,12 +63,6 @@ create 'my_ns:my_table', 'fam'
 
 ```bash
 list_namespace_tables 'my_ns'
-```
-
-- 查看命名空间列表
-
-```bash
-list_namespace
 ```
 
 - 查看某一个命名空间
