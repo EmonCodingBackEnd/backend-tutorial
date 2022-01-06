@@ -3367,9 +3367,3 @@ hive> explain select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on
 hive> explain extended select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
 ```
 
-
-
-
-
-## 3、hbase
-
