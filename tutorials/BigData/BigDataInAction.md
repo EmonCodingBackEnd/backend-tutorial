@@ -4,7 +4,9 @@
 
 [TOC]
 
+# The Hadoop Ecosystem
 
+![img](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fupload-images.jianshu.io%2Fupload_images%2F6324591-a30ffec26b39ba83.png&refer=http%3A%2F%2Fupload-images.jianshu.io&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1644050845&t=d7f0cc5880834b08fddf76d75d5b2031)
 
 # 一、基础软件安装
 
@@ -3364,4 +3366,10 @@ hive> explain select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on
 ```sql
 hive> explain extended select e.empno, e.ename, e.sal, e.deptno from emp e join dept d on e.deptno=d.deptno;
 ```
+
+
+
+
+
+## 3、hbase
 
