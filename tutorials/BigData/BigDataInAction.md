@@ -466,7 +466,7 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 
 ## 4、安装Spark
 
-### 4.1、Spark编译安装
+### 4.1、Spark编译安装（外部HDFS）
 
 目录规划：
 
@@ -2278,7 +2278,7 @@ export JAVA_HOME=${JAVA_HOME}
 
 
 
-## 8、安装HBase（外部ZK+CDH）
+## 8、安装HBase（外部ZK+外部HDFS+CDH）
 
 1. 下载
 
