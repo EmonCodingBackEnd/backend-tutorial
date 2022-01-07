@@ -133,7 +133,7 @@ admin.serverPort=8090
 
 9. 连接
 
-- 访问8090端口的服务
+- 访问8090端口的服务【版本3.5.5开始支持】
 
 ```bash
 # 比如
@@ -161,6 +161,15 @@ http://192.168.1.116:8090/commands/stat
 
 
 ### 1.2、ZooKeeper集群（CDH版）
+
+- Zookeeper角色
+  - leader：领导者
+    - 集群中只有一个leader
+    - 参与leader选举，有投票权
+  - follower：跟随者
+    - 参与leader选举，有投票权
+  - observer：观察者
+    - 不参与leader选举，没有投票权
 
 #### 1.2.1、Zookeeper集群规划
 
@@ -202,7 +211,7 @@ http://192.168.1.116:8090/commands/stat
 [emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
 ```
 
-- 编辑`zoo.cfg`文件
+- 配置`zoo.cfg`文件
 
 ```bash
 [emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
@@ -218,7 +227,51 @@ server.2=emon2:2888:3888
 server.3=emon3:2888:3888
 ```
 
+- 配置`myid`
 
+配置ASCII编码格式的服务编号，服务启动时，会通过数据目录`dataDir`下的`myid`文件识别出服务编号。
+
+```bash
+# 注意，这里主机名对应的myid编号，是要和zoo.cfg中配置的server.x对应上，否则集群启动报错！
+[emon@emon ~]$ echo 1 > /usr/local/zoo/data/myid
+[emon@emon2 ~]$ echo 2 > /usr/local/zoo/data/myid
+[emon@emon3 ~]$ echo 3 > /usr/local/zoo/data/myid
+```
+
+#### 1.2.4、启动与停止
+
+1. 启动与停止
+
+- 启动（端口号2181）
+
+```bash
+[emon@emon ~]$ zkServer.sh start
+[emon@emon2 ~]$ zkServer.sh start
+[emon@emon3 ~]$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+44611 QuorumPeerMain
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ zkServer.sh stop
+[emon@emon2 ~]$ zkServer.sh stop
+[emon@emon3 ~]$ zkServer.sh stop
+```
+
+- 状态
+
+```bash
+[emon@emon ~]$ zkServer.sh status
+[emon@emon2 ~]$ zkServer.sh status
+[emon@emon3 ~]$ zkServer.sh status
+```
 
 
 
