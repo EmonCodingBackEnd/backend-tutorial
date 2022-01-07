@@ -12,6 +12,8 @@
 
 ## 1、安装ZooKeeper（CDH版）
 
+### 1.1、ZooKeeper单节点（CDH版）
+
 1. 下载
 
 官网地址： https://zookeeper.apache.org/index.html
@@ -155,6 +157,68 @@ http://192.168.1.116:8090/commands/stat
 ```bash
 [zk: localhost:2181(CONNECTED) 0] quit
 ```
+
+
+
+### 1.2、ZooKeeper集群（CDH版）
+
+#### 1.2.1、Zookeeper集群规划
+
+| 机器名 | IP1-家庭      | IP2-公司   | 部署内容 |
+| ------ | ------------- | ---------- | -------- |
+| emon   | 192.168.1.116 | 10.0.0.116 |          |
+| emon2  | 192.168.1.117 | 10.0.0.117 |          |
+| emon3  | 192.168.1.118 | 10.0.0.118 |          |
+
+#### 1.2.2、前置安装
+
+1. 配置SSH免密登录
+
+<font color="red">每一台服务器都需要配置免密登录。</font>
+
+[配置SSH免密登录](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#532%E5%89%8D%E7%BD%AE%E5%AE%89%E8%A3%85)
+
+2. JDK安装
+
+<font color="red">每一台服务器都需要安装JDK。</font>
+
+[安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1安装jdk)
+
+3. 安装Zookeeper
+
+<font color="red">每一台服务器都需要安装Zookeeper。</font>
+
+[安装ZooKeeper](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#1%E5%AE%89%E8%A3%85zookeepercdh%E7%89%88)
+
+#### 1.2.3、配置
+
+<font color="red">每一台服务器都需要配置，且配置内容一样。</font>
+
+<font color="red">仅emon这个主服务器执行如下命令。</font>
+
+- 复制`zoo_sample.cfg`到`zoo.cfg`
+
+```
+[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
+```
+
+- 编辑`zoo.cfg`文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg 
+# [修改]
+dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
+# [新增]
+dataLogDir=/usr/local/zoo/logs
+# [新增]修改默认的8080端口，该选项在3.5.5之后才需要配置
+admin.serverPort=8090
+# [新增]
+server.1=emon:2888:3888
+server.2=emon2:2888:3888
+server.3=emon3:2888:3888
+```
+
+
 
 
 
@@ -1068,7 +1132,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 
 ##### 1.配置SSH免密登录
 
-<font color="gree">每一台服务器都需要安装Hadoop。</font>
+<font color="red">每一台服务器都需要配置免密登录。</font>
 
 - 检查SSH keys是否存在：（每一台服务器都需要做）
 
@@ -1121,13 +1185,13 @@ The key's randomart image is:
 
 ##### 2.JDK安装
 
-<font color="gree">每一台服务器都需要安装Hadoop。</font>
+<font color="red">每一台服务器都需要安装JDK。</font>
 
 [安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
 
 ##### 3.安装Hadoop
 
-<font color="gree">每一台服务器都需要安装Hadoop。</font>
+<font color="red">每一台服务器都需要安装Hadoop。</font>
 
 [安装Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#5%E5%AE%89%E8%A3%85hadoop)
 
@@ -1143,7 +1207,7 @@ The key's randomart image is:
 
 #### 5.3.3、配置
 
-<font color="gree">每一台服务器都需要安装Hadoop。</font>
+<font color="red">每一台服务器都需要配置，且配置内容一样。</font>
 
 - 配置`core-site.xml`
 
@@ -1162,8 +1226,6 @@ The key's randomart image is:
 ```
 
 - 配置`hdfs-site.xml`
-
-<center><font color="red">单节点参考hdfs-site.xml.singlebak；集群参考hdfs-site.xml.clusterbak</font></center>
 
 ```bash
 # 修改副本数量，由于默认副本系统是3，也可以不用修改了
@@ -1184,8 +1246,6 @@ The key's randomart image is:
 ```
 
 - 修改从节点
-
-<center><font color="red">单节点参考slaves.singlebak；集群参考slaves.clusterbak</font></center>
 
 ```bash
 [emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/slaves 
@@ -1239,7 +1299,7 @@ emon3
 
 #### 5.3.4、格式化与启动
 
-<font color="gree">仅emon这个主服务器执行如下命令。</font>
+<font color="red">仅emon这个主服务器执行如下命令。</font>
 
 ##### 1.格式化HDFS
 
@@ -2363,7 +2423,7 @@ export HBASE_MANAGES_ZK=false
         <name>hbase.cluster.distributed</name>
         <value>true</value>
     </property>
-    <!-- zk的位置 -->
+    <!-- zk的位置，如果是zk集群采用 emon,emon2,emon3 形式配置 -->
     <property>
         <name>hbase.zookeeper.quorum</name>
         <value>emon</value>
