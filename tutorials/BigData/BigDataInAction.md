@@ -2321,7 +2321,7 @@ export PATH=$HBASE_HOME/bin:$PATH
 6. 目录规划
 
 ```bash
-[emon@emon ~]$ mkdir -p /usr/local/hbase/data
+[emon@emon ~]$ mkdir -p /usr/local/hbase/tmp
 ```
 
 7. 配置文件
@@ -2334,7 +2334,9 @@ export PATH=$HBASE_HOME/bin:$PATH
 
 ```bash
 # [新增]
-JAVA_HOME=/usr/local/java
+export JAVA_HOME=/usr/local/java
+# [新增]
+export HBASE_MANAGES_ZK=false
 ```
 
 - 配置`hbase-site.xml`
@@ -2345,6 +2347,11 @@ JAVA_HOME=/usr/local/java
 
 ```xml
 <configuration>
+    <!--Temporary directory on the local filesystem-->
+    <property>
+    	<name>hbase.tmp.dir</name>
+        <value>/usr/local/hbase/tmp</value>
+    </property>
     <!-- hbase数据存放的目录，若用本地目录，必须带上file://,否则hbase启动不起来 -->
     <property>
         <name>hbase.rootdir</name>
