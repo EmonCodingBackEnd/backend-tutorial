@@ -150,9 +150,9 @@ hbase> alter 'test','f3'
 - 删除某个列族
 
 ```bash
-hbase> disable 't_demo_tbl
-hbase> alter 't_demo_tbl', NAME=>'f1',METHOD=>'delete'
-hbase> enable 't_demo_tbl'
+hbase> disable 'test'
+hbase> alter 'test', NAME=>'f1',METHOD=>'delete'
+hbase> enable 'test'
 或者
 hbase> alter 'test','delete'=>'f3'
 ```
