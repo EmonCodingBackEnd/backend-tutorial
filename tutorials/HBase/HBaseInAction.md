@@ -105,9 +105,9 @@ create '<table name>','<column family1>','<column family2>'......,'<column famil
 - 创建表
 
 ```bash
-# '[命名空间]:表名,'列簇1','列簇2','列簇3'
-# 命名空间可以不写，默认是default；列簇最多5个
-hbase> create 'test','f1','f2','f3'
+# '[命名空间]:表名,'列族1','列族2','列族3'
+# 命名空间可以不写，默认是default；列族最多5个
+hbase> create 'test','cf1','cf2','cf3'
 ```
 
 - 查看表结构
@@ -141,20 +141,20 @@ hbase> is_enabled 'test'
 
 ```bash
 hbase> disable 'test'
-hbase> alter 'test', NAME=>'f1',VERSIONS=>3
+hbase> alter 'test', NAME=>'cf1',VERSIONS=>3
 hbase> enable 'test'
 或者
-hbase> alter 'test','f3'
+hbase> alter 'test','cf3'
 ```
 
 - 删除某个列族
 
 ```bash
 hbase> disable 'test'
-hbase> alter 'test', NAME=>'f1',METHOD=>'delete'
+hbase> alter 'test', NAME=>'cf1',METHOD=>'delete'
 hbase> enable 'test'
 或者
-hbase> alter 'test','delete'=>'f3'
+hbase> alter 'test','delete'=>'cf3'
 ```
 
 - 查看所有表
@@ -193,8 +193,8 @@ hbase> drop 'test'
 - 向表中插入数据
 
 ```bash
-# put '[命名空间]:表名','行键','列簇:列名','列值'
-# 命名空间可以不写，默认是default；列簇的列可以不存在，修改数据也是put，只需要行键和列相同
+# put '[命名空间]:表名','行键','列族:列名','列值'
+# 命名空间可以不写，默认是default；列族的列可以不存在，修改数据也是put，只需要行键和列相同
 hbase> put 'test','0001','f1:username','henry'
 ```
 
@@ -231,9 +231,9 @@ hbase> get 'test','r1','f1'
 
 ```bash
 # get '[命名空间]:表名','行键','列族1','列族2'
-hbase> get 'test','r1','f1','f2'
+hbase> get 'test','r1','f1','cf2'
 # get '[命名空间]:表名','行键','列族1:列名','列族2'
-hbase> get 'test','0001','f1:age','f2'
+hbase> get 'test','0001','f1:age','cf2'
 ```
 
 - 获取某个行键的某个列族的某个列值
