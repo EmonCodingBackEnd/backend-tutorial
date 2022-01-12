@@ -215,6 +215,8 @@ hbase> deleteall 'test','r1'
 
 **Hive Data Query Language**
 
+### 4.1、常规查询
+
 - 获取某个行键的所有列族的列值
 
 ```bash
@@ -271,3 +273,88 @@ hbase> scan 'test',{COLUMNS=>'f1:nickname'}
 ```bash
 hbase> count 'test'
 ```
+
+### 4.2、过滤器
+
+- 使用`show_filters`命令查看当前HBase支持的过滤器类型
+
+```bash
+hbase> show_filters
+DependentColumnFilter
+KeyOnlyFilter
+ColumnCountGetFilter
+SingleColumnValueFilter
+PrefixFilter
+SingleColumnValueExcludeFilter
+FirstKeyOnlyFilter
+ColumnRangeFilter
+TimestampsFilter
+FamilyFilter
+QualifierFilter
+ColumnPrefixFilter
+RowFilter
+MultipleColumnPrefixFilter
+InclusiveStopFilter
+PageFilter
+ValueFilter
+ColumnPaginationFilter
+```
+
+使用上述过滤器时，一般需要配合比较运算符或者比较器使用。
+
+**比较运算符**
+
+| 比较运算符 | 描述     |
+| ---------- | -------- |
+| =          | 等于     |
+| >          | 大于     |
+| >=         | 大于等于 |
+| <          | 小于     |
+| <=         | 小于等于 |
+| !=         | 不等于   |
+
+**比较器**
+
+| 比较器                 | 描述             |
+| ---------------------- | ---------------- |
+| BinaryComparator       | 匹配完整字节数组 |
+| BinaryPrefixComparator | 匹配字节数组前缀 |
+| BitComparator          | 匹配比特位       |
+| NullComparator         | 匹配空值         |
+| RegexStringComparator  | 匹配正则表达式   |
+| SubstringComparator    | 匹配子字符串     |
+
+过滤器使用语法格式：
+
+```bash
+scan '表名',{FILTER=>"过滤器(比较运算符,'比较器')"}
+```
+
+#### 4.2.1、行键过滤器
+
+​		`RowFilter`可以配合比较器和运算符，实现行键字符串的比较和过滤。例如，匹配行键中大于0001的数据，可以使用`binary`比较器；匹配以0001开头的行键，可以使用substring比较器，注意 `substring` 不支持大于或小于运算符。
+
+- 行键过滤器
+
+  - `PrefixFilter`：行键前缀比较器，比较行键前缀
+
+    - 示例1
+
+    ```bash
+    scan 'user',{FILTER=>"PrefixFilter('test_lm')"}
+    ```
+
+    - 示例2
+
+    ```bash
+    scan 'user',{FILTER=>"RowFilter(=,'substring:test_lm')"}
+    ```
+
+    
+
+| 行键过滤器   | 描述                         | 示例                                                         |
+| ------------ | ---------------------------- | ------------------------------------------------------------ |
+| RowFilter    | 行键大于或以XX开头           |                                                              |
+| PrefixFilter | 行键前缀比较器，比较行键前缀 | scan '表名',{Filter=>"PrefixFilter('0001')"} 等同于 scan '表名',{Filter=>"PrefixFilter('0001')"} |
+|              |                              |                                                              |
+

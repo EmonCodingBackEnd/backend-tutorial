@@ -432,6 +432,16 @@ Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=107374
 [emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic test --from-beginning
 ```
 
+- 查看topic的偏移量
+
+```bash
+[emon@emon ~]$ kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list emon:9092 --topic test
+# 命令执行结果
+test:0:59134
+```
+
+
+
 ### 2.2、Kafka集群
 
 1. 目录规划
@@ -587,10 +597,10 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 
 目录规划：
 
-| 目录                        | 作用      |
-| --------------------------- | --------- |
-| /usr/local/spark/custom/lib | jar库文件 |
-|                             |           |
+| 目录                          | 作用      |
+| ----------------------------- | --------- |
+| /usr/local/spark/custom/lib   | jar库文件 |
+| /usr/local/spark/custom/shell | 脚本文件  |
 
 1. 下载源码
 
@@ -767,28 +777,35 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 - 自定义测试
 
+  - [依赖项目](git@github.com:EmonCodingBackEnd/backend-spark-learning.git)
   - 上传自定义jar
-
+  
   `git clone git@github.com:EmonCodingBackEnd/backend-spark-learning.git`并打包`spark-ss`模块，上传jar到spark：
-
+  
   ```bash
   scp spark-ss-1.0-SNAPSHOT.jar emon@emon:/usr/local/spark/custom/lib
   ```
-
+  
   - 模拟9527端口发送数据
-
+  
   ```bash
   # 命令回车后会进入输入状态，输入内容回车即可
   nc -lk 9527
   ```
-
+  
   - 执行
-
+  
   ```bash
   [emon@emon ~]$ spark-submit --class com.coding.bigdata.ss.NetworkWordCountApp --master yarn /usr/local/spark/custom/lib/spark-ss-1.0-SNAPSHOT.jar 2
   ```
-
+  
   - 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
+  
+  
+  
+  
+
+
 
 
 ## 5、安装Hadoop（CDH版）
