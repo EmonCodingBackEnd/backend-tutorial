@@ -58,6 +58,17 @@ localhost:6379> flushall
 localhost:6379> clear
 ```
 
+- 帮助
+
+```bash
+# string类型命令操作帮助
+emon:6379> help @string
+# ttl命令帮助
+emon:6379> help ttl
+```
+
+
+
 ## 1.2、Redis的数据类型
 
 ### 1.2.1、string 字符串
