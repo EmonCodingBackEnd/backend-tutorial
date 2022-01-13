@@ -4,7 +4,11 @@
 
 [toc]
 
-# 一、Redis
+# 一、安装
+
+[安装redis](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#12%E5%AE%89%E8%A3%85redis)
+
+# 一、常用命令
 
 ## 1.1、Redis的命令行客户端
 
