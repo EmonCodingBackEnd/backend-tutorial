@@ -67,7 +67,17 @@ emon:6379> help @string
 emon:6379> help ttl
 ```
 
+- 查看当前连接数
 
+```bash
+emon:6379> info clients
+```
+
+- 查看最大连接数
+
+```bash
+ emon:6379> config get maxclients
+```
 
 ## 1.2、Redis的数据类型
 
