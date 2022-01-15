@@ -597,10 +597,13 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 
 目录规划：
 
-| 目录                          | 作用      |
-| ----------------------------- | --------- |
-| /usr/local/spark/custom/lib   | jar库文件 |
-| /usr/local/spark/custom/shell | 脚本文件  |
+| 目录                           | 作用               |
+| ------------------------------ | ------------------ |
+| /usr/local/spark/custom/lib    | jar库文件          |
+| /usr/local/spark/custom/shell  | 脚本文件           |
+| /usr/local/spark/custom/source | 存放源码资源的目录 |
+
+
 
 1. 下载源码
 
