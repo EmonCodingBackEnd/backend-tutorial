@@ -56,7 +56,7 @@
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
+[emon@emon ~]$ ln -snf /usr/local/ZooKeeper/zookeeper-3.4.5-cdh5.16.2/ /usr/local/zoo
 ```
 
 5. 配置环境变量
@@ -304,7 +304,7 @@ server.3=emon3:2888:3888
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
 ```
 
 5. 配置环境变量
@@ -747,7 +747,7 @@ https://github.com/apache/spark/pull/16884/files
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Spark/spark-3.0.3-bin-2.6.0-cdh5.16.2/ /usr/local/spark
+[emon@emon ~]$ ln -snf /usr/local/Spark/spark-3.0.3-bin-2.6.0-cdh5.16.2/ /usr/local/spark
 ```
 
 7. 配置环境变量
@@ -811,7 +811,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 
 
-## 5、安装Hadoop（CDH版）
+## 5、安装Hadoop
 
 目录规划：
 
@@ -824,7 +824,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 | /usr/local/hadoop/custom/source | 存放spark等等源码的目录    |
 |                                 |                            |
 
-### 5.1、Hadoop单节点（CDH版）
+### 5.1、Hadoop伪集群（CDH版）
 
 #### 5.1.1、安装
 
@@ -850,7 +850,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 
 - hadoop软件包常见目录说明
 
-  - `bin`： hadoop客户端名单
+  - `bin`： hadoop客户端命令
 
   - `etc/hadoop`： hadoop相关的配置文件存放目录
 
@@ -861,7 +861,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/ /usr/local/hadoop
+[emon@emon ~]$ ln -snf /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/ /usr/local/hadoop
 ```
 
 5. 配置环境变量
@@ -1160,9 +1160,9 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 >
 > ​					yarn-daemon.sh stop nodemanager
 
-### 5.3、Hadoop集群（CDH版）
+### 5.2、Hadoop集群（CDH版）
 
-#### 5.3.1、Hadoop集群规划
+#### 5.2.1、Hadoop集群规划
 
 - 节点情况
   - HDFS
@@ -1201,7 +1201,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 192.168.1.118 emon3
 ```
 
-#### 5.3.2、前置安装
+#### 5.2.2、前置安装
 
 ##### 1.配置SSH免密登录
 
@@ -1278,7 +1278,7 @@ The key's randomart image is:
 
 
 
-#### 5.3.3、配置
+#### 5.2.3、配置
 
 <font color="red">每一台服务器都需要配置，且配置内容一样。</font>
 
@@ -1370,7 +1370,7 @@ emon3
 </configuration>
 ```
 
-#### 5.3.4、格式化与启动
+#### 5.2.4、格式化与启动
 
 <font color="red">仅emon这个主服务器执行如下命令。</font>
 
@@ -1516,6 +1516,62 @@ http://repo.emon.vip:8088
 停止YARN->停止HDFS
 
 
+
+### 5.3、Hadoop伪集群（Apache）
+
+#### 5.3.0、前提
+
+已配置IP
+
+已设置hostname
+
+已配置SSH免密登录
+
+已安装JDK
+
+#### 5.3.1、安装
+
+1. 下载
+
+最新发行版下载页面：https://hadoop.apache.org/releases.html
+
+历史发行版下载页面：https://archive.apache.org/dist/hadoop/common/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Hadoop
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/hadoop-3.3.1.tar.gz -C /usr/local/Hadoop/
+```
+
+- hadoop软件包常见目录说明
+
+  - `bin`： hadoop客户端命令
+
+
+  - `etc/hadoop`： hadoop相关的配置文件存放目录
+
+
+  - `sbin`： 启动hadoop相关进程的脚本
+
+
+  - `share`： 常用例子
+
+4. 创建软连接
+
+```bash
+# 注意：如果ln -s命令，在软连接存在时会导致软连接路径下产生一个无效软连接；-snf会移除旧的
+[emon@emon ~]$ ln -snf /usr/local/Hadoop/hadoop-3.3.1/ /usr/local/hadoop
+```
 
 ### 5.8、Hadoop环境切换
 
@@ -1664,7 +1720,7 @@ https://archive.cloudera.com/cdh5/cdh/5/ （已无法下载）
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Hive/hive-1.1.0-cdh5.16.2/ /usr/local/hive
+[emon@emon ~]$ ln -snf /usr/local/Hive/hive-1.1.0-cdh5.16.2/ /usr/local/hive
 ```
 
 5. 配置环境变量
@@ -1907,7 +1963,7 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Flume/apache-flume-1.6.0-cdh5.16.2-bin/ /usr/local/flume
+[emon@emon ~]$ ln -snf /usr/local/Flume/apache-flume-1.6.0-cdh5.16.2-bin/ /usr/local/flume
 ```
 
 5. 配置环境变量
@@ -2432,7 +2488,7 @@ export JAVA_HOME=${JAVA_HOME}
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/HBase/hbase-1.2.0-cdh5.16.2/ /usr/local/hbase
+[emon@emon ~]$ ln -snf /usr/local/HBase/hbase-1.2.0-cdh5.16.2/ /usr/local/hbase
 ```
 
 5. 配置环境变量
@@ -2571,7 +2627,7 @@ hbase(main):014:0> exit
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/HBase/hbase-2.2.1/ /usr/local/hbase
+[emon@emon ~]$ ln -snf /usr/local/HBase/hbase-2.2.1/ /usr/local/hbase
 ```
 
 5. 配置环境变量
@@ -2700,7 +2756,7 @@ hbase(main):014:0> exit
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Spark/spark-2.4.4-bin-hadoop2.7/ /usr/local/spark
+[emon@emon ~]$ ln -snf /usr/local/Spark/spark-2.4.4-bin-hadoop2.7/ /usr/local/spark
 ```
 
 5. 配置环境变量

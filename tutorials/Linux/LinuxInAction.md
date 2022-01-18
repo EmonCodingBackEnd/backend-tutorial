@@ -4893,7 +4893,7 @@ test                Overall->Read,Run->Replay
 				-- Branch Specifier(blank for 'any')：*/master
 	-- Build
 		-- Root POM: pom.xml
-		-- Goals and opotions: clean package -Dmaven.test.skip=true
+		-- Goals and options: clean package -Dmaven.test.skip=true
 	-- Post Steps
 		Run only if build succeeds or is unstable[勾选]
 		-- Send files or execute commands over SSH
