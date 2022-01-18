@@ -1573,6 +1573,24 @@ http://repo.emon.vip:8088
 [emon@emon ~]$ ln -snf /usr/local/Hadoop/hadoop-3.3.1/ /usr/local/hadoop
 ```
 
+5. 配置环境变量
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/hadoop.sh
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$HADOOP_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+#### 5.3.2、配置
+
+
+
 ### 5.8、Hadoop环境切换
 
 **备注**：如果`/usr/local/hadoop/etc/hadoop/slaves`配置了主机名，但主机名在`/etc/hosts`定义为`127.0.0.1  emon`会有本地可以查看文件内容，但JavaAPI无法执行open出hdfs文件内容的问题；但如果主机名要配置为`192.168.1.116    emon`这样时，在公司和家里切换麻烦，写了如下切换的脚本。
