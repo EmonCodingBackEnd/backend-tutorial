@@ -869,7 +869,7 @@ https://archive.cloudera.com/cdh5/cdh/5/  （已无法下载）
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/hadoop.sh
 export HADOOP_HOME=/usr/local/hadoop
-export PATH=$HADOOP_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ```
 
 使之生效：
@@ -1004,7 +1004,7 @@ Starting secondary namenodes [0.0.0.0]
 21/12/26 19:26:06 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 ```
 
-**说明：**启动日志参见`/usr/local/hadoop/logs`
+**说明**：启动日志参见`/usr/local/hadoop/logs`
 
 - 验证1
 
@@ -1578,7 +1578,7 @@ http://repo.emon.vip:8088
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/hadoop.sh
 export HADOOP_HOME=/usr/local/hadoop
-export PATH=$HADOOP_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ```
 
 使之生效：
@@ -1588,6 +1588,167 @@ export PATH=$HADOOP_HOME/bin:$PATH
 ```
 
 #### 5.3.2、配置
+
+##### 1.HDFS配置
+
+- 配置`hadoop-env.sh`
+
+```
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hadoop-env.sh 
+```
+
+```bash
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+# [新增]
+export HADOOP_LOG_DIR=${HADOOP_HOME}/logs
+```
+
+- 配置`core-site.xml`
+
+```bash
+# 在打开的文件中<configuration>节点内添加属性
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/core-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+		<value>hdfs://emon:8020</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/usr/local/hadoop/tmp</value>
+    </property>
+</configuration>
+```
+
+- 配置`hdfs-site.xml`
+
+```bash
+# 修改副本数量
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+</configuration>
+```
+
+##### 2.YARN配置
+
+1. 配置
+
+- 配置`mapred-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml
+```
+
+```xml
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+</configuration>
+```
+
+- 配置`yarn-site.xml`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/yarn-site.xml 
+```
+
+```xml
+<configuration>
+
+<!-- Site specific YARN configuration properties -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <!-- 白名单 -->
+    <property>
+    	<name>yarn.nodemanager.env-whitelist</name> 
+        <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
+    </property>
+</configuration>
+```
+
+##### 3.节点配置
+
+- `workers`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/workers 
+```
+
+```bash
+#localhost
+emon
+```
+
+#### 5.3.3、HDFS格式化
+
+- 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
+
+```bash
+[emon@emon ~]$ hdfs namenode -format
+```
+
+```bash
+WARNING: /usr/local/hadoop/logs does not exist. Creating.
+2022-01-18 18:20:30,042 INFO namenode.NameNode: STARTUP_MSG: 
+/************************************************************
+STARTUP_MSG: Starting NameNode
+STARTUP_MSG:   host = emon/10.0.0.116
+STARTUP_MSG:   args = [-format]
+STARTUP_MSG:   version = 3.3.1
+STARTUP_MSG:   classpath =......
+......省略......
+2022-01-18 18:20:31,481 INFO namenode.NameNode: Caching file names occurring more than 10 times
+2022-01-18 18:20:31,486 INFO snapshot.SnapshotManager: Loaded config captureOpenFiles: false, skipCaptureAccessTimeOnlyChange: false, snapshotDiffAllowSnapRootDescendant: true, maxSnapshotLimit: 65536
+2022-01-18 18:20:31,488 INFO snapshot.SnapshotManager: SkipList is disabled
+2022-01-18 18:20:31,494 INFO util.GSet: Computing capacity for map cachedBlocks
+2022-01-18 18:20:31,494 INFO util.GSet: VM type       = 64-bit
+2022-01-18 18:20:31,495 INFO util.GSet: 0.25% max memory 1.0 GB = 2.7 MB
+2022-01-18 18:20:31,495 INFO util.GSet: capacity      = 2^18 = 262144 entries
+2022-01-18 18:20:31,502 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.window.num.buckets = 10
+2022-01-18 18:20:31,502 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.num.users = 10
+2022-01-18 18:20:31,502 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.windows.minutes = 1,5,25
+2022-01-18 18:20:31,506 INFO namenode.FSNamesystem: Retry cache on namenode is enabled
+2022-01-18 18:20:31,506 INFO namenode.FSNamesystem: Retry cache will use 0.03 of total heap and retry cache entry expiry time is 600000 millis
+2022-01-18 18:20:31,508 INFO util.GSet: Computing capacity for map NameNodeRetryCache
+2022-01-18 18:20:31,508 INFO util.GSet: VM type       = 64-bit
+2022-01-18 18:20:31,509 INFO util.GSet: 0.029999999329447746% max memory 1.0 GB = 326.7 KB
+2022-01-18 18:20:31,509 INFO util.GSet: capacity      = 2^15 = 32768 entries
+2022-01-18 18:20:31,536 INFO namenode.FSImage: Allocated new BlockPoolId: BP-823583849-10.0.0.116-1642501231529
+2022-01-18 18:20:31,563 INFO common.Storage: Storage directory /usr/local/hadoop/tmp/dfs/name has been successfully formatted.
+2022-01-18 18:20:31,599 INFO namenode.FSImageFormatProtobuf: Saving image file /usr/local/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
+2022-01-18 18:20:31,742 INFO namenode.FSImageFormatProtobuf: Image file /usr/local/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 399 bytes saved in 0 seconds .
+2022-01-18 18:20:31,767 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
+2022-01-18 18:20:31,796 INFO namenode.FSNamesystem: Stopping services started for active state
+2022-01-18 18:20:31,796 INFO namenode.FSNamesystem: Stopping services started for standby state
+2022-01-18 18:20:31,806 INFO namenode.FSImage: FSImageSaver clean checkpoint: txid=0 when meet shutdown.
+2022-01-18 18:20:31,806 INFO namenode.NameNode: SHUTDOWN_MSG: 
+/************************************************************
+SHUTDOWN_MSG: Shutting down NameNode at emon/10.0.0.116
+************************************************************/
+```
+
+
+
+
+
+
+
+
 
 
 
