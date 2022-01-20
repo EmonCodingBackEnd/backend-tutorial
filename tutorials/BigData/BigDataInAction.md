@@ -824,7 +824,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 | /usr/local/hadoop/custom/source | 存放spark等等源码的目录    |
 |                                 |                            |
 
-### 5.1、Hadoop伪集群（CDH版）
+### 5.1、Hadoop伪分布式集群（CDH5版）
 
 #### 5.1.0、前提
 
@@ -1170,7 +1170,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 >
 > ​					yarn-daemon.sh stop nodemanager
 
-### 5.2、Hadoop集群（CDH版）
+### 5.2、Hadoop集群（CDH5版）
 
 #### 5.2.0、前提
 
@@ -1682,7 +1682,7 @@ http://repo.emon.vip:8088
 
 
 
-### 5.3、Hadoop伪分布式集群（Apache版）
+### 5.3、Hadoop伪分布式集群（Apache6版）
 
 #### 5.3.0、前提
 
@@ -1976,7 +1976,7 @@ not running
 
 
 
-### 5.4、Hadoop分布式集群（Apache版）
+### 5.4、Hadoop分布式集群（Apache6版）
 
 #### 5.4.0、前提
 
@@ -2278,6 +2278,20 @@ not running
 ```
 
 访问地址：http://emon:8088
+
+
+
+### 5.7、Hadoop注意事项
+
+#### 5.7.1、Hadoop的客户端节点
+
+1.在实际工作中不建议直接连接集群中的节点来操作集群，直接把集群中的节点暴露给普通开发人员是不安全的。
+
+2.建议在业务及其上安装Hadoop，这样就可以在业务机器上操作Hadoop集群了，此机器就称为是Hadoop的客户端节点。
+
+3.Hadoop的客户端节点是没有数量限制的。
+
+4.拷贝一份主节点的hadoop安装目录，即可作为客户端；不要启动，仅作为命令依赖。
 
 ### 5.8、Hadoop环境切换
 
