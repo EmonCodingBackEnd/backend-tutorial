@@ -242,7 +242,13 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 CentOS8默认没安装semanage命令，安装如下：
 
 ```bash
-[emon@emon ~]$ sudo yum install -y policycoreutils-python-utils
+[root@emon ~]# yum install -y policycoreutils-python-utils
+```
+
+8. nc
+
+```bash
+[root@emon ~]# yum install -y nmap
 ```
 
 

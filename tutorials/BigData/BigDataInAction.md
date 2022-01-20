@@ -1842,7 +1842,25 @@ not running
 | emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM      |
 | emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM      |
 
-#### 5.4.2、
+#### 5.4.2、集群内时间同步服务
+
+<font color="red">每一台服务器都需要安装ntp。</font>
+
+1. 安装
+
+- 检查是否已安装
+
+```bash
+[emon@emon ~]$ yum list ntp
+```
+
+- 如果未安装，则安装
+
+```bash
+[emon@emon ~]$ yum install -y ntp
+```
+
+
 
 ### 5.8、Hadoop环境切换
 
