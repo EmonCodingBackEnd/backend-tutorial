@@ -1517,7 +1517,7 @@ http://repo.emon.vip:8088
 
 
 
-### 5.3、Hadoop伪集群（Apache）
+### 5.3、Hadoop伪集群（Apache版）
 
 #### 5.3.0、前提
 
@@ -1694,7 +1694,9 @@ export HADOOP_LOG_DIR=${HADOOP_HOME}/logs
 emon
 ```
 
-#### 5.3.3、HDFS格式化
+#### 5.3.3、格式化与启动停止
+
+##### 1.HDFS格式化
 
 - 格式化HDFS文件系统：第一次执行的时候一定要格式化文件系统，不要重复执行。
 
@@ -1742,11 +1744,22 @@ SHUTDOWN_MSG: Shutting down NameNode at emon/10.0.0.116
 ************************************************************/
 ```
 
+##### 2.启动与停止
 
+- 启动
 
-
-
-
+```bash
+[emon@emon ~]$ start-all.sh 
+# 命令行输出信息
+WARNING: Attempting to start all Apache Hadoop daemons as emon in 10 seconds.
+WARNING: This is not a recommended production deployment configuration.
+WARNING: Use CTRL-C to abort.
+Starting namenodes on [emon]
+Starting datanodes
+Starting secondary namenodes [emon]
+Starting resourcemanager
+Starting nodemanagers
+```
 
 
 
