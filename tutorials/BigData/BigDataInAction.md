@@ -1844,9 +1844,9 @@ not running
 
 #### 5.4.2、集群内时间同步服务
 
-<font color="red">每一台服务器都需要安装ntp。</font>
-
 1. 安装
+
+<font color="red">每一台服务器都需要安装ntp。</font>
 
 - 检查是否已安装
 
@@ -1857,7 +1857,127 @@ not running
 - 如果未安装，则安装
 
 ```bash
-[emon@emon ~]$ yum install -y ntp
+[emon@emon ~]$ sudo yum install -y ntp
+```
+
+2. 配置服务端
+
+<font color="red">仅emon服务器配置。</font>
+
+- 配置`ntp.conf`
+
+```bash
+[emon@emon ~]$ sudo vim /etc/ntp.conf 
+```
+
+```bash
+# [新增]
+logfile /var/log/ntpd.log
+# [备注]如下两行配置完全未变动，只是想记录下这个是事件同步服务归属集群网段的配置
+restrict 127.0.0.1
+restrict ::1
+# [修改]去掉默认的server的4个配置，增加阿里云时间同步服务同步
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server ntp1.aliyun.com
+server ntp2.aliyun.com
+server ntp3.aliyun.com
+# 当所有授时服务都不可用时，采用本机作为授时服务
+server 127.0.0.1
+fudge 127.0.0.1 stratum 10
+```
+
+**授时服务**：可以在 https://www.ntppool.org/zone/asia 查看更多授时服务
+
+- 同步时间
+
+```bash
+[emon@emon ~]$ sudo ntpdate -u ntp1.aliyun.com
+# 命令行输出信息
+20 Jan 13:56:45 ntpdate[119191]: adjust time server 120.25.115.20 offset 0.003865 sec
+```
+
+- 开启ntp服务
+
+```bash
+[emon@emon ~]$ sudo systemctl start ntpd
+```
+
+- 查看服务状态
+
+```bash
+[emon@emon ~]$ sudo systemctl status ntpd
+```
+
+- 关闭服务命令
+
+```bash
+[emon@emon ~]$ sudo systemctl stop ntpd
+```
+
+- 设置为开机自动启动
+
+```bash
+[emon@emon ~]$ sudo systemctl enable ntpd
+# 校验设置结果
+[emon@emon ~]$ sudo systemctl is-enabled ntpd
+# 命令行输出信息，enabled表示已经设置开机自启成功
+enabled
+```
+
+- 查看状态
+
+```bash
+[emon@emon ~]$ ntpstat
+# 命令行输出信息
+synchronised to NTP server (120.25.115.20) at stratum 3
+   time correct to within 27 ms
+   polling server every 64 s
+# 注意，以上成功的信息，是在服务启动5-10分钟后才有同步成功的信息，否则是   
+unsynchronised
+  time server re-starting
+   polling server every 8 s  
+```
+
+3. 配置客户端
+
+<font color="red">仅emon服务器之外的服务器配置（比如这里的emon2和emon3）。</font>
+
+- 配置`ntp.conf`
+
+```bash
+[emon@emon ~]$ sudo vim /etc/ntp.conf 
+```
+
+```bash
+# [新增]
+logfile /var/log/ntpd.log
+# [修改]去掉默认的server的4个配置，指定到emon服务器
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server emon
+```
+
+- 开启ntp服务
+
+```bash
+[emon@emon ~]$ sudo systemctl start ntpd
+```
+
+- 设置为开机自动启动
+
+```bash
+[emon@emon ~]$ sudo systemctl enable ntpd
+```
+
+- 查看状态
+
+```bash
+[emon@emon2 ~]$ ntpstat
 ```
 
 
