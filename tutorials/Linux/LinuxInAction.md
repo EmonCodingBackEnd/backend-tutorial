@@ -1854,6 +1854,10 @@ http://192.168.1.116/
 - 脚本编写
 
 ```bash
+[emon@emon ~]$ vim /usr/local/nginx/sbin/cut_my_log.sh
+```
+
+```bash
 #!/bin/bash
 LOG_PATH="/usr/local/nginx/logs"
 RECORD_TIME=$(date -d "yesterday" +%Y-%m-%d+%H:%M)
