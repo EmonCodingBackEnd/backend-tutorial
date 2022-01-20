@@ -1162,7 +1162,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 
 ### 5.2、Hadoop集群（CDH版）
 
-#### 5.2.1、Hadoop集群规划
+#### 5.2.1、集群规划
 
 - 节点情况
   - HDFS
@@ -1525,7 +1525,7 @@ http://repo.emon.vip:8088
 
 已设置hostname
 
-已配置SSH免密登录
+已配置SSH免密登录（emon到emon、emon1和emon2的免密登录）
 
 已安装JDK
 
@@ -1812,6 +1812,37 @@ not running
 
 
 ### 5.4、Hadoop分布式集群（Apache版）
+
+#### 5.4.0、前提
+
+已配置IP
+
+已设置hostname
+
+已配置SSH免密登录（emon到emon、emon1和emon2的免密登录）
+
+已安装JDK
+
+#### 5.4.1、集群规划
+
+- 节点情况
+  - HDFS
+    - NN：NameNode
+    - SNN：SecondaryNameNode
+    - DN：DataNode
+  - YARN
+    - RM：ResourceManager
+    - NM：NodeManager
+
+- **一主两从分布式集群规划**
+
+| 机器名 | IP1-家庭      | IP2-公司   | 部署内容    |
+| ------ | ------------- | ---------- | ----------- |
+| emon   | 192.168.1.116 | 10.0.0.116 | NN、SNN、RM |
+| emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM      |
+| emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM      |
+
+#### 5.4.2、
 
 ### 5.8、Hadoop环境切换
 
