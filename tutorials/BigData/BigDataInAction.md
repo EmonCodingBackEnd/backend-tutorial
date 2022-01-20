@@ -826,6 +826,16 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 ### 5.1、Hadoop伪集群（CDH版）
 
+#### 5.1.0、前提
+
+已配置IP
+
+已设置hostname
+
+已配置SSH免密登录（emon到emon、emon1和emon2的免密登录）
+
+已安装JDK
+
 #### 5.1.1、安装
 
 1. 下载
@@ -1162,6 +1172,18 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 
 ### 5.2、Hadoop集群（CDH版）
 
+#### 5.2.0、前提
+
+已配置IP：[配置网络](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#21%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C)
+
+已设置hostname：[修改主机名](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#13%E4%BF%AE%E6%94%B9%E4%B8%BB%E6%9C%BA%E5%90%8D)
+
+已配置SSH免密登录（emon到emon、emon1和emon2的免密登录）
+
+已安装JDK：[安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
+
+已配置集群内时间同步服务
+
 #### 5.2.1、集群规划
 
 - 节点情况
@@ -1256,11 +1278,143 @@ The key's randomart image is:
 [emon@emon ~]$ ssh emon3
 ```
 
-##### 2.JDK安装
+##### 2.集群内时间同步服务
 
-<font color="red">每一台服务器都需要安装JDK。</font>
+1. 安装
 
-[安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1%E5%AE%89%E8%A3%85jdk)
+<font color="red">每一台服务器都需要安装ntp。</font>
+
+- 检查是否已安装
+
+```bash
+[emon@emon ~]$ yum list ntp
+```
+
+- 如果未安装，则安装
+
+```bash
+[emon@emon ~]$ sudo yum install -y ntp
+```
+
+2. 配置服务端
+
+<font color="red">仅emon服务器配置。</font>
+
+- 配置`ntp.conf`
+
+```bash
+[emon@emon ~]$ sudo vim /etc/ntp.conf 
+```
+
+```bash
+# [新增]
+logfile /var/log/ntpd.log
+# [备注]如下两行配置完全未变动，只是想记录下这个是事件同步服务归属集群网段的配置
+restrict 127.0.0.1
+restrict ::1
+# [修改]去掉默认的server的4个配置，增加阿里云时间同步服务同步
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server ntp1.aliyun.com
+server ntp2.aliyun.com
+server ntp3.aliyun.com
+# 当所有授时服务都不可用时，采用本机作为授时服务
+server 127.0.0.1
+fudge 127.0.0.1 stratum 10
+```
+
+**授时服务**：可以在 https://www.ntppool.org/zone/asia 查看更多授时服务
+
+- 同步时间
+
+```bash
+[emon@emon ~]$ sudo ntpdate -u ntp1.aliyun.com
+# 命令行输出信息
+20 Jan 13:56:45 ntpdate[119191]: adjust time server 120.25.115.20 offset 0.003865 sec
+```
+
+- 开启ntp服务
+
+```bash
+[emon@emon ~]$ sudo systemctl start ntpd
+```
+
+- 查看服务状态
+
+```bash
+[emon@emon ~]$ sudo systemctl status ntpd
+```
+
+- 关闭服务命令
+
+```bash
+[emon@emon ~]$ sudo systemctl stop ntpd
+```
+
+- 设置为开机自动启动
+
+```bash
+[emon@emon ~]$ sudo systemctl enable ntpd
+# 校验设置结果
+[emon@emon ~]$ sudo systemctl is-enabled ntpd
+# 命令行输出信息，enabled表示已经设置开机自启成功
+enabled
+```
+
+- 查看状态
+
+```bash
+[emon@emon ~]$ ntpstat
+# 命令行输出信息
+synchronised to NTP server (120.25.115.20) at stratum 3
+   time correct to within 27 ms
+   polling server every 64 s
+# 注意，以上成功的信息，是在服务启动5-10分钟后才有同步成功的信息，否则是   
+unsynchronised
+  time server re-starting
+   polling server every 8 s  
+```
+
+3. 配置客户端
+
+<font color="red">仅emon服务器之外的服务器配置（比如这里的emon2和emon3）。</font>
+
+- 配置`ntp.conf`
+
+```bash
+[emon@emon ~]$ sudo vim /etc/ntp.conf 
+```
+
+```bash
+# [新增]
+logfile /var/log/ntpd.log
+# [修改]去掉默认的server的4个配置，指定到emon服务器
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server emon
+```
+
+- 开启ntp服务
+
+```bash
+[emon@emon ~]$ sudo systemctl start ntpd
+```
+
+- 设置为开机自动启动
+
+```bash
+[emon@emon ~]$ sudo systemctl enable ntpd
+```
+
+- 查看状态
+
+```bash
+[emon@emon2 ~]$ ntpstat
+```
 
 ##### 3.安装Hadoop
 
@@ -1268,19 +1422,19 @@ The key's randomart image is:
 
 [安装Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#5%E5%AE%89%E8%A3%85hadoop)
 
-- 确保JAVA_HOME指定到JDK8，查看配置
+#### 5.2.3、配置
+
+<font color="red">每一台服务器都需要配置，且配置内容一样。</font>
+
+- 配置`hadoop-env.sh`
+
+确保JAVA_HOME指定到JDK8，查看配置
 
 ```bash
 [emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/hadoop-env.sh 
 ```
 
 可以看到`export JAVA_HOME=${JAVA_HOME}`，所以，如果JAVA_HOME环境变量是正确的即可。
-
-
-
-#### 5.2.3、配置
-
-<font color="red">每一台服务器都需要配置，且配置内容一样。</font>
 
 - 配置`core-site.xml`
 
@@ -1842,143 +1996,9 @@ not running
 | emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM      |
 | emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM      |
 
-#### 5.4.2、集群内时间同步服务
 
-1. 安装
 
-<font color="red">每一台服务器都需要安装ntp。</font>
-
-- 检查是否已安装
-
-```bash
-[emon@emon ~]$ yum list ntp
-```
-
-- 如果未安装，则安装
-
-```bash
-[emon@emon ~]$ sudo yum install -y ntp
-```
-
-2. 配置服务端
-
-<font color="red">仅emon服务器配置。</font>
-
-- 配置`ntp.conf`
-
-```bash
-[emon@emon ~]$ sudo vim /etc/ntp.conf 
-```
-
-```bash
-# [新增]
-logfile /var/log/ntpd.log
-# [备注]如下两行配置完全未变动，只是想记录下这个是事件同步服务归属集群网段的配置
-restrict 127.0.0.1
-restrict ::1
-# [修改]去掉默认的server的4个配置，增加阿里云时间同步服务同步
-#server 0.centos.pool.ntp.org iburst
-#server 1.centos.pool.ntp.org iburst
-#server 2.centos.pool.ntp.org iburst
-#server 3.centos.pool.ntp.org iburst
-server ntp1.aliyun.com
-server ntp2.aliyun.com
-server ntp3.aliyun.com
-# 当所有授时服务都不可用时，采用本机作为授时服务
-server 127.0.0.1
-fudge 127.0.0.1 stratum 10
-```
-
-**授时服务**：可以在 https://www.ntppool.org/zone/asia 查看更多授时服务
-
-- 同步时间
-
-```bash
-[emon@emon ~]$ sudo ntpdate -u ntp1.aliyun.com
-# 命令行输出信息
-20 Jan 13:56:45 ntpdate[119191]: adjust time server 120.25.115.20 offset 0.003865 sec
-```
-
-- 开启ntp服务
-
-```bash
-[emon@emon ~]$ sudo systemctl start ntpd
-```
-
-- 查看服务状态
-
-```bash
-[emon@emon ~]$ sudo systemctl status ntpd
-```
-
-- 关闭服务命令
-
-```bash
-[emon@emon ~]$ sudo systemctl stop ntpd
-```
-
-- 设置为开机自动启动
-
-```bash
-[emon@emon ~]$ sudo systemctl enable ntpd
-# 校验设置结果
-[emon@emon ~]$ sudo systemctl is-enabled ntpd
-# 命令行输出信息，enabled表示已经设置开机自启成功
-enabled
-```
-
-- 查看状态
-
-```bash
-[emon@emon ~]$ ntpstat
-# 命令行输出信息
-synchronised to NTP server (120.25.115.20) at stratum 3
-   time correct to within 27 ms
-   polling server every 64 s
-# 注意，以上成功的信息，是在服务启动5-10分钟后才有同步成功的信息，否则是   
-unsynchronised
-  time server re-starting
-   polling server every 8 s  
-```
-
-3. 配置客户端
-
-<font color="red">仅emon服务器之外的服务器配置（比如这里的emon2和emon3）。</font>
-
-- 配置`ntp.conf`
-
-```bash
-[emon@emon ~]$ sudo vim /etc/ntp.conf 
-```
-
-```bash
-# [新增]
-logfile /var/log/ntpd.log
-# [修改]去掉默认的server的4个配置，指定到emon服务器
-#server 0.centos.pool.ntp.org iburst
-#server 1.centos.pool.ntp.org iburst
-#server 2.centos.pool.ntp.org iburst
-#server 3.centos.pool.ntp.org iburst
-server emon
-```
-
-- 开启ntp服务
-
-```bash
-[emon@emon ~]$ sudo systemctl start ntpd
-```
-
-- 设置为开机自动启动
-
-```bash
-[emon@emon ~]$ sudo systemctl enable ntpd
-```
-
-- 查看状态
-
-```bash
-[emon@emon2 ~]$ ntpstat
-```
+#### 5.4.3、安装主服务
 
 
 
