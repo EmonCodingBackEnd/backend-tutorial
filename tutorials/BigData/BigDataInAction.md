@@ -1965,7 +1965,7 @@ not running
 
 - 验证yarn
 
-**注意**：确保防火墙停止，或者9870端口是放开的！
+**注意**：确保防火墙停止，或者8088端口是放开的！
 
 ```bash
 [emon@emon ~]$ sudo firewall-cmd --state
@@ -2236,14 +2236,23 @@ Stopping resourcemanager
 - 验证
 
 ```bash
+# emon服务器上
 [emon@emon ~]$ jps
 # 命令行输出信息
 115706 NameNode
-116051 DataNode
 116438 SecondaryNameNode
 116671 ResourceManager
-116990 NodeManager
 117343 Jps
+# emon2服务器上
+[emon@emon2 ~]$ jps
+8400 Jps
+8174 DataNode
+8286 NodeManager
+# emon3服务器上
+[emon@emon3 ~]$ jps
+8294 DataNode
+8374 NodeManager
+8536 Jps
 ```
 
 - 验证hdfs
@@ -2257,9 +2266,11 @@ not running
 
 访问地址：http://emon:9870
 
+可以看到 [Live Nodes](http://emon:9870/dfshealth.html#tab-datanode) 有两个DN节点
+
 - 验证yarn
 
-**注意**：确保防火墙停止，或者9870端口是放开的！
+**注意**：确保防火墙停止，或者8088端口是放开的！
 
 ```bash
 [emon@emon ~]$ sudo firewall-cmd --state
