@@ -66,7 +66,7 @@
     - [ZooKeeper](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/ZooKeeper)
     - [Kafka](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Kafka)
     - [Scala](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Scala)
-
+    - [Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Hadoop)
     - [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
 
 
