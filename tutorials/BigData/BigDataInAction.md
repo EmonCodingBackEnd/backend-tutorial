@@ -1426,6 +1426,8 @@ server emon
 
 <font color="red">每一台服务器都需要配置，且配置内容一样。</font>
 
+##### 1.HDFS配置
+
 - 配置`hadoop-env.sh`
 
 确保JAVA_HOME指定到JDK8，查看配置
@@ -1472,15 +1474,7 @@ server emon
 </configuration>
 ```
 
-- 修改从节点
-
-```bash
-[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/slaves 
-#localhost
-emon
-emon2
-emon3
-```
+##### 2.YARN配置
 
 - 配置`mapred-site.xml`
 
@@ -1523,6 +1517,23 @@ emon3
     </property>
 </configuration>
 ```
+
+##### 2.节点配置
+
+- `slaves`
+
+```bash
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/slaves 
+```
+
+```bash
+#localhost
+emon
+emon2
+emon3
+```
+
+
 
 #### 5.2.4、格式化与启动
 
@@ -1998,7 +2009,15 @@ not running
 | emon2  | 192.168.1.117 | 10.0.0.117 | DN、NM      |
 | emon3  | 192.168.1.118 | 10.0.0.118 | DN、NM      |
 
-#### 5.4.3、安装主服务
+#### 5.4.3、前置安装
+
+[安装Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#531%E5%AE%89%E8%A3%85)
+
+
+
+#### 5.4.4、配置
+
+
 
 
 
