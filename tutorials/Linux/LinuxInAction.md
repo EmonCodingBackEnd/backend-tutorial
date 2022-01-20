@@ -88,16 +88,16 @@ Swap:          5.0G          0B        5.0G
 - 第一步
 
 ```bash
-[root@emon ~]# hostnamectl set-hostname emon2
+[root@emon ~]# hostnamectl set-hostname emon
 ```
 
 - 第二步：验证
 
 ```bash
 [root@emon ~]# cat /etc/hostname
-emon2
+emon
 [root@emon ~]# hostname
-emon2
+emon
 ```
 
 - 第三步：配置
@@ -107,7 +107,8 @@ emon2
 ```
 
 ```bash
-127.0.0.1   emon2
+# 这里也可以是某个具体的IP地址
+127.0.0.1   emon
 ```
 
 - 第四部：退出Shell，重新登录即可
