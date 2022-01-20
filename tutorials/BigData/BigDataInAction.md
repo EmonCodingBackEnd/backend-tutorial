@@ -1517,7 +1517,7 @@ http://repo.emon.vip:8088
 
 
 
-### 5.3、Hadoop伪集群（Apache版）
+### 5.3、Hadoop伪分布式集群（Apache版）
 
 #### 5.3.0、前提
 
@@ -1761,9 +1761,57 @@ Starting resourcemanager
 Starting nodemanagers
 ```
 
+- 停止
+
+```bash
+[emon@emon ~]$ stop-all.sh 
+WARNING: Stopping all Apache Hadoop daemons as emon in 10 seconds.
+WARNING: Use CTRL-C to abort.
+Stopping namenodes on [emon]
+Stopping datanodes
+Stopping secondary namenodes [emon]
+Stopping nodemanagers
+Stopping resourcemanager
+```
+
+- 验证
+
+```bash
+[emon@emon ~]$ jps
+# 命令行输出信息
+115706 NameNode
+116051 DataNode
+116438 SecondaryNameNode
+116671 ResourceManager
+116990 NodeManager
+117343 Jps
+```
+
+- 验证hdfs
+
+**注意**：确保防火墙停止，或者9870端口是放开的！
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --state
+not running
+```
+
+访问地址：http://emon:9870
+
+- 验证yarn
+
+**注意**：确保防火墙停止，或者9870端口是放开的！
+
+```bash
+[emon@emon ~]$ sudo firewall-cmd --state
+not running
+```
+
+访问地址：http://emon:8088
 
 
 
+### 5.4、Hadoop分布式集群（Apache版）
 
 ### 5.8、Hadoop环境切换
 
@@ -1807,9 +1855,9 @@ function mgr() {
     fi
 }
 
-mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
-
 mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop namenode
+
+mgr /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 
 sleep 3
 
