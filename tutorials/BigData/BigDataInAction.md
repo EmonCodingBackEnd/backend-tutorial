@@ -1682,7 +1682,9 @@ http://repo.emon.vip:8088
 
 
 
-### 5.3、Hadoop伪分布式集群（Apache6版）
+### 5.3、Hadoop伪分布式集群（Apache3版）
+
+![image-20220121143635299](images/image-20220121143635299.png)
 
 #### 5.3.0、前提
 
@@ -1963,6 +1965,8 @@ not running
 
 访问地址：http://emon:9870
 
+可以看到 [Live Nodes](http://emon:9870/dfshealth.html#tab-datanode) 有一个DN节点
+
 - 验证yarn
 
 **注意**：确保防火墙停止，或者8088端口是放开的！
@@ -1976,7 +1980,7 @@ not running
 
 
 
-### 5.4、Hadoop分布式集群（Apache6版）
+### 5.4、Hadoop分布式集群（Apache3版）
 
 #### 5.4.0、前提
 
