@@ -176,4 +176,16 @@ HDFS中，如果一个文件小于一个数据块的大小，那么并不会占�
 
 ![image-20220121223458199](images/image-20220121223458199.png)
 
-Size是实际大小，Block Size是文件的最大块大小。
+Size是实际大小，Block Size是文件的最大块的大小。
+
+
+
+## 2.5、NameNode总结
+
+> 注意：block块存放在哪些datanode上，只有datanode自己知道，当集群启动的时候，datanode会扫描自己节点上所有的block块信息，然后把节点和这个节点上的所有block块信息告诉给namenode。这个关系是每次重启集群都会动态加载的【这个其实就是为什么集群数据越多，启动越慢的原因】
+
+NameNode维护了两份关系：
+
+第一份关系：file与block list的关系，对应的关系信息存储在fsimage和edits文件中，当NameNode启动的时候会把文件中的元数据信息加载到内存中。
+
+第二份关系：datanode与block的关系，对应的关系主要在集群启动的时候保存在内存中，当DataNode启动时会把当前节点上的Block信息和节点信息上报给NameNode。
