@@ -6,9 +6,9 @@
 
 # 一、HDFS命令
 
-# 二、HDFS核心进程剖析
+# 二、HDFS详解
 
-## 2.1、HDFS体系结构
+## 2.1、HDFS体系结构分析
 
 ![image-20220121144248315](images/image-20220121144248315.png)
 
@@ -26,7 +26,7 @@ HDFS中还包含一个SecondaryNameNode进程，这个进程从字面意思上�
 
 员工：DataNode
 
-### 2.2.1、初识NameNode
+### 2.1.1、NameNode介绍
 
 NameNode是整个文件系统的管理节点。
 
@@ -35,7 +35,7 @@ NameNode是整个文件系统的管理节点。
 - 文件/目录的信息：表示文件/目录的一些基本信息，所有者 属组 修改时间 文件大小等信息。
 - 每个文件对应的数据块列表：如果一个文件太大，那么在集群中存储的时候会对文件进行切割，这个时候就类似于会给文件分成一块一块的，存储到不同机器上面。所以HDFS还要记录一下一个文件到底被分了多少块，每一块都在什么地方存储着。
 
-### 2.2.2、NameNode包含的文件
+### 2.1.2、NameNode包含的文件
 
 NameNode主要包括以下文件：
 
@@ -106,7 +106,7 @@ current  in_use.lock
 [emon@emon current]$ hdfs oev -i edits_0000000000000000001-0000000000000000002 -o edits.xml
 ```
 
-### 2.2.3、SecondaryNameNode
+### 2.1.3、SecondaryNameNode
 
 - SecondaryNameNode主要负责定期的把edits文件中的内容合并到fsimage中。
 - 这个合并操作成为checkpoint，在合并的时候会对edits中的内容进行转换，生成新的内容保存到fsimage文件中。
@@ -115,13 +115,21 @@ current  in_use.lock
 
 所以，在2.X版本SecondaryNameNode是必须的，但3.X的版本不是必须的了。
 
-### 2.2.4、DataNode介绍
+### 2.1.4、DataNode介绍
 
 - 提供真实文件数据的存储服务。
 - HDFS会按照固定的大小，顺序对文件进行划分并编号，划分好的每一个块称一个Block，HDFS默认Block大小是128MB。
 - Block块是HDFS读写数据的基本单位，不管你的文件是文本文件，还是视频或者音频文件，对HDFS而言都是字节。
 
-### 2.2.5、DataNode包含的文件
+### 2.1.5、DataNode包含的文件
+
+DataNode需要关注的文件有如下：
+
+- blk
+
+  - > 位置：/usr/local/hadoop/tmp/dfs/data/current/BP-823583849-10.0.0.116-1642501231529/current/finalized/subdir0/subdir0
+
+- VERSION
 
 和NameNode一样，DataNode的存储目录也可以在`hdfs-site.xml`配置文件覆盖`hdfs.default.xml`中的同名参数。
 
@@ -178,7 +186,38 @@ HDFS中，如果一个文件小于一个数据块的大小，那么并不会占�
 
 Size是实际大小，Block Size是文件的最大块的大小。
 
-### 2.2.5、NameNode总结
+另外，在DataNode的数据目录下面的current目录中有一个VERSION文件。这个文件和NameNode里面的VERSION文件相似，对比如下：
+**NameNode下的VERSION文件**：
+
+```bash
+[emon@emon ~]$ cat /usr/local/hadoop/tmp/dfs/name/current/VERSION 
+#Sat Jan 22 09:27:01 CST 2022
+namespaceID=1685831230
+clusterID=CID-8368f407-a3a6-4d9e-86eb-ed62198078e6
+cTime=1642501231529
+storageType=NAME_NODE
+blockpoolID=BP-823583849-10.0.0.116-1642501231529
+layoutVersion=-66
+```
+
+**DataNode下的VERSION文件**：
+
+```bash
+[emon@emon ~]$ cat /usr/local/hadoop/tmp/dfs/data/current/VERSION 
+#Sat Jan 22 09:27:04 CST 2022
+storageID=DS-5ec2332c-eff2-4ead-8f36-0aaa5a01a31e
+clusterID=CID-8368f407-a3a6-4d9e-86eb-ed62198078e6
+cTime=0
+datanodeUuid=dd05c2ac-6668-4317-8d72-15551cf97d98
+storageType=DATA_NODE
+layoutVersion=-57
+```
+
+所以，NameNode不要随便格式化，因为格式化了以后VERSION里面的clusterID会变化，但是datanode的VERSION中的clusterID并不会变化，就匹配不上了。
+
+**重点**：如果要重新格式化，需要先清空集群中每一台服务器上的`${hadoop.tmp.dir}`目录。
+
+### 2.1.6、NameNode总结
 
 > 注意：block块存放在哪些datanode上，只有datanode自己知道，当集群启动的时候，datanode会扫描自己节点上所有的block块信息，然后把节点和这个节点上的所有block块信息告诉给namenode。这个关系是每次重启集群都会动态加载的【这个其实就是为什么集群数据越多，启动越慢的原因】
 
@@ -189,4 +228,123 @@ NameNode维护了两份关系：
 第二份关系：datanode与block的关系，对应的关系主要在集群启动的时候保存在内存中，当DataNode启动时会把当前节点上的Block信息和节点信息上报给NameNode。
 
 > 注意了，NameNode启动的时候会把文件中的元数据信息加载到内存中，然后每一个文件的元数据信息会占用150字节的内存空间，这个是恒定的，和文件大小没关系。这也是HDFS不适合存储小文件的原因。不管大文件还是小文件，一个文件的元数据信息在NameNode中都会占用150字节，NameNode节点的内存是有限的，所以它的存储能力也是有限的，如果我们存储了一堆都是几KB的小文件，最后发现NameNode内存占满了，确实存储了很多文件，但是文件的总体大小确很小，这样就失去了HDFS存在的价值。
+
+
+
+## 2.2、HDFS高级
+
+### 2.2.1、HDFS的回收站
+
+HDFS会为每一个用户创建一个回收站目录：`/user/用户名/.Trash/`，每一个被用户在Shell命令行删除的文件/目录，会进入到对应的回收站目录中，在回收站中的数据都有一个生存周期，也就是当回收站中的文件/目录在一段时间之内没有被用户恢复的话，HDFS就会自动的把这个文件/目录彻底删除，之后，用户就永远也找不回这个文件/目录了。
+
+默认情况下HDFS的回收站是没有开启的，需要通过一个配置来开启，在`core-site.xml`中添加如下配置，value的单位是分钟，1440分钟表示是一天的生存周期。
+
+```xml
+    <property>
+        <name>fs.trash.interval</name>
+        <value>1440</value>
+    </property>
+```
+
+在修改配置信息之前先验证一下删除操作，显示的是直接删除掉了。
+
+```bash
+[emon@emon hadoop]$ hdfs dfs -rm /NOTICE.txt
+Deleted /NOTICE.txt
+```
+
+停止集群 ==> 修改主节点 emon 上的回收站配置 ==> 同步到其他两个节点 ==> 启动集群：
+
+```bash
+[emon@emon ~]$ stop-all.sh 
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/core-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://emon:8020</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/usr/local/hadoop/tmp</value>
+    </property>
+    <property>
+        <name>fs.trash.interval</name>
+        <value>1440</value>
+    </property>
+</configuration>
+```
+
+```bash
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/core-site.xml emon@emon2:/usr/local/hadoop/etc/hadoop/
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/core-site.xml emon@emon3:/usr/local/hadoop/etc/hadoop/
+```
+
+启动集群，再执行删除操作：
+
+```bash
+[emon@emon hadoop]$ hdfs dfs -rm /NOTICE.txt
+2022-01-22 11:06:16,208 INFO fs.TrashPolicyDefault: Moved: 'hdfs://emon:8020/NOTICE.txt' to trash at: hdfs://emon:8020/user/emon/.Trash/Current/NOTICE.txt
+```
+
+此时看到提示信息说把删除的文件移到了指定目录中，其实就是移动到了当前用户的回收站目录。
+
+> 注意：如果删除的文件过大，超过回收站大小的话会提示删除失败，需要指定参数 -skipTrash ，指定这个参数表示删除的文件不会进回收站。
+
+```bash
+[emon@emon hadoop]$ hdfs dfs -rm -skipTrash /LICENSE.txt
+Deleted /LICENSE.txt
+```
+
+### 2.2.2、HDFS的安全模式
+
+### 2.2.3、实战：定时上传数据至HDFS
+
+### 2.2.4、HDFS的高可用和高扩展
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
