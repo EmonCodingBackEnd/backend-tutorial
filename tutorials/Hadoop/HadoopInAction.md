@@ -249,7 +249,7 @@ HDFS会为每一个用户创建一个回收站目录：`/user/用户名/.Trash/`
 在修改配置信息之前先验证一下删除操作，显示的是直接删除掉了。
 
 ```bash
-[emon@emon hadoop]$ hdfs dfs -rm /NOTICE.txt
+[emon@emon ~]$ hdfs dfs -rm /NOTICE.txt
 Deleted /NOTICE.txt
 ```
 
@@ -285,7 +285,7 @@ Deleted /NOTICE.txt
 启动集群，再执行删除操作：
 
 ```bash
-[emon@emon hadoop]$ hdfs dfs -rm /NOTICE.txt
+[emon@emon ~]$ hdfs dfs -rm /NOTICE.txt
 2022-01-22 11:06:16,208 INFO fs.TrashPolicyDefault: Moved: 'hdfs://emon:8020/NOTICE.txt' to trash at: hdfs://emon:8020/user/emon/.Trash/Current/NOTICE.txt
 ```
 
@@ -294,11 +294,43 @@ Deleted /NOTICE.txt
 > 注意：如果删除的文件过大，超过回收站大小的话会提示删除失败，需要指定参数 -skipTrash ，指定这个参数表示删除的文件不会进回收站。
 
 ```bash
-[emon@emon hadoop]$ hdfs dfs -rm -skipTrash /LICENSE.txt
+[emon@emon ~]$ hdfs dfs -rm -skipTrash /LICENSE.txt
 Deleted /LICENSE.txt
 ```
 
 ### 2.2.2、HDFS的安全模式
+
+平时操作HDFS的时候，可能会遇到这个问题，特别是刚启动集群后去上传或者删除文件，会发现错误，提示NameNode处于`safe mode`。这个属于HDFS的安全模式，因为在集群每次重启的时候，HDFS都会检查集群中文件信息是否完整，例如副本是否缺少之类的信息，所以这个时间段内是不允许对集群有修改操作的，如果遇到了这种情况，可以稍等一会，等HDFS自检完毕，就会自动退出安全模式。
+
+此时访问HDFS的web ui界面，可以看到下面的信息，on表示处于安全模式，off表示安全模式已退出。
+
+**安全模式开启图示**：
+
+![image-20220122112610207](images/image-20220122112610207.png)
+
+
+
+**安全模式关闭图示**：
+
+![image-20220122112005572](images/image-20220122112005572.png)
+
+或者通过hdfs命令也可以查看当前的状态：
+
+```bash
+[emon@emon ~]$ hdfs dfsadmin -safemode get
+Safe mode is OFF
+```
+
+如果想快速离开安全模式，可以通过命令强制离开，正常情况下建议等HDFS自检完毕，自动退出。
+
+```bash
+[emon@emon ~]$ hdfs dfsadmin -safemode leave
+Safe mode is OFF
+```
+
+此时，再操作HDFS中的文件就可以了。
+
+
 
 ### 2.2.3、实战：定时上传数据至HDFS
 
