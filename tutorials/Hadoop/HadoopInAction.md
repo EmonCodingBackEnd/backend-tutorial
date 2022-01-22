@@ -334,6 +334,98 @@ Safe mode is OFF
 
 ### 2.2.3、实战：定时上传数据至HDFS
 
+> 需求分析：
+>
+> 在实际工作中会有定时上传数据到HDFS的需求，我们有一个web项目每天都会产生日志文件，日志文件的格式为access_2020-01-01+12:35.log这种格式的，每天产生一个，我们需要每天凌晨将昨天生成的日志文件上传至HDFS上，按天分目录存储，HDFS上的目录格式为20200101。
+>
+> 说明：根据 /usr/local/nginx/sbin/cut_my_log.sh 脚本对nginx日志进行按照每分钟切割，可以生成测试文件。
+
+针对这个需求，我们需要开发一个shell脚本，方便定时调度执行：
+
+第一步：我们需要获取到昨天日志文件的名称
+
+第二步：在HDFS上面使用昨天的日期创建目录
+
+第三步：将昨天的日志文件上传到刚创建的HDFS目录中
+
+第四部：要考虑到脚本重跑，补数据的情况
+
+第五步：配置crontab任务
+
+开始开发shell脚本，脚本内容如下：
+
+```bash
+[emon@emon ~] vim /usr/local/hadoop/custom/shell/uploadLogData.sh
+```
+
+```bash
+#!/bin/bash
+
+# 获取昨天日期字符串
+yesterday=$1
+if [ "$yesterday" = "" ]
+then
+    yesterday=`date +%Y-%m-%d+%H --date="1 days ago"`
+fi
+
+# 拼接日志文件路径信息
+logPath=/usr/local/nginx/logs/access.${yesterday}.log
+
+# 将日期字符串中的 -+: 去掉，并且拼接成HDFS的路径
+hdfsPath=/log/${yesterday//[-+:]/}
+
+# 在HDFS上面创建目录
+hdfs dfs -mkdir -p ${hdfsPath}
+
+# 将数据上传到HDFS的指定目录中
+hdfs dfs -put ${logPath} ${hdfsPath}
+```
+
+```bash
+# -x 参数跟踪脚本执行情况
+[emon@emon ~]$ sh -x /usr/local/hadoop/custom/shell/uploadLogData.sh 
+# 命令行输出信息
++ yesterday=
++ '[' '' = '' ']'
+++ date +%Y-%m-%d+%H '--date=1 days ago'
++ yesterday=2022-01-21+13
++ logPath=/usr/local/nginx/logs/access.2022-01-21+13.log
++ hdfsPath=/log/2022012113
++ hdfs dfs -mkdir -p /log/2022012113
++ hdfs dfs -put /usr/local/nginx/logs/access.2022-01-21+13.log /log/2022012113
+put: `/log/2022012113/access.2022-01-21+13.log': File exists
+[emon@emon shell]$ sh -x uploadLogData.sh 
++ yesterday=
++ '[' '' = '' ']'
+++ date +%Y-%m-%d+%H '--date=1 days ago'
++ yesterday=2022-01-21+13
++ logPath=/usr/local/nginx/logs/access.2022-01-21+13.log
++ hdfsPath=/log/2022012113
++ hdfs dfs -mkdir -p /log/2022012113
++ hdfs dfs -put /usr/local/nginx/logs/access.2022-01-21+13.log /log/2022012113
+
+[emon@emon ~]$ hdfs dfs -ls -R /log
+drwxr-xr-x   - emon supergroup          0 2022-01-22 13:54 /log/2022012113
+-rw-r--r--   2 emon supergroup        564 2022-01-22 13:54 /log/2022012113/access.2022-01-21+13.log
+```
+
+```bash
+# 手工上传指定日志
+[emon@emon ~]$ sh -x /usr/local/hadoop/custom/shell/uploadLogData.sh 2022-01-21+12
++ yesterday=2022-01-21+12
++ '[' 2022-01-21+12 = '' ']'
++ logPath=/usr/local/nginx/logs/access.2022-01-21+12.log
++ hdfsPath=/log/2022012112
++ hdfs dfs -mkdir -p /log/2022012112
++ hdfs dfs -put /usr/local/nginx/logs/access.2022-01-21+12.log /log/2022012112
+
+[emon@emon ~]$ hdfs dfs -ls -R /log
+drwxr-xr-x   - emon supergroup          0 2022-01-22 14:01 /log/2022012112
+-rw-r--r--   2 emon supergroup        412 2022-01-22 14:01 /log/2022012112/access.2022-01-21+12.log
+drwxr-xr-x   - emon supergroup          0 2022-01-22 13:54 /log/2022012113
+-rw-r--r--   2 emon supergroup        564 2022-01-22 13:54 /log/2022012113/access.2022-01-21+13.log
+```
+
 ### 2.2.4、HDFS的高可用和高扩展
 
 
