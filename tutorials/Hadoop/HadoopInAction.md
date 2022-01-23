@@ -448,6 +448,8 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 
 ## 3.2、MapReduce任务日志查看
 
+### 3.2.1、在yarn的web界面查看日志
+
 默认情况下，在yarn的web界面(http://emon:8088) ==> 点击对应任务的history链接 ==> 打不开链接？
 
 原因：1、window的hosts文件中没有配置emon的解析；2、必须要启动historyserver进程，并且还要开启日志聚合功能，才能在web界面上直接查看任务对应的日志信息，因为默认情况下任务的日志是散落在nodemanager节点上的，要想查看需要找到对应的nodemanager节点上去查看，这样就很不方便，通过日志聚合功能可以把之前本来散落在nodemanager节点上的日志统一收集到hdfs上的指定目录中，这样就可以在yarn的web界面中直接查看了。
@@ -519,6 +521,14 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 ```
 
 OK，任务日志可查看了！
+
+### 3.2.2、命令行查看日志
+
+从yarnweb上获取applicationId，然后执行命令：
+
+```bash
+[emon@emon ~]$ /usr/local/hadoop/bin/yarn logs -applicationId application_1642928361436_0002
+```
 
 
 
