@@ -446,19 +446,79 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 
 ![image-20220122152410838](images/image-20220122152410838.png)
 
+## 3.2、MapReduce任务日志查看
 
+默认情况下，在yarn的web界面(http://emon:8088) ==> 点击对应任务的history链接 ==> 打不开链接？
 
+原因：1、window的hosts文件中没有配置emon的解析；2、必须要启动historyserver进程，并且还要开启日志聚合功能，才能在web界面上直接查看任务对应的日志信息，因为默认情况下任务的日志是散落在nodemanager节点上的，要想查看需要找到对应的nodemanager节点上去查看，这样就很不方便，通过日志聚合功能可以把之前本来散落在nodemanager节点上的日志统一收集到hdfs上的指定目录中，这样就可以在yarn的web界面中直接查看了。
 
+如何开启日志聚合功能？
 
+需要通过一个配置来开启，在`yarn-site.xml`中添加如下配置：
 
+```xml
+    <property>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>yarn.log-server.url</name>
+        <value>http://emon:19888/jobhistory/logs</value>
+    </property>
+```
 
+停止集群 ==> 修改主节点 emon 上的`yarn-site.xml`配置 ==> 同步到其他两个节点 ==> 启动集群：
 
+```bash
+[emon@emon ~]$ stop-all.sh 
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/yarn-site.xml
+```
 
+```xml
+<configuration>
 
+<!-- Site specific YARN configuration properties -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <!-- 白名单 -->
+    <property>
+        <name>yarn.nodemanager.env-whitelist</name>
+        <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
+    </property>
+    <property>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>yarn.log-server.url</name>
+        <value>http://emon:19888/jobhistory/logs</value>
+    </property>
+</configuration>
+```
 
+```bash
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/yarn-site.xml emon@emon2:/usr/local/hadoop/etc/hadoop/
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/yarn-site.xml emon@emon3:/usr/local/hadoop/etc/hadoop/
+```
 
+启动集群 ==> 启动emon节点historyserver进程 ==> 启动其他节点historyserver进程。
 
+```bash
+[emon@emon ~]$ start-all.sh 
+[emon@emon ~]$ mapred --daemon start historyserver
+[emon@emon ~]$ jps
+39843 NameNode
+40196 DataNode
+40824 ResourceManager
+41689 Jps
+41146 NodeManager
+40587 SecondaryNameNode
+41627 JobHistoryServer <== historserver进程
+```
 
+OK，任务日志可查看了！
 
 
 
