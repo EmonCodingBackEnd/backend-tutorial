@@ -522,6 +522,12 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 
 OK，任务日志可查看了！
 
+另外，停止historyserver命令：
+
+```bash
+[emon@emon ~]$ mapred --daemon stop historyserver
+```
+
 ### 3.2.2、命令行查看日志
 
 从yarnweb上获取applicationId，然后执行命令：
@@ -530,11 +536,17 @@ OK，任务日志可查看了！
 [emon@emon ~]$ /usr/local/hadoop/bin/yarn logs -applicationId application_1642928361436_0002
 ```
 
+## 3.3、停止集群任务
 
+```bash
+[emon@emon ~]$ /usr/local/hadoop/bin/yarn application -kill <applicationId>
+```
 
+## 3.4、Shuffle过程详解
 
+![image-20220123173304902](images/image-20220123173304902.png)
 
-
+## 3.5、Hadoop中序列化机制
 
 
 
