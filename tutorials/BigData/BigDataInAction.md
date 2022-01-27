@@ -2804,7 +2804,7 @@ export JAVA_HOME=${JAVA_HOME}
 
 
 
-### 7.2、配置示例
+### 7.3、配置示例
 
 - 示例1：netcat=>控制台
 

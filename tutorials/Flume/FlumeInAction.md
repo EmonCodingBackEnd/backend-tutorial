@@ -66,5 +66,109 @@ Flume是一个高可用，高可靠，分布式的海量日志采集、聚合和
 
     - > HDFS Sink：将数据传输到HDFS中
 
-    - >  Kafka Sink：将数据发送到Kafka消息队列中
+    - > Kafka Sink：将数据发送到Kafka消息队列中
 
+
+
+## 2.3、Flume的使用示例
+
+### 2.3.1、示例1：netcat->memory->logger
+
+- 配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/example.conf 
+```
+
+```properties
+# example.conf: A single-node Flume configuration
+
+# Name the components on this agent
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# Describe/configure the source
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 44444
+
+# Describe the sink
+a1.sinks.k1.type = logger
+
+# Use a channel which buffers events in memory
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# Bind the source and sink to the channel
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 前台启动【测试用】
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+- 后台启动
+
+```bash
+[emon@emon ~]$ nohup flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
+```
+
+**说明**：`-Dflume.root.logger=INFO.LOGFILE`是`$FLUME_HOME/conf/log4j.properties`的默认值，可以省略！根据配置，日志`logs`文件会在命令执行时所在目录生成！
+
+- 查看启动信息
+
+```bash
+[emon@emon ~]$ jps -m
+```
+
+- 验证
+
+```bash
+[emon@emon ~]$ telnet emon 44444
+```
+
+输入数据并回车，可以看到`flume-ng`终端可以看到对应输出！
+
+- Supervisor管理服务运行【生产用】【推荐】
+
+```bash
+[emon@emon ~]$ vim supervisor.d/flume-netcat-memory-logger.ini
+```
+
+```ini
+[program:flume-netcat-memory-logger]
+command=/usr/local/flume/bin/flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,console
+directory=/usr/local/flume/config
+autostart=false                 ; 在supervisord启动的时候也自动启动
+startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true                ; 程序退出后自动重启,可选值：[unexpected,true,false]，默认为unexpected，表示进程意外杀死后才重启
+startretries=3                  ; 启动失败自动重试次数，默认是3
+user=emon                       ; 用哪个用户启动进程，默认是root
+priority=70                     ; 进程启动优先级，默认999，值小的优先启动
+redirect_stderr=true            ; 把stderr重定向到stdout，默认false
+stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
+stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
+environment=JAVA_HOME="/usr/local/java"
+stdout_logfile=/usr/local/flume/config/example.log    ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动
+创建日志文件）
+stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
+```
+
+```bash
+# 加载最新配置文件
+[emon@emon ~]$ sudo supervisorctl update
+# 查看被管控的服务
+[emon@emon ~]$ sudo supervisorctl status
+# 启动
+[emon@emon ~]$ sudo supervisorctl start flume-netcat-memory-logger
+# 重启
+[emon@emon ~]$ sudo supervisorctl restart flume-netcat-memory-logger
+# 停止
+[emon@emon ~]$ sudo supervisorctl stop flume-netcat-memory-logger
+```
