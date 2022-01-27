@@ -2654,10 +2654,6 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
   
   OK！
 
-
-
-
-
 ## 7、安装Flume
 
 ### 7.1、安装（CDH5版）
@@ -2678,7 +2674,7 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
 [emon@emon ~]$ tar -zxvf /usr/local/src/flume-ng-1.6.0-cdh5.16.2.tar.gz -C /usr/local/Flume/
 ```
 
-**特殊说明：**如下提示，对该包解压无需关注，不影响使用。
+**特殊说明**：如下提示，对该包解压无需关注，不影响使用。
 
 > gzip: stdin: decompression OK, trailing garbage ignored
 > apache-flume-1.6.0-cdh5.16.2-bin/bin/
@@ -2736,6 +2732,75 @@ export JAVA_HOME=${JAVA_HOME}
 ```
 
 ### 7.2、安装Flume（Apache版）
+
+1. 下载
+
+最新发行版下载页面：https://flume.apache.org/download.html
+
+历史发行版下载页面：http://archive.apache.org/dist/flume/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/flume/1.9.0/apache-flume-1.9.0-bin.tar.gz --no-check-certificate
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Flume
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-flume-1.9.0-bin.tar.gz -C /usr/local/Flume/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/Flume/apache-flume-1.9.0-bin/ /usr/local/flume
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`flume.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/flume.sh
+export FLUME_HOME=/usr/local/flume
+export PATH=$FLUME_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config
+```
+
+7. 配置文件
+
+- 复制`flume-env.sh.template`到`flume-env.sh`
+
+```bash
+[emon@emon ~]$ cp /usr/local/flume/conf/flume-env.sh.template /usr/local/flume/conf/flume-env.sh
+```
+
+- 编辑`flume-env.sh`
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/conf/flume-env.sh
+```
+
+```bash
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+```
 
 
 
