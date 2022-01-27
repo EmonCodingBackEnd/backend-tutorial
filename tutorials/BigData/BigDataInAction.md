@@ -2658,9 +2658,9 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
 
 
 
-## 7、安装Flume（CDH版）
+## 7、安装Flume
 
-### 7.1、安装
+### 7.1、安装（CDH5版）
 
 1. 下载
 
@@ -2734,6 +2734,10 @@ export PATH=$FLUME_HOME/bin:$PATH
 # [新增]
 export JAVA_HOME=${JAVA_HOME}
 ```
+
+### 7.2、安装Flume（Apache版）
+
+
 
 ### 7.2、配置示例
 
