@@ -2632,11 +2632,11 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
   
   ```
 
-  ># 还没完，如果已经碰到了上面的错误，在后续级联删除hive库时，会碰到卡主的情况，日志显示错误：
+  >还没完，如果已经碰到了上面的错误，在后续级联删除hive库时，会碰到卡主的情况，日志显示错误：
   >
   >Specified key was too long; max key length is 3072 bytes
   >
-  ># 怎么办？
+  >怎么办？
   
   第一步：在mysql命令行下，检查hive对应数据库中的tbls表：
   

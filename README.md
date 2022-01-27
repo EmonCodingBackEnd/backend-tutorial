@@ -67,6 +67,7 @@
     - [Kafka](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Kafka)
     - [Scala](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Scala)
     - [Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Hadoop)
+    - [Flume](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Flume)
     - [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
 
 

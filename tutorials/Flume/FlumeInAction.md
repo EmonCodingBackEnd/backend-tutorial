@@ -6,9 +6,7 @@
 
 # 一、安装
 
-[安装Kafka（外部ZK）](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#2%E5%AE%89%E8%A3%85kafka%E5%A4%96%E9%83%A8zk)
-
-
+[安装Flume](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#7%E5%AE%89%E8%A3%85flume)
 
 # 二、Flume详解
 
@@ -56,7 +54,17 @@ Flume是一个高可用，高可靠，分布式的海量日志采集、聚合和
 
 - Sink：目的地
 
+  - > 从Channel中读取数据并存储到指定目的地
+    >
+    > Sink的表现形式：控制台、HDFS、Kafka等
+    >
+    > 注意：Channel中的数据直到进入目的地才会被删除，当Sink写入失败后，可以自动重写，不会造成数据丢失。
 
+  - 常用的Sink组件
 
+    - > Logger Sink：将数据作为日志处理
 
+    - > HDFS Sink：将数据传输到HDFS中
+
+    - >  Kafka Sink：将数据发送到Kafka消息队列中
 
