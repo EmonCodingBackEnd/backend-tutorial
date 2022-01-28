@@ -449,7 +449,7 @@ Event包含header和body。
 
 - Source Interceptors：Source可以指定一个或者多个拦截器，按先后顺序依次对采集到的数据进行处理。
 
-  - > 场景Interceptors类型：Timestamp Interceptor、Host Interceptor、Search and Replace Interceptor、Static Interceptor、Regex Extractor Interceptor等。
+  - > 常见Interceptors类型：Timestamp Interceptor、Host Interceptor、Search and Replace Interceptor、Static Interceptor、Regex Extractor Interceptor等。
 
   - 简单介绍
 
@@ -465,11 +465,15 @@ Event包含header和body。
 
 - Channel Selectors：Source发往多个Channel的策略设置。
 
+  - > Channel Selectors类型包括：Replicating Channel Selector和Multiplexing Channel Selector，其中Replicating Channel Selector是默认的选择器，它会将Source采集过来的Event发往所有Channel。
+
+  - 简单介绍
+
+    - > 
+
 - Sink Processors：Sink发送数据的策略设置。
 
-
-
-## 3.2.2、案例：对采集到的数据按天按类型分目录存储
+### 3.2.1、案例：对采集到的数据按天按类型分目录存储
 
 需求：对采集到的数据按天按类型分目录存储。
 
@@ -580,5 +584,75 @@ a1.sinks.k1.channel = c1
 
 ```bash
 [emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execFileHdfs/exec-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+
+
+### 3.2.2、案例：多Channel之Replication Channel Selector
+
+![image-20220128201338201](images/image-20220128201338201.png)
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryToLoggerAndHdfs
+[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1 k2
+a1.channels = c1 c2
+
+# 配置sources组件
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 44444
+
+# 配置sink组件
+a1.sinks.k1.type = logger
+
+a1.sinks.k2.type = hdfs
+a1.sinks.k2.hdfs.path = hdfs://emon:8020/flume/replicating
+a1.sinks.k2.hdfs.filePrefix = data
+a1.sinks.k2.hdfs.fileSuffix	= .log
+a1.sinks.k2.hdfs.fileType = DataStream
+a1.sinks.k2.hdfs.writeFormat = Text
+a1.sinks.k2.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k2.hdfs.rollSize = 134217728
+a1.sinks.k2.hdfs.rollCount = 0
+a1.sinks.k2.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+a1.channels.c2.type = memory
+a1.channels.c2.capacity = 1000
+a1.channels.c2.transactionCapacity = 100
+
+# 配置channel选择器[默认就是Replication Channel Selector]
+a1.sources.r1.selector.type = replicating
+
+# 把组件连接起来
+a1.sources.r1.channels = c1 c2
+a1.sinks.k1.channel = c1
+a1.sinks.k2.channel = c2
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+- 验证
+
+```bash
+[emon@emon ~]$ telnet emon 44444
 ```
 
