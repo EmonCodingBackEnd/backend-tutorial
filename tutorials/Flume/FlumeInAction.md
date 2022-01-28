@@ -889,7 +889,8 @@ a1.sinks.k1.channel = c1
 [emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 启动配置1
 [emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryAvro/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
-
+# 向netcat输入
+[emon@emon ~]$ telnet emon 44444
 ```
 
 
