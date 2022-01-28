@@ -588,9 +588,9 @@ a1.sinks.k1.channel = c1
 
 
 
-### 3.2.2、案例：多Channel之Replication Channel Selector
+### 3.2.2、案例：多Channel之Replicating Channel Selector
 
-![image-20220128201338201](images/image-20220128201338201.png)
+![image-20220128204743723](images/image-20220128204743723.png)
 
 - 配置
 
@@ -655,4 +655,87 @@ a1.sinks.k2.channel = c2
 ```bash
 [emon@emon ~]$ telnet emon 44444
 ```
+
+### 3.2.3、案例：多Channel之Multiplexing Channel Selector
+
+![image-20220128205003169](images/image-20220128205003169.png)
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2
+[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1 k2
+a1.channels = c1 c2
+
+# 配置sources组件
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 44444
+
+# 配置拦截器[多个拦截器按照顺序依次执行]
+a1.sources.r1.interceptors = i1
+a1.sources.r1.interceptors.i1.type = regex_extractor
+a1.sources.r1.interceptors.i1.regex = "city":"(\\w+)"
+a1.sources.r1.interceptors.i1.serializers = s1
+a1.sources.r1.interceptors.i1.serializers.s1.name = city
+
+# 配置sink组件
+a1.sinks.k1.type = logger
+
+a1.sinks.k2.type = hdfs
+a1.sinks.k2.hdfs.path = hdfs://emon:8020/flume/multiplexing
+a1.sinks.k2.hdfs.filePrefix = data
+a1.sinks.k2.hdfs.fileSuffix	= .log
+a1.sinks.k2.hdfs.fileType = DataStream
+a1.sinks.k2.hdfs.writeFormat = Text
+a1.sinks.k2.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k2.hdfs.rollSize = 134217728
+a1.sinks.k2.hdfs.rollCount = 0
+a1.sinks.k2.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+a1.channels.c2.type = memory
+a1.channels.c2.capacity = 1000
+a1.channels.c2.transactionCapacity = 100
+
+# 配置channel选择器
+a1.sources.r1.selector.type = multiplexing
+a1.sources.r1.selector.header = city
+a1.sources.r1.selector.mapping.bj = c1
+a1.sources.r1.selector.default = c2
+
+# 把组件连接起来
+a1.sources.r1.channels = c1 c2
+a1.sinks.k1.channel = c1
+a1.sinks.k2.channel = c2
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+- 验证
+
+```bash
+[emon@emon ~]$ telnet emon 44444
+# 命令行输入信息
+{"name":"jack","age":19,"city":"bj"}
+{"name":"tom","age":26,"city":"sh"}
+```
+
+
 
