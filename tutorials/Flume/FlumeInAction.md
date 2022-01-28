@@ -893,7 +893,153 @@ a1.sinks.k1.channel = c1
 [emon@emon ~]$ telnet emon 44444
 ```
 
-
-
-
 ### 3.2.5、案例：故障转移
+
+![image-20220128223433646](images/image-20220128223433646.png)
+
+**说明**：这里用`配置1<==>bigdata04`，`配置2<==>bigdata02`，`配置3<==>bigdata03`
+
+- 配置1
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryAvroFailover
+[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryAvroFailover/netcat-memory-avro.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1 k2
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 44444
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = avro
+a1.sinks.k1.hostname = emon
+a1.sinks.k1.port = 41414
+a1.sinks.k1.batch-size = 1
+
+a1.sinks.k2.type = avro
+a1.sinks.k2.hostname = emon
+a1.sinks.k2.port = 41415
+a1.sinks.k2.batch-size = 1
+
+# 配置sink策略
+a1.sinkgroups = g1
+a1.sinkgroups.g1.sinks = k1 k2
+a1.sinkgroups.g1.processor.type = failover
+a1.sinkgroups.g1.processor.priority.k1 = 5
+a1.sinkgroups.g1.processor.priority.k2 = 10
+a1.sinkgroups.g1.processor.maxpenalty = 10000
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+a1.sinks.k2.channel = c1
+```
+
+- 配置2
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfsFailover1
+[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = avro
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 41414
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/failover
+a1.sinks.k1.hdfs.filePrefix = data1
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 配置3
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfsFailover2
+[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = avro
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 41415
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/failover
+a1.sinks.k1.hdfs.filePrefix = data2
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 启动
+
+```bash
+# 启动配置2
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+# 启动配置3
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+# 启动配置1
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryAvroFailover/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+# 向netcat输入
+[emon@emon ~]$ telnet emon 44444
+```
