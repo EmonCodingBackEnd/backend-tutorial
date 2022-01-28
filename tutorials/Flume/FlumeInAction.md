@@ -467,11 +467,17 @@ Event包含header和body。
 
   - > Channel Selectors类型包括：Replicating Channel Selector和Multiplexing Channel Selector，其中Replicating Channel Selector是默认的选择器，它会将Source采集过来的Event发往所有Channel。
 
+- Sink Processors：Sink发送数据的策略设置。
+
+  - > Sink Processors类型包括这三种：Default Sink Processor、Load balancing Sink Processor和Failover Sink Processor
+
   - 简单介绍
 
-    - > 
+    - > Default Sink Processor是默认的，不用配置sinkgroup，就是咱们现在使用的这种最普通的形式，一个channel后面接一个sink的形式。
 
-- Sink Processors：Sink发送数据的策略设置。
+    - > Load balancing Sink Processor是负载均衡处理器，一个channel后面可以接多个sink，这多个sink属于一个sinkgroup，根据指定的算法进行轮询或者随机发送，减轻单个sink的压力。
+
+    - > Failover Sink Processor是故障转移处理器，一个channel后面可以接多个sink，这多个sink属于一个sinkgroup，按照sink的优先级，默认先让优先级高的sink来处理数据，如果这个sink出现了故障，则用优先级第一点的sink处理数据，可以保障数据不丢失。
 
 ### 3.2.1、案例：对采集到的数据按天按类型分目录存储
 
@@ -737,5 +743,156 @@ a1.sinks.k2.channel = c2
 {"name":"tom","age":26,"city":"sh"}
 ```
 
+### 3.2.4、案例：负载均衡
+
+![image-20220128212221837](images/image-20220128212221837.png)
+
+**说明**：这里用`配置1<==>bigdata04`，`配置2<==>bigdata02`，`配置3<==>bigdata03`
+
+- 配置1
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryAvro
+[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryAvro/netcat-memory-avro.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1 k2
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = netcat
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 44444
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = avro
+a1.sinks.k1.hostname = emon
+a1.sinks.k1.port = 41414
+a1.sinks.k1.batch-size = 1
+
+a1.sinks.k2.type = avro
+a1.sinks.k2.hostname = emon
+a1.sinks.k2.port = 41415
+a1.sinks.k2.batch-size = 1
+
+# 配置sink策略
+a1.sinkgroups = g1
+a1.sinkgroups.g1.sinks = k1 k2
+a1.sinkgroups.g1.processor.type = load_balance
+a1.sinkgroups.g1.processor.backoff = true
+a1.sinkgroups.g1.processor.selector = round_robin
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+a1.sinks.k2.channel = c1
+```
+
+- 配置2
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs1
+[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs1/avro-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = avro
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 41414
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/load_balance
+a1.sinks.k1.hdfs.filePrefix = data1
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 配置3
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs2
+[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs2/avro-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = avro
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 41415
+
+# 配置sink组件[为了方便演示，把batch-size设置为1]
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/load_balance
+a1.sinks.k1.hdfs.filePrefix = data2
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 启动
+
+```bash
+# 启动配置2
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+# 启动配置3
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+# 启动配置1
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryAvro/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+
+```
 
 
+
+
+### 3.2.5、案例：故障转移
