@@ -72,12 +72,16 @@ Flume是一个高可用，高可靠，分布式的海量日志采集、聚合和
 
 ## 2.3、Flume的使用示例
 
+**说明**：示例文件命名规则是`sourceType-channelType-sinkType`，比如：`netcat-memory-logger`.
+
+**说明2**：flume运行环境Hadoop，请保证在具有Hadoop的客户端或Hadoop节点上执行。
+
 ### 2.3.1、示例1：netcat->memory->logger
 
 - 配置
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/example.conf 
+[emon@emon ~]$ vim /usr/local/flume/config/netcat-memory-logger.conf 
 ```
 
 ```properties
@@ -109,13 +113,13 @@ a1.sinks.k1.channel = c1
 - 前台启动【测试用】
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
-- 后台启动
+- 后台启动【不推荐】
 
 ```bash
-[emon@emon ~]$ nohup flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
+[emon@emon ~]$ nohup flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
 ```
 
 **说明**：`-Dflume.root.logger=INFO.LOGFILE`是`$FLUME_HOME/conf/log4j.properties`的默认值，可以省略！根据配置，日志`logs`文件会在命令执行时所在目录生成！
@@ -142,7 +146,7 @@ a1.sinks.k1.channel = c1
 
 ```ini
 [program:flume-netcat-memory-logger]
-command=/usr/local/flume/bin/flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/example.conf --name a1 -Dflume.root.logger=INFO,console
+command=/usr/local/flume/bin/flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
 directory=/usr/local/flume/config
 autostart=false                 ; 在supervisord启动的时候也自动启动
 startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
@@ -154,8 +158,7 @@ redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
 environment=JAVA_HOME="/usr/local/java"
-stdout_logfile=/usr/local/flume/config/example.log    ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动
-创建日志文件）
+stdout_logfile=/usr/local/flume/config/netcat-memory-logger.log    ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
 stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
 killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
 ```
@@ -172,3 +175,410 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 # 停止
 [emon@emon ~]$ sudo supervisorctl stop flume-netcat-memory-logger
 ```
+
+### 2.3.2、示例2：采集文件内容上传至HDFS
+
+需求：采集目录中已有的文件内容，存储到HDFS。
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/spooldirFileHdfs
+[emon@emon ~]$ vim /usr/local/flume/config/spooldirFileHdfs/spooldir-file-hdfs.conf
+```
+
+```properties
+# Name the components on this agent
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# Describe/configure the source
+a1.sources.r1.type = spooldir
+a1.sources.r1.spoolDir = /usr/local/flume/config/spooldirFileHdfs/spooldir
+a1.sources.r1.fileHeader = true
+
+# Describe the sink
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/spooldirFileHdfs
+a1.sinks.k1.hdfs.filePrefix = events-
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+
+# Use a channel which buffers events in memory
+a1.channels.c1.type = file
+a1.channels.c1.checkpointDir = /usr/local/flume/config/spooldirFileHdfs/checkpoint
+a1.channels.c1.dataDirs = /usr/local/flume/config/spooldirFileHdfs/data
+
+# Bind the source and sink to the channel
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 初始化数据
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/spooldirFileHdfs/{spooldir,checkpoint,data}
+[emon@emon ~]$ vim /usr/local/flume/config/spooldirFileHdfs/spooldir/class1.dat
+```
+
+```tex
+jack    18  male
+jessic  20  female
+tom 17  male
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/spooldirFileHdfs/spooldir-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+**说明**：启动后`class1.dat`会被处理，并修改文件名为`class1.dat.COMPLETED`，之后不会再扫描该文件。
+
+### 2.3.3、示例3：采集网站日志上传至HDFS
+
+需求：
+
+- 将A和B两台机器实时产生的日志数据汇总到机器C中。
+- 通过机器C将数据统一上传至HDFS的指定目录中。
+
+**注意**：HDFS中的目录是按天生成的，每天一个目录。
+
+![image-20220127230931850](images/image-20220127230931850.png)
+
+**说明**：这里用`配置1<==>bigdata02`，`配置2<==>bigdata03`，`配置3<==>bigdata04`
+
+- 配置1
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/execMemoryAvro1
+[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro1/exec-memory-avro.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /usr/local/flume/config/execMemoryAvro1/access.log
+
+# 配置sink组件
+a1.sinks.k1.type = avro
+a1.sinks.k1.hostname = emon
+a1.sinks.k1.port = 4545
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 配置2
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/execMemoryAvro2
+[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro2/exec-memory-avro.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /usr/local/flume/config/execMemoryAvro2/access.log
+
+# 配置sink组件
+a1.sinks.k1.type = avro
+a1.sinks.k1.hostname = emon
+a1.sinks.k1.port = 4545
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 配置3
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs
+[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs/avro-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = avro
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 4545
+
+# 配置sink组件
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/access/%Y%m%d
+a1.sinks.k1.hdfs.filePrefix = access
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 日志生成脚本1
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh
+```
+
+```bash
+#!/bin/bash
+# 循环向文件中生成数据
+while [ "1" = "1" ]; do
+    # 获取当前时间戳
+    curr_time=$(date +%s)
+    # 获取当前主机名
+    name=$(hostname)
+    echo "${name}1"_"${curr_time}" >> /usr/local/flume/config/execMemoryAvro1/access.log
+    # 暂停1秒
+    sleep 1
+done
+```
+
+```bash
+# 修改执行权限
+[emon@emon ~]$ chmod u+x /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh 
+```
+
+- 日志生成脚本2
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh
+```
+
+```bash
+#!/bin/bash
+# 循环向文件中生成数据
+while [ "1" = "1" ]; do
+    # 获取当前时间戳
+    curr_time=$(date +%s)
+    # 获取当前主机名
+    name=$(hostname)
+    echo "${name}2"_"${curr_time}" >> /usr/local/flume/config/execMemoryAvro2/access.log
+    # 暂停1秒
+    sleep 1
+done
+```
+
+```bash
+# 修改执行权限
+[emon@emon ~]$ chmod u+x /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh 
+```
+
+- 启动
+
+```bash
+# 第一步：启动配置3
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+# 第二步：启动配置1
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execMemoryAvro1/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+# 第三步：启动配置2
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execMemoryAvro2/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+# 第四步：为配置1开启日志生成
+[emon@emon ~]$ sh -x /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh
+# 第五步：为配置2开启日志生成
+[emon@emon ~]$ sh -x /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh
+```
+
+- 停止
+
+停止配置1=>停止配置2=>停止配置3
+
+# 三、Flume高级组件
+
+## 3.1、Event
+
+Event是Flume传输数据的基本单位，也是事务的基本单位，在文本文件中，通常一行记录就是一个Event。
+
+Event包含header和body。
+
+- body：是采集到的那一行记录的原始内容。
+- header：类型为Map<String, String>，里面可以存储一些属性信息，方便后续使用。
+
+我们可以在Source中给每一条数据的header中增加key-value，在Chanel和Sink中使用header中的值了。
+
+## 3.2、高级组件
+
+- Source Interceptors：Source可以指定一个或者多个拦截器，按先后顺序依次对采集到的数据进行处理。
+
+  - > 场景Interceptors类型：Timestamp Interceptor、Host Interceptor、Search and Replace Interceptor、Static Interceptor、Regex Extractor Interceptor等。
+
+  - 简单介绍
+
+    - > Timestamp Interceptor：向event中的header里面添加timestamp时间戳信息。
+
+    - > Host Interceptor：向event中的header里面添加host属性，host的值为当前机器的主机名或者ip。
+
+    - > Search and Replace Interceptor：根据指定的规则查询Event中的body里面的数据，然后进行替换，这个拦截器会修改event中body的值，也就是会修改原始采集到的数据内容。【修改body值】【常用】
+
+    - > Static Interceptor：向event中的header里面添加固定的key和value。
+
+    - > Regex Extractor Interceptor：根据指定的规则从Event中的body里面抽取数据，生成key和value，再把key和value添加到header中。【常用】
+
+- Channel Selectors：Source发往多个Channel的策略设置。
+
+- Sink Processors：Sink发送数据的策略设置。
+
+
+
+## 3.2.2、案例：对采集到的数据按天按类型分目录存储
+
+需求：对采集到的数据按天按类型分目录存储。
+
+原始数据格式：
+
+```tex
+video_info
+{"id":"14943445328940974601","uid":"840717325115457536","lat":"53.530598","lnt":"-2.5620373","hots":0,"title":"0","status":"1","topicId":"0","end_time":"1494344570","watch_num":0,"share_num":"1","replay_url":null,"replay_num":0,"start_time":"1494344544","timestamp":1494344571,"type":"video_info"}
+user_info
+{"uid":"861848974414839801","nickname":"mick","usign":"","sex":1,"birthday":"","face":"","big_face":"","email":"abc@qq.com","mobile":"","reg_type":"102","last_login_time":"1494344580","reg_time":"1494344580","last_update_time":"1494344580","status":"5","is_verified":"0","verified_info":"","is_seller":"0","level":1,"exp":0,"anchor_level":0,"anchor_exp":0,"os":"android","timestamp":1494344580,"type":"user_info"}
+gift_record
+{"send_id":"834688818270961664","good_id":"223","video_id":"14943443045138661356","gold":"10","timestamp":1494344574,"type":"gift_record"}
+```
+
+这份数据中有三种类型的数据，视频信息、用户信息、送礼信息，数据都是json格式的，这些数据还有一个共性就是里面都有一个type字段，type字段的值代表数据类型。
+
+当我们的直播平台正常运行时，会实时产生这些日志数据，我们希望把这些数据采集到hdfs上进行存储，并且要按照数据类型进行分目录存储，视频数据放一块、用户数据放一块、送礼数据放一块，针对这个需求配置agent的话，source使用基于文件的execsource、channel使用基于文件的channel，我们希望保证数据的完整性和准确性，sink使用hdfssink。
+
+但注意，hdfssink中的path不能写死，首先是按照天就是需要动态获取日期，然后是因为不同类型的数据要存储到不同的目录中，也就意味着path路径中肯定要有变量，除了日期变量还有数据类型变量。
+
+这里的数据类型的格式都是单词中间有一个下划线，但是我们的要求是目录中的单次不要出现下划线，使用驼峰的命名格式。
+
+所以，在hdfs中最终生成的目录大致是如下这样的：
+
+```bash
+hdfs://emon:8020/moreType/20200101/videoInfo
+hdfs://emon:8020/moreType/20200101/userInfo
+hdfs://emon:8020/moreType/20210101/giftRecord
+```
+
+所以，整体流程如下：
+`Exec Source`=>`Search and Replace Interceptor`=>`Regex Extractor Interceptor`=>`File Channel`=>`HDFS Sink`.
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/execFileHdfs
+[emon@emon ~]$ vim /usr/local/flume/config/execFileHdfs/exec-file-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /usr/local/flume/config/execFileHdfs/moreType.log
+
+# 配置拦截器[多个拦截器按照顺序依次执行]
+a1.sources.r1.interceptors = i1 i2 i3 i4
+a1.sources.r1.interceptors.i1.type = search_replace
+a1.sources.r1.interceptors.i1.searchPattern = "type":"video_info"
+a1.sources.r1.interceptors.i1.replaceString = "type":"videoInfo"
+
+a1.sources.r1.interceptors.i2.type = search_replace
+a1.sources.r1.interceptors.i2.searchPattern = "type":"user_info"
+a1.sources.r1.interceptors.i2.replaceString = "type":"userInfo"
+
+a1.sources.r1.interceptors.i3.type = search_replace
+a1.sources.r1.interceptors.i3.searchPattern = "type":"gift_record"
+a1.sources.r1.interceptors.i3.replaceString = "type":"giftRecord"
+
+a1.sources.r1.interceptors.i4.type = regex_extractor
+a1.sources.r1.interceptors.i4.regex = "type":"(\\w+)"
+a1.sources.r1.interceptors.i4.serializers = s1
+a1.sources.r1.interceptors.i4.serializers.s1.name = logType
+
+# 配置sink组件
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/moreType/%Y%m%d/%{logType}
+a1.sinks.k1.hdfs.filePrefix = data
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = file
+a1.channels.c1.checkpointDir = /usr/local/flume/config/execFileHdfs/checkpoint
+a1.channels.c1.dataDirs = /usr/local/flume/config/execFileHdfs/data
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+- 初始化数据
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/flume/config/execFileHdfs/{checkpoint,data}
+[emon@emon ~]$ vim /usr/local/flume/config/execFileHdfs/moreType.log
+```
+
+```json
+{"id":"14943445328940974601","uid":"840717325115457536","lat":"53.530598","lnt":"-2.5620373","hots":0,"title":"0","status":"1","topicId":"0","end_time":"1494344570","watch_num":0,"share_num":"1","replay_url":null,"replay_num":0,"start_time":"1494344544","timestamp":1494344571,"type":"video_info"}
+{"uid":"861848974414839801","nickname":"mick","usign":"","sex":1,"birthday":"","face":"","big_face":"","email":"abc@qq.com","mobile":"","reg_type":"102","last_login_time":"1494344580","reg_time":"1494344580","last_update_time":"1494344580","status":"5","is_verified":"0","verified_info":"","is_seller":"0","level":1,"exp":0,"anchor_level":0,"anchor_exp":0,"os":"android","timestamp":1494344580,"type":"user_info"}
+{"send_id":"834688818270961664","good_id":"223","video_id":"14943443045138661356","gold":"10","timestamp":1494344574,"type":"gift_record"}
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execFileHdfs/exec-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
