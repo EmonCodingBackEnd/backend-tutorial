@@ -1043,3 +1043,8 @@ a1.sinks.k1.channel = c1
 # 向netcat输入
 [emon@emon ~]$ telnet emon 44444
 ```
+
+## 3.3、各种自定义组件
+
+![image-20220128225133307](images/image-20220128225133307.png)
+
