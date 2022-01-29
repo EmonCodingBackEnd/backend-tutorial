@@ -2421,9 +2421,11 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
 
 
-## 6、安装Hive（CDH版）
+## 6、安装Hive
 
-### 6.1、基本安装
+### 6.1、安装Hive（CDH5版）
+
+#### 6.1.1、基本安装
 
 1. 下载
 
@@ -2465,7 +2467,7 @@ export PATH=$HIVE_HOME/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-### 6.2、配置
+#### 6.1.2、配置
 
 1. 配置
 
@@ -2592,6 +2594,8 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
      OWNER_TYPE: ROLE
 1 row in set (0.00 sec)
 ```
+
+### 6.2、安装Hive（Apache版）
 
 
 
