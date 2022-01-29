@@ -826,7 +826,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 ### 5.1、Hadoop伪分布式集群（CDH5版）
 
-#### 5.1.0、前提
+#### 5.1.0、依赖环境
 
 已配置IP：[配置网络](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#21%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C)
 
@@ -1172,7 +1172,7 @@ emon: starting nodemanager, logging to /usr/local/Hadoop/hadoop-2.6.0-cdh5.16.2/
 
 ### 5.2、Hadoop集群（CDH5版）
 
-#### 5.2.0、前提
+#### 5.2.0、依赖环境
 
 已配置IP：[配置网络](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#21%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C)
 
@@ -1686,7 +1686,7 @@ http://repo.emon.vip:8088
 
 ![image-20220121143635299](images/image-20220121143635299.png)
 
-#### 5.3.0、前提
+#### 5.3.0、依赖环境
 
 已配置IP：[配置网络](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#21%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C)
 
@@ -1982,7 +1982,7 @@ not running
 
 ### 5.4、Hadoop分布式集群（Apache3版）
 
-#### 5.4.0、前提
+#### 5.4.0、依赖环境
 
 已配置IP：[配置网络](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#21%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C)
 
@@ -2423,6 +2423,11 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
 ## 6、安装Hive
 
+### 6.0、依赖环境
+
+- JDK8
+- Hadoop3
+
 ### 6.1、安装Hive（CDH5版）
 
 #### 6.1.1、基本安装
@@ -2596,6 +2601,52 @@ DB_LOCATION_URI: hdfs://0.0.0.0:8020/user/hive/warehouse
 ```
 
 ### 6.2、安装Hive（Apache版）
+
+#### 6.2.1、基本安装
+
+1. 下载
+
+最新发行版下载页面：https://hive.apache.org/downloads.html
+
+历史发行版下载页面：https://archive.apache.org/dist/hive/ 或者 https://dlcdn.apache.org/hive/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz --no-check-certificate
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Hive
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-hive-3.1.2-bin.tar.gz -C /usr/local/Hive/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/Hive/apache-hive-3.1.2-bin/ /usr/local/hive
+```
+
+5. 配置环境变量
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/hive.sh
+export HIVE_HOME=/usr/local/hive
+export PATH=$HIVE_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+#### 6.2.2、配置
 
 
 
