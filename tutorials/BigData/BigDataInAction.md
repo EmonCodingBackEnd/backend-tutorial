@@ -2752,6 +2752,8 @@ schemaTool completed
 
 ##### 2.启动hive命令行【旧，hive1.x开始支持】
 
+- 进入hive命令行
+
 ```bash
 # 进入CLI
 [emon@emon ~]$ hive
@@ -2764,6 +2766,12 @@ OK
 default
 Time taken: 0.751 seconds, Fetched: 1 row(s)
 hive> exit;
+```
+
+- 不进入hive命令行，直接在bash执行
+
+```bash
+[emon@emon ~]hive -e "select * from t1"
 ```
 
 ##### 3.MySQL库情况
