@@ -68,6 +68,8 @@
     - [Scala](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Scala)
     - [Hadoop](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Hadoop)
     - [Flume](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Flume)
+    - [Hive](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Hive)
+    
     - [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
 
 
