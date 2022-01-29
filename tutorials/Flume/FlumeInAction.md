@@ -1131,6 +1131,6 @@ done
 
 ```bash
 [emon@emon ~]$ chmod u+x /usr/local/flume/config/monlist.sh
-[emon@emon ~]$ sh /usr/local/flume/config/monlist.sh
+[emon@emon ~]$ sh -x /usr/local/flume/config/monlist.sh
 ```
 
