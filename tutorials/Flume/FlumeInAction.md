@@ -1048,3 +1048,89 @@ a1.sinks.k1.channel = c1
 
 ![image-20220128225133307](images/image-20220128225133307.png)
 
+## 3.4、Flume优化及监控
+
+### 3.4.1、Flume优化
+
+- 调整Flume进程的内存大小，建议设置1G~2G，太小的话会导致频繁GC。
+
+  - > 可以通过配置`vim /usr/local/flume/conf/flume-env.sh`文件的`JAVA_OPTS`属性调整。比如：
+    >
+    > export JAVA_OPTS="-Xms100m -Xmx2000m -Dcom.sun.management.jmxremote"
+    >
+    > 建议这里的Xms和Xmx设置为一样大，避免进行内存交换，内存交换也会比较消耗性能。
+
+- 启动多个Flume进程时，建议修改配置区分日志文件。
+
+
+
+### 3.4.2、Flume监控【缺少supervisor情况下使用】
+
+Flume是一个单进程程序，会存在单点故障，所以需要有一个监控机制，发现Flume进程Down掉之后，需要重启
+
+通过Shell脚本实现Flume进程监控及自动重启。
+
+- 配置文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/monlist.conf
+```
+
+```properties
+netcat-memory-logger=/usr/local/flume/config/netcat-memory-logger.sh
+```
+
+- netcat-memory-logger.sh
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/netcat-memory-logger.sh
+```
+
+```bash
+#!/bin/bash
+flume_path=/usr/local/flume
+nohup flume-ng agent --conf $flume_path/conf --conf-file $flume_path/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
+```
+
+```bash
+[emon@emon ~]$ chmod u+x /usr/local/flume/config/netcat-memory-logger.sh
+```
+
+- monlist.sh
+
+```bash
+[emon@emon ~]$ vim /usr/local/flume/config/monlist.sh
+```
+
+```bash
+#!/bin/bash
+monlist=`cat /usr/local/flume/config/monlist.conf`
+echo "start check"
+for item in ${monlist}
+do
+	# 设置字段分隔符
+	OLD_IFS=$IFS
+	# 以=分隔，转换为数组
+	IFS="="
+	# 把一行内容转成多列
+	arr=(${item})
+	# 获取等号左边内容
+	name=${arr[0]}
+	# 获取等号右边内容
+	script=${arr[1]}
+	echo "time is:"`date +"%Y-%m-%d %H:%M:%S"`" check "$name
+	if [ `jps -m|grep $name | wc -l` -eq 0 ]; then
+		# 发短信或者邮件告警
+		echo `date +"%Y-%m-%d %H:%M:%S"` $name "is none"
+		sh -x ${script}
+	else
+		echo "time is:"`date +"%Y-%m-%d %H:%M:%S"`" check "$name" is ok!"
+	fi
+done
+```
+
+```bash
+[emon@emon ~]$ chmod u+x /usr/local/flume/config/monlist.sh
+[emon@emon ~]$ sh /usr/local/flume/config/monlist.sh
+```
+
