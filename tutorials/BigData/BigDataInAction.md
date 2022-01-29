@@ -2853,6 +2853,8 @@ Driver: Hive JDBC (version 2.3.7)
 Transaction isolation: TRANSACTION_REPEATABLE_READ
 Beeline version 2.3.7 by Apache Hive
 0: jdbc:hive2://localhost:10000> 
+# 使用主机名访问
+[emon@emon ~]$ beeline -u jdbc:hive2://emon:10000 -n emon
 ```
 
 ### 6.9、Hive学习碰到的问题（配对CDH5）
