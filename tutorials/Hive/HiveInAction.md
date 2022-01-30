@@ -249,9 +249,37 @@ property.hive.log.level = WARN
 property.hive.log.dir = /usr/local/hive/logs
 ```
 
-## 2.5、Hive中数据库的操作
+# 三、Hive操作命令
 
-### 2.5.1、查看数据库
+## 3.0、数据准备
+
+hive演练数据： 链接：https://pan.baidu.com/s/11dCFUjQOlAKLyZoSh8wpxg 
+提取码：1111 
+
+数据上传：下载数据解压后，上传到 `/usr/local/hive/custom/data`目录。
+
+```bash
+[emon@emon ~]$ ll -h /usr/local/hive/custom/data/hivedata/
+总用量 56K
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 b_source.data
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 ex_par.data
+-rw-r--r--. 1 emon emon  10 1月  30 13:52 external_table.data
+-rw-r--r--. 1 emon emon  18 1月  30 13:52 partition_1.data
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 partition_2.data
+-rw-r--r--. 1 emon emon  79 1月  30 13:52 stu2.data
+-rw-r--r--. 1 emon emon  30 1月  30 13:52 stu3.data
+-rw-r--r--. 1 emon emon  51 1月  30 13:52 stu.data
+-rw-r--r--. 1 emon emon 123 1月  30 13:52 student.data
+-rw-r--r--. 1 emon emon  39 1月  30 13:52 student_favors_2.data
+-rw-r--r--. 1 emon emon  48 1月  30 13:52 student_favors.data
+-rw-r--r--. 1 emon emon 246 1月  30 13:52 student_score.data
+-rw-r--r--. 1 emon emon  10 1月  30 13:52 t2.data
+-rw-r--r--. 1 emon emon  73 1月  30 13:52 t3.data
+```
+
+## 3.1、Hive中数据库的操作
+
+### 3.1.1、查看数据库
 
 - 查看数据库列表
 
@@ -259,7 +287,7 @@ property.hive.log.dir = /usr/local/hive/logs
 hive (default)> show databases;
 ```
 
-### 2.5.2、选择数据库
+### 3.1.2、选择数据库
 
 - 选择数据库
 
@@ -313,7 +341,7 @@ ERROR:
 No query specified
 ```
 
-### 2.5.3、创建数据库
+### 3.1.3、创建数据库
 
 - 创建数据库
 
@@ -327,7 +355,7 @@ hive (default)> create database mydb1;
 hive (default)> create database mydb2 location '/user/hive/mydb2';
 ```
 
-### 2.5.4、删除数据库
+### 3.1.4、删除数据库
 
 - 删除数据库
 
@@ -342,9 +370,9 @@ hive (default)> drop database default;
 FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. MetaException(message:Can not drop default database in catalog hive)
 ```
 
-## 2.6、Hive中表的操作
+## 3.2、Hive中表的操作
 
-### 2.6.1、创建表
+### 3.2.1、创建表
 
 - 创建表
 
@@ -352,7 +380,7 @@ FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTa
 hive (default)> create table t2(id int);
 ```
 
-### 2.6.2、查看表
+### 3.2.2、查看表
 
 - 查看表
 
@@ -400,7 +428,7 @@ ERROR:
 No query specified
 ```
 
-### 2.6.3、查看表信息
+### 3.2.3、查看表信息
 
 - 查看表基本信息
 
@@ -414,7 +442,7 @@ hive (default)> desc t2;
 hive (default)> show create table t2;
 ```
 
-### 2.6.4、修改表名
+### 3.2.4、修改表名
 
 - 修改表名
 
@@ -422,36 +450,18 @@ hive (default)> show create table t2;
 hive (default)> alter table t2 rename to t2_bak;
 ```
 
-### 2.6.5、加载数据
-
-hive演练数据： 链接：https://pan.baidu.com/s/11dCFUjQOlAKLyZoSh8wpxg 
-提取码：1111 
-
-数据上传：下载数据解压后，上传到 `/usr/local/hive/custom/data`目录。
-
-```bash
-[emon@emon ~]$ ll -h /usr/local/hive/custom/data/hivedata/
-总用量 56K
--rw-r--r--. 1 emon emon  27 1月  30 13:52 b_source.data
--rw-r--r--. 1 emon emon  27 1月  30 13:52 ex_par.data
--rw-r--r--. 1 emon emon  10 1月  30 13:52 external_table.data
--rw-r--r--. 1 emon emon  18 1月  30 13:52 partition_1.data
--rw-r--r--. 1 emon emon  27 1月  30 13:52 partition_2.data
--rw-r--r--. 1 emon emon  79 1月  30 13:52 stu2.data
--rw-r--r--. 1 emon emon  30 1月  30 13:52 stu3.data
--rw-r--r--. 1 emon emon  51 1月  30 13:52 stu.data
--rw-r--r--. 1 emon emon 123 1月  30 13:52 student.data
--rw-r--r--. 1 emon emon  39 1月  30 13:52 student_favors_2.data
--rw-r--r--. 1 emon emon  48 1月  30 13:52 student_favors.data
--rw-r--r--. 1 emon emon 246 1月  30 13:52 student_score.data
--rw-r--r--. 1 emon emon  10 1月  30 13:52 t2.data
--rw-r--r--. 1 emon emon  73 1月  30 13:52 t3.data
-```
+### 3.2.5、加载数据
 
 - 加载数据
 
 ```sql
 hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.data' into table t2_bak;
+```
+
+- 加载数据并覆盖表旧数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.data' overwrite into table t2_bak;
 ```
 
 - 加载数据之使用HDFS直接put数据
@@ -460,7 +470,7 @@ hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.
 [emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/t2.data /user/hive/warehouse/t2_bak/t2_bak.data
 ```
 
-### 2.6.6、表增加字段及注释
+### 3.2.6、表增加字段及注释
 
 - 添加字段
 
@@ -547,7 +557,7 @@ alter table partition_keys modify column pkey_comment varchar(4000) character se
 
 重建表即可！
 
-### 2.6.7、删除表
+### 3.2.7、删除表
 
 - 删除表
 
@@ -555,5 +565,102 @@ alter table partition_keys modify column pkey_comment varchar(4000) character se
 hive (default)> drop table t2;
 ```
 
-### 2.6.8、指定列和行的分隔符
+### 3.2.8、指定列和行的分隔符
+
+**hive数据的默认行分隔符是换行符`\n`，默认的列分隔符是`\001`，在linux输入是Ctrl+V和Ctrl+A等效于`\001`**
+
+- 创建一张表
+
+```sql
+create table t3(
+id int comment 'ID',
+stu_name string comment 'name',
+stu_birthday date comment 'birthday',
+online boolean comment 'is online'
+);
+```
+
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t3.data' into table t3;
+hive (default)> select * from t3;
+# 命令行输出
+OK
+t3.id	t3.stu_name	t3.stu_birthday	t3.online
+NULL	NULL	NULL	NULL
+NULL	NULL	NULL	NULL
+NULL	NULL	NULL	NULL
+Time taken: 0.139 seconds, Fetched: 3 row(s)
+```
+
+发现都是空数据，查看t3.data数据：
+
+```bash
+[emon@emon ~]$ cat -A /usr/local/hive/custom/data/hivedata/t3.data 
+1^IM-eM-<M- M-dM-8M-^I^I2020-01-01^Itrue$
+2^IM-fM-^]M-^NM-eM-^[M-^[^I2020-02-01^Ifalse$
+3^IM-gM-^NM-^KM-dM-:M-^T^I2020-03-01^I0$
+```
+
+并不是列的默认分隔符`\001`。
+
+- 方法一：调整数据使用`\001`分隔数据，再次加载数据即可！
+- 方法二：调整建表语句，指定表的列分隔符
+
+```sql
+create table t3_new(
+id int comment 'ID',
+stu_name string comment 'name',
+stu_birthday date comment 'birthday',
+online boolean comment 'is online'
+) row format delimited 
+fields terminated by '\t' 
+lines terminated by '\n';
+```
+
+导入数据并验证：
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t3.data' into table t3_new;
+hive (default)> select * from t3_new;
+# 命令行输出
+OK
+t3_new.id	t3_new.stu_name	t3_new.stu_birthday	t3_new.online
+1	张三	2020-01-01	true
+2	李四	2020-02-01	false
+3	王五	2020-03-01	NULL
+Time taken: 0.111 seconds, Fetched: 3 row(s)
+```
+
+## 3.3、Hive中的数据类型
+
+- 基本数据类型：常用的有INT，STRING，BOOLEAN，DOUBLE等
+- 复合数据类型：常用的有ARRAY，MAP，STRUCT等
+
+### 3.3.1、基本数据类型
+
+| 数据类型    | 开始支持版本 | 数据类型  | 开始支持版本 |
+| ----------- | ------------ | --------- | ------------ |
+| TINYINT     | ~            | TIMESTAMP | 0.8.0        |
+| SMALLINT    | ~            | DATE      | 0.12.0       |
+| INT/INTEGER | ~            | STRING    | ~            |
+| BIGINT      | ~            | VARCHAR   | 0.12.0       |
+| FLOAT       | ~            | CHAR      | 0.13.0       |
+| DOUBLE      | ~            | BOOLEAN   | ~            |
+| DECIMAL     | 0.11.0       |           |              |
+|             |              |           |              |
+
+### 3.3.2、复合数据类型
+
+| 数据类型 | 开始支持版本 | 格式                             |
+| -------- | ------------ | -------------------------------- |
+| ARRAY    | 0.14.0       | ARRAY<data_type>                 |
+| MAP      | 0.14.0       | MAP<primitive_type,data_type>    |
+| STRUCT   | ~            | STRUCT<col_name : data_type,...> |
+|          |              |                                  |
+
+### 3.3.3、案例：复合数据类型的使用
+
+#### 1.使用ARRAY字段存储用户的兴趣爱好
 
