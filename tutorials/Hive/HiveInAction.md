@@ -97,6 +97,114 @@ Hive默认可以直接加载文本文件（TextFile），还支持SequenceFile�
 
 
 
+## 2.4、Hive的使用
+
+操作Hive可以在Shell命令行下操作，或者是使用JDBC代码的方式操作。
+
+### 2.4.1、命令行方式
+
+- hive命令
+- beeline命令：需要开启 `hiveserver2` 服务
+
+### 2.4.2、JDBC方式
+
+启动 `hiveserver2`服务后，可通过编程方式JDBC连接到hive。
+
+### 2.4.3、Set命令的使用
+
+在hive命令行中可以使用`set`命令临时设置一些参数的值，其实就是临时修改`hive-site.xml`中参数的值。
+
+不过通过set命令设置的参数只在当前会话有效，退出重新打开就无效了。
+
+如果想要对当前机器上的当前用户有效的话可以把命令配置在`~/.hiverc`文件中。
+
+
+
+在`hive-site.xml`中有一个参数是`hive.cli.print.current.db`，这个参数可以显示当前所在的数据库名称，默认值为 false。
+
+```sql
+hive> set hive.cli.print.current.db=true;
+hive (default)> 
+```
+
+还有一个参数`hive.cli.print.header`可以控制获取结果的时候显示字段名称，这样看起来会比较清晰。
+
+```sql
+hive (default)> select * from t1;
+OK
+1	zs
+Time taken: 1.641 seconds, Fetched: 1 row(s)
+
+hive (default)> set hive.cli.print.header=true;
+
+hive (default)> select * from t1;
+OK
+t1.id	t1.name
+1	zs
+Time taken: 0.138 seconds, Fetched: 1 row(s)
+```
+
+以上两个可以作为个人习惯，放入`~/.hiverc`即可！
+
+```bash
+[emon@emon ~]$ vim ~/.hiverc
+set hive.cli.print.current.db=true;
+set hive.cli.print.header=true;
+```
+
+### 2.4.4、Hive的日志冲突
+
+```bash
+[emon@emon ~]$ hive
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/HBase/hbase-1.2.0-cdh5.16.2/lib/slf4j-log4j12-1.7.5.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/Hadoop/hadoop-3.3.1/share/hadoop/common/lib/slf4j-log4j12-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/Hive/apache-hive-3.1.2-bin/lib/log4j-slf4j-impl-2.10.0.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/Hadoop/hadoop-3.3.1/share/hadoop/common/lib/slf4j-log4j12-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Hive Session ID = e0884b82-ce89-4fa4-a44c-d7d9cdaf8bdf
+
+Logging initialized using configuration in jar:file:/usr/local/Hive/apache-hive-3.1.2-bin/lib/hive-common-3.1.2.jar!/hive-log4j2.properties Async: true
+Hive Session ID = 49b99f56-45ad-46d1-8552-46b7c39502fb
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. spark, tez) or using Hive 1.X releases.
+hive (default)>
+```
+
+我们每次进入hive命令行时都会有这么一堆日志，看着不简洁，如何去掉？
+
+日志显示有重复的日志依赖，这里可以Hadoop之外的日志jar引入：
+
+```bash
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/HBase/hbase-1.2.0-cdh5.16.2/lib/slf4j-log4j12-1.7.5.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/Hadoop/hadoop-3.3.1/share/hadoop/common/lib/slf4j-log4j12-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+```
+
+去掉重复的日志依赖：
+
+```bash
+[emon@emon ~]$ mv /usr/local/hive/lib/log4j-slf4j-impl-2.10.0.jar /usr/local/hive/lib/log4j-slf4j-impl-2.10.0.jar.bak
+[emon@emon ~]$ mv /usr/local/hbase/lib/slf4j-log4j12-1.7.5.jar /usr/local/hbase/lib/slf4j-log4j12-1.7.5.jar.bak
+```
+
+再次进入hive命令行，就正常了：
+
+```bash
+[emon@emon ~]$ hive
+Hive Session ID = 5b863280-c7f2-44e3-a0de-42805288283b
+
+Logging initialized using configuration in jar:file:/usr/local/Hive/apache-hive-3.1.2-bin/lib/hive-common-3.1.2.jar!/hive-log4j2.properties Async: true
+Hive Session ID = 938ca9dd-83d0-4122-a694-e4113b5f969d
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. spark, tez) or using Hive 1.X releases.
+hive (default)>
+```
+
+
+
 
 
 

@@ -2665,6 +2665,7 @@ HADOOP_HOME=/usr/local/hadoop
 - `hive-site.xml`
 
 ```bash
+# 可以复制模板生成hive-site.xml后修改以下属性的值，也可以直接跳过该步骤，手动编写hive-site.xml文件。推荐：跳过复制，直接手写。
 [emon@emon ~]$ cp /usr/local/hive/conf/hive-default.xml.template /usr/local/hive/conf/hive-site.xml
 [emon@emon ~]$ vim /usr/local/hive/conf/hive-site.xml
 ```
