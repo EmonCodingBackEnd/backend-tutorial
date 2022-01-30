@@ -2423,6 +2423,17 @@ echo -e "\e[1;32m 成功启动Hadoop HDFS，对应环境 " $ENV_NAME"("$ENV_VALU
 
 ## 6、安装Hive
 
+目录规划：
+
+| 目录                          | 作用                             |
+| ----------------------------- | -------------------------------- |
+| /usr/local/hive/tmp           | hive执行任务和查询的本地临时目录 |
+| /usr/local/hive/custom/data   | 测试数据                         |
+| /usr/local/hive/custom/lib    | jar库文件                        |
+| /usr/local/hive/custom/shell  | 脚本文件                         |
+| /usr/local/hive/custom/source | 存放spark等等源码的目录          |
+| /usr/local/hive/logs          | hive日志目录                     |
+
 ### 6.0、依赖环境
 
 - JDK8
@@ -4198,8 +4209,6 @@ hive.cli.print.current.db=false
 hive> set hive.cli.print.current.db=true;
 hive (default)> 
 ```
-
-
 
 #### 2.2.2、表操作
 

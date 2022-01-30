@@ -97,7 +97,7 @@ Hive默认可以直接加载文本文件（TextFile），还支持SequenceFile�
 
 
 
-## 2.4、Hive的使用
+## 2.4、Hive使用前的配置
 
 操作Hive可以在Shell命令行下操作，或者是使用JDBC代码的方式操作。
 
@@ -152,7 +152,19 @@ set hive.cli.print.current.db=true;
 set hive.cli.print.header=true;
 ```
 
-### 2.4.4、Hive的日志冲突
+### 2.4.4、hive历史操作命令
+
+linux中有一个history命令可以查看历史操作命令，hive中也有类似功能。
+
+hive中的历史命令会存储在当前用户目录下的 .hivehistory 目录中。
+
+```bash
+[emon@emon ~]$ tailf -10 ~/.hivehistory 
+```
+
+### 2.4.5、Hive的日志
+
+#### 2.4.5.1、Hive的日志冲突
 
 ```bash
 [emon@emon ~]$ hive
@@ -203,49 +215,345 @@ Hive-on-MR is deprecated in Hive 2 and may not be available in the future versio
 hive (default)>
 ```
 
+#### 2.4.5.2、Hive的日志配置
 
+- Hive的运行时日志`hive-log4j2.properties`配置
 
+```bash
+[emon@emon ~]$ cp /usr/local/hive/conf/hive-log4j2.properties.template /usr/local/hive/conf/hive-log4j2.properties
+[emon@emon ~]$ vim /usr/local/hive/conf/hive-log4j2.properties
+```
 
+```properties
+# [修改]
+# property.hive.log.level = INFO
+property.hive.log.level = WARN
+# [修改]
+# property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
+property.hive.log.dir = /usr/local/hive/logs
+```
 
+- Hive的任务执行日志
 
+```bash
+[emon@emon ~]$ cp /usr/local/hive/conf/hive-exec-log4j2.properties.template /usr/local/hive/conf/hive-exec-log4j2.properties
+[emon@emon ~]$ vim /usr/local/hive/conf/hive-exec-log4j2.properties
+```
 
+```properties
+# [修改]
+# property.hive.log.level = INFO
+property.hive.log.level = WARN
+# [修改]
+# property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
+property.hive.log.dir = /usr/local/hive/logs
+```
 
+## 2.5、Hive中数据库的操作
 
+### 2.5.1、查看数据库
 
+- 查看数据库列表
 
+```sql
+hive (default)> show databases;
+```
 
+### 2.5.2、选择数据库
 
+- 选择数据库
 
+```sql
+hive (default)> use default;
+```
 
+default是默认数据库，默认就在这个库里面。
 
+咱们前面说过hive的数据都是存储在HDFS上的，那这里的default数据库在HDFS上是如何体现的？
 
+在`hive-site.xml`中有一个参数`hive.metastore.warehouse.dir`：
 
+```bash
+# hive-site.xml的模板是hive-default.xml.template
+[emon@emon ~]$ vim /usr/local/hive/conf/hive-default.xml.template 
+```
 
+```xml
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>/user/hive/warehouse</value>
+    <description>location of default database for the warehouse</description>
+  </property>
+```
 
+在HDFS中的体现：
 
+```bash
+[emon@emon ~]$ hdfs dfs -ls -R /user/hive
+drwxr-xr-x   - emon supergroup          0 2022-01-29 19:14 /user/hive/warehouse
+drwxr-xr-x   - emon supergroup          0 2022-01-29 19:15 /user/hive/warehouse/t1
+-rw-r--r--   1 emon supergroup          5 2022-01-29 19:15 /user/hive/warehouse/t1/000000_0
+```
 
+在MySQL中的体现：
 
+```mysql
+mysql> select * from dbs \G;
+*************************** 1. row ***************************
+          DB_ID: 1
+           DESC: Default Hive database
+DB_LOCATION_URI: hdfs://emon:8020/user/hive/warehouse
+           NAME: default
+     OWNER_NAME: public
+     OWNER_TYPE: ROLE
+      CTLG_NAME: hive
+1 row in set (0.00 sec)
 
+ERROR: 
+No query specified
+```
 
+### 2.5.3、创建数据库
 
+- 创建数据库
 
+```sql
+hive (default)> create database mydb1;
+```
 
+- 创建数据库并指定HDFS位置
 
+```sql
+hive (default)> create database mydb2 location '/user/hive/mydb2';
+```
 
+### 2.5.4、删除数据库
 
+- 删除数据库
 
+```sql
+hive (default)> drop database mydb1;
+```
 
+**注意**：无法删除`default`数据库：
 
+```sql
+hive (default)> drop database default;
+FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. MetaException(message:Can not drop default database in catalog hive)
+```
 
+## 2.6、Hive中表的操作
 
+### 2.6.1、创建表
 
+- 创建表
 
+```sql
+hive (default)> create table t2(id int);
+```
 
+### 2.6.2、查看表
 
+- 查看表
 
+```sql
+hive (default)> show tables;
+```
 
+表的元数据信息在MySQL中的体现：
 
+```mysql
+mysql> select * from tbls \G;
+*************************** 1. row ***************************
+            TBL_ID: 11
+       CREATE_TIME: 1643520292
+             DB_ID: 1
+  LAST_ACCESS_TIME: 0
+             OWNER: emon
+        OWNER_TYPE: USER
+         RETENTION: 0
+             SD_ID: 11
+          TBL_NAME: t2
+          TBL_TYPE: MANAGED_TABLE
+VIEW_EXPANDED_TEXT: NULL
+VIEW_ORIGINAL_TEXT: NULL
+IS_REWRITE_ENABLED:  
+1 row in set (0.00 sec)
 
+ERROR: 
+No query specified
+```
 
+表字段的元数据信息在MySQL中的体现：
 
+```mysql
+mysql> select * from columns_v2 \G;
+*************************** 1. row ***************************
+      CD_ID: 11
+    COMMENT: NULL
+COLUMN_NAME: id
+  TYPE_NAME: int
+INTEGER_IDX: 0
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+```
+
+### 2.6.3、查看表信息
+
+- 查看表基本信息
+
+```sql
+hive (default)> desc t2;
+```
+
+- 查看表创建详细信息
+
+```sql
+hive (default)> show create table t2;
+```
+
+### 2.6.4、修改表名
+
+- 修改表名
+
+```sql
+hive (default)> alter table t2 rename to t2_bak;
+```
+
+### 2.6.5、加载数据
+
+hive演练数据： 链接：https://pan.baidu.com/s/11dCFUjQOlAKLyZoSh8wpxg 
+提取码：1111 
+
+数据上传：下载数据解压后，上传到 `/usr/local/hive/custom/data`目录。
+
+```bash
+[emon@emon ~]$ ll -h /usr/local/hive/custom/data/hivedata/
+总用量 56K
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 b_source.data
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 ex_par.data
+-rw-r--r--. 1 emon emon  10 1月  30 13:52 external_table.data
+-rw-r--r--. 1 emon emon  18 1月  30 13:52 partition_1.data
+-rw-r--r--. 1 emon emon  27 1月  30 13:52 partition_2.data
+-rw-r--r--. 1 emon emon  79 1月  30 13:52 stu2.data
+-rw-r--r--. 1 emon emon  30 1月  30 13:52 stu3.data
+-rw-r--r--. 1 emon emon  51 1月  30 13:52 stu.data
+-rw-r--r--. 1 emon emon 123 1月  30 13:52 student.data
+-rw-r--r--. 1 emon emon  39 1月  30 13:52 student_favors_2.data
+-rw-r--r--. 1 emon emon  48 1月  30 13:52 student_favors.data
+-rw-r--r--. 1 emon emon 246 1月  30 13:52 student_score.data
+-rw-r--r--. 1 emon emon  10 1月  30 13:52 t2.data
+-rw-r--r--. 1 emon emon  73 1月  30 13:52 t3.data
+```
+
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.data' into table t2_bak;
+```
+
+- 加载数据之使用HDFS直接put数据
+
+```bash
+[emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/t2.data /user/hive/warehouse/t2_bak/t2_bak.data
+```
+
+### 2.6.6、表增加字段及注释
+
+- 添加字段
+
+```sql
+hive (default)> alter table t2_bak add columns(name string);
+```
+
+- 添加注释
+
+```sql
+# 注意，缩进使用的是空格，而不是tab
+create table t2(
+    age int comment '年龄'
+) comment '测试';
+```
+
+```sql
+# 执行效果
+hive (default)> create table t2(
+              >     age int comment '年龄'
+              > ) comment '测试';
+# 查看注释的编码
+hive (default)> show create table t2;
+OK
+createtab_stmt
+CREATE TABLE `t2`(
+  `age` int COMMENT '??')
+COMMENT '??'
+......省略......
+```
+
+默认情况下，由于hive的注释在MySQL的元数据表`columns_v2`和`table_params`都是`DEFAULT CHARSET=latin1`编码，所以会显示乱码。
+
+注释在MySQL情况：
+
+```mysql
+mysql> show create table columns_v2 \G;
+*************************** 1. row ***************************
+       Table: columns_v2
+Create Table: CREATE TABLE `columns_v2` (
+  `CD_ID` bigint(20) NOT NULL,
+  `COMMENT` varchar(256) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `COLUMN_NAME` varchar(767) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `TYPE_NAME` mediumtext,
+  `INTEGER_IDX` int(11) NOT NULL,
+  PRIMARY KEY (`CD_ID`,`COLUMN_NAME`),
+  KEY `COLUMNS_V2_N49` (`CD_ID`),
+  CONSTRAINT `COLUMNS_V2_FK1` FOREIGN KEY (`CD_ID`) REFERENCES `cds` (`CD_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+mysql> show create table table_params \G;
+*************************** 1. row ***************************
+       Table: table_params
+Create Table: CREATE TABLE `table_params` (
+  `TBL_ID` bigint(20) NOT NULL,
+  `PARAM_KEY` varchar(256) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `PARAM_VALUE` mediumtext CHARACTER SET latin1 COLLATE latin1_bin,
+  PRIMARY KEY (`TBL_ID`,`PARAM_KEY`),
+  KEY `TABLE_PARAMS_N49` (`TBL_ID`),
+  CONSTRAINT `TABLE_PARAMS_FK1` FOREIGN KEY (`TBL_ID`) REFERENCES `tbls` (`TBL_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+```
+
+- 解决注释乱码
+
+修改注释在MySQL的元数据表编码：
+
+```mysql
+# 修改注释元数据表字段编码
+alter table columns_v2 modify column comment varchar(256) character set utf8mb4 collate utf8mb4_unicode_ci;
+alter table table_params modify column param_value mediumtext character set utf8mb4 collate utf8mb4_unicode_ci;
+
+# 如果你的表创建了分区，还需要再执行两条命令：
+alter table partition_params modify column param_value varchar(4000) character set utf8mb4 collate utf8mb4_unicode_ci;
+alter table partition_keys modify column pkey_comment varchar(4000) character set utf8mb4 collate utf8mb4_unicode_ci;
+```
+
+重建表即可！
+
+### 2.6.7、删除表
+
+- 删除表
+
+```sql
+hive (default)> drop table t2;
+```
+
+### 2.6.8、指定列和行的分隔符
 
