@@ -664,3 +664,87 @@ Time taken: 0.111 seconds, Fetched: 3 row(s)
 
 #### 1.使用ARRAY字段存储用户的兴趣爱好
 
+- 创建数据表
+
+```sql
+create table stu(
+id int,
+name string,
+favors array<string>
+) row format delimited 
+fields terminated by '\t'
+collection items terminated by ','
+lines terminated by '\n';
+```
+
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu.data' into table stu;
+```
+
+- 查询数据
+
+```sql
+hive (default)> select id,name,favors[0] from stu;
+```
+
+#### 2.使用MAP字段存储学生考试成绩
+
+- 创建数据表
+
+```sql
+create table stu2(
+id int,
+name string,
+scores map<string,int>
+) row format delimited 
+fields terminated by '\t'
+collection items terminated by ','
+map keys terminated by ':'
+lines terminated by '\n';
+```
+
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu2.data' into table stu2;
+```
+
+- 查询数据
+
+```sql
+hive (default)> select id,name,scores['chinese'] as ch_score,scores['math'] math_score from stu2;
+```
+
+#### 3.使用STRUCT字段存储学生地址信息
+
+- 创建数据表
+
+```sql
+create table stu3(
+id int,
+name string,
+address struct<home_addr:string,office_addr:string>
+) row format delimited 
+fields terminated by '\t'
+collection items terminated by ','
+lines terminated by '\n';
+```
+
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu3.data' into table stu3;
+```
+
+- 查询数据
+
+```sql
+hive (default)> select id,name,address.home_addr,address.office_addr from stu3;
+```
+
+
+
+
+
