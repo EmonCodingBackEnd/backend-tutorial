@@ -744,7 +744,35 @@ hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu
 hive (default)> select id,name,address.home_addr,address.office_addr from stu3;
 ```
 
+#### 4.三种复合类型结合使用
 
+- 创建数据表
 
+```sql
+create table student(
+id int comment 'id',
+name string comment 'name',
+favors array<string>,
+scores map<string, int>,
+address struct<home_addr:string,office_addr:string>
+) row format delimited 
+fields terminated by '\t'
+collection items terminated by ','
+map keys terminated by ':'
+lines terminated by '\n';
+```
 
+- 加载数据
+
+```sql
+hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/student.data' into table student;
+```
+
+- 查询数据
+
+```sql
+hive (default)> select id,name,favors[0],scores['chinese'],address.home_addr,address.office_addr from student;
+```
+
+## 3.4、Hive中的表类型
 
