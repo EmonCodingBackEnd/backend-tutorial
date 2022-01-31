@@ -1604,3 +1604,5 @@ group by a.key;
 
 
 
+# 五、Hive的Web操作界面之Hue
+
