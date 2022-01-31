@@ -1591,9 +1591,16 @@ select count(distinct name) from order;
 select count(tmp.name) from (select name from order group by name) tmp;
 ```
 
+### 4.2.6、一个SQL语句分析：解决数据倾斜
 
-
-
+```sql
+select a.key, sum(a.cnt) as cnt
+from (
+    select key, count(*) as cnt from tablename group by key,
+    case when key='key001' then hash(random()) %50 else 0 end
+) a
+group by a.key;
+```
 
 
 
