@@ -655,7 +655,7 @@ scala> :quit
 
 ## 4、安装Spark
 
-### 4.1、Spark编译安装（外部HDFS+外部Yarn）
+### 4.1、Spark编译安装（外部HDFS和Yarn）：基于CDH5版Hadoop
 
 目录规划：
 
@@ -866,9 +866,18 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
   
   - 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
   
-  
-  
-  
+
+
+
+### 4.2、安装Spark（外部HDFS和YARN）：基于Apache版Hadoop
+
+1. 下载
+
+官网地址：http://spark.apache.org/
+
+下载地址：http://spark.apache.org/downloads.html
+
+各个版本：https://archive.apache.org/dist/spark/
 
 
 
