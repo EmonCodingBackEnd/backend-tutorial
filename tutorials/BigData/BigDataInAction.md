@@ -1003,8 +1003,6 @@ See Spark's "Building Spark" doc for correct Maven options.
 [emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
 export SPARK_HOME=/usr/local/spark
 export PATH=$SPARK_HOME/bin:$PATH
-# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
-export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ```
 
 使之生效：
@@ -1017,21 +1015,34 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
 
-- 样例测试
+- 样例测试：基于yarn执行样例测试
 
 ```
 [emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
 
-#### 4.2.2、local模式
+#### 4.2.2、Yarn模式
 
-无
+1. 配置
 
-#### 4.2.3、Standalone模式
+- `spark-env.sh`
 
-无
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/spark-env.sh.template /usr/local/spark/conf/spark-env.sh
+[emon@emon ~]$ vim /usr/local/spark/conf/spark-env.sh
+```
 
-#### 4.2.4、配置一主两从集群
+```properties
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+# [新增]
+# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+```
+
+#### 4.2.3、Standalone集群模式
+
+**配置一主两从集群**：
 
 1. 配置
 
@@ -1107,6 +1118,12 @@ emon3
 访问： http://emon:8080
 
 可以看到2个Workers节点。
+
+- 验证3：基于spark执行样例测试
+
+```bash
+[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master spark://emon:7077 /usr/local/spark/examples/jars/spark-examples*.jar 2
+```
 
 
 ## 5、安装Hadoop
