@@ -867,6 +867,8 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 ### 4.2、Spark编译安装（外部HDFS和YARN）：基于Apache版Hadoop
 
+#### 4.2.1、基本安装
+
 1. 下载源码
 
 官网地址：http://spark.apache.org/
@@ -1020,6 +1022,91 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ```
 [emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
+
+#### 4.2.2、local模式
+
+无
+
+#### 4.2.3、Standalone模式
+
+无
+
+#### 4.2.4、配置一主两从集群
+
+1. 配置
+
+- `spark-env.sh`
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/spark-env.sh.template /usr/local/spark/conf/spark-env.sh
+[emon@emon ~]$ vim /usr/local/spark/conf/spark-env.sh
+```
+
+```properties
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+# [新增]
+export SPARK_MASTER_HOST=emon
+```
+
+2. `slaves`
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/slaves.template /usr/local/spark/conf/slaves
+[emon@emon ~]$ vim /usr/local/spark/conf/slaves
+```
+
+```bash
+# localhost
+emon2
+emon3
+```
+
+3. 拷贝到emon2和emon3
+
+- 确保emon2和emon3创建安装目录
+
+```bash
+[emon@emon2 ~]$ mkdir /usr/local/Spark
+[emon@emon3 ~]$ mkdir /usr/local/Spark
+```
+
+- 拷贝到emon2和emon3安装目录
+
+```bash
+[emon@emon ~]$ scp -rq /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ emon@emon2:/usr/local/Spark/
+[emon@emon ~]$ scp -rq /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ emon@emon3:/usr/local/Spark/
+```
+
+- 配置emon2和emon3上软连接
+
+```bash
+[emon@emon2 ~]$ ln -snf /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ /usr/local/spark
+[emon@emon3 ~]$ ln -snf /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ /usr/local/spark
+```
+
+4. 在主节点启动Spark集群
+
+```bash
+[emon@emon ~]$ /usr/local/spark/sbin/start-all.sh 
+```
+
+- 验证1
+
+```bash
+[emon@emon ~]$ jps
+124560 Master
+[emon@emon2 ~]$ jps
+12824 Worker
+[emon@emon3 ~]$ jps
+12227 Worker
+```
+
+- 验证2
+
+访问： http://emon:8080
+
+可以看到2个Workers节点。
 
 
 ## 5、安装Hadoop
