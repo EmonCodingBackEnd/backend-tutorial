@@ -675,10 +675,6 @@ scala> :quit
 
 各个版本：https://archive.apache.org/dist/spark/
 
-![image-20220104094307878](images/image-20220104094307878.png)
-
-
-
 ```bash
 [emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/spark/spark-3.0.3/spark-3.0.3.tgz --no-check-certificate
 ```
@@ -869,7 +865,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 
 
-### 4.2、安装Spark（外部HDFS和YARN）：基于Apache版Hadoop
+### 4.2、Spark编译安装（外部HDFS和YARN）：基于Apache版Hadoop
 
 1. 下载
 
