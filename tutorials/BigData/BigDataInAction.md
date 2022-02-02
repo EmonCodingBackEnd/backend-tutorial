@@ -1011,16 +1011,6 @@ export PATH=$SPARK_HOME/bin:$PATH
 [emon@emon ~]$ source /etc/profile
 ```
 
-8. 测试
-
-前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
-
-- 样例测试：基于yarn执行样例测试
-
-```
-[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
-```
-
 #### 4.2.2、Yarn模式
 
 1. 配置
@@ -1038,6 +1028,16 @@ export JAVA_HOME=${JAVA_HOME}
 # [新增]
 # 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+```
+
+2. 测试
+
+前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
+
+- 样例测试：基于yarn执行样例测试
+
+```bash
+[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn --deploy-mode cluster /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
 
 #### 4.2.3、Standalone集群模式
