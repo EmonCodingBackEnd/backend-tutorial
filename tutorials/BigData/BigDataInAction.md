@@ -867,7 +867,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 ### 4.2、Spark编译安装（外部HDFS和YARN）：基于Apache版Hadoop
 
-1. 下载
+1. 下载源码
 
 官网地址：http://spark.apache.org/
 
@@ -875,7 +875,151 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 各个版本：https://archive.apache.org/dist/spark/
 
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/spark/spark-2.4.8/spark-2.4.8.tgz --no-check-certificate
+```
 
+2. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Spark
+```
+
+3. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.8.tgz -C /usr/local/Spark/
+```
+
+4. 编译
+
+参考文档：https://spark.apache.org/docs/2.4.8/building-spark.html
+
+>Spark源码编译的3大方式：
+>
+>1、Maven编译
+>
+>2、SBT编译
+>
+>3、打包编译make-distribution.sh
+>
+>切记：不同版本的Spark对环境的依赖不同，比如Spark2.4.8的版本依赖Maven 3.5.4，JDK8和Scala2.12；具体参考官网！
+
+- 切换目录
+
+```bash
+[emon@emon ~]$ cd /usr/local/Spark/spark-2.4.8/
+```
+
+- 编译之前查看
+
+```bash
+[emon@emon spark-2.4.8]$ ./dev/make-distribution.sh --help
++++ dirname ./dev/make-distribution.sh
+++ cd ./dev/..
+++ pwd
++ SPARK_HOME=/usr/local/Spark/spark-2.4.8
++ DISTDIR=/usr/local/Spark/spark-2.4.8/dist
++ MAKE_TGZ=false
++ MAKE_PIP=false
++ MAKE_R=false
++ NAME=none
++ MVN=/usr/local/Spark/spark-2.4.8/build/mvn
++ ((  1  ))
++ case $1 in
++ exit_with_usage
++ set +x
+make-distribution.sh - tool for making binary distributions of Spark
+
+usage:
+make-distribution.sh [--name] [--tgz] [--pip] [--r] [--mvn <mvn-command>] <maven build options>
+See Spark's "Building Spark" doc for correct Maven options.
+```
+
+- 启动编译
+
+命令要求：基于`Maven3.5.4及以上`、`JAVA 8`、`Scala 2.12`
+
+```bash
+[emon@emon spark-2.4.8]$ ./dev/make-distribution.sh --name hadoop3.3.1 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-3.1 -Dhadoop.version=3.3.1
+```
+
+命令解释：
+
+`--name`：指定编译后打包的名字，名称组成规则是 spark版本+bin+name，比如 `spark-3.0.3-bin-hadoop3.3.1`
+
+`--tgz`：编译后是一个tgz包
+
+`-Phadoop-3.1`：表示使用hadoop-3.1这个profile
+
+`-Dhadoop.version`：指定hadoop的具体版本是`3.3.1`
+
+`-Pyarn`：可运行在yarn上
+
+`-Phive`：指定hive
+
+编译问题：
+
+问题1：编译时执行了`make-distribution.sh`命令后看到如下信息卡主了
+
+```bash
+......省略......
+++ grep -v INFO
+++ tail -n 1
+```
+
+原因：这一步需要检查环境变量信息，慢是正常的，一般等待2-5分钟就开始执行了。当然，由于机器和网络环境，碰到多等一会的情况，也请淡定！开始执行后，整个过程预计10-15分钟！
+
+- 编译成功
+
+编译成功后，可以看到打包后的文件：spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz
+
+转存该文件并退出编译目录：
+
+```bash
+[emon@emon spark-2.4.8]$ mv spark-2.4.8-bin-hadoop3.3.1.tgz /usr/local/src/
+[emon@emon spark-2.4.8]$ cd
+```
+
+5. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.8-bin-hadoop3.3.1.tgz -C /usr/local/Spark/
+```
+
+6. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ /usr/local/spark
+```
+
+7. 配置环境变量
+
+在`/etc/profile.d`目录创建`spark.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
+export SPARK_HOME=/usr/local/spark
+export PATH=$SPARK_HOME/bin:$PATH
+# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+8. 测试
+
+前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
+
+- 样例测试
+
+```
+[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
+```
 
 
 ## 5、安装Hadoop
