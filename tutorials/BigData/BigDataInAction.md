@@ -820,8 +820,6 @@ https://github.com/apache/spark/pull/16884/files
 [emon@emon ~]$ sudo vim /etc/profile.d/spark.sh
 export SPARK_HOME=/usr/local/spark
 export PATH=$SPARK_HOME/bin:$PATH
-# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
-export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ```
 
 使之生效：
@@ -830,44 +828,57 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 [emon@emon ~]$ source /etc/profile
 ```
 
-5. 测试
+#### 4.1.3、YARN模式
+
+1. 配置
+
+- `spark-env.sh`
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/spark-env.sh.template /usr/local/spark/conf/spark-env.sh
+[emon@emon ~]$ vim /usr/local/spark/conf/spark-env.sh
+# [新增]
+export JAVA_HOME=${JAVA_HOME}
+# [新增]
+# 避免spark on yarn时When running with master 'yarn' either HADOOP_CONF_DIR or YARN_CONF_DIR must be set in the environment.
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+```
+
+2. 测试
 
 前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
 
-- 样例测试
+- 样例测试：基于yarn执行样例测试
 
 ```bash
-[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn /usr/local/spark/examples/jars/spark-examples*.jar 2
+[emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn --deploy-mode cluster /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
 
-- 自定义测试
+自定义测试
 
-  - [依赖项目](git@github.com:EmonCodingBackEnd/backend-spark-learning.git)
-  - 上传自定义jar
-  
-  `git clone git@github.com:EmonCodingBackEnd/backend-spark-learning.git`并打包`spark-ss`模块，上传jar到spark：
-  
-  ```bash
-  scp spark-ss-1.0-SNAPSHOT.jar emon@emon:/usr/local/spark/custom/lib
-  ```
-  
-  - 模拟9527端口发送数据
-  
-  ```bash
-  # 命令回车后会进入输入状态，输入内容回车即可
-  nc -lk 9527
-  ```
-  
-  - 执行
-  
-  ```bash
-  [emon@emon ~]$ spark-submit --class com.coding.bigdata.ss.NetworkWordCountApp --master yarn /usr/local/spark/custom/lib/spark-ss-1.0-SNAPSHOT.jar 2
-  ```
-  
-  - 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
-  
+- [依赖项目](git@github.com:EmonCodingBackEnd/backend-spark-learning.git)
+- 上传自定义jar
 
+`git clone git@github.com:EmonCodingBackEnd/backend-spark-learning.git`并打包`spark-ss`模块，上传jar到spark：
 
+```bash
+scp spark-ss-1.0-SNAPSHOT.jar emon@emon:/usr/local/spark/custom/lib
+```
+
+- 模拟9527端口发送数据
+
+```bash
+# 命令回车后会进入输入状态，输入内容回车即可
+nc -lk 9527
+```
+
+- 执行
+
+```bash
+[emon@emon ~]$ spark-submit --class com.coding.bigdata.ss.NetworkWordCountApp --master yarn /usr/local/spark/custom/lib/spark-ss-1.0-SNAPSHOT.jar 2
+```
+
+- 在nc窗口输入内容，比如： a,a,a,b,b,c 之后回车，可以在执行窗口看到输出的统计结果。
 
 ### 4.2、Spark编译安装（外部HDFS和YARN）：基于Apache版Hadoop
 
