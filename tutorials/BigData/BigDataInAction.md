@@ -867,7 +867,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 ### 4.2、Spark编译安装（外部HDFS和YARN）：基于Apache版Hadoop
 
-#### 4.2.1、基本安装
+#### 4.2.1、编译
 
 1. 下载源码
 
@@ -881,19 +881,13 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 [emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/spark/spark-2.4.8/spark-2.4.8.tgz --no-check-certificate
 ```
 
-2. 创建解压目录
+2. 解压
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Spark
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.8.tgz -C /usr/local/src/
 ```
 
-3. 解压
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.8.tgz -C /usr/local/Spark/
-```
-
-4. 编译
+3. 编译
 
 参考文档：https://spark.apache.org/docs/2.4.8/building-spark.html
 
@@ -910,7 +904,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 - 切换目录
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Spark/spark-2.4.8/
+[emon@emon ~]$ cd /usr/local/src/spark-2.4.8
 ```
 
 - 编译之前查看
@@ -1009,19 +1003,27 @@ java.lang.IllegalArgumentException: Unrecognized Hadoop major version number: 3.
 [emon@emon spark-2.4.8]$ cd
 ```
 
-5. 解压安装
+#### 4.2.2、安装
+
+1. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Spark
+```
+
+2. 解压安装
 
 ```bash
 [emon@emon ~]$ tar -zxvf /usr/local/src/spark-2.4.8-bin-hadoop3.3.1.tgz -C /usr/local/Spark/
 ```
 
-6. 创建软连接
+3. 创建软连接
 
 ```bash
 [emon@emon ~]$ ln -snf /usr/local/Spark/spark-2.4.8-bin-hadoop3.3.1/ /usr/local/spark
 ```
 
-7. 配置环境变量
+4. 配置环境变量
 
 在`/etc/profile.d`目录创建`spark.sh`文件：
 
