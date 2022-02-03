@@ -943,7 +943,7 @@ See Spark's "Building Spark" doc for correct Maven options.
 命令要求：基于`Maven3.5.4及以上`、`JAVA 8`、`Scala 2.12`
 
 ```bash
-[emon@emon spark-2.4.8]$ ./dev/make-distribution.sh --name hadoop3.3.1 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-3.1 -Dhadoop.version=3.3.1
+[emon@emon spark-2.4.8]$ ./dev/make-distribution.sh --name hadoop3.3.1 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-3.1 -Dhadoop.version=3.3.1 -Pscala-2.12
 ```
 
 命令解释：
