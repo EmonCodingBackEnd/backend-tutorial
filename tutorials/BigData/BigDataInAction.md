@@ -943,6 +943,7 @@ See Spark's "Building Spark" doc for correct Maven options.
 命令要求：基于`Maven3.5.4及以上`、`JAVA 8`、`Scala 2.12`
 
 ```bash
+# 这种自己编译的方式，对local模式的spark-shell支持不够，会遇到 问题2
 [emon@emon spark-2.4.8]$ ./dev/make-distribution.sh --name hadoop3.3.1 --tgz -Phive -Phive-thriftserver -Pyarn -Phadoop-3.1 -Dhadoop.version=3.3.1 -Pscala-2.12
 ```
 
@@ -971,6 +972,31 @@ See Spark's "Building Spark" doc for correct Maven options.
 ```
 
 原因：这一步需要检查环境变量信息，慢是正常的，一般等待2-5分钟就开始执行了。当然，由于机器和网络环境，碰到多等一会的情况，也请淡定！开始执行后，整个过程预计10-15分钟！
+
+问题2：
+
+```bash
+java.lang.IllegalArgumentException: Unrecognized Hadoop major version number: 3.3.1
+  at org.apache.hadoop.hive.shims.ShimLoader.getMajorVersion(ShimLoader.java:174)
+  at org.apache.hadoop.hive.shims.ShimLoader.loadShims(ShimLoader.java:139)
+  at org.apache.hadoop.hive.shims.ShimLoader.getHadoopShims(ShimLoader.java:100)
+  at org.apache.hadoop.hive.conf.HiveConf$ConfVars.<clinit>(HiveConf.java:368)
+  at org.apache.hadoop.hive.conf.HiveConf.<clinit>(HiveConf.java:105)
+  at java.lang.Class.forName0(Native Method)
+  at java.lang.Class.forName(Class.java:348)
+  at org.apache.spark.util.Utils$.classForName(Utils.scala:238)
+  at org.apache.spark.sql.SparkSession$.hiveClassesArePresent(SparkSession.scala:1128)
+  at org.apache.spark.repl.Main$.createSparkSession(Main.scala:102)
+  ... 57 elided
+<console>:14: error: not found: value spark
+       import spark.implicits._
+              ^
+<console>:14: error: not found: value spark
+       import spark.sql
+              ^
+```
+
+原因：不影响使用，这种自己编译的方式，对local模式的spark-shell支持不够
 
 - 编译成功
 
