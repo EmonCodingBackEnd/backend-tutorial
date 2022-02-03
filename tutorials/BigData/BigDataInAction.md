@@ -622,7 +622,7 @@ Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=10737
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Scala/scala-2.12.10/ /usr/local/scala
+[emon@emon ~]$ ln -snf /usr/local/Scala/scala-2.12.10/ /usr/local/scala
 ```
 
 6. 配置环境变量
