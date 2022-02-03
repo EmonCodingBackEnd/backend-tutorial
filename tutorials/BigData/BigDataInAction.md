@@ -665,7 +665,7 @@ scala> :quit
 | /usr/local/spark/custom/shell  | 脚本文件           |
 | /usr/local/spark/custom/source | 存放源码资源的目录 |
 
-
+#### 4.1.1、编译
 
 1. 下载源码
 
@@ -679,19 +679,13 @@ scala> :quit
 [emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/spark/spark-3.0.3/spark-3.0.3.tgz --no-check-certificate
 ```
 
-2. 创建解压目录
+2. 解压
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Spark
+[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3.tgz -C /usr/local/src/
 ```
 
-3. 解压
-
-```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3.tgz -C /usr/local/Spark/
-```
-
-4. 编译
+3. 编译
 
 参考文档：https://spark.apache.org/docs/3.0.3/building-spark.html
 
@@ -708,7 +702,7 @@ scala> :quit
 - 切换目录
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Spark/spark-3.0.3/
+[emon@emon ~]$ cd /usr/local/src/spark-3.0.3/
 ```
 
 - 编辑`pom.xml`内容
@@ -794,21 +788,31 @@ https://github.com/apache/spark/pull/16884/files
 ```bash
 [emon@emon spark-3.0.3]$ mv spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz /usr/local/src/
 [emon@emon spark-3.0.3]$ cd
+# 清理编译环境
+[emon@emon ~]$ rm -rf /usr/local/src/spark-3.0.3
 ```
 
-5. 解压安装
+#### 4.1.2、安装
+
+1. 创建解压目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Spark
+```
+
+2. 解压安装
 
 ```bash
 [emon@emon ~]$ tar -zxvf /usr/local/src/spark-3.0.3-bin-2.6.0-cdh5.16.2.tgz -C /usr/local/Spark/
 ```
 
-6. 创建软连接
+3. 创建软连接
 
 ```bash
 [emon@emon ~]$ ln -snf /usr/local/Spark/spark-3.0.3-bin-2.6.0-cdh5.16.2/ /usr/local/spark
 ```
 
-7. 配置环境变量
+4. 配置环境变量
 
 在`/etc/profile.d`目录创建`spark.sh`文件：
 
@@ -826,7 +830,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 [emon@emon ~]$ source /etc/profile
 ```
 
-8. 测试
+5. 测试
 
 前提条件：Hadoop启动，YARN服务启动，`HADOOP_CONF_DIR`或`YARN_CONF_DIR`环境变量已成功配置。
 
@@ -1001,6 +1005,8 @@ java.lang.IllegalArgumentException: Unrecognized Hadoop major version number: 3.
 ```bash
 [emon@emon spark-2.4.8]$ mv spark-2.4.8-bin-hadoop3.3.1.tgz /usr/local/src/
 [emon@emon spark-2.4.8]$ cd
+# 清理编译环境
+[emon@emon ~]$ rm -rf /usr/local/src/spark-2.4.8
 ```
 
 #### 4.2.2、安装
