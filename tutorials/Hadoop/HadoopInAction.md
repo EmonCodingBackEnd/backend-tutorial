@@ -459,9 +459,20 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 需要通过一个配置来开启，在`yarn-site.xml`中添加如下配置：
 
 ```xml
+    <!-- 开启日志聚合 -->
     <property>
         <name>yarn.log-aggregation-enable</name>
         <value>true</value>
+    </property>
+	<!-- 日志聚合HDFS目录 -->
+	<property>
+		<name>yarn.nodemanager.remote-app-log-dir</name>
+		<value>/tmp/logs/emon/yarn-logs</value>
+	</property>
+	<!-- 日志保存时间30days,单位秒 -->
+	<property>
+		<name>yarn.log-aggregation.retain-seconds</name>
+		<value>2592000</value>
     </property>
     <property>
         <name>yarn.log-server.url</name>
@@ -489,9 +500,20 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
         <name>yarn.nodemanager.env-whitelist</name>
         <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
     </property>
+    <!-- 开启日志聚合 -->
     <property>
         <name>yarn.log-aggregation-enable</name>
         <value>true</value>
+    </property>
+	<!-- 日志聚合HDFS目录 -->
+	<property>
+		<name>yarn.nodemanager.remote-app-log-dir</name>
+		<value>/tmp/logs/emon/yarn-logs</value>
+	</property>
+	<!-- 日志保存时间30days,单位秒 -->
+	<property>
+		<name>yarn.log-aggregation.retain-seconds</name>
+		<value>2592000</value>
     </property>
     <property>
         <name>yarn.log-server.url</name>
