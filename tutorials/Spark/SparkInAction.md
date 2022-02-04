@@ -70,9 +70,83 @@ Driver进程所在的节点可以是Spark集群的某一个节点或者就是我
 
 
 
+## 2.4、Spark任务日志
 
+### 2.4.1、在yarn的web界面查看日志
 
+使用on yarn模式提交Spark任务时，在任务执行中，点击对应任务的Tracking UI列的ApplicationMaster，可以打开Spark界面。
 
+操作路径：在yarn的web界面([http://emon:8088](http://emon:8088/)) ==> 点击对应任务的ApplicationMaster链接（任务执行完成后只能看到history链接）==>点击查看。
 
+如果是history链接，点击进去查看logs链接日志时，会提示`Failed redirect for container_xxx_xxx_xxx_xxx`。
 
+如何解决？开启 Spark HistoryServer 进程。
+
+任意选择一个服务器开启spark的historyserver进程都可以，选择集群内的节点，或者选择spark的客户端节点都可以。
+
+下面我们就在这个spark的客户端节点上启动spark的historyserver进程。
+
+需要修改`spark-defaults.conf`和`spark-env.sh`。
+
+- `spark-defaults.conf`
+
+如果目前尚不存在`spark-defaults.conf`文件，可以从`spark-defaults.conf.template`复制一份重命名为`spark-defaults.conf`。
+
+```bash
+[emon@emon ~]$ cp /usr/local/spark/conf/spark-defaults.conf.template /usr/local/spark/conf/spark-defaults.conf
+[emon@emon ~]$ vim /usr/local/spark/conf/spark-defaults.conf
+```
+
+```properties
+# [新增]
+spark.eventLog.enabled=true
+# [新增]
+spark.eventLog.compress=true
+# [新增]
+spark.eventLog.dir=hdfs://emon:8020/tmp/logs/emon/logs
+# [新增]注意里面的emon表示hadoop的用户
+spark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/emon/logs
+# [新增]
+spark.yarn.historyServer.address=http://emon:18080
+```
+
+注意：在哪个节点上启动spark的historyserver进程，`spark.yarn.historyServer.address`的值里面就指定哪个节点的主机名信息。
+
+- `spark-env.sh`
+
+```bash
+[emon@emon ~]$ vim /usr/local/spark/conf/spark-env.sh
+```
+
+```properties
+# [新增]
+export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/emon/logs"
+```
+
+- 确保日志目录存在
+
+```bash
+# 如果日志目录不存在，启动时会报错
+[emon@emon ~]$ hdfs dfs -mkdir -p hdfs://emon:8020/tmp/logs/emon/logs
+```
+
+- 启动
+
+```bash
+[emon@emon ~]$ /usr/local/spark/sbin/start-history-server.sh 
+```
+
+- 验证
+
+```bash
+# 其他进程忽略显示，看到如下进程表示Spark的HistoryServer启动成功
+[emon@emon ~]$ jps
+17287 HistoryServer
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ /usr/local/spark/sbin/stop-history-server.sh 
+```
 
