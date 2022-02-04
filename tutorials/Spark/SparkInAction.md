@@ -86,6 +86,8 @@ Driver进程所在的节点可以是Spark集群的某一个节点或者就是我
 
 下面我们就在这个spark的客户端节点上启动spark的historyserver进程。
 
+**说明**：该配置基于Hadoop的MapReduce任务日志配置，请先确保MapReduce的任务日志配置OK！
+
 需要修改`spark-defaults.conf`和`spark-env.sh`。
 
 - `spark-defaults.conf`
