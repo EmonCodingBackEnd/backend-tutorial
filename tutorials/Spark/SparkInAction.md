@@ -105,9 +105,9 @@ spark.eventLog.enabled=true
 # [新增]
 spark.eventLog.compress=true
 # [新增]
-spark.eventLog.dir=hdfs://emon:8020/tmp/logs/emon/spark-logs
+spark.eventLog.dir=hdfs://emon:8020/tmp/logs/spark-events
 # [新增]注意里面的emon表示hadoop的用户
-spark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/emon/spark-logs
+spark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/spark-events
 # [新增]
 spark.yarn.historyServer.address=http://emon:18080
 # [新增]
@@ -124,14 +124,14 @@ spark.yarn.historyServer.allowTracking=true
 
 ```properties
 # [新增]
-export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/emon/spark-logs"
+export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/spark-events"
 ```
 
 - 确保日志目录存在
 
 ```bash
 # 如果日志目录不存在，启动时会报错
-[emon@emon ~]$ hdfs dfs -mkdir -p hdfs://emon:8020/tmp/logs/emon/spark-logs
+[emon@emon ~]$ hdfs dfs -mkdir -p hdfs://emon:8020/tmp/logs/spark-events
 ```
 
 - 启动

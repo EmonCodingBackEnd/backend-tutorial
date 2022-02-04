@@ -467,7 +467,7 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 	<!-- 日志聚合HDFS目录 -->
 	<property>
 		<name>yarn.nodemanager.remote-app-log-dir</name>
-		<value>/tmp/logs/emon/yarn-logs</value>
+		<value>/tmp/logs/yarn-logs</value>
 	</property>
 	<!-- 日志保存时间30days,单位秒 -->
 	<property>
@@ -508,7 +508,7 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 	<!-- 日志聚合HDFS目录 -->
 	<property>
 		<name>yarn.nodemanager.remote-app-log-dir</name>
-		<value>/tmp/logs/emon/yarn-logs</value>
+		<value>/tmp/logs/yarn-logs</value>
 	</property>
 	<!-- 日志保存时间30days,单位秒 -->
 	<property>
