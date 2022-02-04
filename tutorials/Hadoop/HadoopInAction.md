@@ -575,6 +575,10 @@ OK，任务日志可查看了！
 [emon@emon ~]$ mapred --daemon stop historyserver
 ```
 
+启动成功后，可以访问地址查看历史日志：
+
+http://emon:19888
+
 ### 3.2.2、命令行查看日志
 
 从yarnweb上获取applicationId，然后执行命令：

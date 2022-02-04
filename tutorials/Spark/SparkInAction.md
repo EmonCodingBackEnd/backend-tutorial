@@ -148,9 +148,12 @@ export SPARK_HISTORY_OPTS="-Dspark.history.ui.port=18080 -Dspark.history.fs.logD
 17287 HistoryServer
 ```
 
+可访问如下地址：
+
+http://emon:18080
+
 - 停止
 
 ```bash
 [emon@emon ~]$ /usr/local/spark/sbin/stop-history-server.sh 
 ```
-
