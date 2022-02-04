@@ -533,7 +533,7 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
         <name>mapreduce.framework.name</name>
         <value>yarn</value>
     </property>
-    <!-- 历史日志 -->
+    <!-- 日志监控服务的地址 -->
     <property>
          <name>mapreduce.jobhistory.address</name>
          <value>emon:10020</value>
