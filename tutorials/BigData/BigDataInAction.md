@@ -1085,7 +1085,7 @@ export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 [emon@emon ~]$ spark-submit --class org.apache.spark.examples.SparkPi --master yarn --deploy-mode cluster /usr/local/spark/examples/jars/spark-examples*.jar 2
 ```
 
-#### 4.2.3、Standalone集群模式
+#### 4.2.3、Standalone独立集群模式
 
 **配置一主两从集群**：
 
