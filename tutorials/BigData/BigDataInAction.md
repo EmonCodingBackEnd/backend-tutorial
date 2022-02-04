@@ -10,6 +10,35 @@
 
 # 一、基础软件安装
 
+大数据整体外部资源目录规划：
+
+```bash
+[emon@emon ~]$ mkdir -p bigdata/{hadoop,flume,hive,spark,flink}/{data,lib,shell,source}
+```
+
+| 目录                    | 作用       |
+| ----------------------- | ---------- |
+| ~/bigdata/hadoop/data   | 测试数据   |
+| ~/bigdata/hadoop/lib    | jar库文件  |
+| ~/bigdata/hadoop/shell  | sh脚本文件 |
+| ~/bigdata/hadoop/source | 源码目录   |
+| ~/bigdata/flume/data    |            |
+| ~/bigdata/flume/lib     |            |
+| ~/bigdata/flume/shell   |            |
+| ~/bigdata/flume/source  |            |
+| ~/bigdata/hive/data     |            |
+| ~/bigdata/hive/lib      |            |
+| ~/bigdata/hive/shell    |            |
+| ~/bigdata/hive/source   |            |
+| ~/bigdata/spark/data    |            |
+| ~/bigdata/spark/lib     |            |
+| ~/bigdata/spark/shell   |            |
+| ~/bigdata/spark/source  |            |
+| ~/bigdata/flink/data    |            |
+| ~/bigdata/flink/lib     |            |
+| ~/bigdata/flink/shell   |            |
+| ~/bigdata/flink/source  |            |
+
 ## 1、安装ZooKeeper（CDH版）
 
 ### 1.1、ZooKeeper单节点（CDH版）
