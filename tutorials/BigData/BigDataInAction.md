@@ -2217,7 +2217,7 @@ export HADOOP_LOG_DIR=${HADOOP_HOME}/logs
 ```
 
 ```bash
-#localhost
+# localhost
 emon
 ```
 
