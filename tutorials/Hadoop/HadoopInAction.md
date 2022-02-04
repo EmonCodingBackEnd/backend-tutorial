@@ -523,8 +523,33 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 ```
 
 ```bash
+# 如果不需要修改默认值，不需要修改
+[emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml 
+```
+
+```xml
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <!-- 历史日志 -->
+    <property>
+         <name>mapreduce.jobhistory.address</name>
+         <value>emon:10020</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.webapp.address</name>
+        <value>emon:19888</value>
+    </property>
+</configuration>
+```
+
+```bash
 [emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/yarn-site.xml emon@emon2:/usr/local/hadoop/etc/hadoop/
 [emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/yarn-site.xml emon@emon3:/usr/local/hadoop/etc/hadoop/
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/mapred-site.xml emon@emon2:/usr/local/hadoop/etc/hadoop/
+[emon@emon ~]$ scp -rq /usr/local/hadoop/etc/hadoop/mapred-site.xml emon@emon3:/usr/local/hadoop/etc/hadoop/
 ```
 
 启动集群 ==> 启动emon节点historyserver进程 ==> 启动其他节点historyserver进程。
