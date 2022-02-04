@@ -111,7 +111,7 @@ spark.history.fs.logDirectory=hdfs://emon:8020/tmp/logs/spark-events
 # [新增]
 spark.yarn.historyServer.address=http://emon:18080
 # [新增]
-# spark.yarn.historyServer.allowTracking=true
+spark.yarn.historyServer.allowTracking=true
 ```
 
 注意：在哪个节点上启动spark的historyserver进程，`spark.yarn.historyServer.address`的值里面就指定哪个节点的主机名信息。

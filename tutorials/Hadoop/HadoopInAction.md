@@ -516,14 +516,14 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
 		<value>2592000</value>
     </property>
     <property>
-        <name>yarn.log-server.url</name>
+        <name>yarn.log.server.url</name>
         <value>http://emon:19888/jobhistory/logs</value>
     </property>
 </configuration>
 ```
 
 ```bash
-# 如果不需要修改默认值，不需要修改
+# 如果不需要修改默认值，不需要修改[非必须，但推荐]
 [emon@emon ~]$ vim /usr/local/hadoop/etc/hadoop/mapred-site.xml 
 ```
 
@@ -533,14 +533,21 @@ NameNode节点负责接收用户的操作请求，所有的读写请求都会经
         <name>mapreduce.framework.name</name>
         <value>yarn</value>
     </property>
-    <!-- 日志监控服务的地址 -->
+    <!-- 历史日志服务 jobhistory 相关配置 -->
     <property>
-         <name>mapreduce.jobhistory.address</name>
-         <value>emon:10020</value>
+        <name>mapreduce.jobhistory.address</name>
+        <value>emon:10020</value>
+        <description>历史服务器端口号</description>
     </property>
     <property>
         <name>mapreduce.jobhistory.webapp.address</name>
         <value>emon:19888</value>
+        <description>历史服务器的WEB UI端口号</description>
+    </property>
+    <property>
+    	<name>mapreduce.jobhistory.joblist.cache.size</name>
+        <value>2000</value>
+        <description>内存中缓存的historyfile文件信息（主要是job对应的文件目录）</description>
     </property>
 </configuration>
 ```
