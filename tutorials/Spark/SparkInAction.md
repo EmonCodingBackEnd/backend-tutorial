@@ -1,4 +1,4 @@
-# Spark实战
+#  Spark实战
 
 [返回列表](https://github.com/EmonCodingBackEnd/backend-tutorial)
 
@@ -240,4 +240,157 @@ Broadcast Variable会将使用到的变量，仅仅为每个节点拷贝一份�
 
 
 ![image-20220207121651821](images/image-20220207121651821.png)
+
+
+
+# 三、Spark性能优化的道与术
+
+## 3.1、宽依赖和窄依赖
+
+- 窄依赖（Narrow Dependency）：指父RDD的每个分区只被子RDD的一个分区所使用，例如map、filter等这些算子。一个RDD，对它的父RDD只有简单的一对一的关系，也就是说，RDD的每个partition仅仅依赖于父RDD中的一个partition，父RDD和子RDD的partition之间的对应关系，是一对一的。
+- 宽依赖（Shuffle Dependency）：父RDD的每个分区都可能被子RDD的多个分区使用，例如groupByKey、reduceByKey、sortByKey等算子，这些算子其实都会产生shuffle操作。也就是说，每一个父RDD的partition中的数据都可能会传输一部分到下一个RDD的每个partition中。此时就会出现，父RDD和子RDD的partition之间，具有错综复杂的关系，那么，这种情况就叫做两个RDD之间是宽依赖，同时，他们之间会发生shuffe操作。
+
+![image-20220207133514534](images/image-20220207133514534.png)
+
+
+
+也就是说，产生了shuffle就是宽依赖，否则是窄依赖！
+
+这就是宽窄依赖的区别，那么我们在这区分宽窄依赖有什么意义吗？
+
+### 3.1.1、Stage
+
+Spark Job是根据action算子触发的，遇到action算子就会起一个job。
+
+> 注意：stage的划分依据就是看是否产生了shuffle（即宽依赖），遇到一个shuffle操作就划分为前后两个stage。
+>
+> stage是由一组并行的task组成，stage会将一批task用TaskSet来封装，提交给TaskScheduler进行分配，最后发送到Executor执行。
+
+
+
+![image-20220207134145073](images/image-20220207134145073.png)
+
+
+
+## 3.2、Spark Job的三种提交模式
+
+- standalone模式：基于Spark自己的standalone集群。
+
+```bash
+spark-submit --master spark://emon:7077
+```
+
+- yarn的client模式
+
+```bash
+spark-submit --master yarn --deploy-mode client
+```
+
+> 这种方式主要用于测试，查看日志方便一些，部分日志会直接打印到控制台上面，因为driver进程运行在本地客户端，就是提交Spark任务的那个客户端机器，driver负责调度job，会与yarn集群产生大量的通信。一般情况下Spark客户端机器和Hadoop集群机器无法通过内网通信，只能通过外网，这样在大量通信的情况下会影响通信效率，并且当我们执行一些action操作的时候数据也会返回给driver端，driver端机器的配置一般都不高，可能会导致内存溢出等问题。
+
+- yarn的cluster模式【推荐】
+
+```bash
+spark-submit --master yarn --deploy-mode cluster
+```
+
+> 这种方式driver进程运行的集群中的某一台机器上，这样集群内部节点之间通信是可以通过内网通信的，并且集群内的机器的配置也会比普通的客户机器配置高，所以就不存在yarn-client模式的一些问题了，只不过这个时候查看日志只能到集群上面看了，这倒也不算啥影响。
+
+![image-20220207141037949](images/image-20220207141037949.png)
+
+
+
+## 3.3、Shuffle机制分析
+
+在MapReduce框架中，Shuffle是连接Map和Reduce之间的桥梁，Map阶段通过Shuffle读取数据并输出到对应的Reduce；而Reduce阶段负责从Map端拉取数据并进行计算。在整个Shuffle过程中，往往伴随着大量的磁盘和网络I/O。所以Shuffle性能的高低也直接决定了整个程序的性能高低。Spark也会有自己的Shuffle实现过程。
+
+在Spark中，什么情况下，会发生Shuffle呢？
+
+reduceByKey、groupByKey、sortByKey、countByKey、join等操作都会产生Shuffle。
+
+Spark Shuffle的迭代历程：
+
+1. Spark 0.8及以前，使用未优化的Hash Based Shuffle
+2. Spark 0.8.1，优化后的Hash Based Shuffle
+3. Spark1.6之后，使用Sort-Based Shuffle
+
+### 3.3.1、未优化的Hash Based Shuffle
+
+![image-20220207142658446](images/image-20220207142658446.png)
+
+
+
+注意：那个bucket缓存是非常重要的，ShuffleMapTask会把所有的数据都写入Bucket缓存之后，才会刷写到对应的磁盘文件中，但是这就有一个问题，如果map端数据过多，那么很容易造成内存溢出，所以Spark在优化后的Hash Based Shuffle中对这个问题进行了优化，默认这个内存缓存是100kb，当Bucket中的数据达到了阈值之后，就会将数据一点点地刷写到对应的ShuffleBlockFile磁盘中了。
+
+这种操作的优点，是不容易发生内存溢出。缺点在于，如果内存缓存过小的话，那么可能发生过多的磁盘IO操作。所以，这里的内存缓存大小，是可以根据实际的业务情况进行优化的。
+
+### 3.3.2、优化后的Hash Based Shuffle
+
+![image-20220207144155682](images/image-20220207144155682.png)
+
+
+
+此时文件的数量变成了CPU core数量 * ResultTask数量，比如每个节点上有2个CPU，有100个ResultTask，那么每个节点上会产生200个文件，这时候文件数量就变得少多了。
+
+但是如果ResultTask端的并行任务过多的话，则CPU core * ResultTask依旧过大，也会产生很多小文件。
+
+
+
+### 3.3.3、Sort-Based Shuffle
+
+引入Consolidation机制虽然在一定程度上减少了磁盘文件数量，但是不足以有效提高Shuffle的性能，这种情况只适合中小型数据规模的数据处理。
+
+为了让Spark能在更大规模的集群上高性能处理大规模的数据，因此Spark引入了Sort-Based Shuffle。
+
+![image-20220207154749262](images/image-20220207154749262.png)
+
+
+
+该机制针对每一个ShufleMapTask都只创建一个文件，将所有的ShuffleMapTask的数据都写入同一个文件，并且对应生成一个索引文件。
+
+以前的数据是放在内存中，等到数据写完了再刷写到磁盘，现在为了减少内存的使用，在内存不够用的时候，可以将内存中的数据溢写到磁盘，结束的时候，再讲这些溢写的文件联合内存中的数据一起进行归并，从而减少内存的使用量。一方面文件数量显著减少，另一方面减少缓存所占用的内存大小，而且同时避免GC的风险和频率。
+
+
+
+## 3.4、Spark之checkpoint
+
+### 3.4.1、checkpoint概述
+
+- 针对Spark Job，如果我们担心某些关键的，在后面会反复使用的RDD，因为节点故障导致数据丢失，那么可以针对该RDD启动checkpoint机制，实现容错和高可用。
+- 首先调用SparkContext的setCheckpointDir()方法，设置一个容错的文件系统目录（HDFS），然后对RDD调用checkpoint()方法。
+- 最后，在RDD所在的job运行结束之后，会启动一个单独的job，将checkpoint设置过的RDD的数据写入之前设置的文件系统中。
+
+### 3.4.2、RDD之checkpoint流程
+
+- 第一步：SparkContext设置checkpoint目录，用于存放checkpoint的数据
+
+对RDD调用checkpoint方法，然后它就会被RDDCheckpointData对象进行管理，此时这个RDD的checkpoint状态会被设置为`Initialized`。
+
+- 第二步：待RDD所在的Job运行结束，会调用Job中最后一个RDD的doCheckpoint方法，该方法沿着RDD的血缘关系向上查找被checkpoint方法标记过的RDD，并将其checkpoint状态从`Initialized`设置为`CheckpointingInProgress`。
+- 第三步：启动一个单独的Job，来将血缘关系中标记为`CheckpointInProgress`的RDD执行checkpoint操作，也就是将其数据写入checkpoint目录。
+- 第四步：将RDD数据写入checkpoint目录之后，会将RDD状态改变为`Checkpointed`
+
+并且还会改变RDD的血缘关系，即会清除掉RDD所有依赖的RDD，最后还会设置其父RDD为新创建的`CheckpointRDD`。
+
+### 3.4.3、checkpoint与持久化的区别
+
+- lineage是否发生变化
+
+lineage（血缘关系）说的就是RDD之间的依赖关系。
+
+持久化，只是将数据保存在内存中或者本地磁盘文件中，RDD的lineage（血缘关系）是不变的；Checkpoint执行之后，RDD就没有依赖的RDD了，也就是它的lineage改变了。
+
+- 丢失数据的可能性
+
+持久化的数据丢失的可能性较大，如果采用persist把数据存在内存中的话，虽然速度最快但是也是最不可靠的，就算放在磁盘上也不是完全可靠的，因为磁盘也会损坏。
+
+checkpoint的数据通常是保存在高可用文件系统中（HDFS），丢失的可能性很低。
+
+> 建议：对需要checkpoint的RDD，先执行persist（StorageLevel.DISK_ONLY)
+
+为什么呢？
+
+因为默认情况下，如果某个RDD没有持久化，但是设置了checkpoint，那么这个时候，本来Spark任务以及执行结束了，但是由于中间的RDD没有持久化，在进行checkpoint的时候想要将这个RDD的数据写入外部存储系统的话，就需要重新计算这个RDD的数据，再将其checkpoint到外部存储系统中。
+
+如果对需要checkpoint的RDD进行了基于磁盘的持久化，那么后面进行checkpoint操作时，就会直接从磁盘上读取RDD的数据了，就不需要重新再计算一次了，这样效率就搞了。
 
