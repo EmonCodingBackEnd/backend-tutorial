@@ -394,3 +394,107 @@ checkpoint的数据通常是保存在高可用文件系统中（HDFS），丢失
 
 如果对需要checkpoint的RDD进行了基于磁盘的持久化，那么后面进行checkpoint操作时，就会直接从磁盘上读取RDD的数据了，就不需要重新再计算一次了，这样效率就搞了。
 
+
+
+## 3.5、JVM垃圾回收调优
+
+- 如果内存设置不合理会导致大部分时间都消耗在垃圾回收上
+- 默认情况下，Spark使用每个executor 60%的内存空间来缓存RDD，那么只有40%的内存空间来存放算子执行期间创建的对象
+- 如果垃圾回收频繁发生，就需要对这个比例进行调优，通过参数`spark.storage.memoryFraction`来修改比例
+- Java堆空间被划分成了两块空间：年轻代和老年代
+- 年轻代存放短时间存活的对象，老年代存放长时间存活的对象
+- 年轻代又被划分了三块空间：Ecen、Survivor1、Survivor2
+
+![image-20220209215956191](images/image-20220209215956191.png)
+
+
+
+## 3.6、Spark程序性能优化
+
+### 3.6.1、性能优化方案
+
+- 高性能序列化类库
+- 持久化或者checkpoint
+- JVM垃圾回收调优
+- 提高并行度
+- 数据本地化
+- 算子优化
+
+### 3.6.2、JVM垃圾回收调优
+
+- 如果内存设置不合理会导致大部分时间都消耗在垃圾回收上
+- 默认情况下，Spark使用每个executor 60%的内存空间来缓存RDD，那么只有40%的内存空间来存放算子执行期间创建的对象
+- 如果垃圾回收频繁发生，就需要对这个比例进行调优，通过参数`spark.storage.memoryFraction`来修改比例
+- Java堆空间被划分成了两块空间：年轻代和老年代
+- 年轻代存放短时间存活的对象，老年代存放长时间存活的对象
+- 年轻代又被划分了三块空间：Ecen、Survivor1、Survivor2
+
+![image-20220209215956191](images/image-20220209215956191.png)
+
+### 3.6.3、提高并行度
+
+- spark-submit脚本常用配置参数
+
+  - `--name mySparkJobName`：指定任务名称
+  - `--class com.xxx`：指定入口类
+  - `--master yarn`：指定集群地址，on yarn模式指定 yarn
+  - `--deploy-mode cluster`：client代表yarn-client，cluster代表yarn-cluster
+  - `--executor-memory 1G`：executor进程的内存大小，实际工作中可以设置2~4G即可
+  - `--num-executors 2`：分配多少个executor进程
+  - `--executor-cores 2`：一个executor进程分配多少个cpu
+  - `--driver-cores 1`：driver进程分配多少core，默认为1
+  - `--driver-memory 1G`：driver进程的内存，如果需要使用类似于collect之类的action算子向driver端拉取数据，则这里可以设置大一些
+  - `--jars jarpath,jar2path`：在这里可以设置job依赖的第三方jar包，支持本地路径或hdfs路径
+  - `--packages groupId:artifactId:version,groupId:artifactId:version`：设置job依赖的jar包，通过maven下载
+  - `--files filePath,file2Path`：设置job依赖的外援资源文件
+
+### 3.6.4、数据本地化
+
+数据本地化对于Spark Job性能有着巨大的影响。如果数据以及要计算它的代码是在一起的，那么性能当然会非常高。但是，如果数据和计算它的代码是分开的，那么其中之一必须到另外一方的机器上。通常来说，移动代码到其他节点，会比移动数据到代码所在节点，速度要高得多，因为代码比较小。Spark也正是基于这个数据本地化的原则来构建task调度算法的。
+
+数据本地化是指数据离计算它的代码有多近。基于数据距离代码的距离，有几种数据本地化级别：
+
+- PROCESS_LOCAL：进程本地化，性能最好。数据和计算它的代码在同一个JVM进程中。
+- NODE_LOCAL：节点本地化，数据和计算它的代码在一个节点上，但是不在一个JVM进程。
+- NO_PREF：数据从哪里过来，性能都是一样的。
+- RACK_LOCAL：数据和计算它的代码在一个机架上，数据需要通过网络在节点之间进行传输。
+- ANY：数据可能在任意地方，比如其他网络环境内，或者其他机架上，性能最差。
+
+Spark倾向使用最好的本地化级别调度task，但这是不现实的。
+
+如果目前我们要处理的数据所在的executor上目前没有空闲的CPU，那么Spark就会降低本地化级别。这是有两个选择：
+
+第一：等待，直到executor上的cpu释放出来，那么就分配task过去。
+
+第二：立即在任意一个其他executor上启动一个task。
+
+Spark默认会等待指定时间，期望task要处理的数据所在的节点上的executor空闲出一个cpu，从而将task分配过去，只要超过了时间，那么Spark就会将task分配到其他任意一个空闲的executor上。
+
+可以设置参数：`spark.locality`系列参数，来调节Spark等待task可以进行数据本地化的时间。
+
+> spark.locality.wait：默认等待3秒，针对所有级别。
+>
+> spark.locality.wait.proces：:等待指定的时间看能否达到数据和计算它的代码在同一个JVM。
+>
+> spark.locality.wait.node：等待指定的实际看能否达到数据和计算它的代码在一个节点上执行。
+>
+> spark.locality.wait.rack：等待指定的时间看能否达到数据和计算它的代码在一个机架上。
+
+### 3.6.5、算子优化
+
+- map vs mapPartitions
+  - map操作：对RDD中的每个元素进行操作，一次处理一条数据。
+  - mapPartitions操作：对RDD中的每个partition进行操作，一次处理一个分区的数据。
+
+所以，map操作：执行1次map算子只处理1个元素，如果partition中的元素较多，假设当前已经处理了1000个元素，在内存不足的情况下，Spark可以通过GC等方法回收内存（比如将已经处理掉的1000个元素从内存中回收）。因此，map操作通常不会导致OOM异常。
+
+mapPartitions操作：执行1次map算子需要接收该partition中的所有元素，因此一旦元素很多而内存不足，就容易导致OOM的异常，也不是说一定就会产生OOM异常，只是和map算子对比的话，相对来说容易产生OOM异常。
+
+不过一般情况下，mapPartitions的性能更高；初始化操作、数据库链接等操作适合使用mapPartitions操作。
+
+这是因为：假设需要将RDD中的每个元素写入数据库中，这时候就应该把创建数据库链接的操作放置在mapPartitions中，创建数据库链接这个操作本身就是一个比较耗时的操作，如果该操作放在map中执行，将会频繁执行，比较耗时且影响数据库的稳定性。
+
+
+
+- foreach vs foreachPartition
+

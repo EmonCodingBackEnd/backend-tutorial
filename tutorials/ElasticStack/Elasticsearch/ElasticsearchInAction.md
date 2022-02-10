@@ -651,6 +651,8 @@ adapter将会自动加载conf/es下的所有.yml结尾的配置文件
 update loginfo set content = concat(content , '-更新时间', now());
 -- 在canaldb-bak库查询并验证
 select * from loginfo;
+
+[emon@emon ~]# curl http://172.16.154.169:8081/etl/es/hbsitedb_flat_goods.yml -X POST -d "params=2022-02-10 15:01:02"
 ```
 
 
