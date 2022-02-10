@@ -494,7 +494,47 @@ mapPartitions操作：执行1次map算子需要接收该partition中的所有元
 
 这是因为：假设需要将RDD中的每个元素写入数据库中，这时候就应该把创建数据库链接的操作放置在mapPartitions中，创建数据库链接这个操作本身就是一个比较耗时的操作，如果该操作放在map中执行，将会频繁执行，比较耗时且影响数据库的稳定性。
 
+- foreach vs foreachPartitions
+  - foreach：一次处理一条数据
+  - foreachPartitions：一次处理一个分区的数据
 
+foreachPartitions和mapPartitions的特性是一样的，唯一的区别就是mapPartitions是transformation操作（不会立即执行），foreachPartitions是action操作（会立即执行）。
 
-- foreach vs foreachPartition
+- repartition的使用
+
+对RDD进行重新分区，repartition主要有两个应用场景：
+
+1. 可以调整RDD的并行度
+
+针对个别RDD，如果感觉分区数量不合适，想要调整，可以通过repartition进行调整，分区调整了之后，对应的并行度也就可以调整了。
+
+2. 可以解决RDD中数据倾斜的问题
+
+如果RDD中不同分区之间的数据出现了数据倾斜，可以通过repartition实现数据重新分发，可以分发到不同分区中。
+
+- reduceByKey和groupByKey的区别
+
+在实现分组聚合功能时这两个算子有什么区别？
+
+看这两行代码：
+
+```scala
+val counts = wordCountRDD.reduceByKey(_ + _)
+val count = wordCountRDD.groupByKey().map(wc => (wc._1, wc._2.sum))
+```
+
+这两行代码的最终效果是一样的，都是对wordCountRDD中每个单词出现的次数进行聚合统计，那这两种方式在原理层面有什么区别吗？
+
+首先这两个算子在执行的时候都会产生shuffle。
+
+但是：
+
+1. 当采用reduceByKey时，数据在进行shuffle之前会先进行局部聚合。
+2. 当使用groupByKey时，数据在shuffle之前不会进行局部聚合，会原样进行shuffle。
+
+这样的话reduceByKey就减少了shuffle的数据传送，所以效率会高一些。
+
+如果能用reduceByKey，那就用reduceByKey，因为它会在map端，先进行本地combine，可以大大减少要传输到reduce端的数据量，减小网络传输的开销。
+
+![image-20220210174543902](images/image-20220210174543902.png)
 
