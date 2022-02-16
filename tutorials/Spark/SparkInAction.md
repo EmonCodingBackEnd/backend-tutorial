@@ -538,3 +538,78 @@ val count = wordCountRDD.groupByKey().map(wc => (wc._1, wc._2.sum))
 
 ![image-20220210174543902](images/image-20220210174543902.png)
 
+
+
+# 四、Spark SQL
+
+## 4.1、DataFrame
+
+- Spark SQL是Spark的一个模块，主要用于进行结构化数据的处理，它提供的最核心的编程抽象，就是`DataFrame`。
+- `DataFrame=RDD+Schema`，它其实和关系型数据库中的表非常类似，DataFrame可以通过很多来源进行构建。它其实和关系型数据库中的表非常类似，RDD可以认为是表中的数据，Schema是表结构信息。DataFrame可以通过很多来源进行构建，包括：结构化的数据文件，Hive中的表，外部的关系型数据库以及RDD。
+
+Spark1.3出现的`DataFrame`，Spark1.6出现了`DataSet`，在Spark2.0中两者统一，`DataFrame`等于`DataSet[Row]`。
+
+- 由于DataFrame等于DataSet[Row],所以可以互相转换。
+
+## 4.2、SparkSession
+
+要使用Spark SQL，首先需要创建一个SparkSession对象。
+
+SparkSession中包含了SparkContext和SqlContext。所以说，想通过SparkSession来操作RDD的话需要先通过它来获取SparkContext。这个SqlContext是使用SparkSQL操作hive的时候会用到的。
+
+
+
+# 五、数据仓库
+
+## 数据仓库分层设计
+
+- APP数据应用层：为统计报表提供数据
+- DWS数据汇总层：对数据进行轻度汇总（宽表）
+- DWD明细数据层：清洗之后的数据
+- ODS原始数据层：存放原始数据
+
+## 典型的数据仓库系统架构
+
+![image-20220212150226804](images/image-20220212150226804.png)
+
+
+
+## 项目需求分析
+
+想要开发一个完整的数据仓库系统，至少需要以下这几个功能模块：
+
+- 数据采集平台，这个模块主要负责采集各种数据源的数据
+- 数据仓库，这个模块负责数据仓库和管理
+- 数据报表，这个模块其实就是数据可视化展示了
+
+通过这三个模块可以实现数据采集，构建数据仓库，最后基于数据仓库中的数据实现上层应用，体现数据仓库的价值。
+
+## 数据选项
+
+- 数据采集：Flume【推荐】、Logstash、FileBeat、Sqoop【推荐】
+  - Flume：日志采集
+  - Sqoop：关系型数据库采集
+- 数据存储：HDFS【推荐】、MySQL
+- 数据计算：Hive【优先】、Spark
+- 数据可视化：Hue、Zeppelin【推荐】、Echarts（开发数据接口）
+
+## 整体架构设计
+
+![image-20220212153256966](images/image-20220212153256966.png)
+
+
+
+## 服务器资源规划-测试环境
+
+![image-20220212153551565](images/image-20220212153551565.png)
+
+
+
+## 服务器资源规划-生产环境
+
+
+
+![image-20220212153657188](images/image-20220212153657188.png)
+
+
+
