@@ -4135,8 +4135,6 @@ export PATH=$SQOOP_HOME/bin:$PATH
 [emon@emon ~]$ cp /usr/local/src/mysql-connector-java-5.1.27-bin.jar /usr/local/sqoop/lib/
 ```
 
-#### 9.1.2、配置
-
 
 
 ## 50、安装HBase（外部ZK）
