@@ -476,6 +476,13 @@ hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/t2
 [emon@emon ~]$ hdfs dfs -put /home/emon/bigdata/hive/data/hivedata/t2.data /user/hive/warehouse/t2_bak/t2_bak.data
 ```
 
+- 加载数据之`insert override`示例【特例，与上下文无关】
+
+```sql
+hive> insert overwrite table trackinfo_province_stat partition(day='2013-07-21')
+select province,count(*) as cnt from trackinfo where day='2013-07-21' group by province;
+```
+
 ### 3.2.6、表增加字段及注释
 
 - 添加字段
