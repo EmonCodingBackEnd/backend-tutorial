@@ -906,22 +906,23 @@ Time taken: 0.058 seconds, Fetched: 7 row(s)
 hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_1.data' into table partition_1 partition(dt='20200101');
 ```
 
-- 创建分区并加载数据2
-
-```sql
-hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location '/home/emon/bigdata/hive/data/hivedata/partition_1.data';
-```
-
-- 创建分区不加载数据
+- 添加分区不加载数据
 
 ```sql
 hive (default)> alter table partition_1 add partition(dt='20200102');
 ```
 
-- 创建分区如果分区不存在
+- 添加分区如果分区不存在
 
 ```sql
 hive (default)> alter table partition_1 add if not exists partition(dt='20200102');
+```
+
+- 添加分区并指定数据
+
+```bash
+# location指定HDFS文件的相对路径或者绝对路径都可以
+hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location '20200102';
 ```
 
 - 对已存在的分区加载数据
@@ -1052,10 +1053,17 @@ hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/ex
 hive (default)> alter table ex_par drop partition(dt='20200101');
 ```
 
-- 添加分区
+- 添加分区并指定HDFS文件路径
 
 ```sql
 hive (default)> alter table ex_par add partition(dt='20200101') location '/user/hive/data/ex_par/dt=20200101';
+```
+
+- 基于现有hive表插入分区数据【特例，与上下文无关】
+
+```sql
+hive> insert overwrite table trackinfo_province_stat partition(day='2013-07-21')
+select province,count(*) as cnt from trackinfo where day='2013-07-21' group by province;
 ```
 
 ### 3.4.4、桶表
