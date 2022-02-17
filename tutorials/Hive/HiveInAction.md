@@ -259,7 +259,7 @@ hive演练数据： 链接：https://pan.baidu.com/s/11dCFUjQOlAKLyZoSh8wpxg
 数据上传：下载数据解压后，上传到 `/usr/local/hive/custom/data`目录。
 
 ```bash
-[emon@emon ~]$ ll -h /usr/local/hive/custom/data/hivedata/
+[emon@emon ~]$ ll -h /home/emon/bigdata/hive/data/hivedata/
 总用量 56K
 -rw-r--r--. 1 emon emon  27 1月  30 13:52 b_source.data
 -rw-r--r--. 1 emon emon  27 1月  30 13:52 ex_par.data
@@ -461,19 +461,19 @@ hive (default)> alter table t2 rename to t2_bak;
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.data' into table t2_bak;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/t2.data' into table t2_bak;
 ```
 
 - 加载数据并覆盖表旧数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t2.data' overwrite into table t2_bak;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/t2.data' overwrite into table t2_bak;
 ```
 
 - 加载数据之使用HDFS直接put数据
 
 ```bash
-[emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/t2.data /user/hive/warehouse/t2_bak/t2_bak.data
+[emon@emon ~]$ hdfs dfs -put /home/emon/bigdata/hive/data/hivedata/t2.data /user/hive/warehouse/t2_bak/t2_bak.data
 ```
 
 ### 3.2.6、表增加字段及注释
@@ -589,7 +589,7 @@ online boolean comment 'is online'
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t3.data' into table t3;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/t3.data' into table t3;
 hive (default)> select * from t3;
 # 命令行输出
 OK
@@ -603,7 +603,7 @@ Time taken: 0.139 seconds, Fetched: 3 row(s)
 发现都是空数据，查看t3.data数据：
 
 ```bash
-[emon@emon ~]$ cat -A /usr/local/hive/custom/data/hivedata/t3.data 
+[emon@emon ~]$ cat -A /home/emon/bigdata/hive/data/hivedata/t3.data 
 1^IM-eM-<M- M-dM-8M-^I^I2020-01-01^Itrue$
 2^IM-fM-^]M-^NM-eM-^[M-^[^I2020-02-01^Ifalse$
 3^IM-gM-^NM-^KM-dM-:M-^T^I2020-03-01^I0$
@@ -628,7 +628,7 @@ lines terminated by '\n';
 导入数据并验证：
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/t3.data' into table t3_new;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/t3.data' into table t3_new;
 hive (default)> select * from t3_new;
 # 命令行输出
 OK
@@ -686,7 +686,7 @@ lines terminated by '\n';
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu.data' into table stu;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/stu.data' into table stu;
 ```
 
 - 查询数据
@@ -714,7 +714,7 @@ lines terminated by '\n';
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu2.data' into table stu2;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/stu2.data' into table stu2;
 ```
 
 - 查询数据
@@ -741,7 +741,7 @@ lines terminated by '\n';
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/stu3.data' into table stu3;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/stu3.data' into table stu3;
 ```
 
 - 查询数据
@@ -771,7 +771,7 @@ lines terminated by '\n';
 - 加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/student.data' into table student;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/student.data' into table student;
 ```
 
 - 查询数据
@@ -808,7 +808,7 @@ key string
 - 加载数据：
 
 ```bash
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/external_table.data' into table external_table;
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/external_table.data' into table external_table;
 ```
 
 - 查询数据：
@@ -888,7 +888,7 @@ Time taken: 0.058 seconds, Fetched: 7 row(s)
 - 查看待加载数据
 
 ```bash
-[emon@emon ~]$ more /usr/local/hive/custom/data/hivedata/partition_1.data 
+[emon@emon ~]$ more /home/emon/bigdata/hive/data/hivedata/partition_1.data 
 1	zhangsan
 2	lisi
 ```
@@ -896,7 +896,13 @@ Time taken: 0.058 seconds, Fetched: 7 row(s)
 - 创建分区并加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_1.data' into table partition_1 partition(dt='20200101');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_1.data' into table partition_1 partition(dt='20200101');
+```
+
+- 创建分区并加载数据2
+
+```sql
+hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location '/home/emon/bigdata/hive/data/hivedata/partition_1.data';
 ```
 
 - 创建分区不加载数据
@@ -916,7 +922,7 @@ hive (default)> alter table partition_1 add if not exists partition(dt='20200102
   - 方法1
 
   ```sql
-  hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_1.data' into table partition_1 partition(dt='20200102');
+  hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_1.data' into table partition_1 partition(dt='20200102');
   ```
 
   - 方法2：通过HDFS命令直接put到`/user/hive/warehouse/partition_1/dt=20200102`目录下
@@ -973,7 +979,7 @@ Time taken: 0.044 seconds, Fetched: 9 row(s)
 - 查看待加载数据
 
 ```bash
-[emon@emon ~]$ more /usr/local/hive/custom/data/hivedata/partition_2.data 
+[emon@emon ~]$ more /home/emon/bigdata/hive/data/hivedata/partition_2.data 
 1	zhangsan
 2	lisi
 3	wangwu
@@ -983,10 +989,10 @@ Time taken: 0.044 seconds, Fetched: 9 row(s)
 
 ```sql
 # 导入4份数据
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_2.data' into table partition_2 partition(year=2020,school='xk');
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_2.data' into table partition_2 partition(year=2020,school='english');
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_2.data' into table partition_2 partition(year=2019,school='xk');
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/partition_2.data' into table partition_2 partition(year=2019,school='english');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_2.data' into table partition_2 partition(year=2020,school='xk');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_2.data' into table partition_2 partition(year=2020,school='english');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_2.data' into table partition_2 partition(year=2019,school='xk');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/partition_2.data' into table partition_2 partition(year=2019,school='english');
 ```
 
 - 查看当前分区表的分区详情
@@ -1030,7 +1036,7 @@ location '/user/hive/data/ex_par';
 - 创建分区并加载数据
 
 ```sql
-hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/ex_par.data' into table ex_par partition(dt='20200101');
+hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/ex_par.data' into table ex_par partition(dt='20200101');
 ```
 
 - 删除分区
@@ -1080,7 +1086,7 @@ id int
   - 先加载到普通表
 
   ```sql
-  hive (default)> load data local inpath '/usr/local/hive/custom/data/hivedata/b_source.data' into table b_source;
+  hive (default)> load data local inpath '/home/emon/bigdata/hive/data/hivedata/b_source.data' into table b_source;
   ```
 
   - 开启桶操作
@@ -1287,7 +1293,7 @@ MySQL中支持的函数这里面大部分都支持，并且hive支持的函数�
 基础数据是这样的：
 
 ```bash
-[emon@emon ~]$ more /usr/local/hive/custom/data/hivedata/student_score.data 
+[emon@emon ~]$ more /home/emon/bigdata/hive/data/hivedata/student_score.data 
 1	zs1	chinese	80
 2	zs1	math	90
 3	zs1	english	89
@@ -1321,7 +1327,7 @@ location '/user/hive/data/student_score';
 - 上传数据
 
 ```bash
-[emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/student_score.data /user/hive/data/student_score
+[emon@emon ~]$ hdfs dfs -put /home/emon/bigdata/hive/data/hivedata/student_score.data /user/hive/data/student_score
 ```
 
 - 查询数据
@@ -1385,7 +1391,7 @@ select *,dense_rank() over(partition by sub order by score desc) as num from stu
 - 原始数据
 
 ```bash
-[emon@emon ~]$ more /usr/local/hive/custom/data/hivedata/student_favors.data 
+[emon@emon ~]$ more /home/emon/bigdata/hive/data/hivedata/student_favors.data 
 zs	swing
 zs	footbal
 zs	sing
@@ -1413,7 +1419,7 @@ location '/user/hive/data/student_favors';
 - 上传数据
 
 ```bash
-[emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/student_favors.data /user/hive/data/student_favors
+[emon@emon ~]$ hdfs dfs -put /home/emon/bigdata/hive/data/hivedata/student_favors.data /user/hive/data/student_favors
 ```
 
 - 查询数据
@@ -1469,7 +1475,7 @@ split可以对表中的某一列进行切割，返回一个数组类型的字段
 - 原始数据
 
 ```bash
-[emon@emon ~]$ more /usr/local/hive/custom/data/hivedata/student_favors_2.data 
+[emon@emon ~]$ more /home/emon/bigdata/hive/data/hivedata/student_favors_2.data 
 zs	swing,footbal,sing
 ls	codeing,swing
 ```
@@ -1498,7 +1504,7 @@ location '/user/hive/data/student_favors_2';
 - 上传数据
 
 ```bash
-[emon@emon ~]$ hdfs dfs -put /usr/local/hive/custom/data/hivedata/student_favors_2.data /user/hive/data/student_favors_2
+[emon@emon ~]$ hdfs dfs -put /home/emon/bigdata/hive/data/hivedata/student_favors_2.data /user/hive/data/student_favors_2
 ```
 
 - 查询数据
