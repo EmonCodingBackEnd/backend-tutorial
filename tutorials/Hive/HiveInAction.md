@@ -922,7 +922,9 @@ hive (default)> alter table partition_1 add if not exists partition(dt='20200102
 
 ```bash
 # location指定HDFS文件的相对路径或者绝对路径都可以
-hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location '20200102';
+hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location 'dt=20200102';
+# 或者
+hive (default)> alter table partition_1 add if not exists partition(dt='20200102') location '/user/hive/warehouse/partition_1/dt=20200102';
 ```
 
 - 对已存在的分区加载数据
