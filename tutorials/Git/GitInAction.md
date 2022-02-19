@@ -846,7 +846,7 @@ git diff HEAD
 
 ## 7.6 版本回退
 
-`git reset`是版本回退的基本命令，根据后面参数的不同，回退的形式也不同。
+### 7.6.1、尚未暂存(git add)的文件回退
 
 - 尚未使用`git add`添加到仓库的文件，想要使得他回退到编辑之前
 
@@ -859,6 +859,24 @@ git checkout -- <file name>
 ```shell
 git checkout <commit id> <absolute_file_path>
 ```
+
+- 还可以放弃改变
+
+```bash
+git restore <file name>
+```
+
+### 7.6.2、已经暂存尚未commit的文件回退
+
+- 已经使用`git add`暂存后的文件回退
+
+```bash
+git restore --staged <file name>
+```
+
+### 7.6.3、已经commit的文件回退
+
+`git reset`是版本回退的基本命令，根据后面参数的不同，回退的形式也不同。
 
 - 已经使用`git add`添加到仓库的文件，想要使得他回退到`git add`之前
 
@@ -932,7 +950,40 @@ Git Your branch is ahead of 'origin/master' by X commits
 git reset --hard origin/master
 ```
 
+### 7.6.4、git rebase -i commitId 方式删除中间某个commit
 
+背景：假如有分支A（正常提交）->B(错误提交）->C（正常提交），现在想保留C删除B如何处理？
+
+- 查看提交日志
+
+![image-20220219100329145](images/image-20220219100329145.png)
+
+注意：这里的git lg是自定义命令，可以使用git log替换。
+
+- git rebase回退到A
+
+```bash
+# 回退到首次错误提交之前的commitId，会打开vim新窗口如下图
+git rebase -i A
+```
+
+![image-20220219100507404](images/image-20220219100507404.png)
+
+- 修改错误提交commitId的命令类型
+
+**修改pick->drop**之后保存退出vim。
+
+![image-20220219100729452](images/image-20220219100729452.png)
+
+- 进入rebase编辑窗口，调整代码，重新commit
+- 使用git rebase --continue进入下一个rebase进程，如果已经是最后一个了，会自动退出。
+- 完成删除错误提交的任务，结果如下图：
+
+![image-20220219101536995](images/image-20220219101536995.png)
+
+可以看到，`update:20220218-02`已被删除，同时`update:20220218-03`受影响，重新提交了`update:20220219-01`解决了该影响。
+
+**特别注意**：整个修复过程很凶险，如果对代码提交不熟悉，会导致代码丢失。而且该方法是一种commit之后的后悔药，在使用之后如果处理不当，会二次后悔，必须要慎之又慎的处理`git rebase -continue`的过程。
 
 ## 7.7 设置忽略文件
 
