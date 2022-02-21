@@ -41,6 +41,10 @@
 
 ## 1、安装ZooKeeper（CDH版）
 
+### 1.0、依赖
+
+依赖JDK
+
 ### 1.1、ZooKeeper单节点（CDH版）
 
 1. 下载
@@ -69,7 +73,7 @@
 [emon@emon ~]$ tar -zxvf /usr/local/src/zookeeper-3.4.5-cdh5.16.2.tar.gz -C /usr/local/ZooKeeper/
 ```
 
-**说明：**如果发生错误：
+**说明**：如果发生错误：
 
 > gzip: stdin: decompression OK, trailing garbage ignored
 >
@@ -181,7 +185,7 @@ http://192.168.1.116:8090/commands/stat
 [emon@emon ~]$ zkCli.sh
 ```
 
-- 退出（在链接成功后，使用命令quit退出）
+- 退出（连接成功后，使用命令quit退出）
 
 ```bash
 [zk: localhost:2181(CONNECTED) 0] quit
@@ -300,6 +304,147 @@ server.3=emon3:2888:3888
 [emon@emon ~]$ zkServer.sh status
 [emon@emon2 ~]$ zkServer.sh status
 [emon@emon3 ~]$ zkServer.sh status
+```
+
+### 1.3、Zookeeper单节点（Apache版）
+
+1. 下载
+
+官网地址： https://zookeeper.apache.org/index.html
+
+下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.9/apache-zookeeper-3.5.9-bin.tar.gz --no-check-certificate
+```
+
+2. 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/ZooKeeper
+```
+
+3. 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.5.9-bin.tar.gz -C /usr/local/ZooKeeper/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/ZooKeeper/apache-zookeeper-3.5.9-bin/ /usr/local/zoo
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`zoo.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
+export ZK_HOME=/usr/local/zoo
+export PATH=$ZK_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 配置文件
+
+- 复制`zoo_sample.cfg`到`zoo.cfg`
+
+```bash
+[emon@emon ~]$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
+```
+
+- 编辑`zoo.cfg`文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/zoo/conf/zoo.cfg
+```
+
+```bash
+# [修改]
+dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
+```
+
+7. 启动与停止
+
+- 启动（端口号2181）
+
+```bash
+[emon@emon ~]$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+44611 QuorumPeerMain
+```
+
+- 停止
+
+```bash
+[emon@emon ~]$ zkServer.sh stop
+```
+
+- 状态
+
+```bash
+[emon@emon ~]$ zkServer.sh status
+```
+
+8. 连接
+
+- 远程链接
+
+```bash
+[emon@emon ~]$ zkCli.sh -server emon:2181
+```
+
+- 本地连接
+
+```bash
+[emon@emon ~]$ zkCli.sh
+```
+
+- 退出（连接成功后，使用命令quit退出）
+
+```bash
+[zk: localhost:2181(CONNECTED) 0] quit
+```
+
+- 查看根节点下内容
+
+```bash
+[zk: localhost:2181(CONNECTED) 1] ls /
+```
+
+- 创建节点test并存储数据hello
+
+```bash
+[zk: localhost:2181(CONNECTED) 2] create /test hello
+```
+
+- 查看节点test内容
+
+```bash
+[zk: localhost:2181(CONNECTED) 6] get /test
+# 命令行输出结果
+hello
+```
+
+- 删除节点
+
+```bash
+# 递归删除
+[zk: localhost:2181(CONNECTED) 7] deleteall /test
+# 普通删除
+[zk: localhost:2181(CONNECTED) 7] delete /test
 ```
 
 
