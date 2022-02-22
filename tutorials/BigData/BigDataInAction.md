@@ -41,9 +41,9 @@
 
 ## 1、安装ZooKeeper（CDH版）
 
-### 1.0、依赖
+### 1.0、依赖环境
 
-依赖JDK
+- 依赖JDK
 
 ### 1.1、ZooKeeper单节点（CDH版）
 
@@ -615,6 +615,11 @@ server.3=emon3:2888:3888
 
 ## 2、安装kafka（外部ZK）
 
+### 2.0、依赖环境
+
+- 依赖JDK
+- 依赖Zookeeper
+
 ### 2.1、Kafka单节点
 
 1. 下载
@@ -624,7 +629,7 @@ server.3=emon3:2888:3888
 下载地址：http://kafka.apache.org/downloads
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.1/kafka_2.12-2.5.1.tgz
 ```
 
 2. 创建安装目录
@@ -636,13 +641,13 @@ server.3=emon3:2888:3888
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.0.tgz -C /usr/local/Kafka/
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.1.tgz -C /usr/local/Kafka/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.0/ /usr/local/kafka
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.1/ /usr/local/kafka
 ```
 
 5. 配置环境变量
@@ -664,6 +669,7 @@ export PATH=$KAFKA_HOME/bin:$PATH
 6. 目录规划
 
 ```bash
+# 非必须，配置日志目录后，会自动创建
 [emon@emon ~]$ mkdir -p /usr/local/kafka/logs
 ```
 
@@ -719,6 +725,13 @@ zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 
 ```bash
 [emon@emon ~]$ /usr/local/kafka/kafkaStart.sh
+```
+
+- 验证
+
+```bash
+[emon@emon ~]$ jps
+66411 Kafka
 ```
 
 - 停止
@@ -778,147 +791,177 @@ Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=107374
 test:0:59134
 ```
 
-
-
 ### 2.2、Kafka集群
 
-1. 目录规划
+#### 2.2.1、前置安装
+
+1. 配置SSH免密登录
+
+每一台服务器都需要配置免密登录。
+
+[配置SSH免密登录](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/BigData/BigDataInAction.md#532前置安装)
+
+2. JDK安装
+
+每一台服务器都需要安装JDK。
+
+[安装JDK](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Linux/LinuxInAction.md#1安装jdk)
+
+3. Zookeeper安装
+
+#### 2.2.2、安装节点1
+
+1. 下载
+
+官网地址：http://kafka.apache.org/
+
+下载地址：http://kafka.apache.org/downloads
 
 ```bash
-[emon@emon ~]$ mkdir -pv /usr/local/kafka/{logs9092,logs9093,logs9094}
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.1/kafka_2.12-2.5.1.tgz
 ```
 
-2. 第一个节点
-
-- 复制属性文件
+2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9092.properties
+[emon@emon ~]$ mkdir /usr/local/Kafka
 ```
 
-- 配置
+3. 解压安装
 
 ```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9092.properties 
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.1.tgz -C /usr/local/Kafka/
+```
+
+4. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.1/ /usr/local/kafka
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`kafka.sh`文件：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
+export KAFKA_HOME=/usr/local/kafka
+export PATH=$KAFKA_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+[emon@emon ~]$ source /etc/profile
+```
+
+6. 目录规划
+
+```bash
+# 非必须，配置日志目录后，会自动创建
+[emon@emon ~]$ mkdir -p /usr/local/kafka/logs
+```
+
+7. 配置文件
+
+- 编辑`server.properties`配置文件
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/config/server.properties 
 ```
 
 ```bash
 # [不变]
 broker.id=0
 # [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9092
-# [新增]
-listeners=PLAINTEXT://:9092
-# [修改]
+log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
+# [修改]如果zookeeper是集群，建议配置全部集群节点，比如： emon:2181,emon2:2181,emon3:2181
 zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 ```
 
-3. 第二个节点
+8. 编写启动停止脚本
 
-- 复制属性文件
-
-```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9093.properties
-```
-
-- 配置
+- 启动脚本
 
 ```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9093.properties 
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh
 ```
 
 ```bash
-# [不变]
-broker.id=1
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9093
-# [新增]
-listeners=PLAINTEXT://:9093
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+# 启动kafka
+/usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
 ```
 
-4. 第三个节点
-
-- 复制属性文件
+- 停止脚本
 
 ```bash
-[emon@emon ~]$ cp /usr/local/kafka/config/server.properties /usr/local/kafka/config/server-9094.properties
-```
-
-- 配置
-
-```bash
-[emon@emon ~]$ vim /usr/local/kafka/config/server-9094.properties 
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStop.sh
 ```
 
 ```bash
-# [不变]
-broker.id=2
-# [修改]
-log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs9094
-# [新增]
-listeners=PLAINTEXT://:9094
-# [修改]
-zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+# 关闭kafka
+/usr/local/kafka/bin/kafka-server-stop.sh
 ```
 
-5. 启动与停止
+- 修改可执行权限
+
+```bash
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStart.sh 
+[emon@emon ~]$ chmod u+x /usr/local/kafka/kafkaStop.sh 
+```
+
+#### 2.2.3、安装其他节点
+
+1. 复制到其他节点
+
+```bash
+# 拷贝到emon2
+[emon@emon ~]$ scp -rq /usr/local/Kafka/ emon@emon2:/usr/local/
+# 拷贝到emon3
+[emon@emon ~]$ scp -rq /usr/local/Kafka/ emon@emon3:/usr/local/
+```
+
+2. 生成`broker.id`
+
+```bash
+# 在emon2
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.1/ /usr/local/kafka
+# 查看替换效果
+[emon@emon2 ~]$ sed -n 's/broker.id=0/broker.id=1/p' /usr/local/kafka/config/server.properties 
+# 替换
+[emon@emon2 ~]$ sed -i 's/broker.id=0/broker.id=1/' /usr/local/kafka/config/server.properties 
+
+# 在emon3
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.1/ /usr/local/kafka
+# 查看替换效果
+[emon@emon2 ~]$ sed -n 's/broker.id=0/broker.id=2/p' /usr/local/kafka/config/server.properties 
+# 替换
+[emon@emon2 ~]$ sed -i 's/broker.id=0/broker.id=2/' /usr/local/kafka/config/server.properties 
+```
+
+#### 2.2.4、启动与停止
 
 - 启动
 
 ```bash
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9092.properties
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9093.properties
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server-9094.properties
+[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh 
+[emon@emon2 ~]$ /usr/local/kafka/kafkaStart.sh 
+[emon@emon3 ~]$ /usr/local/kafka/kafkaStart.sh 
+```
+
+- 校验
+
+```bash
+[emon@emon ~]$ jps
+66411 Kafka
 ```
 
 - 停止
 
 ```bash
-# 关闭kafka
-[emon@emon ~]$ /usr/local/kafka/bin/kafka-server-stop.sh
-```
-
-6. 创建`topic`
-
-- 创建
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092,emon:9093,emon:9094 --replication-factor 3 --partitions 1 --topic tests
-# 命令执行结果
-Created topic tests.
-```
-
-- 查看`topic`列表
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
-```
-
-- 查看单个`topic`详情
-
-```bash
-[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic tests
-# 命令执行结果
-Topic: tests	PartitionCount: 1	ReplicationFactor: 3	Configs: segment.bytes=1073741824
-	Topic: tests	Partition: 0	Leader: 0	Replicas: 0,2,1	Isr: 0,2,1
-```
-
-7. 测试生产者消费者
-
-- 生产者
-
-```bash
-# 打开生产者命令行模式
-[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic tests
-```
-
-- 消费者
-
-```bash
-# 打开消费者命令模式
-[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic tests --from-beginning
+[emon@emon ~]$ /usr/local/kafka/kafkaStop.sh
+[emon@emon2 ~]$ /usr/local/kafka/kafkaStop.sh
+[emon@emon3 ~]$ /usr/local/kafka/kafkaStop.sh
 ```
 
 
