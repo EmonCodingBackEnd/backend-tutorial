@@ -195,3 +195,10 @@ Consumer：消息和数据的消费者，从Kafka的topic中消费数据。
 
 
 最后还有一个Zookeeper服务，Kafka的运行是需要依赖于Zookeeper的，Zookeeper负责协调Kafka集群的正常运行。
+
+
+
+# 四、Kafka使用初体验
+
+## 4.1、Kafka中Topic的操作
+
