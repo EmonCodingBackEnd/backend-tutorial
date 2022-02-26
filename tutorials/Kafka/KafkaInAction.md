@@ -437,3 +437,215 @@ acks：0，表示不需要任何节点回复，生产者会继续发送下一条
 
 如果acks设置为0,，表示生产者不会等待任何partition所在节点的回复，它只管发送数据，不管你有没有收到，所以这种情况丢失数据的概率比较高。
 
+> 针对这块在面试的时候会有一个面试题：Kafka如何保证数据不丢？
+
+其实就是通过acks机制保证的，如果设置acks为all，则可以保证数据不丢，因为此时把数据发送给Kafka之后，会等待对应partition所在的所有leader和副本节点都确认收到消息之后才会认为数据发送成功了，所以在这种策略下，只要把数据发送给Kafka之后就不会丢了。
+
+如果acks设置为1，则当我们把数据发送给partition之后，partition的leader节点也确认收到了，但是leader回复完确认消息之后，leader对应的节点就宕机了，副本partition还没来得及将数据同步过去，所以会存在丢失的可能性。
+
+不过如果宕机的是副本partition所在的节点，则数据是不会丢的。
+
+如果acks设置为0的话就表示是顺气自然了，只管发送，不管Kafka有没有收到，这种情况表示对数据丢失都无所谓了。
+
+### 4.2.3、Consumer扩展
+
+在消费者中海油一个消费者组的概念。
+
+每个consumer属于一个消费者组，通过group.id指定消费者组。
+
+那组内消费和组间消费有什么区别吗？
+
+- 组内：消费者组内的所有消费者消费同一份数据；
+
+注意：在同一个消费者组中，一个partition同时只能有一个消费者消费数据。
+
+如果消费者的个数小于分区的个数，一个消费者会消费多个分区的数据。
+
+如果消费者的个数大于分区的个数，则多余的消费者不消费数据。
+
+所以，对于一个topic，同一个消费者组中推荐不能有多于分区个数的消费者，否则将意味着某些消费者将无法获得消息。
+
+- 组间：多个消费者组消费相同的数据，互不影响。
+
+![image-20220224224701210](images/image-20220224224701210.png)
+
+Kafka集群有两个节点，Broker1和Broker2.
+
+集群内有一个topic，这个topic有4个分区，P0，P1，P2，P3
+
+下面有两个消费者组：
+
+Consumer Group A和Consumer Group B
+
+其中Consumer Group A中有两个消费者C1和C2，由于这个topic有4个分区，所以，C1负责消费两个分区的数据，C2负责消费两个分区的数据，这个属于组内消费。
+
+Consumer Group B有5个消费者，C3~C7，其中C3，C4，C5，C6分别消费一个分区的数据，而C7就是多余出来的了，因为现在这个消费者组内的消费者的数量比对应的topic的分区数量还多，但是一个分区同时只能被一个消费者消费，所以就会有一个消费者处于空闲状态。
+
+这个也属于组内消费。
+
+Consumer Group A和Consumer Group B这两个消费者组属于组间消费，互不影响。
+
+### 4.2.4、Topic、Partition扩展
+
+每个partition在存储层面是append log文件。
+
+新消息都会被直接追加到log文件的尾部，每条消息在log文件中的位置成为offset（偏移量）。
+
+越多partitions可以容纳更多的consumer，有效提升并发消费的能力。
+
+> 具体什么时候增加topic的数量？什么时候增加partition的数量呢？
+
+业务类型增加需要增加topic、数据量大需要增加partition。
+
+### 4.2.5、Message扩展
+
+每条Message包含了以下三个属性：
+
+1. offset对应类型：long表示此消息在一个partition中的起始的位置。可以认为offset是partition中Message的id，自增的。
+2. MessageSize对应类型：int32此消息的字节大小。
+3. data是message的具体内容。
+
+看这个图，加深对Topic、Partition、Message的理解。
+
+![image-20220224230826269](images/image-20220224230826269.png)
+
+### 4.2.6、存储策略
+
+在Kafka中每个topic包含1到多个partition，每个partition存储一部分Message。每条Message包含三个属性，其中有一个是offset。
+
+> 问题来了：offset相当于partition中这个message的唯一id，那么如何通过id高效的找到message。
+
+两大法宝：分段+索引
+
+Kafka中数据的存储方式是这样的：
+
+1. 每个partition由多个segment【片段】组成，每个segment中存储多条消息。
+2. 每个partition在内存中对应一个index，记录每个segment中的第一条消息偏移量。
+
+Kafka中数据的存储流程是这样的：
+生产者生产的消息会被发送到topic的多个partition上，topic收到消息后往对应partition的最后一个segment上添加该消息，segment达到一定的大小后会创建新的segment。
+
+来看这个图，可以认为是针对topic中某个partition的描述。
+
+![image-20220225124106761](images/image-20220225124106761.png)
+
+图中左侧就是索引，右边是segment文件，左边的索引里面会存储每个segment文件中第一条消息的偏移量，由于消息的偏移量都是递增的，这样后期查找起来就方便了，先到索引中判断数据在哪一个segment文件中，然后就可以直接定位到具体的segment文件了，这样再查找具体的一条数据就很快了，因为都是有序的。
+
+### 4.2.7、容错机制
+
+> 当Kafka集群中的一个Broker节点宕机，会出现什么现象？
+
+下面来演示一下：
+
+使用`kill -9`杀掉emon中的broker进程测试。
+
+```bash
+[emon@emon ~]$ jps
+82512 Jps
+82011 QuorumPeerMain
+82383 Kafka
+[emon@emon ~]$ kill 82383
+```
+
+我们可以先通过zookeeper来查看一下，因为当Kafka集群中的broker几点启动之后，会自动向zookeeper中进行注册，保存当前节点信息。
+
+```bash
+[emon@emon ~]$ zkCli.sh 
+......
+[zk: localhost:2181(CONNECTED) 0] ls /brokers
+[ids, seqid, topics]
+[zk: localhost:2181(CONNECTED) 1] ls /brokers/ids
+[1, 2]
+```
+
+此时发现zookeeper的/brokers/ids下面只有2个节点信息。
+
+可以通过get命令查看节点信息，这里面会显示对应的主机名和端口号。
+
+```bash
+[zk: localhost:2181(CONNECTED) 2] get /brokers/ids/1
+{"listener_security_protocol_map":{"PLAINTEXT":"PLAINTEXT"},"endpoints":["PLAINTEXT://emon2:9092"],"jmx_port":-1,"host":"emon2","timestamp":"1645766294919","port":9092,"version":4}
+```
+
+然后再使用describe查询topic的详细信息，会发现此时的分区的leader全部变成了目前存活的另外两个节点。
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic hello
+Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs: 
+	Topic: hello	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: hello	Partition: 1	Leader: 2	Replicas: 2,0	Isr: 2
+	Topic: hello	Partition: 2	Leader: 1	Replicas: 0,1	Isr: 1
+	Topic: hello	Partition: 3	Leader: 1	Replicas: 1,0	Isr: 1
+	Topic: hello	Partition: 4	Leader: 1	Replicas: 2,1	Isr: 1,2
+```
+
+此时可以发现Isr中的内容和Replicas中的不一样了，因为Isr中显示的是目前正常运行的节点。
+
+所以当Kafka集群中的一个Broker节点宕机之后，对整个集群而言没有什么特别大的影响，此时集群会给partition重新选出来一些新的Leader节点。
+
+> 当Kafka集群中新增一个Broker节点，会出现什么现象？
+
+新加入一个broker几点，zookeeper会自动识别并在适当的机会选择此节点提供服务。
+
+再次启动emon几点中的broker进行测试。
+
+```bash
+[emon@emon ~]$ /usr/local/kafka/kafkaStart.sh 
+```
+
+此时到zookeeper中查看一下：
+
+```bash
+[emon@emon ~]$ zkCli.sh 
+......
+[zk: localhost:2181(CONNECTED) 0] ls /brokers
+[ids, seqid, topics]
+[zk: localhost:2181(CONNECTED) 1] ls /brokers/ids
+[0, 1, 2]
+```
+
+发现broker.id为0的这个节点信息也有了。
+
+中通过describe查看topic的描述信息，Isr中的信息和Replicas中的内容是一样的了。
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic hello
+Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs: 
+	Topic: hello	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: hello	Partition: 1	Leader: 2	Replicas: 2,0	Isr: 2,0
+	Topic: hello	Partition: 2	Leader: 0	Replicas: 0,1	Isr: 1,0
+	Topic: hello	Partition: 3	Leader: 1	Replicas: 1,0	Isr: 1,0
+	Topic: hello	Partition: 4	Leader: 1	Replicas: 2,1	Isr: 1,2
+```
+
+>  但是启动后有个问题：如果发现新启动的这个节点不会是任何分区的leader？怎么重新均匀分配呢？
+>
+> 备注：我实际重启后，partition编号2的分区，leader是0。
+
+1、Broker中的自动均衡策略（默认已经有）
+
+```bash
+auto.leader.rebalance.enable=true
+leader.imbalance.check.interval.seconds 默认值：300
+```
+
+2、手动执行：
+
+```bash
+[emon@emon ~]$ kafka-leader-election.sh --bootstrap-server emon:9092 --election-type preferred --all-topic-partitions
+# 命令行输出结果
+Successfully completed leader election (PREFERRED) for partitions 88888888-4, hello-4, hello-3, 88888888-2, hello-1
+```
+
+执行后的效果如下，这样就实现了均匀分配。
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic hello
+Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs: 
+	Topic: hello	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: hello	Partition: 1	Leader: 2	Replicas: 2,0	Isr: 0,2
+	Topic: hello	Partition: 2	Leader: 0	Replicas: 0,1	Isr: 0,1
+	Topic: hello	Partition: 3	Leader: 1	Replicas: 1,0	Isr: 0,1
+	Topic: hello	Partition: 4	Leader: 2	Replicas: 2,1	Isr: 1,2
+```
+
