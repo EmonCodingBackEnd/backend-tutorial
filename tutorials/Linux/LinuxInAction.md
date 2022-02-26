@@ -1719,7 +1719,7 @@ sftp>
 ```bash
 [emon@emon nginx-1.18.0]$ make install
 [emon@emon nginx-1.18.0]$ cd
-[emon@emon ~]$ ls /usr/local/Nginx/nginx1.14.0/
+[emon@emon ~]$ ls /usr/local/Nginx/nginx1.18.0/
 conf  html  logs  sbin
 ```
 
@@ -2044,6 +2044,20 @@ server-id=1
 ```bash
 [emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
+
+> 如果是单独安装Mysql，而不是从上到下按照我的安装流程而来，有可能碰到如下错误：
+>
+> /usr/local/mysql/bin/mysqld: error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory
+>
+> 解决：出现该问题首先检查该链接库文件有没有安装使用 命令进行核查
+>
+>  rpm -qa|grep libaio 
+>
+> 运行该命令后发现系统中无该链接库文件
+>
+> 使用命令：
+>
+> sudo yum install -y libaio-devel.x86_64
 
 在日志文件里会提示一个临时密码，记录这个密码：
 
