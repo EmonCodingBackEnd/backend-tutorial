@@ -1515,7 +1515,4 @@ a1.sinks.k1.channel = c1
 -rw-r--r--   1 emon supergroup         12 2022-02-27 17:26 /flume/kafka/data-.1645953988614.log.tmp
 ```
 
-
-
-
-
+此时Flume可以通过tail -F命令实时监控文件中的新增数据，发现有新数据就写入kafka，然后kafka后面的flume落盘程序，以及Kafka后面的实时计算程序就可以使用这份数据了。
