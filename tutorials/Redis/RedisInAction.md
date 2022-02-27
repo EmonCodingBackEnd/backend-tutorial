@@ -1,4 +1,4 @@
-# Redis实战
+#  Redis实战
 
 [返回列表](https://github.com/EmonCodingBackEnd/backend-tutorial)
 
@@ -503,6 +503,24 @@ localhost:6379> zrangebyscore key min max [WITHSCORES] [LIMIT offset count]
 ```bash
 localhost:6379> zrem key member [member ...]
 ```
+
+- 正无穷和负无穷
+
+```bash
+# 添加最大得分元素
+emon:6379> zadd zset1 +inf m
+(integer) 1
+# 添加最小
+emon:6379> zadd zset1 -inf n
+(integer) 1
+emon:6379> zcard zset1
+(integer) 2
+emon:6379> zrange zset1 0 -1
+1) "n"
+2) "m"
+```
+
+
 
 ## 1.3、Redis的发布（pub）与订阅（sub）
 
