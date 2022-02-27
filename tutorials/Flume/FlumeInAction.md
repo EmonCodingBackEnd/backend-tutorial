@@ -1389,7 +1389,7 @@ sink：HdfsSink
 [emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryKafka/exec-memory-kafka.conf
 ```
 
-```bash
+```properties
 # agent的名称是a1
 # 指定source组件、channel组件和sink组件的名称
 a1.sources = r1
@@ -1398,38 +1398,36 @@ a1.channels = c1
 
 # 配置sources组件
 a1.sources.r1.type = exec
-a1.sources.r1.command = tail -F /
+a1.sources.r1.command = tail -F /home/emon/bigdata/flume/shell/config/execMemoryKafka/data/test.log
 
 # 配置sink组件
-a1.sinks.k1.type = logger
-
-a1.sinks.k2.type = hdfs
-a1.sinks.k2.hdfs.path = hdfs://emon:8020/flume/replicating
-a1.sinks.k2.hdfs.filePrefix = data
-a1.sinks.k2.hdfs.fileSuffix	= .log
-a1.sinks.k2.hdfs.fileType = DataStream
-a1.sinks.k2.hdfs.writeFormat = Text
-a1.sinks.k2.hdfs.rollInterval = 3600
-# 128M
-a1.sinks.k2.hdfs.rollSize = 134217728
-a1.sinks.k2.hdfs.rollCount = 0
-a1.sinks.k2.hdfs.useLocalTimeStamp = true
+a1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
+# 指定topic名称
+a1.sinks.k1.kafka.topic = test_r2p5
+# 指定kafka地址，多个节点地址使用逗号分隔
+a1.sinks.k1.kafka.bootstrap.servers = emon:9092,emon2:9092,emon3:9092
+# 一次向Kafka中写多少条数据，默认值为100，在这里为了演示方便，改为1
+# 在实际工作中这个值具体设置多少需要在传输效率和数据延迟上进行取舍
+# 如果Kafka后面的实时计算程序对数据的要求是低延迟，那么这个值小一点比较合适
+# 如果Kafka后面的实时计算程序对数据延迟没什么要求，那么就考虑传输性能，一次多传输一些
+# 建议这个值的大小和ExecSource每秒钟采集的数据量大致相等，这样不会频繁向Kafka中写数据
+a1.sinks.k1.kafka.flumeBatchSize = 1
+a1.sinks.k1.kafka.producer.acks = 1
+# 一个Batch被创建之后，最多过多久，不管这个Batch有没有写满，都必须发送出去
+# linger.ms和flumeBatchSize，哪个先满足先按哪个规则执行，这个值默认是0，在这设置为1
+a1.sinks.k1.kafka.producer.linger.ms = 1
+# 指定数据传输时的压缩格式，对数据进行压缩，提高传输效率
+a1.sinks.k1,kafka.producer.compression.type = snappy
 
 # 配置channel组件
 a1.channels.c1.type = memory
 a1.channels.c1.capacity = 1000
 a1.channels.c1.transactionCapacity = 100
 
-a1.channels.c2.type = memory
-a1.channels.c2.capacity = 1000
-a1.channels.c2.transactionCapacity = 100
-
-# 配置channel选择器[默认就是Replication Channel Selector]
-a1.sources.r1.selector.type = replicating
-
 # 把组件连接起来
-a1.sources.r1.channels = c1 c2
+a1.sources.r1.channels = c1
 a1.sinks.k1.channel = c1
-a1.sinks.k2.channel = c2
 ```
+
+## 5.2、配置Kafka到Hdfs
 
