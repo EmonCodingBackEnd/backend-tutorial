@@ -1378,14 +1378,14 @@ sink：HdfsSink
 
 这里面这些组件其实只有KafkaSource和KafkaSink我们没有使用过，其他的组件都已经用过了。
 
-### 5.1、配置日志到Kafka
+## 5.1、配置日志到Kafka
 
 文件名：`exec-memory-kafka.conf`
 
 - 配置
 
 ```bash
-[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execMemoryKafka
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execMemoryKafka/data
 [emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryKafka/exec-memory-kafka.conf
 ```
 
@@ -1409,7 +1409,7 @@ a1.sinks.k1.kafka.bootstrap.servers = emon:9092,emon2:9092,emon3:9092
 # 一次向Kafka中写多少条数据，默认值为100，在这里为了演示方便，改为1
 # 在实际工作中这个值具体设置多少需要在传输效率和数据延迟上进行取舍
 # 如果Kafka后面的实时计算程序对数据的要求是低延迟，那么这个值小一点比较合适
-# 如果Kafka后面的实时计算程序对数据延迟没什么要求，那么就考虑传输性能，一次多传输一些
+# 如果Kafka后面的实时计算程序对数据延迟没什么要求，那么就考虑传输性能，一次多传输一些数据，这样吞吐量会有所提升
 # 建议这个值的大小和ExecSource每秒钟采集的数据量大致相等，这样不会频繁向Kafka中写数据
 a1.sinks.k1.kafka.flumeBatchSize = 1
 a1.sinks.k1.kafka.producer.acks = 1
@@ -1430,4 +1430,92 @@ a1.sinks.k1.channel = c1
 ```
 
 ## 5.2、配置Kafka到Hdfs
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/kafkaMemoryHdfs
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/kafkaMemoryHdfs/kafka-memory-hdfs.conf
+```
+
+```properties
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = org.apache.flume.source.kafka.KafkaSource
+# 一次性向channel中写入的最大数据量，在这为了演示方便，设置为1
+# 这个参数的值不要大于MemoryChannel中transactionCapacity的值
+a1.sources.r1.batchSize = 1
+# 最大多长时间向channel写一次数据
+a1.sources.r1.batchDurationMillis = 2000
+# 指定kafka地址，多个节点地址使用逗号分隔
+a1.sources.r1.kafka.bootstrap.servers = emon:9092,emon2:9092,emon3:9092
+# topic名称，可以指定一个或者多个，多个topic之间使用逗号隔开
+# 也可以使用正则表达式指定一个topic名称规则
+a1.sources.r1.kafka.topics = test_r2p5
+# 指定消费者组id
+a1.sources.r1.kafka.consumer.group.id = flume-con1
+
+# 配置sink组件
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = hdfs://emon:8020/flume/kafka
+a1.sinks.k1.hdfs.filePrefix = data-
+a1.sinks.k1.hdfs.fileSuffix	= .log
+a1.sinks.k1.hdfs.fileType = DataStream
+a1.sinks.k1.hdfs.writeFormat = Text
+a1.sinks.k1.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k1.hdfs.rollSize = 134217728
+a1.sinks.k1.hdfs.rollCount = 0
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+# 把组件连接起来
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+## 5.3、创建Kafka的topic
+
+```bash
+[emon@emon ~]$ kafka-topics.sh --create --zookeeper emon:2181 --partitions 2 --replication-factor 2 --topic test_r2p5
+```
+
+## 5.4、启动
+
+- 启动第二个Agent
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/kafkaMemoryHdfs/kafka-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+- 启动第一个Agent
+
+```bash
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/execMemoryKafka/exec-memory-kafka.conf --name a1 -Dflume.root.logger=INFO,console
+```
+
+- 模拟产生日志数据
+
+```bash
+[emon@emon ~]$ echo "hello world" >> /home/emon/bigdata/flume/shell/config/execMemoryKafka/data/test.log
+```
+
+- 到HDFS上查看数据，验证结果：
+
+```bash
+[emon@emon ~]$ hdfs dfs -ls -R /flume/kafka
+-rw-r--r--   1 emon supergroup         12 2022-02-27 17:26 /flume/kafka/data-.1645953988614.log.tmp
+```
+
+
+
+
 
