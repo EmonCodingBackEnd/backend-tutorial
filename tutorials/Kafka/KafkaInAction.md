@@ -978,3 +978,5 @@ http://emon:9000/
 
 点击`Save`后跳转的界面上，点击`Go to cluster view.`查看。
 
+# 六、实战：Kafka集群平滑升级
+

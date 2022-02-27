@@ -81,7 +81,7 @@ Flume是一个高可用，高可靠，分布式的海量日志采集、聚合和
 - 配置
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/netcat-memory-logger.conf 
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcat-memory-logger.conf 
 ```
 
 ```properties
@@ -113,13 +113,13 @@ a1.sinks.k1.channel = c1
 - 前台启动【测试用】
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
 - 后台启动【不推荐】
 
 ```bash
-[emon@emon ~]$ nohup flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
+[emon@emon ~]$ nohup flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,LOGFILE &
 ```
 
 **说明**：`-Dflume.root.logger=INFO.LOGFILE`是`$FLUME_HOME/conf/log4j.properties`的默认值，可以省略！根据配置，日志`logs`文件会在命令执行时所在目录生成！
@@ -146,7 +146,7 @@ a1.sinks.k1.channel = c1
 
 ```ini
 [program:flume-netcat-memory-logger]
-command=/usr/local/flume/bin/flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
+command=/usr/local/flume/bin/flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcat-memory-logger.conf --name a1 -Dflume.root.logger=INFO,console
 directory=/usr/local/flume/config
 autostart=false                 ; 在supervisord启动的时候也自动启动
 startsecs=10                    ; 启动10秒后没有异常退出，就表示进程正常启动了，默认为1秒
@@ -158,7 +158,7 @@ redirect_stderr=true            ; 把stderr重定向到stdout，默认false
 stdout_logfile_maxbytes=20MB    ; stdout 日志文件大小，默认50MB
 stdout_logfile_backups = 20     ; stdout 日志文件备份数，默认是10
 environment=JAVA_HOME="/usr/local/java"
-stdout_logfile=/usr/local/flume/config/netcat-memory-logger.log    ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
+stdout_logfile=/home/emon/bigdata/flume/shell/config/netcat-memory-logger.log    ; stdout 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（supervisord 会自动创建日志文件）
 stopasgroup=true                ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
 killasgroup=true                ;默认为false，向进程组发送kill信号，包括子进程
 ```
@@ -183,8 +183,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 - 配置
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/spooldirFileHdfs
-[emon@emon ~]$ vim /usr/local/flume/config/spooldirFileHdfs/spooldir-file-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/spooldirFileHdfs
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/spooldir-file-hdfs.conf
 ```
 
 ```properties
@@ -195,7 +195,7 @@ a1.channels = c1
 
 # Describe/configure the source
 a1.sources.r1.type = spooldir
-a1.sources.r1.spoolDir = /usr/local/flume/config/spooldirFileHdfs/spooldir
+a1.sources.r1.spoolDir = /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/spooldir
 a1.sources.r1.fileHeader = true
 
 # Describe the sink
@@ -212,8 +212,8 @@ a1.sinks.k1.hdfs.rollCount = 0
 
 # Use a channel which buffers events in memory
 a1.channels.c1.type = file
-a1.channels.c1.checkpointDir = /usr/local/flume/config/spooldirFileHdfs/checkpoint
-a1.channels.c1.dataDirs = /usr/local/flume/config/spooldirFileHdfs/data
+a1.channels.c1.checkpointDir = /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/checkpoint
+a1.channels.c1.dataDirs = /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/data
 
 # Bind the source and sink to the channel
 a1.sources.r1.channels = c1
@@ -223,8 +223,8 @@ a1.sinks.k1.channel = c1
 - 初始化数据
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/spooldirFileHdfs/{spooldir,checkpoint,data}
-[emon@emon ~]$ vim /usr/local/flume/config/spooldirFileHdfs/spooldir/class1.dat
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/{spooldir,checkpoint,data}
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/spooldir/class1.dat
 ```
 
 ```tex
@@ -236,7 +236,7 @@ tom 17  male
 - 启动
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/spooldirFileHdfs/spooldir-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/spooldirFileHdfs/spooldir-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
 **说明**：启动后`class1.dat`会被处理，并修改文件名为`class1.dat.COMPLETED`，之后不会再扫描该文件。
@@ -257,8 +257,8 @@ tom 17  male
 - 配置1
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/execMemoryAvro1
-[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro1/exec-memory-avro.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execMemoryAvro1
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryAvro1/exec-memory-avro.conf
 ```
 
 ```properties
@@ -270,7 +270,7 @@ a1.channels = c1
 
 # 配置sources组件
 a1.sources.r1.type = exec
-a1.sources.r1.command = tail -F /usr/local/flume/config/execMemoryAvro1/access.log
+a1.sources.r1.command = tail -F /home/emon/bigdata/flume/shell/config/execMemoryAvro1/access.log
 
 # 配置sink组件
 a1.sinks.k1.type = avro
@@ -290,8 +290,8 @@ a1.sinks.k1.channel = c1
 - 配置2
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/execMemoryAvro2
-[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro2/exec-memory-avro.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execMemoryAvro2
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryAvro2/exec-memory-avro.conf
 ```
 
 ```properties
@@ -303,7 +303,7 @@ a1.channels = c1
 
 # 配置sources组件
 a1.sources.r1.type = exec
-a1.sources.r1.command = tail -F /usr/local/flume/config/execMemoryAvro2/access.log
+a1.sources.r1.command = tail -F /home/emon/bigdata/flume/shell/config/execMemoryAvro2/access.log
 
 # 配置sink组件
 a1.sinks.k1.type = avro
@@ -323,8 +323,8 @@ a1.sinks.k1.channel = c1
 - 配置3
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs
-[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs/avro-memory-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/avroMemoryHdfs
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/avroMemoryHdfs/avro-memory-hdfs.conf
 ```
 
 ```properties
@@ -366,7 +366,7 @@ a1.sinks.k1.channel = c1
 - 日志生成脚本1
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryAvro1/generateAccessLog.sh
 ```
 
 ```bash
@@ -377,7 +377,7 @@ while [ "1" = "1" ]; do
     curr_time=$(date +%s)
     # 获取当前主机名
     name=$(hostname)
-    echo "${name}1"_"${curr_time}" >> /usr/local/flume/config/execMemoryAvro1/access.log
+    echo "${name}1"_"${curr_time}" >> /home/emon/bigdata/flume/shell/config/execMemoryAvro1/access.log
     # 暂停1秒
     sleep 1
 done
@@ -385,13 +385,13 @@ done
 
 ```bash
 # 修改执行权限
-[emon@emon ~]$ chmod u+x /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh 
+[emon@emon ~]$ chmod u+x /home/emon/bigdata/flume/shell/config/execMemoryAvro1/generateAccessLog.sh 
 ```
 
 - 日志生成脚本2
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryAvro2/generateAccessLog.sh
 ```
 
 ```bash
@@ -402,7 +402,7 @@ while [ "1" = "1" ]; do
     curr_time=$(date +%s)
     # 获取当前主机名
     name=$(hostname)
-    echo "${name}2"_"${curr_time}" >> /usr/local/flume/config/execMemoryAvro2/access.log
+    echo "${name}2"_"${curr_time}" >> /home/emon/bigdata/flume/shell/config/execMemoryAvro2/access.log
     # 暂停1秒
     sleep 1
 done
@@ -410,22 +410,22 @@ done
 
 ```bash
 # 修改执行权限
-[emon@emon ~]$ chmod u+x /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh 
+[emon@emon ~]$ chmod u+x /home/emon/bigdata/flume/shell/config/execMemoryAvro2/generateAccessLog.sh 
 ```
 
 - 启动
 
 ```bash
 # 第一步：启动配置3
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/avroMemoryHdfs/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 第二步：启动配置1
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execMemoryAvro1/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/execMemoryAvro1/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
 # 第三步：启动配置2
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execMemoryAvro2/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/execMemoryAvro2/exec-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
 # 第四步：为配置1开启日志生成
-[emon@emon ~]$ sh -x /usr/local/flume/config/execMemoryAvro1/generateAccessLog.sh
+[emon@emon ~]$ sh -x /home/emon/bigdata/flume/shell/config/execMemoryAvro1/generateAccessLog.sh
 # 第五步：为配置2开启日志生成
-[emon@emon ~]$ sh -x /usr/local/flume/config/execMemoryAvro2/generateAccessLog.sh
+[emon@emon ~]$ sh -x /home/emon/bigdata/flume/shell/config/execMemoryAvro2/generateAccessLog.sh
 ```
 
 - 停止
@@ -516,8 +516,8 @@ hdfs://emon:8020/moreType/20210101/giftRecord
 - 配置
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/execFileHdfs
-[emon@emon ~]$ vim /usr/local/flume/config/execFileHdfs/exec-file-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execFileHdfs
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execFileHdfs/exec-file-hdfs.conf
 ```
 
 ```properties
@@ -529,7 +529,7 @@ a1.channels = c1
 
 # 配置sources组件
 a1.sources.r1.type = exec
-a1.sources.r1.command = tail -F /usr/local/flume/config/execFileHdfs/moreType.log
+a1.sources.r1.command = tail -F /home/emon/bigdata/flume/shell/config/execFileHdfs/moreType.log
 
 # 配置拦截器[多个拦截器按照顺序依次执行]
 a1.sources.r1.interceptors = i1 i2 i3 i4
@@ -565,8 +565,8 @@ a1.sinks.k1.hdfs.useLocalTimeStamp = true
 
 # 配置channel组件
 a1.channels.c1.type = file
-a1.channels.c1.checkpointDir = /usr/local/flume/config/execFileHdfs/checkpoint
-a1.channels.c1.dataDirs = /usr/local/flume/config/execFileHdfs/data
+a1.channels.c1.checkpointDir = /home/emon/bigdata/flume/shell/config/execFileHdfs/checkpoint
+a1.channels.c1.dataDirs = /home/emon/bigdata/flume/shell/config/execFileHdfs/data
 
 # 把组件连接起来
 a1.sources.r1.channels = c1
@@ -576,8 +576,8 @@ a1.sinks.k1.channel = c1
 - 初始化数据
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/execFileHdfs/{checkpoint,data}
-[emon@emon ~]$ vim /usr/local/flume/config/execFileHdfs/moreType.log
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execFileHdfs/{checkpoint,data}
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execFileHdfs/moreType.log
 ```
 
 ```json
@@ -589,7 +589,7 @@ a1.sinks.k1.channel = c1
 - 启动
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/execFileHdfs/exec-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/execFileHdfs/exec-file-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
 
@@ -601,8 +601,8 @@ a1.sinks.k1.channel = c1
 - 配置
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryToLoggerAndHdfs
-[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf
 ```
 
 ```properties
@@ -653,7 +653,7 @@ a1.sinks.k2.channel = c2
 - 启动
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
 - 验证
@@ -669,8 +669,8 @@ a1.sinks.k2.channel = c2
 - 配置
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2
-[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs2
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf
 ```
 
 ```properties
@@ -731,7 +731,7 @@ a1.sinks.k2.channel = c2
 - 启动
 
 ```bash
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcatMemoryToLoggerAndHdfs2/netcat-memory-logger-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 ```
 
 - 验证
@@ -752,8 +752,8 @@ a1.sinks.k2.channel = c2
 - 配置1
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryAvro
-[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryAvro/netcat-memory-avro.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/netcatMemoryAvro
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcatMemoryAvro/netcat-memory-avro.conf
 ```
 
 ```properties
@@ -800,8 +800,8 @@ a1.sinks.k2.channel = c1
 - 配置2
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs1
-[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs1/avro-memory-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/avroMemoryHdfs1
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/avroMemoryHdfs1/avro-memory-hdfs.conf
 ```
 
 ```properties
@@ -841,8 +841,8 @@ a1.sinks.k1.channel = c1
 
 - 配置3
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfs2
-[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfs2/avro-memory-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/avroMemoryHdfs2
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/avroMemoryHdfs2/avro-memory-hdfs.conf
 ```
 
 ```properties
@@ -884,11 +884,11 @@ a1.sinks.k1.channel = c1
 
 ```bash
 # 启动配置2
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/avroMemoryHdfs1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 启动配置3
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfs2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/avroMemoryHdfs2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 启动配置1
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryAvro/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcatMemoryAvro/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
 # 向netcat输入
 [emon@emon ~]$ telnet emon 44444
 ```
@@ -902,8 +902,8 @@ a1.sinks.k1.channel = c1
 - 配置1
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/netcatMemoryAvroFailover
-[emon@emon ~]$ vim /usr/local/flume/config/netcatMemoryAvroFailover/netcat-memory-avro.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/netcatMemoryAvroFailover
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcatMemoryAvroFailover/netcat-memory-avro.conf
 ```
 
 ```properties
@@ -951,8 +951,8 @@ a1.sinks.k2.channel = c1
 - 配置2
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfsFailover1
-[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover1
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf
 ```
 
 ```properties
@@ -992,8 +992,8 @@ a1.sinks.k1.channel = c1
 
 - 配置3
 ```bash
-[emon@emon ~]$ mkdir /usr/local/flume/config/avroMemoryHdfsFailover2
-[emon@emon ~]$ vim /usr/local/flume/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover2
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf
 ```
 
 ```properties
@@ -1035,11 +1035,11 @@ a1.sinks.k1.channel = c1
 
 ```bash
 # 启动配置2
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover1/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 启动配置3
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/avroMemoryHdfsFailover2/avro-memory-hdfs.conf --name a1 -Dflume.root.logger=INFO,console
 # 启动配置1
-[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /usr/local/flume/config/netcatMemoryAvroFailover/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
+[emon@emon ~]$ flume-ng agent --conf /usr/local/flume/conf --conf-file /home/emon/bigdata/flume/shell/config/netcatMemoryAvroFailover/netcat-memory-avro.conf --name a1 -Dflume.root.logger=INFO,console
 # 向netcat输入
 [emon@emon ~]$ telnet emon 44444
 ```
@@ -1073,17 +1073,17 @@ Flume是一个单进程程序，会存在单点故障，所以需要有一个监
 - 配置文件
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/monlist.conf
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/monlist.conf
 ```
 
 ```properties
-netcat-memory-logger=/usr/local/flume/config/netcat-memory-logger.sh
+netcat-memory-logger=/home/emon/bigdata/flume/shell/config/netcat-memory-logger.sh
 ```
 
 - netcat-memory-logger.sh
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/netcat-memory-logger.sh
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/netcat-memory-logger.sh
 ```
 
 ```bash
@@ -1093,18 +1093,18 @@ nohup flume-ng agent --conf $flume_path/conf --conf-file $flume_path/config/netc
 ```
 
 ```bash
-[emon@emon ~]$ chmod u+x /usr/local/flume/config/netcat-memory-logger.sh
+[emon@emon ~]$ chmod u+x /home/emon/bigdata/flume/shell/config/netcat-memory-logger.sh
 ```
 
 - monlist.sh
 
 ```bash
-[emon@emon ~]$ vim /usr/local/flume/config/monlist.sh
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/monlist.sh
 ```
 
 ```bash
 #!/bin/bash
-monlist=`cat /usr/local/flume/config/monlist.conf`
+monlist=`cat /home/emon/bigdata/flume/shell/config/monlist.conf`
 echo "start check"
 for item in ${monlist}
 do
@@ -1130,8 +1130,8 @@ done
 ```
 
 ```bash
-[emon@emon ~]$ chmod u+x /usr/local/flume/config/monlist.sh
-[emon@emon ~]$ sh -x /usr/local/flume/config/monlist.sh
+[emon@emon ~]$ chmod u+x /home/emon/bigdata/flume/shell/config/monlist.sh
+[emon@emon ~]$ sh -x /home/emon/bigdata/flume/shell/config/monlist.sh
 ```
 
 
@@ -1324,5 +1324,112 @@ sqoop export \
 --update-mode allowinsert
 ```
 
+# 五、实战：Flume集成Kafka
 
+在实际工作中flume和kafka会深度结合使用。
+
+1：flume采集数据，将数据实时写入kafka
+
+2：flume从kafka中消费数据，保存到hdfs，做数据备份
+
+下面我们就来看一个综合案例。
+
+使用flume采集日志文件中产生的实时数据，写入到kafka中，然后再使用flume从kafka中将数据消费出来，保存到hdfs上面。
+
+那为什么不直接使用flume将采集到的日志数据保存到hdfs上面呢？
+
+因为中间使用kafka进行缓冲之后，后面既可以实现实时计算，又可以实现离线数据备份，最终实现离线计算，所以这一份数据就可以实现两种需求，使用起来很方便，所以在工作中一般都会这样做。
+
+
+
+![image-20220227154345823](images/image-20220227154345823.png)
+
+下面我们来实现一下这个功能。
+
+其实在Flume中，针对Kafka提供的有KafkaSource和KafkaSink。
+
+- KafkaSource是从Kafka中读取数据；
+
+- KafkaSink是向Kafka中写入数据。
+
+所以针对我们目前这个架构，主要就是配置Flume的Agent。
+
+需要配置两个Agent：
+
+第一个Agent负责实时采集日志文件，将采集到的数据写入Kafka中；
+
+第二个Agent负责从Kafka中读取数据，将数据写入HDFS中进行备份。
+
+针对第一个Agent：
+
+source：ExecSource，使用tail -F监控日志文件即可；
+
+channel：MemoryChannel
+
+sink：KafkaSink
+
+针对第二个Agent：
+
+source：KafkaSource
+
+channel：MemoryChannel
+
+sink：HdfsSink
+
+这里面这些组件其实只有KafkaSource和KafkaSink我们没有使用过，其他的组件都已经用过了。
+
+### 5.1、配置日志到Kafka
+
+文件名：`exec-memory-kafka.conf`
+
+- 配置
+
+```bash
+[emon@emon ~]$ mkdir /home/emon/bigdata/flume/shell/config/execMemoryKafka
+[emon@emon ~]$ vim /home/emon/bigdata/flume/shell/config/execMemoryKafka/exec-memory-kafka.conf
+```
+
+```bash
+# agent的名称是a1
+# 指定source组件、channel组件和sink组件的名称
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# 配置sources组件
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /
+
+# 配置sink组件
+a1.sinks.k1.type = logger
+
+a1.sinks.k2.type = hdfs
+a1.sinks.k2.hdfs.path = hdfs://emon:8020/flume/replicating
+a1.sinks.k2.hdfs.filePrefix = data
+a1.sinks.k2.hdfs.fileSuffix	= .log
+a1.sinks.k2.hdfs.fileType = DataStream
+a1.sinks.k2.hdfs.writeFormat = Text
+a1.sinks.k2.hdfs.rollInterval = 3600
+# 128M
+a1.sinks.k2.hdfs.rollSize = 134217728
+a1.sinks.k2.hdfs.rollCount = 0
+a1.sinks.k2.hdfs.useLocalTimeStamp = true
+
+# 配置channel组件
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 1000
+a1.channels.c1.transactionCapacity = 100
+
+a1.channels.c2.type = memory
+a1.channels.c2.capacity = 1000
+a1.channels.c2.transactionCapacity = 100
+
+# 配置channel选择器[默认就是Replication Channel Selector]
+a1.sources.r1.selector.type = replicating
+
+# 把组件连接起来
+a1.sources.r1.channels = c1 c2
+a1.sinks.k1.channel = c1
+a1.sinks.k2.channel = c2
+```
 
