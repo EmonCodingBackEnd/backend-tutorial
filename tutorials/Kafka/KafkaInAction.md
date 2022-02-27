@@ -423,11 +423,11 @@ Producer默认是随机将数据发送到topic的不同分区中，也可以根�
 
 具体的数据通讯策略是由acks参数控制的。
 
-acks默认为1，表示需要Leader节点回复收到消息，这样生产者才会发送下一条数据。
+- acks默认为1，表示需要Leader节点回复收到消息，这样生产者才会发送下一条数据。【默认】
 
-acks：all，表示需要所有Leader+副本节点回复收到消息（acks=-1），这样生产者才会发送下一条数据。
+- acks：all，表示需要所有Leader+副本节点回复收到消息（acks=-1），这样生产者才会发送下一条数据。
 
-acks：0，表示不需要任何节点回复，生产者会继续发送下一条数据。
+- acks：0，表示不需要任何节点回复，生产者会继续发送下一条数据。
 
 ![image-20220224174604391](images/image-20220224174604391.png)
 
@@ -704,4 +704,58 @@ CONSUMER-ID：消费者ID；
 HOST：主机；
 
 CLIENT-ID：客户端ID。
+
+### 4.3.2、Consumer消费顺序
+
+当一个消费者消费一个partition时候，消费的数据顺序和此partition数据的生产顺序是一致的；
+
+当一个消费者消费多个partition时候，消费者按照partition的顺序，首先消费一个partition，当消费完一个partition最新的数据后再消费其它partition中的数据。
+
+> 总之：如果一个消费者消费多个partition，只能保证消费的数据顺序在一个partition内是有序的。
+
+也就是说消费Kafka中的数据只能保证消费partition内的数据是有序的，多个partition之间是无序的。
+
+### 4.3.3、Kafka的三种语义
+
+Kafka可以实现以下三种语义，这三种语义是针对消费者而言的：
+
+- 至少一次：at-least-once
+
+这种语义有可能会对数据重复处理。
+
+实现至少一次消费语义的消费者也很简单。
+
+1：设置`enable.auto.commit`为false，禁用自动提交offset。
+
+2：消息处理完之后手动调用`consumer.commitSync()`提交offset
+
+这种方式是在消费数据之后，手动调用函数`consumer.commitSync()`同步提交offset。
+
+有可能处理多次的场景是消费者的消息处理完成并输出到结果库，但是offset还没有提交，这个时候消费者挂掉了，再重启的时候会重新消费并处理消息，所以至少会处理一次。
+
+- 至多一次：at-most-once【默认】
+
+这种语义有可能会丢失数据。
+
+至多一次消费语义是Kafka消费者的默认实现。配置这种消费者最简单的方式是：
+
+1：enable.auto.commit设置为true。
+
+2：auto.commit.interval.ms设置为一个较低的时间范围。
+
+由于上面的配置，此时Kafka会有一个独立的线程负责按照指定时间间隔提交offset。
+
+消费者的offset已经提交，但是消息还在处理中（还没有处理完），这个时候程序挂了，导致数据没有被成功处理，再重启的时候会从上次提交的offset处理消费，导致上次没有被成功处理的消息就丢失了。
+
+- 仅一次：exactly-once
+
+这种语义可以保证数据只被消费处理一次。
+
+1：将enable.auto.commit设置为false，禁用自动提交offset。
+
+2：使用consumer.seek(topicPartition, ofset)来指定offset；
+
+3：在处理消息的时候，要同时保存住每个消息的offset。以原子事务的方式保存offset和处理的消息结果，这个时候相当于自己保存offset信息了，把offset和具体的数据绑定到一块，数据真正处理成功的时候才会保存offset信息。
+
+这样就可以保证数据仅被处理一次了。
 
