@@ -200,7 +200,7 @@ Consumer：消息和数据的消费者，从Kafka的topic中消费数据。
 
 
 
-# 四、Kafka使用初体验
+# 四、Kafka基础与进阶
 
 ## 4.1、Kafka中Topic的操作
 
@@ -509,7 +509,9 @@ Consumer Group A和Consumer Group B这两个消费者组属于组间消费，互
 
 ![image-20220224230826269](images/image-20220224230826269.png)
 
-### 4.2.6、存储策略
+## 4.3、Kafka核心值存储和容错机制
+
+### 4.3.1、存储策略
 
 在Kafka中每个topic包含1到多个partition，每个partition存储一部分Message。每条Message包含三个属性，其中有一个是offset。
 
@@ -531,7 +533,7 @@ Kafka中数据的存储流程是这样的：
 
 图中左侧就是索引，右边是segment文件，左边的索引里面会存储每个segment文件中第一条消息的偏移量，由于消息的偏移量都是递增的，这样后期查找起来就方便了，先到索引中判断数据在哪一个segment文件中，然后就可以直接定位到具体的segment文件了，这样再查找具体的一条数据就很快了，因为都是有序的。
 
-### 4.2.7、容错机制
+### 4.3.2、容错机制
 
 > 当Kafka集群中的一个Broker节点宕机，会出现什么现象？
 
@@ -649,9 +651,9 @@ Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs:
 	Topic: hello	Partition: 4	Leader: 2	Replicas: 2,1	Isr: 1,2
 ```
 
-## 4.3、Kafka生产消费者实战
+## 4.4、Kafka生产消费者实战
 
-### 4.3.1、Consumer消费offset查询
+### 4.4.1、Consumer消费offset查询
 
 Kafka0.9版本以前，消费者的offset信息保存在zookeeper中。
 
@@ -705,7 +707,7 @@ HOST：主机；
 
 CLIENT-ID：客户端ID。
 
-### 4.3.2、Consumer消费顺序
+### 4.4.2、Consumer消费顺序
 
 当一个消费者消费一个partition时候，消费的数据顺序和此partition数据的生产顺序是一致的；
 
@@ -715,7 +717,7 @@ CLIENT-ID：客户端ID。
 
 也就是说消费Kafka中的数据只能保证消费partition内的数据是有序的，多个partition之间是无序的。
 
-### 4.3.3、Kafka的三种语义
+### 4.4.3、Kafka的三种语义
 
 Kafka可以实现以下三种语义，这三种语义是针对消费者而言的：
 
@@ -758,4 +760,221 @@ Kafka可以实现以下三种语义，这三种语义是针对消费者而言的
 3：在处理消息的时候，要同时保存住每个消息的offset。以原子事务的方式保存offset和处理的消息结果，这个时候相当于自己保存offset信息了，把offset和具体的数据绑定到一块，数据真正处理成功的时候才会保存offset信息。
 
 这样就可以保证数据仅被处理一次了。
+
+# 五、Kafka技巧篇
+
+## 5.1、Kafka集群参数调优
+
+### 5.1.1、JVM参数调优
+
+默认启动的Broker进程只会使用1G内存，在实际使用中会导致进程频繁GC，影响Kafka集群的性能和稳定性。
+
+通过`jstat -gcutil <pid> 1000`查看到Kafka进程GC的情况，主要看YGC、YGCT、FGC、FGCT这几个参数，如果这几个值不是很大，就没什么问题。
+
+```bash
+[emon@emon ~]$ jps
+# 命令行输出结果
+94074 QuorumPeerMain
+97789 Jps
+94447 Kafka
+[emon@emon ~]$ jstat -gcutil 94447 1000
+# 命令行输出结果
+  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT   
+  0.00 100.00  30.58  23.44  92.17  92.87     16    0.359     0    0.000    0.359
+  0.00 100.00  30.58  23.44  92.17  92.87     16    0.359     0    0.000    0.359
+  0.00 100.00  30.58  23.44  92.17  92.87     16    0.359     0    0.000    0.359
+  0.00 100.00  30.58  23.44  92.17  92.87     16    0.359     0    0.000    0.359
+```
+
+YGC：young gc发生的次数；
+
+YGCT：young gc消耗的时间；
+
+FGC：full gc发生的次数；
+
+FGCT：full gc消耗的时间。
+
+如果你发现YGC很频繁，或者FGC很频繁，就说明内存分配的少了。此时需要修改`kafka-server-start.sh`中的KAFKA_HEAP_OPTS：
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/bin/kafka-server-start.sh 
+```
+
+```bash
+# 在脚本使用KAFKA_HEAP_OPTS之前设置该变量值
+export KAFKA_HEAP_OPTS="-Xmx10G -Xms10G -XX:metaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80"
+```
+
+这个配置表示给Kafka分配了10G内存，在服务器4核16G内存情况下。
+
+### 5.1.2、Replication参数调优
+
+- replica.socket.timeout.ms=60000
+
+这个参数的默认值是30秒，它是控制partition副本之间socket通信的超时时间，如果设置的太小，有可能会犹豫网络原因导致造成误判，认为某一个partition副本连不上了。
+
+- replica.lag.time.max.ms=50000
+
+如果一个副本在指定的时间内没有向leader节点发送任何请求，或者在指定的时间内没有同步完leader中的数据，则leader会将这个节点从ISR列表中移除。
+
+如果网络不好，或者Kafka压力较大，建议调大该值，否则可能会频繁出现副本丢失，进而导致集群需要频繁复制副本，导致集群压力更大，会陷入一个恶性循环。
+
+### 5.1.3、Log参数调优
+
+这块是针对Kafka中数据文件的删除时机进行设置，不是对Kafka本身的日志参数配置。
+
+- log.retention.hours=24
+
+这个参数默认值为168，单位是小时，就是7天，默认对数据保存7天，可以在这调整数据保存的时间，我们在实际工作中改为了只保存1天，因为Kafka中的数据我们会在hdfs中进行备份，保存一份，所以就没有必要在Kafka中保留太长时间了。
+
+在Kafka中保留只是为了能够让你在指定的时间内恢复数据，或者重新消费数据，如果没有这种需求，那么就没必要设置太长时间。
+
+> 注意：这里分析的Replication的参数和Log参数都是在`server.properties`文件中进行配置。
+
+
+
+## 5.2、Kafka Topic命名小技巧
+
+针对Kafka中Topic命名的小技巧。
+
+建议在给topic命名的时候在后面跟上r2p10之类的内容：
+
+r2：表示Partition的弗恩因子是2
+
+p10：表示这个Topic的分区数是10
+
+这样的好处是后期我们如果要写消费者消费指定topic的数据，通过topic的名称我们就知道应该设置多少个消费者消费数据效率最高。
+
+因为一个partition同时只能被一个消费者消费，所以效率最高的情况就是消费者的数据和topic的分区数量保持一致。
+
+在这里通过topic的名称就可以直接看到，一目了然。
+
+但是也有一个缺点，就是后期如果我们动态调整了topic的partition，那么这个topic名称上的partition数量就不准确了，针对这个topic，建议大家一开始的时候就提前预估一下，可以多设置一些partition，我们在工作中的时候针对一些数据量比较大的topic一般会设置4050个partition，数据量少的topic一般设置510个partition，这样后期调整topic partition数量的场景就比较少了。
+
+
+
+## 5.3、Kafka集群监控管理工具
+
+现在我们操作Kafka都是在命令行界面中通过脚本操作的，后面需要传很多参数，用起来还是比较麻烦的，那么Kafka没有提供web界面的支持吗？
+
+很遗憾的告诉你，Apache官方并没有提供，不过好消息是有一个由雅虎开源的一个工具，目前用起来还不错。
+
+它之前的名字叫KafkaManager，后来改名字了，叫[CMAK](https://github.com/yahoo/CMAK)。
+
+CMAK是目前最受欢迎的Kafka集群管理工具，最早由雅虎开源，用户可以在Web界面上操作Kafka集群，可以轻松检查集群状态（Topic、Consumer、Offset、Brokers、Replica、Partition）。
+
+下载地址：https://github.com/yahoo/CMAK/tags
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/yahoo/CMAK/releases/download/3.0.0.5/cmak-3.0.0.5.zip
+```
+
+> 注意：由于cmak-3.0.0.5.zip版本是在java11这个版本下编译的，所以在运行的时候也需要使用java11这个版本，我们目前服务器上使用的是java8这个版本。
+
+我们为什么不使用java11版本呢？因为自2019年1月1日起，java8之后的更新版本在商业用途的时候就需要收费授权了。
+
+在针对cmak-3.0.0.5.zip这个版本，如果我们想要使用的话有两种解决办法：
+
+1：下载cmak的源码，使用jdk8编译
+
+2：额外安装一个java11
+
+如果想要编译的话需要安装sbt这个工具对源码进行编译，sbt是Scala的构建工具，类似于Java中的Maven。由于我们在这个使用不属于商业用途，所以使用java11是没问题的，那就不用重新编译了。
+
+下载JDK11：
+
+下面的下载地址，可以通过ORACLE官网下载页，登录后获取：
+
+官网下载页地址： http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://download.oracle.com/otn/java/jdk/11.0.14+8/7e5bbbfffe8b45e59d52a96aacab2f04/jdk-11.0.14_linux-x64_bin.tar.gz?AuthParam=1645937638_93d909234b0b472bdf015454d7da3b2c
+```
+
+### 5.3.1、安装JDK11
+
+- 解压安装
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/jdk-11.0.7_linux-x64_bin.tar.gz -C /usr/local/Java
+```
+
+### 5.3.2、安装cmak
+
+- 创建安装目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Cmak
+```
+
+- 解压
+
+```bash
+[emon@emon ~]$ unzip /usr/local/src/cmak-3.0.0.5.zip -d /usr/local/Cmak/
+```
+
+- 修改JDK版本
+
+```bash
+[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.5/bin/cmak
+```
+
+```bash
+# 在die()函数之前添加一行：
+JAVA_HOME=/usr/local/Java/jdk-11.0.7/
+```
+
+- 修改conf
+
+```bash
+[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.5/conf/application.conf 
+```
+
+```bash
+# 找到cmak.zkhosts=${?ZK_HOSTS}，在其后追加：
+cmak.zkhosts="emon:2181"
+```
+
+注意：如果是zk的集群，可以类似`cmak.zkhosts="emon:2181,emon2:2181,emon3:2181"`
+
+同时，该zookeeper只是被cmak使用的，是否是kafka所使用的zk集群，么的关系。
+
+- 调整Kafka配合cmak
+
+1： 先停止Kafka集群；
+
+2：在启动脚本之前添加JMX_PORT配置
+
+```bash
+[emon@emon ~]$ vim /usr/local/kafka/kafkaStart.sh 
+```
+
+```bash
+# 启动kafka
+JMX_PORT=9988 /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties
+```
+
+3：同步该启动脚本到其他节点
+
+```bash
+[emon@emon ~]$ scp -rq /usr/local/kafka/kafkaStart.sh emon@emon2:/usr/local/kafka/
+[emon@emon ~]$ scp -rq /usr/local/kafka/kafkaStart.sh emon@emon3:/usr/local/kafka/
+```
+
+- 启动cmak的脚本
+
+```bash
+# 默认9000端口，可以通过-Dhttp.port调整
+[emon@emon ~]$ /usr/local/Cmak/cmak-3.0.0.5/bin/cmak -Dconfig.file=/usr/local/Cmak/cmak-3.0.0.5/conf/application.conf -Dhttp.port=9000
+```
+
+- 访问
+
+http://emon:9000/
+
+添加一个Cluster，重点参数配置如下：
+
+![image-20220227133713361](images/image-20220227133713361.png)
+
+点击`Save`后跳转的界面上，点击`Go to cluster view.`查看。
 
