@@ -649,3 +649,59 @@ Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs:
 	Topic: hello	Partition: 4	Leader: 2	Replicas: 2,1	Isr: 1,2
 ```
 
+## 4.3、Kafka生产消费者实战
+
+### 4.3.1、Consumer消费offset查询
+
+Kafka0.9版本以前，消费者的offset信息保存在zookeeper中。
+
+从Kafka0.9开始，使用了新的消费API，消费者的信息会保存在Kafka里面的`__consumer_offsets`这个topic中。
+
+因为频繁操作zookeeper性能不高，所以Kafka在自己的topic中负责维护消费者的offset信息。
+
+> 如何查询保存在Kafka中农的Consumer的offset信息呢？
+
+使用`kafka-consumer-groups.sh`这个脚本可以查看。
+
+- 查看目前所有的consumer group。
+
+```bash
+[emon@emon ~]$ kafka-consumer-groups.sh --list --bootstrap-server emon:9092
+# 命令行输出结果
+con-2
+con-1
+```
+
+- 查看某一个具体consumer group的信息
+
+```bash
+[emon@emon ~]$ kafka-consumer-groups.sh --describe --bootstrap-server emon:9092 --group con-1
+# 命令行输出结果
+Consumer group 'con-1' has no active members.
+
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+con-1           hello           4          0               0               0               -               -               -
+con-1           hello           2          0               0               0               -               -               -
+con-1           hello           3          2               2               0               -               -               -
+con-1           hello           0          0               0               0               -               -               -
+con-1           hello           1          2               2               0               -               -               -
+```
+
+GROUP：当前消费者组，通过group.id指定的值；
+
+TOPIC：当前消费的topic；
+
+PARTITION：消费的分区；
+
+CURRENT-OFFSET：消费者消费到这个分区的offset；
+
+LOG-END-OFFSET：当前分区中数据的最大offset；
+
+LAG：当前分区未消费数据量；
+
+CONSUMER-ID：消费者ID；
+
+HOST：主机；
+
+CLIENT-ID：客户端ID。
+

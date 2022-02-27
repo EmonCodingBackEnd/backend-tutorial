@@ -4719,7 +4719,7 @@ http://192.168.1.116:8082/
       - Use password authentication,or use a different key[勾选]
         - Passphrase / Password： `[密码]`
     
-    **说明：**Hostname对应的emon，是表示主机名emon，对应的是虚拟机当前的IP地址。
+    **说明**：Hostname对应的emon，是表示主机名emon，对应的是虚拟机当前的IP地址。
     
   - 使用插件：在构建Job时，Post Steps可以勾选Send files or execute commands over SSH了。
 
