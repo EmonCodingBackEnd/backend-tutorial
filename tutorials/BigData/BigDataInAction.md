@@ -39,7 +39,7 @@
 | ~/bigdata/flink/shell   |                |
 | ~/bigdata/flink/source  |                |
 
-## 1、安装ZooKeeper（CDH版）
+## 1、安装ZooKeeper
 
 ### 1.0、依赖环境
 
