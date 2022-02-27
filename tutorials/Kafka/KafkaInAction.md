@@ -15,43 +15,29 @@
 - 创建
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092 --replication-factor 1 --partitions 1 --topic test
-# 命令执行结果
-Created topic test.
-```
-
-或者：
-
-```bash
+# --zookeeper emon:2181 可以替换为 --bootstrap-server emon:9092；若是多个可以 emon:9092,emon2:9092,emon3:9092
 [emon@emon ~]$ kafka-topics.sh --create --zookeeper emon:2181 --replication-factor 1 --partitions 1 --topic test
-# 命令执行结果
-Created topic test.
 ```
 
 - 查看topic列表
 
 ```bash
+# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
 [emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
-# 命令执行结果
-test
 ```
 
 - 查看单个topic详情
 
 ```bash
+# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
 [emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
-# 命令执行结果
-Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
-	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
 ```
 
 - 删除
 
 ```bash
+# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
 [emon@emon ~]$ kafka-topics.sh --delete --zookeeper emon:2181 --topic ssstopic
-# 命令执行结果，提示如果 delete.topic.enable不设置true，执行不产生影响，仅仅标记为deletion
-Topic ssstopic is marked for deletion.
-Note: This will have no impact if delete.topic.enable is not set to true.
 ```
 
 - 生产者
@@ -979,4 +965,48 @@ http://emon:9000/
 点击`Save`后跳转的界面上，点击`Go to cluster view.`查看。
 
 # 六、实战：Kafka集群平滑升级
+
+之前我们在使用Kafka 0.9.0.0 版本的时候，遇到一个比较诡异的问题：
+
+针对消费者组增加消费者的时候可能会导致rebalance，进而导致部分consumer不能再消费分区数据。
+
+意思就是之前针对这个topic的5个分区只有2个消费者消费数据，后期我们动态的把消费者调整到了5个，这样可能会导致部分消费者无法消费分区中的数据。
+
+针对这个bug这里有一份详细描述：
+
+https://issues.apache.org/jira/browse/KAFKA-2978
+
+此bug官方在0.9.0.1版本中进行了修复。
+
+当时我们的线上集群使用的就是0.9.0.0的版本。
+
+所以我们需要对线上集群在不影响线上业务的情况下进行升级，称为平滑升级，也就是升级的时候不影响线上的正常业务运行。
+
+接下来我们就查看了官网文档，上面有针对集群平滑升级的一些信息：
+
+http://kafka.apache.org/090/documentation.html#upgrade
+
+在验证这个升级流程的时候我们是在测试环境下，先模拟线上的集群环境，进行充分测试，可千万不能简单测试一下就直接搞到测试环境去做，这样是很危险的。
+
+由于当时这个Kafka集群我们还没有移交给运维负责，并且运维当时对这个框架也不是很熟悉，所以才由我们开发人员来进行平滑升级，否则这种框架升级的事情肯定是交给运维去做的。
+
+那接下来看一下具体的平滑升级步骤：
+
+小版本之间集群升级不需要额外修改集群的配置文件。只需要按照下面步骤去执行即可。
+
+假设Kafka0.9.0.0集群在三胎服务器上，需要把这三台服务器上的Kafka集群升级到0.9.0.1版本。
+
+> 注意：提前在集群的三台机器上 把0.9.0.1的安装包，解压、配置好。
+
+主要是log.dirs这个参数，0.9.0.1中的这个参数和0.9.0.0的这个参数一定要保持一致，这样新版本的Kafka才可以识别之前的Kafka中的数据。
+
+在集群升级过程中建议通过CMAK查看集群的状态信息，比较方便。
+
+1：先stop掉0.9.0.0集群中的第一个节点，然后去CMAK上查看集群的broker信息，确认节点已经停掉。并且再看一下，节点的副本下线状态。确认集群是否识别到副本下线状态。
+
+然后在当前节点把Kafka0.9.0.1启动起来。再回到CMAK中查看broker信息，确认刚启动的节点是否已经正确显示，并且还要确认这个节点是否可以正常接收和发送数据。
+
+2：按照第一步的流程去依次操作剩余节点即可，就是先把0.9.0.0版本的Kafka停掉，再把0.9.0.1版本的Kafka启动即可。
+
+> 注意：每操作一个节点，需要稍等一下，确认这个节点可以正常接收和发送数据之后，再处理下一个节点。
 
