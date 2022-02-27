@@ -91,6 +91,18 @@ string：最简单的字符串类型键值对缓存，也是最基本的。
 localhost:6379> keys * 
 ```
 
+- 游标查询
+
+```bash
+emon:6379> scan cursor [MATCH pattern] [COUNT count]
+# 第一次迭代传0
+emon:6379> scan 0
+# 指定返回2条
+emon:6379> scan 0 count 2
+# 指定match
+emon:6379> scan 0 match day* count 3
+```
+
 - 查看key的类型
 
 ```bash
@@ -209,6 +221,13 @@ localhost:6379> mget key [key ...]
 # 特殊：如连续设置的key，有任何一个已经存在，则整体都会被忽略！0-表示全部被忽略，1-表示全部成功！
 localhost:6379> msetnx key value [key value ...]
 (integer) 1
+```
+
+- 是否存在
+
+```bash
+# 存在返回1，否则返回0
+emon:6379> exists key
 ```
 
 
@@ -553,5 +572,5 @@ string：微博数，粉丝数（避免使用select count(*) from xxx)
 
 
 
-## 3.4、使用Redis存储数据
+## 
 
