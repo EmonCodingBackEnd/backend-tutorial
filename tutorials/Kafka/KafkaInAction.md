@@ -44,7 +44,7 @@
 
 ```bash
 # 打开生产者命令行模式
-[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic test
+[emon@emon ~]$ kafka-console-producer.sh --broker-list emon:9092 --topic test
 ```
 
 - 消费者
