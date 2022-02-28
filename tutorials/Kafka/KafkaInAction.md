@@ -22,21 +22,21 @@
 - 查看topic列表
 
 ```bash
-# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
-[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+# --zookeeper emon:2181 可以替换为 --bootstrap-server emon:9092；若是多个可以 emon:9092,emon2:9092,emon3:9092
+[emon@emon ~]$ kafka-topics.sh --list --zookeeper emon:2181
 ```
 
 - 查看单个topic详情
 
 ```bash
-# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
-[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
+# --zookeeper emon:2181 可以替换为 --bootstrap-server emon:9092；若是多个可以 emon:9092,emon2:9092,emon3:9092
+[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic test
 ```
 
 - 删除
 
 ```bash
-# --bootstrap-server emon:9092 可以替换为 --zookeeper emon:2181；若是多个可以 emon:9092,emon2:9092,emon3:9092
+# --zookeeper emon:2181 可以替换为 --bootstrap-server emon:9092；若是多个可以 emon:9092,emon2:9092,emon3:9092
 [emon@emon ~]$ kafka-topics.sh --delete --zookeeper emon:2181 --topic ssstopic
 ```
 
