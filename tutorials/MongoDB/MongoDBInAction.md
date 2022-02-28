@@ -613,7 +613,7 @@ rs.addArb("repo.emon.vip:27019") 或者 rs.add({host:"repo.emon.vip:27019",arbit
 
 # 二、Mongo数据库介绍
 
-## 2.1、 概念对比
+## 2.1、概念对比
 
 | RDBMS         | MongoDB                      |
 | ------------- | ---------------------------- |
@@ -4332,7 +4332,7 @@ db.<collection>.explain().<method(...)>
 
 
 
-# 10、MongoDB管理工具
+# 十、MongoDB管理工具
 
 ## 10.1、安装Database Tools
 
@@ -4389,23 +4389,190 @@ export PATH=/usr/local/mongodb/bin:/usr/local/mongodbtools/bin:$PATH
 
 ### 10.2.1、`mongoexport`导出
 
+**导出所用的用户，必须拥有read权限**
+
 语法格式：
 
 ```bash
 mongoexport --collection=<coll> <options> <connection-string>
 ```
 
+- 导出CSV格式
+
 ```bash
-[emon@emon ~]$ mongoexport --db test --collection accounts --type=csv --fields name,balance --out /usr/local/mongodb/bak/accounts.csv -u backup -p test123
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=csv --fields name,balance --out /usr/local/mongodb/bak/accounts.csv -u readUser -p passwd --authenticationDatabase admin
 ```
 
+> `--authenticationDatabase admin`：表示用户readUser的验证需要在admin这个数据库，如果`-p`指定的用户和`--db`指定的数据库归属一致，可省略该选项。
+>
+> `--fields`必须被指定，导出结果仅包含--fields指定的字段
 
+- 导出JSON格式，指定`--fields`
 
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=json --fields name,balance --out /usr/local/mongodb/bak/accounts.json -u readUser -p passwd --authenticationDatabase admin
+```
 
+> `--fields`可用不指定；如果指定，哪怕--fields不指定`_id`，仍会包含`_id`字段
+
+- 导出JSON格式，不指定`--fields`
+
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=json --out /usr/local/mongodb/bak/accounts.json -u readUser -p passwd --authenticationDatabase admin
+```
+
+- 导出JSON格式，指定`--query`
+
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=json --out /usr/local/mongodb/bak/accounts.json -u readUser -p passwd --authenticationDatabase admin --query '{"balance":{"$gte":100}}'
+```
+
+- 导出JSON格式，指定--host和--port
+
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=json --out /usr/local/mongodb/bak/accounts.json -u readUser -p passwd --authenticationDatabase admin --query '{"balance":{"$gte":100}}' --host emon --port 27017
+```
+
+> 其他的参数：
+> --limit
+>
+> --skip
+>
+> --sort
+
+- 导出JSON格式，指定限制
+
+```bash
+[emon@emon ~]$ mongoexport --db test --collection accounts --type=json --out /usr/local/mongodb/bak/accounts.json -u readUser -p passwd --authenticationDatabase admin --limit 2 --skip 1
+```
+
+### 10.2.2、`mongoimport`导入
+
+**导出所用的用户，必须拥有readWrite权限，比如：readWriteAnyDatabase**
+
+- 导入CSV文件
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type csv --headerline --file /usr/local/mongodb/bak/accounts.csv -u writeUser -p passwd --authenticationDatabase admin
+```
+
+> --headerline：指定第一行为标题行
+
+- 查看导入文档
+
+```bash
+[emon@emon ~]$ mongo -u readUser -p  passwd --authenticationDatabase admin  --quiet --eval 'db.importAccounts.find()'
+```
+
+- 导入CSV文件，导入之前drop集合
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type csv --headerline --file /usr/local/mongodb/bak/accounts.csv --drop -u writeUser -p passwd --authenticationDatabase admin
+```
+
+- 导入CSV文件，自定义header
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type csv --fields im_name,im_balance --file /usr/local/mongodb/bak/accounts.csv -u writeUser -p passwd --authenticationDatabase admin
+```
+
+> 注意：--fields和--headerline只能二选一，所以，如果使用--fields时，要去掉csv文件首行的标题头
+
+- 导入CSV文件，多次导入时执行更新
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type csv --headerline --file /usr/local/mongodb/bak/accounts.csv --drop -u writeUser -p passwd --authenticationDatabase admin --upsetFields name,balance
+```
+
+> 导入时，默认按照主键对比重复数据，如果指定了--upsetFields会按照指定字段去对比。
+
+- 导入JSON文件，指定去重字段
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type json --file /usr/local/mongodb/bak/accounts.json -u writeUser -p passwd --authenticationDatabase admin --authenticationDatabase admin --upsetFields name,balance
+```
+
+> 导入时，默认按照主键对比重复数据，如果指定了--upsetFields会按照指定字段去对比。
+
+- 导入JSON文件，默认导入
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type json --file /usr/local/mongodb/bak/accounts.json -u writeUser -p passwd --authenticationDatabase admin
+```
+
+- 导入JSON文件，碰到错误就停止，指定导入顺序
+
+```bash
+[emon@emon ~]$ mongoimport --db test --collection importAccounts --type json --file /usr/local/mongodb/bak/accounts.json -u writeUser -p passwd --authenticationDatabase admin --stopOnError --maintainInsertionOrder
+```
 
 ## 10.3、二进制格式导入导出
 
+## 10.4、显示数据库服务器进程状态：mongostat
 
+**需要对操作的数据库具备`clusterMonitor`角色的权限**
+
+- 默认监控
+
+```bash
+[emon@emon ~]$ mongostat --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin
+# 命令行输出
+insert query update delete getmore command dirty used flushes vsize  res qrw arw net_in net_out conn  set repl                time
+    *0    *0     *0     *0       0     1|0  0.0% 1.8%       0 2.28G 492M 0|0 1|0   266b   43.6k   26 emon  PRI Feb 28 16:51:13.387
+```
+
+说明：
+
+command： 每秒执行的命令数
+
+dirty,used：数据库引擎缓存的使用量和百分比
+
+vsize：虚拟内存使用量（MB）
+
+res：常驻内存使用量（MB）
+
+conn：连接数
+
+- 指定监控刷新频率
+
+```bash
+# 指定3秒一次
+[emon@emon ~]$ mongostat --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin 3
+```
+
+- 指定监控刷新次数和频率
+
+```bash
+[emon@emon ~]$ mongostat --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin --rowcount 5 3
+```
+
+- 指定关注的状态
+
+```bash
+[emon@emon ~]$ mongostat --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin --rowcount 5 3 -o "command,dirty,used,vsize,res,conn,time"
+```
+
+## 10.5、显示各个集合上的读写时间：mongotop
+
+**需要对操作的数据库具备`clusterMonitor`角色的权限**
+
+- 默认统计
+
+```bash
+[emon@emon ~]$ mongotop --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin
+```
+
+- 指定监控刷新频率
+
+```bash
+[emon@emon ~]$ mongotop --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin 3
+```
+
+- 指定监控刷新次数和频率
+
+```bash
+[emon@emon ~]$ mongotop --host localhost --port 27017 -u monitorUser -p passwd --authenticationDatabase admin --rowcount 5 3
+```
 
 
 
@@ -4452,9 +4619,9 @@ mongoexport --collection=<coll> <options> <connection-string>
   
 - 集群管理角色
   - `clusterAdmin`: 只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。
-  - `clusterManager`: 
-  - clusterMonitor
-  - hostManager
+  - `clusterManager`: 授予管理和监控集群的权限
+  - `clusterMonitor`：授予监控集群的权限，对监控工具具有readonly的权限
+  - `hostManager`：管理Server
   
 - 备份恢复角色
   - backup
@@ -4576,7 +4743,8 @@ db.createUser(user, writeConcern)
 - 创建一个只能读取test数据库的用户
 
 ```js
-> use test;
+> user admin
+// 仅能导出数据库test中的集合
 > db.createUser(
 	{
         user: "testReader",
@@ -4584,6 +4752,35 @@ db.createUser(user, writeConcern)
         roles: [{role: "read", db: "test"}]
     }
 )
+// 创建所有数据库都可用的备份用户
+> db.createUser({
+	user: "readUser",
+	pwd: "passwd",
+	roles: ["readAnyDatabase"]
+})
+```
+
+- 创建一个能写入所有数据库的用户
+
+```js
+> user admin
+// 创建所有数据库都可用的导入用户
+> db.createUser({
+	user: "writeUser",
+	pwd: "passwd",
+	roles: ["readWriteAnyDatabase"]
+})
+```
+
+- 创建一个具有集群监控的用户
+
+```js
+> user admin
+> db.createUser({
+	user: "monitorUser",
+	pwd: "passwd",
+	roles: ["clusterMonitor"]
+})
 ```
 
 
@@ -4808,7 +5005,26 @@ Mongo Shell是用来操作MongoDB的javascript客户端界面
 > exit
 ```
 
+## 4、Studio 3T
 
+### 4.1、复制集连接
+
+【File】->【Connect...】->【New Connection】
+
+在【Server】Tab中：
+
+- Connection name：连接名称
+- Connection Type：连接类型选择 Replica Set
+- Members：点击【Add...】，录入Server和Port并点击【OK】，然后点击【Discover】
+- Replica Set Name：复制集名称
+- Read Preference：Primary
+
+在【Authentication】Tab中：
+
+- Authentication Mode：Legacy(SCRAM-SHA-1)
+- User name：用户名
+- Password：密码
+- Authentication DB：数据库
 
 # 九十九、用户信息
 
