@@ -590,5 +590,354 @@ string：微博数，粉丝数（避免使用select count(*) from xxx)
 
 
 
-## 
+# 四、Redis高级特性
+
+## 4.1、expire生存时间
+
+Redis中可以使用expire命令设置一个键的生存时间，到时间后Redis会自动删除它。
+
+> 它的一个典型应用场景时：手机验证码。
+
+我们平时在登录或者注册的时候，手机会收到一个验证码，上面会提示验证码的过期时间，过了这个时间之后这个验证码就不能用了。
+
+expire支持以下操作：
+
+| 命令     | 格式                   | 解释                          |
+| -------- | ---------------------- | ----------------------------- |
+| expire   | expire key seconds     | 设置key的过期时间（单位：秒） |
+| ttl      | ttl key                | 获取key的剩余有效时间         |
+| persist  | persist key            | 取消key的过期时间             |
+| expireat | expireat key timestamp | 设置UNIX时间戳的过期时间      |
+
+
+
+
+
+## 4.2、pipeline管道
+
+针对批量操作数据或者批量初始化数据的时候使用，效率高。
+
+Redis的pipeline功能在命令行中没有实现，在Java客户端（jedis）中是可以使用的。
+
+它的原理是这样的：
+
+![image-20220302091606643](images/image-20220302091606643.png)
+
+不使用管道的时候，我们每次执行一条命令都需要和redis服务器交互一次。
+
+使用管道之后，可以实现一次提交一批命令，这一批命令只需要和redis服务器交互一次，所以就提高了性能。
+
+这个功能就类似于MySQL中的batch批处理。
+
+## 4.3、info命令
+
+这里面参数比较多，在这我们主要关注几个重点的参数。
+
+```bash
+# Server
+# Redis服务器版本
+redis_version:5.0.8
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:c09b553745bda413
+redis_mode:standalone
+os:Linux 3.10.0-1062.el7.x86_64 x86_64
+arch_bits:64
+multiplexing_api:epoll
+atomicvar_api:atomic-builtin
+gcc_version:4.8.5
+process_id:105372
+run_id:5fe51dddd038c4f5751c313e8f0a44c7de28fb28
+tcp_port:6379
+uptime_in_seconds:214752
+uptime_in_days:2
+hz:10
+configured_hz:10
+lru_clock:2017930
+executable:/usr/local/redis/redis-server
+# 启动Redis时使用的配置文件路径
+config_file:/usr/local/redis/redis.conf
+
+# Clients
+# 已连接客户端的数量
+connected_clients:2
+client_recent_max_input_buffer:2
+client_recent_max_output_buffer:0
+blocked_clients:0
+
+# Memory
+used_memory:20605040
+# Redis目前存储数据使用的内容
+used_memory_human:19.65M
+used_memory_rss:27955200
+used_memory_rss_human:26.66M
+used_memory_peak:20719048
+used_memory_peak_human:19.76M
+used_memory_peak_perc:99.45%
+used_memory_overhead:11025256
+used_memory_startup:861344
+used_memory_dataset:9579784
+used_memory_dataset_perc:48.52%
+allocator_allocated:20571232
+allocator_active:27917312
+allocator_resident:27917312
+total_system_memory:6124597248
+# Redis可以使用的内存总量，和服务器的内存有关
+total_system_memory_human:5.70G
+used_memory_lua:37888
+used_memory_lua_human:37.00K
+used_memory_scripts:0
+used_memory_scripts_human:0B
+number_of_cached_scripts:0
+maxmemory:200000000
+maxmemory_human:190.73M
+maxmemory_policy:noeviction
+allocator_frag_ratio:1.36
+allocator_frag_bytes:7346080
+allocator_rss_ratio:1.00
+allocator_rss_bytes:0
+rss_overhead_ratio:1.00
+rss_overhead_bytes:37888
+mem_fragmentation_ratio:1.36
+mem_fragmentation_bytes:7383968
+mem_not_counted_for_evict:0
+mem_replication_backlog:0
+mem_clients_slaves:0
+mem_clients_normal:66616
+mem_aof_buffer:0
+mem_allocator:libc
+active_defrag_running:0
+lazyfree_pending_objects:0
+
+# Persistence
+loading:0
+rdb_changes_since_last_save:0
+rdb_bgsave_in_progress:0
+rdb_last_save_time:1646185019
+rdb_last_bgsave_status:ok
+rdb_last_bgsave_time_sec:0
+rdb_current_bgsave_time_sec:-1
+rdb_last_cow_size:360448
+aof_enabled:0
+aof_rewrite_in_progress:0
+aof_rewrite_scheduled:0
+aof_last_rewrite_time_sec:-1
+aof_current_rewrite_time_sec:-1
+aof_last_bgrewrite_status:ok
+aof_last_write_status:ok
+aof_last_cow_size:0
+
+# Stats
+total_connections_received:14
+total_commands_processed:400239
+instantaneous_ops_per_sec:0
+total_net_input_bytes:14722884
+total_net_output_bytes:15807481
+instantaneous_input_kbps:0.00
+instantaneous_output_kbps:0.00
+rejected_connections:0
+sync_full:0
+sync_partial_ok:0
+sync_partial_err:0
+expired_keys:0
+expired_stale_perc:0.00
+expired_time_cap_reached_count:0
+evicted_keys:0
+keyspace_hits:11
+keyspace_misses:1
+pubsub_channels:0
+pubsub_patterns:0
+latest_fork_usec:528
+migrate_cached_sockets:0
+slave_expires_tracked_keys:0
+active_defrag_hits:0
+active_defrag_misses:0
+active_defrag_key_hits:0
+active_defrag_key_misses:0
+
+# Replication
+role:master
+connected_slaves:0
+master_replid:fbcd950f8c060c2ac9ca8731ec1fd883505c793a
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+# CPU
+used_cpu_sys:68.496385
+used_cpu_user:32.703689
+used_cpu_sys_children:0.295049
+used_cpu_user_children:0.065101
+
+# Cluster
+cluster_enabled:0
+
+# Keyspace
+# db0表示0号数据库，keys：表示0号数据库的key总量，expires：表示0号数据库失效被删除的数量。
+db0:keys=200000,expires=0,avg_ttl=0
+db1:keys=2,expires=0,avg_ttl=0
+```
+
+
+
+## 4.4、Redis的持久化
+
+Redis持久化简单理解就是把内存中的数据持久化到磁盘中，可以保证Redis重启之后还能恢复之前的数据。
+
+Redis支持两种持久化，可以单独使用或者组合使用。
+
+RDB和AOF。
+
+
+
+### 4.4.1、RDB是Redis默认的持久化机制。
+
+RDB持久化是通过快照完成的，当符合一定条件时，Redis会自动将内存中的所有数据执行快照操作并存储到硬盘上，默认存储在dump.rdb文件中。
+
+> Redis什么时候会执行快照？
+
+Redis执行快照的时机是由以下参数控制的，这些参数是在redis.conf文件中的。
+
+打开`redis.conf`文件：
+
+```bash
+save 900 1
+save 300 10
+save 60 10000
+```
+
+save 900 1 表示900秒内至少一个key被更改则进行快照。
+
+这里面的三个时机哪个先满足都会执行快照操作。
+
+RDB的优点：由于存储的有数据快照文件，恢复数据很方便。
+
+RDB的缺点：会丢失最后一次快照以后更改的所有数据，因为两次快照之间是由一个时间差的，这期间之内修改的数据可能会丢失。
+
+
+
+### 4.4.2、Redis持久化之AOF（Append Only File）
+
+AOF持久化是通过日志文件的方式，默认情况下没有开启，可以通过appendonly参数开启。
+
+打开`redis.conf`文件：
+
+```bash
+appendonly yes
+appendfilename "appendonly.aof"
+```
+
+AOF日志文件的保存位置和RDB文件相同，都是dir参数设置的，默认的文件名是`appendonly.aof`。
+
+> 注意：dir参数的值为.表示当前目录，也就是说我们在哪一个目录下启动redis，rdb快照文件和aof日志就产生在哪一个目录。
+
+AOF方式只会记录用户的写命令，添加、修改、删除之类的命令，查询命令不会记录，因为查询命令不会影响数据内容。
+
+
+
+那redis什么时候会把用户的写命令同步到aof文件中呢？
+
+打开`redis.conf`文件：
+
+```bash
+# appendfsync always
+appendfsync everysec
+# appendfsync no
+```
+
+默认是每秒钟执行一次同步操作。`appendfsync everysec`。
+
+也可以实现每执行一次写操作就执行一次同步操作，`appendfsync always`，但是这样效率会有点低。
+
+或者使用`appendfsync no`，表示不主动进行同步，由操作系统来做，30秒执行一次。
+
+
+
+如果大家对数据的丢失确实是0容忍的话，可以使用always。
+
+不过一般情况下，redis中存储的都是一些缓存数据，就算丢了也没关系，程序还会继续往里面写新数据，不会造成多大影响。
+
+
+
+## 4.5、Redis的安全策略
+
+### 4.5.1、设置数据库密码
+
+默认情况下访问redis只要网络能通就可以直接访问，这样其实是有一些不安全的，不过我们一般会限制只能在内网访问，这样其实问题也不大。
+
+redis针对这个问题，也支持给数据库设置密码，在`redis.conf`中配置。
+
+```bash
+requirepass `[密码]`
+```
+
+设置后重启即可。
+
+### 4.5.2、命令重命名
+
+咱们前面讲过一个命令是flushall，这个命令是很危险的，它可以把redis中的所有数据全部清空，所以在实际工作中一般需要将这个命令给禁用掉，防止误操作。
+
+在`redis.conf`配置文件中进行设置：
+
+```bash
+rename-command flushall ""
+```
+
+修改后重启服务。
+
+
+
+## 4.6、一个Redis实例最多能存放多少key？
+
+> 一个Redis实例最多能存放多少key？
+>
+> 有没有限制？
+
+Redis本身是不会限制存储多少key的，但是Redis是基于内存的，它的存储极限是系统中的可用内存值，如果内存存满了，那就无法再存储key了。
+
+
+
+## 4.7、Redis监控命令-monitor
+
+这个monitor命令是一把双刃剑。
+
+在实际工作中要慎用。
+
+演示：
+
+```bash
+# 打开监控
+127.0.0.1:6379> monitor
+OK
+# 以下内容是执行Java代码RedisSingle存放和获取key=name时生成的信息
+1646192727.039401 [0 10.0.0.139:14597] "AUTH" "redis123"
+1646192727.040123 [0 10.0.0.139:14597] "AUTH" "redis123"
+1646192727.040460 [0 10.0.0.139:14597] "SET" "name" "lm"
+1646192727.040713 [0 10.0.0.139:14597] "GET" "name"
+```
+
+monitor可以监控我们对redis的所有操作，如果在线上的服务器上打开了这个功能，这里面就会频繁打印出来我们对redis数据库的所有操作，这样会影响redis的性能，所以说要慎用。
+
+
+
+但是在某些特殊的场景下面它是很有用的。
+
+查找某个key的添加删除情况，比如查看某个key为啥莫名其妙消失：
+
+```bash
+[emon@emon ~]$ redis-cli -a `[密码]`  monitor | grep "name"
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+1646193234.573779 [0 10.0.0.139:11146] "SET" "name" "lm"
+1646193234.574205 [0 10.0.0.139:11146] "GET" "name"
+```
+
+
+
+
+
+# 五、Redis架构演进
 
