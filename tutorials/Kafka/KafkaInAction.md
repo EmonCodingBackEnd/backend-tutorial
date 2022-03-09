@@ -741,7 +741,7 @@ Kafka可以实现以下三种语义，这三种语义是针对消费者而言的
 
 1：将enable.auto.commit设置为false，禁用自动提交offset。
 
-2：使用consumer.seek(topicPartition, ofset)来指定offset；
+2：使用consumer.seek(topicPartition, offset)来指定offset；
 
 3：在处理消息的时候，要同时保存住每个消息的offset。以原子事务的方式保存offset和处理的消息结果，这个时候相当于自己保存offset信息了，把offset和具体的数据绑定到一块，数据真正处理成功的时候才会保存offset信息。
 
