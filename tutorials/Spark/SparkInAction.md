@@ -557,3 +557,11 @@ Spark1.3出现的`DataFrame`，Spark1.6出现了`DataSet`，在Spark2.0中两者
 
 SparkSession中包含了SparkContext和SqlContext。所以说，想通过SparkSession来操作RDD的话需要先通过它来获取SparkContext。这个SqlContext是使用SparkSQL操作hive的时候会用到的。
 
+
+
+# 五、Spark Streaming
+
+Spark Streaming是Spark Core API的一种扩展，它可以用于进行大规模、高吞吐量、容错的实时数据流的处理。
+
+![image-20220309224243853](images/image-20220309224243853.png)
+
