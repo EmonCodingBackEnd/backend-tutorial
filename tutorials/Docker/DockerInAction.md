@@ -4,9 +4,310 @@
 
 [TOC]
 
+# Vagrant的安装与使用
+
+## 1、Vagrant是什么
+
+Vagrant是构建在虚拟化技术之上的虚拟机运行环境管理工具。
+
+- 建立和删除虚拟机
+- 配置虚拟机运行参数
+- 管理虚拟机运行状态
+- 自动化配置和安装开发环境
+- 打包和分发虚拟机运行环境
+
+- Vagrant的运行，需要依赖某项具体的虚拟化技术
+  - VirtualBox
+  - VMWare
+
+
+
+### 1.1、个人角度优势
+
+- 跨平台
+- 可移动
+- 自动化部署无需人工参与
+- 面试加分项
+
+### 1.2公司角度
+
+- 减少人力培训成本
+- 统一开发环境
+
+VAGRANT+Virtualbox/VMWare+ubuntu/CentOS=目标环境
+
+## 2、Vagrant适用范围
+
+- 开发环境
+- 项目配置比较复杂
+
+
+
+## 3、Window安装Vagrant
+
+1. 下载
+
+下载地址：https://www.vagrantup.com/downloads
+
+2. 安装
+
+双击安装，安装后提示重启计算机，重启即可！
+
+3. 查看版本
+
+```bash
+$ vagrant --version
+Vagrant 2.2.19
+$ vagrant -v
+Vagrant 2.2.19
+```
+
+4. 修改Vagrant box保存路径
+
+add box的时候默认保存在用户文件夹下的`.vagrant.d`目录，通过设置VAGRANT_HOME环境变量可以改变默认位置。
+
+VAGRANT_HOME = `D:\SharedWorkspace\.vagrant.d`
+
+## 4、Vagrant的使用
+
+### 4.1、使用VirtualBox创建虚拟机
+
+#### 第一步：启动virtualbox
+
+virtualbox安装后启动！
+
+#### 第二步：下载box
+
+如何查询各种boxes：https://app.vagrantup.com/boxes/search
+
+下载地址：https://app.vagrantup.com/centos/boxes/7
+
+根据使用的Vagrant是VirtualBox还是VMWare，选择`virtualbox`或者`vmware_desktop ` 类型的 provider下载！
+
+下载后本地安装：
+
+```bash
+# 如果不是为了`vagrant add box boxesname boxespath`可以不下载。
+vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
+```
+
+#### 第三步：Vagrantfile
+
+- 规划一个目录，作为Vagrant虚拟机目录，比如：Vagrant/centos7
+
+如果尚未看到Vagrantfile，初始化配置Vagrantfile
+
+```bash
+vagrant init
+# 或者指定boxes【推荐】
+vagrant init centos/7
+```
+
+- 编辑Vagrantfile
+
+```bash
+$ vim Vagrantfile
+```
+
+```bash
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+end
+```
+
+#### 第四步：初始化机器
+
+```bash
+$ vagrant up
+# 指定virtualbox这个provider【推荐】；特别说明：默认也是 virtualbox
+$ vagrant up --provider virtualbox
+```
+
+
+
+### 4.2、使用VMWare创建虚拟机
+
+#### 第一步：安装VMWare provider插件vmware-desktop
+
+1. 下载VMWare-utility
+
+https://www.vagrantup.com/docs/providers/vmware/vagrant-vmware-utility
+
+下载后，双击安装！
+
+2. 下载VMWare-desktop查看
+
+```bash
+$ vagrant plugin install vagrant-vmware-desktop
+# 命令行输出结果
+Installing the 'vagrant-vmware-desktop' plugin. This can take a few minutes...
+Installed the plugin 'vagrant-vmware-desktop (3.0.1)'!
+```
+
+3. 安装VMWare并启动
+
+双击VMWare安装后，启动！
+
+#### 第二步：下载box
+
+如何查询各种boxes：https://app.vagrantup.com/boxes/search
+
+下载地址：https://app.vagrantup.com/centos/boxes/7
+
+根据使用的Vagrant是VirtualBox还是VMWare，选择`virtualbox`或者`vmware_desktop ` 类型的 provider下载！
+
+下载后本地安装：
+
+```bash
+# 如果不是为了`vagrant add box boxesname boxespath`可以不下载。
+vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
+```
+
+#### 第三步：Vagrantfile
+
+- 规划一个目录，作为Vagrant虚拟机目录，比如：Vagrant/centos7
+
+如果尚未看到Vagrantfile，初始化配置Vagrantfile
+
+```bash
+vagrant init
+# 或者指定boxes【推荐】
+vagrant init centos/7
+```
+
+- 编辑Vagrant
+
+```bash
+$ vim Vagrantfile
+```
+
+```bash
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+end
+```
+
+#### 第四步：初始化机器
+
+```bash
+# 指定vmware_desktop这个provider【推荐】
+vagrant up --provider vmware_desktop
+```
+
+
+
+### 4.3、Vagrant虚拟机访问
+
+### 4.3.1、通过vagrant ssh命令
+
+```bash
+$ vagrant ssh
+[vagrant@localhost ~]$ pwd
+/home/vagrant
+```
+
+
+
+### 4.3.2、通过XShell工具
+
+#### 1.查看vagrant的ssh配置
+
+```bash
+$ vagrant ssh-config
+# 命令行输出结果
+Host default
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile D:/SharedWorkspace/Vagrant/centos7/.vagrant/machines/default/virtualbox/private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
+```
+
+可以看到：
+
+- HostName 127.0.0.1
+- Port 2222
+- IdentityFile D:/SharedWorkspace/Vagrant/centos7/.vagrant/machines/default/virtualbox/private_key
+
+#### 2.XShell连接
+
+![image-20220311142612246](images/image-20220311142612246.png)
+
+
+
+![image-20220311155658798](images/image-20220311155658798.png)
+
+点击确定后登陆，首次登陆，会提示输入密码；这时，输入密码： vagrant 即可！
+
+#### 3.切换到root
+
+```bash
+# 密码是 vagrant
+[vagrant@localhost ~]$ su - root
+Password: 
+Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
+[root@localhost ~]# 
+```
+
+
+
+## 5、Vagrant的常用命令
+
+| 命令                         | 解释                                |
+| ---------------------------- | ----------------------------------- |
+| vagrant --version/vagrant -v | 查看当前版本                        |
+| vagrant box list             | 查看目前已有的box                   |
+| vagrant box add              | 新增加一个box                       |
+| vagrant box remove < name >  | 删除指定box                         |
+| vagrant init < boxes >       | 初始化配置vagrantfile               |
+| vagrant up                   | 启动虚拟机                          |
+| vagrant ssh                  | ssh登录虚拟机                       |
+| vagrant suspend              | 挂起虚拟机                          |
+| vagrant resume               | 唤醒虚拟机                          |
+| vagrant halt                 | 关闭虚拟机                          |
+| vagrant reload               | 重启虚拟机                          |
+| vagratn status               | 查看虚拟机状态                      |
+| vagrant destroy [name\|id]   | 删除虚拟机，如果是default可以省略id |
+
+
+
+
+
+## 6、Vagrant Plugin命令
+
+| 命令                                  | 解释           |
+| ------------------------------------- | -------------- |
+| vagrant plugin install < pluginName > | 安装插件       |
+| vagrant plugin list                   | 查看安装的插件 |
+| vagrant plugin uninstall              | 卸载插件       |
+| vagrant plugin help                   | 查看命令用法   |
+
+
+
 # 一、Docker的安装与配置
 
 ## 1、安装
+
+[查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
+
+## 1.0、删除旧版Docker
+
+```bash
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+```
+
+如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
 
 ### 1.1、安装要求
 
@@ -51,6 +352,9 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 4. 安装docker
 
 ```shell
+# 安装最新
+[emon@emon ~]$ sudo yum install -y docker-ce
+# 安装指定版本
 [emon@emon ~]$ sudo yum install -y docker-ce-18.06.3.ce
 ```
 
@@ -65,6 +369,7 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 ```shell
 [emon@emon ~]$ sudo docker version
 [emon@emon ~]$ sudo docker info
+[emon@emon ~]$ sudo docker run hello-world
 ```
 
 ### 1.3、配置docker加速器
