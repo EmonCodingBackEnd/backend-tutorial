@@ -288,6 +288,40 @@ Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 
 
 
+# Docker Desktop的安装与使用
+
+1. 下载
+
+下载地址：https://docs.docker.com/desktop/windows/install/
+
+2. 安装
+
+在Windows上双击安装，安装后根据提示重启电脑。
+
+3. 解决WSL 2 installation is incomplete问题
+
+打开Docker Desktop时提示：
+
+![image-20220311180310750](images/image-20220311180310750.png)
+
+
+
+首先，确保如下功能已勾选：
+
+![image-20220311180528462](images/image-20220311180528462.png)
+
+如果以勾选，并且WSL确实有下载，那么尝试更新WSL：
+
+1：以管理员身份启动 powershell
+
+2：执行
+
+```bash
+wsl --update
+```
+
+
+
 # 一、Docker的安装与配置
 
 ## 1、安装
