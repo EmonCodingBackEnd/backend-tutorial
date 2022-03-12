@@ -4,7 +4,7 @@
 
 [TOC]
 
-# Vagrant的安装与使用
+# 序一、Vagrant的安装与使用
 
 ## 1、Vagrant是什么
 
@@ -257,25 +257,23 @@ Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 
 ## 5、Vagrant的常用命令
 
-| 命令                         | 解释                                |
-| ---------------------------- | ----------------------------------- |
-| vagrant --version/vagrant -v | 查看当前版本                        |
-| vagrant box list             | 查看目前已有的box                   |
-| vagrant box add              | 新增加一个box                       |
-| vagrant box remove < name >  | 删除指定box                         |
-| vagrant init < boxes >       | 初始化配置vagrantfile               |
-| vagrant up                   | 启动虚拟机                          |
-| vagrant ssh                  | ssh登录虚拟机                       |
-| vagrant suspend              | 挂起虚拟机                          |
-| vagrant resume               | 唤醒虚拟机                          |
-| vagrant halt                 | 关闭虚拟机                          |
-| vagrant reload               | 重启虚拟机                          |
-| vagratn status               | 查看虚拟机状态                      |
-| vagrant destroy [name\|id]   | 删除虚拟机，如果是default可以省略id |
+| 命令                         | 命令执行结果状态 | 解释                                |
+| ---------------------------- | ---------------- | ----------------------------------- |
+| vagrant --version/vagrant -v |                  | 查看当前版本                        |
+| vagrant box list             |                  | 查看目前已有的box                   |
+| vagrant box add              |                  | 新增加一个box                       |
+| vagrant box remove < name >  |                  | 删除指定box                         |
+| vagrant init < boxes >       |                  | 初始化配置vagrantfile               |
+| vagrant up                   | running          | 启动虚拟机                          |
+| vagrant ssh                  |                  | ssh登录虚拟机                       |
+| vagrant suspend              | saved            | 挂起虚拟机                          |
+| vagrant resume               | running          | 唤醒虚拟机                          |
+| vagrant halt                 | poweroff         | 关闭虚拟机                          |
+| vagrant reload               | running          | 重启虚拟机                          |
+| vagratn status               | running          | 查看虚拟机状态                      |
+| vagrant destroy [name\|id]   |                  | 删除虚拟机，如果是default可以省略id |
 
-
-
-
+特殊说明：vagrant up是一个万能命令，可以对saved/poweroff状态的虚拟机唤醒。
 
 ## 6、Vagrant Plugin命令
 
@@ -288,7 +286,7 @@ Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 
 
 
-# Docker Desktop的安装与使用
+# 序二、Docker Desktop的安装与使用【不推荐】
 
 1. 下载
 
@@ -320,7 +318,16 @@ Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 wsl --update
 ```
 
+3：重启wsl【开启后，会导致VMWare启动失败：VMware Workstation 与 Device/Credential Guard 不兼容。】
 
+```bash
+net stop LxssManager
+net start LxssManager
+```
+
+安装Docker Desktop后，也会默认启用【启用或关闭Windows功能】=>【虚拟化平台】，也会导致如上VMWare启动失败问题。
+
+同时，【服务】=>【HV主机服务】也建议关闭！
 
 # 一、Docker的安装与配置
 
@@ -482,13 +489,13 @@ alias docker="sudo /usr/bin/docker"
 alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
 ```
 
-	使之生效：
+使之生效：
 
 ```shell
 [emon@emon ~]$ source .bashrc
 ```
 
-	使用示例：
+使用示例：
 
 ```shell
 [emon@emon ~]$ docker images
@@ -496,11 +503,9 @@ alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 ```
 
+## 3、基本信息查看
 
-
-# 二、基本信息查看
-
-## 1、查看Docker的基本信息
+### 3.1、查看Docker的基本信息
 
 ```shell
 [emon@emon ~]$ docker info
@@ -551,7 +556,7 @@ Registry Mirrors:
 Live Restore Enabled: false
 ```
 
-## 2、查看Docker版本
+### 3.2、查看Docker版本
 
 ```shell
 [emon@emon ~]$ docker version
@@ -577,9 +582,64 @@ Server:
 
 
 
+# 二、Docker的架构和底层技术
+
+## 1、Docker Platform
+
+- Docker提供了一个开发，打包，运行app的平台
+- 把app和底层infrastructure隔离开来
+
+|         Docker Platform          |
+| :------------------------------: |
+|           Application            |
+|          Docker Engine           |
+| Infrastructure(physical/virtual) |
+
+### 1.1、Docker Engine
+
+- 后台进程（dockerd）
+- REST API Server
+- CLI接口（docker）
+
+![image-20220312112414087](images/image-20220312112414087.png)
+
+查看Docker后台进程：
+
+```bash
+[vagrant@localhost ~]$ ps -ef|grep docker
+root      1952     1  0 02:02 ?        00:00:00 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+```
+
+
+
+## 2、Docker Architecture
+
+![image-20220312113046549](images/image-20220312113046549.png)
+
+## 3、底层技术支持
+
+- Namespaces：做隔离pid，net，ipc，mnt，uts
+- Control groups：做资源限制
+- Union file systems：Container和image的分层
+
+
+
+
+
 # 三、镜像
 
-## 1、获取镜像
+## 1、什么是Image
+
+- 文件和meta data的集合（root filesystem）
+- 分层的，并且每一层都可以添加改变，删除文件，成为一个新的image
+- 不同的image可以共享相同的layer
+- Image本身是read-only的
+
+![image-20220312135147138](images/image-20220312135147138.png)
+
+
+
+## 2、获取镜像
 
 - 获取Docker Hub镜像
   - 镜像是运行容器的前提，官方的Docker Hub网站已经提供了数十万个镜像供开放下载。
@@ -599,12 +659,114 @@ Server:
 [emon@emon ~]$ docker pull hub.c.163.com/public/ubuntu:14.04
 ```
 
-## 2、查看镜像
+### 2.1、案例：DIY一个Base Image
+
+#### 2.1.1、体验hello-world镜像
+
+```bash
+[emon@emon ~]$ docker pull hello-world
+[emon@emon ~]$ docker image ls
+[emon@emon ~]$ docker run hello-world
+```
+
+#### 2.1.2、DIY hello-world镜像
+
+1：安装C语言编译工具
+
+```bash
+[emon@emon ~]$ sudo yum install -y gcc glibc-static
+```
+
+2：创建hello.c文件并编译
+
+```bash
+[emon@emon ~]$ mkdir hello-world
+[emon@emon ~]$ cd hello-world/
+[emon@emon hello-world]$ vim hello.c
+```
+
+```c
+#include<stdio.h>
+
+int main()
+{
+    printf("hello docker\n");
+}
+```
+
+```bash
+[emon@emon hello-world]$ gcc -static hello.c -o hello
+[emon@emon hello-world]$ ls
+hello  hello.c
+[emon@emon hello-world]$ ./hello 
+hello docker
+```
+
+3：编写Dockerfile
+
+```bash
+[emon@emon hello-world]$ vim Dockerfile
+```
+
+```dockerfile
+FROM scratch
+ADD hello /
+CMD ["/hello"]
+```
+
+```bash
+# rushing-dockerhub用户名； .-当前目录寻找Dockerfile
+[emon@emon hello-world]$ docker build -t rushing/hello-world .
+# 命令行输出结果
+Sending build context to Docker daemon  865.3kB
+Step 1/3 : FROM scratch
+ ---> 
+Step 2/3 : ADD hello /
+ ---> 340544a0099c
+Step 3/3 : CMD ["/hello"]
+ ---> Running in 1ae3095100d9
+Removing intermediate container 1ae3095100d9
+ ---> 72b24c24801b
+Successfully built 72b24c24801b
+Successfully tagged rushing/hello-world:latest
+```
+
+4：查看
+
+- 查看image
+
+```bash
+[emon@emon hello-world]$ docker image ls|grep rushing
+rushing/hello-world   latest              72b24c24801b        25 seconds ago      861kB
+```
+
+- 查看image的分层
+
+```bash
+[emon@emon hello-world]$ docker history 72b24c24801b
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+72b24c24801b        2 minutes ago       /bin/sh -c #(nop)  CMD ["/hello"]               0B                  
+340544a0099c        2 minutes ago       /bin/sh -c #(nop) ADD file:e7f35cd45d6ae73c7…   861kB 
+```
+
+5：运行
+
+```bash
+[emon@emon hello-world]$ docker run rushing/hello-world
+# 命令行输出结果
+hello docker
+```
+
+
+
+## 3、查看镜像
 
 - 使用`docker images`命令列出镜像
 
-```shel
+```shell
 [emon@emon ~]$ docker images
+# 或者
+[emon@emon ~]$ docker image ls
 ```
 
 - 列名解析：
@@ -630,7 +792,7 @@ Server:
 
 	其中，对输出结果进行控制的选项如-f, --filter=[]、--no-trunc=true|false、-q, --quiet=true|false等，对大部分子命令都支持。
 
-## 3、为镜像添加标签Tag
+## 4、为镜像添加标签Tag
 
 	为了方便在后续工作中使用特定镜像，还可以使用`docker tag`命令来为本地镜像任意添加新的标签。
 
@@ -642,13 +804,13 @@ centos              7                   b5b4d78bc90c        2 days ago          
 centos              7.8                 b5b4d78bc90c        2 days ago          203MB
 ```
 
-## 4、使用`inspect`命令查看详细信息
+## 5、使用`inspect`命令查看详细信息
 
 ```shell
 [emon@emon ~]$ docker inspect centos:7
 ```
 
-## 5、搜寻镜像
+## 6、搜寻镜像
 
 	使用docker search命令可以搜索远端仓库中共享的镜像，默认搜索官方仓库中的镜像。支持的参数主要包括：
 
@@ -664,7 +826,7 @@ centos              7.8                 b5b4d78bc90c        2 days ago          
 [emon@emon ~]$ docker search --filter=is-automated=true --filter=stars=3 nginx
 ```
 
-## 6、删除镜像
+## 7、删除镜像
 
 - 使用标签删除镜像，命令格式： `docker rmi IMAGE [IMAGE...]`，其中IMAGE可以是标签或者ID
 
@@ -683,11 +845,11 @@ centos              7                   b5b4d78bc90c        2 days ago          
 
 	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。哪怕基于该镜像启动了容器，也会删除镜像。但不影响容器。
 
-## 7、创建镜像
+## 8、创建镜像
 
 	创建镜像的方法主要有三种：基于已有镜像的容器创建、基于本地模板导入、基于Dockerfile创建。
 
-### 7.1、基于已有镜像的容器创建
+### 8.1、基于已有镜像的容器创建
 
 该方法主要是使用docker commit命令。
 
@@ -716,17 +878,17 @@ root@fe1aa9bd8460:/# exit
 [emon@emon ~]$ docker commit -m "Added a new file" -a "Emon" fe1aa9bd8460 test:0.0.1
 ```
 
-### 7.2、基于本地模板导入
+### 8.2、基于本地模板导入
 
 用户也可以直接从一个操作系统模板文件导入一个镜像，主要使用`docker import`命令。
 
 命令格式为`docker import [OPTIONS] file|URL| - [REPOSITORY[:TAG]]`
 
-## 8、存出和载入镜像
+## 9、存出和载入镜像
 
 用户可以使用`docker save`和`docker load`命令来存出和载入镜像。
 
-### 8.1、存出镜像
+### 9.1、存出镜像
 
 ```shell
 [emon@emon ~]$ docker save -o test_0.0.1.tar test:0.0.1
@@ -734,7 +896,7 @@ root@fe1aa9bd8460:/# exit
 
 说明：由于是通过sudo使用的docker命令，这里到处的镜像属于root用户；该镜像可以分发给其他人导入。
 
-### 8.2、载入镜像
+### 9.2、载入镜像
 
 ```shell
 [emon@emon ~]$ docker load --input test_0.0.1.tar 
@@ -759,7 +921,7 @@ root@fe1aa9bd8460:/# exit
 -bash: test_0.0.1.tar: 权限不够
 ```
 
-## 9、上传镜像
+## 10、上传镜像
 
 以使用docker push命令上传镜像到仓库，默认上传到Docker Hub官方仓库（需要登录）。命令格式为：
 
@@ -787,7 +949,9 @@ root@fe1aa9bd8460:/# exit
 [emon@emon ~]$ docker push rushing/test:0.0.1
 ```
 
-![上传结果](https://github.com/EmonCodingBackEnd/backend-tutorial/blob/master/tutorials/Docker/images/2018080801.png)
+
+
+![image-20220312161602917](images/2018080801.png)
 
 
 
@@ -796,9 +960,21 @@ root@fe1aa9bd8460:/# exit
 	简单来说，容器是镜像的一个运行实例。所不同的是，镜像是静态的只读文件，而容器带有运行时需要的
 可写层。如果认为虚拟机是模拟运行的一整套操作系统（包括内核、应用运行态环境和其他系统环境）和跑在上面的应用，那么Docker容器就是独立运行的一个（或一组）应用，以及它们必需的运行环境。
 
-## 1、查看容器
+## 1、什么是Container
 
-### 1.1、基本用法
+- 通过Image创建（Copy）
+
+- 在Image layer之上建立一个container layer（可读写）
+- 类比面向对象：类和实例
+- Image负责app的存储和分发，Container负责运行app
+
+![image-20220312161602917](images/image-20220312161602917.png)
+
+
+
+## 2、查看容器
+
+### 2.1、基本用法
 
 - 命令格式： `docker ps [OPTIIONS]`
 
@@ -817,12 +993,16 @@ root@fe1aa9bd8460:/# exit
 
 ```shell
 [emon@emon ~]$ docker ps
+# 或者
+[emon@emon ~]$ docker container ls
 ```
 
 - 显示所有状态的容器（7种状态：created|restarting|runnning|removing|paused|exited|dead)
 
 ```shell
 [emon@emon ~]$ docker ps -a
+# 或者
+[emon@emon ~]$ docker container ls -a
 ```
 
 - 显示最后被创建的n个容器（不限状态）
@@ -855,7 +1035,7 @@ root@fe1aa9bd8460:/# exit
 [emon@emon ~]$ docker ps -s
 ```
 
-### 1.2、高级用法
+### 2.2、高级用法
 
 如果容器数量过多，或者想排除干扰容器，可以通过--filter或者-f选项，过滤需要显示的容器。
 
@@ -865,10 +1045,6 @@ root@fe1aa9bd8460:/# exit
 | label    | label=<key>或者label=<key>=<value>                           |
 | status   | 支持的状态值有：created/restarting/running/removing/paused/exited/dead |
 | health   | starting/healthy/unhealthy/none 基于健康检查状态过滤容器     |
-|          |                                                              |
-|          |                                                              |
-|          |                                                              |
-|          |                                                              |
 
 条件很多，但万变不离其宗，只需要记住以下3条准则：
 
@@ -912,7 +1088,7 @@ docker rm $(docker ps -q --filter name=.*festive_pasteur.* --filter status=exite
 docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filter status=exited --filter status=dead 2>/dev/null")
 ```
 
-### 1.3、Format格式化显示
+### 2.3、Format格式化显示
 
 如果想要自定义显示容器字段，可以用格式化选项 -format。
 
@@ -953,7 +1129,7 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 
 
-## 2、创建容器
+## 3、创建容器
 
 - 新建容器
 
@@ -1005,7 +1181,7 @@ net.ipv4.ip_forward=1
 
 
 
-## 3、终止容器
+## 4、终止容器
 
 可以使用docker stop来终止一个运行中的容器。该命令的格式为docker stop [-t|--time[=10]][CONTAINER...]。
 
@@ -1025,7 +1201,7 @@ net.ipv4.ip_forward=1
 [emon@emon ~]$ docker restart <container_id|container_name>
 ```
 
-## 4、进入容器
+## 5、进入容器
 
 在使用-d参数时，容器启动后会进入后台，用户无法看到容器中的信息，也无法进行操作。
 
@@ -1072,7 +1248,7 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 
 暂略
 
-## 5、删除容器
+## 6、删除容器
 
 可以使用docker rm 命令来删除处于终止或退出状态的容器，命令格式为：
 
@@ -1098,6 +1274,16 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]。
 [emon@emon ~]$ docker rm <container_id|container_name>
 ```
 
+3. 删除所有停止状态的容器
+
+```bash
+[emon@emon ~]$ docker rm $(docker ps -aq --filter status=exited)
+# 或者
+[emon@emon ~]$ docker rm $(docker container ls -f "status=exited" -q)
+```
+
+
+
 - 删除运行状态的容器
 
 1. 查看运行状态的容器
@@ -1114,11 +1300,11 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]。
 [emon@emon ~]$ docker rm -f 3aa0487c2904
 ```
 
-## 6、导入和导出容器
+## 7、导入和导出容器
 
 某些时候，需要将容器从一个系统迁移到另外一个系统，此时可以使用Docker的导入和导出功能。这也是Docker自身提供的一个重要特性。
 
-### 6.1、导出容器
+### 7.1、导出容器
 
 导出容器是指导出一个已经创建的容器到一个文件，不管此时这个容器是否处于运行状态，可以使用docker export命令，该命令的格式为：
 
@@ -1140,7 +1326,7 @@ docker export [-o|--output[=""]] CONTAINER。
 
 之后，可将导出的tar文件传输到其他机器上，然后再通过导入命令导入到系统中，从而实现容器的迁移。
 
-### 6.2、导入容器
+### 7.2、导入容器
 
 导出的文件又可以使用docker import命令导入变成镜像，该命令格式为：
 
@@ -1154,7 +1340,7 @@ docker import [-c|--change[=[]]][-m|--message[=MESSAGE]] file|URL|-[REPOSITORY[:
 
 注意：导入容器后，体现为镜像，需要启动才会出现到docker ps -qa列表中。
 
-## 7、查看容器日志
+## 8、查看容器日志
 
 - 命令格式： `docker logs [OPTIONS]` <container_id|container_name>
 
