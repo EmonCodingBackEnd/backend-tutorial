@@ -849,9 +849,9 @@ centos              7                   b5b4d78bc90c        2 days ago          
 
 	创建镜像的方法主要有三种：基于已有镜像的容器创建、基于本地模板导入、基于Dockerfile创建。
 
-### 8.1、基于已有镜像的容器创建
+### 8.1、基于已有镜像的容器创建【不推荐】
 
-该方法主要是使用docker commit命令。
+该方法主要是使用docker commit命令；等效命令：docker container commit
 
 命令格式为`docker commit [OPTIONS] CONTAINTER [REPOSITORY[:TAG]]`，主要选项包括：
 
@@ -883,6 +883,37 @@ root@fe1aa9bd8460:/# exit
 用户也可以直接从一个操作系统模板文件导入一个镜像，主要使用`docker import`命令。
 
 命令格式为`docker import [OPTIONS] file|URL| - [REPOSITORY[:TAG]]`
+
+### 8.3、基于Dockerfile创建【推荐】
+
+docker build命令；等效命令：docker image build
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir docker-centos-vim
+[emon@emon ~]$ cd docker-centos-vim/
+```
+
+2：创建Dockerfile
+
+```bash
+[emon@emon docker-centos-vim]$ vim Dockerfile 
+```
+
+```dockerfile
+FROM centos:7
+RUN yum install -y vim
+```
+
+3：创建镜像
+
+```bash
+# -t 指定repository名称为 rushing/centos-vim:latest 其中rushing是dockerhub用户名； .-当前目录寻找Dockerfile
+[emon@emon docker-centos-vim]$ docker build -t rushing/centos-vim .
+```
+
+
 
 ## 9、存出和载入镜像
 
@@ -1377,15 +1408,148 @@ docker logs -t --since="2021-02-17T13:05:30" <container_id|container_name>
 docker logs -f <container_id|container_name>
 ```
 
-# 五、仓库
+
+
+# 五、Dockerfile语法梳理及最佳实践
+
+## 1、关键字讲解
+
+### 1.1、关键字：FROM
+
+```dockerfile
+# 制作base image
+FROM scratch
+```
+
+```dockerfile
+# 使用base image
+FROM centos:7
+```
+
+```dockerfile
+# 使用base image的latest
+FROM ubuntu
+```
+
+### 1.2、关键字：LABEL
+
+```dockerfile
+LABEL maintainer="rushing@163.com"
+LABEL version="1.0"
+LABEL description="This is description"
+```
+
+说明：
+
+- Metadata不可少！
+
+### 1.3、关键字：RUN
+
+```dockerfile
+# 反斜线换行
+RUN yum update && yum install -y vim \
+    python-dev
+RUN /bin/bash -c 'source $HOME/.bashrc;echo $HOME'
+```
+
+说明：
+
+每一次RUN命令，都会生成新的一层！
+
+为了美观，复杂的RUN请用反斜线换行！
+
+避免无用分层，合并多条命令成一行！
+
+### 1.4、关键字：WORKDIR
+
+```dockerfile
+# 创建根目录下test文件夹
+WORKDIR /root
+```
+
+```dockerfile
+# 如果没有会自动创建test目录
+WORKDIR /test
+WORKDIR demo
+# 输出结果应该是 /test/demo
+RUN pwd
+```
+
+说明：
+
+- 用WORKDIR，不要用RUN cd！
+- 尽量使用绝对目录！
+
+### 1.5、关键字：ADD and COPY
+
+```dockerfile
+# 把hello文件添加到/目录
+ADD hello /
+```
+
+```dockerfile
+# 添加到根目录并解压
+ADD test.tar.gz /
+```
+
+```dockerfile
+WORKDIR /root
+# 会创建不存在的文件夹，结果：/root/test/hello
+ADD hello test/
+```
+
+```dockerfile
+WORKDIR /root
+# 会创建不存在的文件夹，结果：/root/test/hello
+COPY hello test/
+```
+
+说明：
+
+- 大部分情况，COPY优于ADD！
+
+- ADD除了COPY还有额外功能（解压）！
+- 添加远程文件/目录请使用curl或者wget！
+
+### 1.6、关键字：ENV
+
+```doc
+# 设置常量
+ENV MYSQL_VERSION 5.6
+# 引用常量
+RUN apt-get install -y mysql-server="${MYSQL_VERSION}" \
+	&& rm -rf /var/lib/apt/lists/*
+```
+
+说明：
+
+- 尽量使用ENV增加可维护性！
+
+### 1.7、关键字：VOLUME and EXPOSE
+
+存储和网络。
 
 
 
-# 六、数据管理
+## 2、案例
+
+参考示例：https://github.com/docker-library/mysql
 
 
 
-# 七、端口映射与容器互联
+# 六、仓库
+
+
+
+# 七、数据管理
+
+
+
+# 八、端口映射与容器互联
+
+
+
+
 
 
 
