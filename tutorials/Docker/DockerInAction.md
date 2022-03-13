@@ -804,7 +804,7 @@ centos              7                   b5b4d78bc90c        2 days ago          
 centos              7.8                 b5b4d78bc90c        2 days ago          203MB
 ```
 
-## 5、使用`inspect`命令查看详细信息
+## 5、使用`inspect`命令查看镜像详细信息
 
 ```shell
 [emon@emon ~]$ docker inspect centos:7
@@ -1310,6 +1310,8 @@ net.ipv4.ip_forward=1
 
 这个时候如果需要进入容器进行操作，有多种方法，包括使用官方的attach或exec命令，以及第三方的nsenter工具等。
 
+### 5.1、attach命令
+
 - attach命令（连接后执行exit会停止容器）【过时方式】
 
 attach是Docker自带的命令，命令格式为：
@@ -1328,6 +1330,8 @@ docker attach [--detach-keys[=[]]][--no-stdin] [--sig-proxy[=true]] CONTAINER
 
 但是使用attach命令有时候不方便。当多个窗口同时用attach命令连接到同一个容器的时候，所有窗口都会同步显示。当某个窗口因命令阻塞时，其他窗口也无法执行操作了。
 
+### 5.2、exec命令
+
 - exec命令（连接后执行exit，并不会停止容器）【推荐方式】
 
  Docker从1.3.0版本起提供了一个更加方便的exec命令，可以在容器内直接执行任意命令。该命令的基本格式为
@@ -1341,13 +1345,21 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 | -t,--tty         | false  | 分配伪终端，默认为false      |
 | -u,--user        |        | 执行命令的用户名或者ID       |
 
-2. 进入容器
+- 进入容器
 
 ```shell
 [emon@emon ~]$ docker exec -it <container_id|container_name> /bin/bash
 ```
 
-- 使用nsenter工具
+- 还可以执行其他命令
+
+```bash
+[emon@emon ~]$ docker exec -it <container_id|container_name> ip addr
+```
+
+
+
+### 5.3、使用nsenter工具
 
 暂略
 
@@ -1480,7 +1492,19 @@ docker logs -t --since="2021-02-17T13:05:30" <container_id|container_name>
 docker logs -f <container_id|container_name>
 ```
 
+- 普通查看
 
+```bash
+docker logs <container_id|container_name>
+```
+
+
+
+## 9、使用inspect命令查看容器详细信息
+
+```bash
+[emon@emon ~]$ docker inspect <container_id|container_name>
+```
 
 # 五、Dockerfile语法梳理及最佳实践
 
@@ -1736,7 +1760,123 @@ ENTRYPOINT [ "/bin/echo", "hello docker" ]
 
 参考示例：https://github.com/docker-library/mysql
 
+### 2.1、flask-demo镜像
 
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/flask-demo
+[emon@emon ~]$ cd dockerdata/flask-demo/
+```
+
+2：编写内容
+
+- 创建app.py
+
+```bash
+[emon@emon flask-demo]$ vim app.py
+```
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return "hello docker"
+
+if __name__ == '__main__':
+    app.run(
+        host='0.0.0.0',
+        port=5000,
+        debug=True
+    )
+```
+
+- 安装flask
+
+```bash
+[emon@emon flask-demo]$ pip3 install flask
+```
+
+- 运行
+
+```bash
+[emon@emon flask-demo]$ python3 app.py
+```
+
+3：创建Dockerfile
+
+```bash
+[emon@emon flask-demo]$ vim Dockerfile
+```
+
+```dockerfile
+FROM python:2.7
+LABEL "maintainer=emon<emon@163.com>"
+RUN pip install flask
+COPY app.py /app
+WORKDIR /app
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+4：创建镜像
+
+```bash
+[emon@emon flask-demo]$ docker build -t rushing/flask-hello-world .
+......省略......
+Step 4/7 : COPY app.py /app
+ ---> 5584b327f25d
+Step 5/7 : WORKDIR /app
+Cannot mkdir: /app is not a directory
+```
+
+可以看到Step 5/7 失败了，如何处理？
+
+进入Step 4/7产生的镜像层：
+
+```bash
+[emon@emon flask-demo]$ docker run -it 5584b327f25d /bin/bash
+root@7666f9b78e80:/# ls -l|grep app
+-rw-rw-r--.   1 root root 212 Mar 13 09:52 app
+```
+
+发现app不是一个目录，而是一个文件。
+
+调整Dockerfile内容：
+
+```dockerfile
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+RUN pip install flask
+COPY app.py /app/
+WORKDIR /app
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+再次创建镜像：
+
+```bash
+[emon@emon flask-demo]$ docker build -t rushing/flask-hello-world .
+```
+
+5：运行镜像
+
+```bash
+[emon@emon flask-demo]$ docker run rushing/flask-hello-world
+# 命令行输出结果
+ * Serving Flask app "app" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 471-935-875
+```
 
 # 六、仓库
 

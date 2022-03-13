@@ -3110,13 +3110,14 @@ pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1
 
 2. pip命令
 
-| 命令                          | 说明     |
-| ----------------------------- | -------- |
-| pip install <package name>    | 安装套件 |
-| pip install -U <package name> | 更新套件 |
-| pip uninstall <package name>  | 卸载套件 |
-| pip search <package name>     | 搜索套件 |
-| pip help                      | 显示说明 |
+| 命令                          | 说明           |
+| ----------------------------- | -------------- |
+| pip install <package name>    | 安装套件       |
+| pip install -U <package name> | 更新套件       |
+| pip uninstall <package name>  | 卸载套件       |
+| pip search <package name>     | 搜索套件       |
+| pip help                      | 显示说明       |
+| pip list                      | 列出安装过的包 |
 
 3. pip3命令
 
