@@ -1234,6 +1234,8 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 ## 3、创建容器
 
+### 3.1、常规命令
+
 - 新建容器
 
 ```shell
@@ -1280,6 +1282,25 @@ net.ipv4.ip_forward=1
 [emon@emon ~]$ sudo sysctl -p
 # 重启网络
 [emon@emon ~]$ sudo systemctl restart network
+```
+
+### 3.2、容器资源限制
+
+- 限定内存
+
+```bash
+# 指定分配内存200M（隐含200M的Swap，共400M）
+[emon@emon ~]$ docker run --memory=200M rushing/ubuntu-stress --vm 1 --verbose
+# 指定分配内存200M（隐含200M的Swap，共400M），指定使用内存500M
+[emon@emon ~]$ docker run --memory=200M rushing/ubuntu-stress --vm 1 --verbose --vm-bytes 500M
+```
+
+- 限定CPU
+
+```bash
+# 设置cpu使用权重，如下test1占用10，test2占用5；如果cpu共享情况下，会按照2:1分配
+[emon@emon ~]$ docker run --cpu-shares=10 --name=test1 rushing/ubuntu-stress --cpu 2
+[emon@emon ~]$ docker run --cpu-shares=5 --name=test2 rushing/ubuntu-stress --cpu 1
 ```
 
 
@@ -1760,7 +1781,7 @@ ENTRYPOINT [ "/bin/echo", "hello docker" ]
 
 参考示例：https://github.com/docker-library/mysql
 
-### 2.1、flask-demo镜像
+### 2.1、flask-demo服务镜像
 
 1：创建目录
 
@@ -1877,6 +1898,42 @@ CMD ["python", "app.py"]
  * Debugger is active!
  * Debugger PIN: 471-935-875
 ```
+
+### 2.2、ubuntu-stress工具镜像
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/ubuntu-stress
+[emon@emon ~]$ cd dockerdata/ubuntu-stress/
+```
+
+2：创建Dockerfile
+
+```bash
+[emon@emon ubuntu-stress]$ vim Dockerfile
+```
+
+```dockerfile
+FROM ubuntu
+RUN apt-get update && apt-get install -y stress
+ENTRYPOINT ["/usr/bin/stress"]
+CMD []
+```
+
+3：创建镜像
+
+```bash
+[emon@emon ubuntu-stress]$ docker build -t rushing/ubuntu-stress .
+```
+
+4：运行镜像
+
+```bash
+[emon@emon ubuntu-stress]$ docker run -it rushing/ubuntu-stress --vm 1 --verbose
+```
+
+
 
 # 六、仓库
 
