@@ -680,8 +680,8 @@ root      1952     1  0 02:02 ?        00:00:00 /usr/bin/dockerd -H fd:// --cont
 2：创建hello.c文件并编译
 
 ```bash
-[emon@emon ~]$ mkdir hello-world
-[emon@emon ~]$ cd hello-world/
+[emon@emon ~]$ mkdir dockerdata/hello-world
+[emon@emon ~]$ cd dockerdata/hello-world/
 [emon@emon hello-world]$ vim hello.c
 ```
 
@@ -983,6 +983,78 @@ RUN yum install -y vim
 
 
 ![image-20220312161602917](images/2018080801.png)
+
+
+
+## 11、构建自己的docker私服
+
+- 创建docker私服
+
+访问：https://hub.docker.com/
+
+访问registry私服文档：https://docs.docker.com/registry/spec/api/#listing-repositories
+
+搜索：registry，找到官方提供的registry，用来存储和发布docker image。
+
+```bash
+[emon@emon ~]$ docker run -d -p 5000:5000 --restart always --name registry registry:2
+```
+
+- 私服安全控制
+
+对文件 `/etc/docker/daemon.json` 追加 `insecure-registries`内容
+
+```bash
+{
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "insecure-registries": ["emon:5000"]
+}
+```
+
+对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：
+
+```bash
+# 在EnvironmentFile后面一行追加
+EnvironmentFile=-/etc/docker/daemon.json
+```
+
+重启Docker服务：
+
+```bash
+[emon@emon hello-world]$ sudo systemctl daemon-reload
+[emon@emon hello-world]$ sudo systemctl restart docker
+```
+
+- 对DIY的hello-world镜像，重新编译成新的镜像：
+
+```bash
+# 注意：这里是 rushing ==> emon:5000
+[emon@emon hello-world]$ docker build -t emon:5000/hello-world .
+[emon@emon hello-world]$ docker images | grep hello
+# 命令行输出结果
+emon:5000/hello-world      latest              da65ce820d2d        29 seconds ago      861kB
+```
+
+- 上传到本地docker私服
+
+```bash
+[emon@emon hello-world]$ docker push emon:5000/hello-world
+# 命令行输出结果
+The push refers to repository [emon:5000/hello-world]
+da4136101ba6: Pushed 
+latest: digest: sha256:77042e6c954be4845eaf2181e4c7cb6d51441fb00cf2c45513b1040cb68f5d32 size: 527
+```
+
+- 验证私服
+
+访问：http://emon:5000/v2/_catalog
+
+- 删除本地helle-world的image，并从私服pull下来
+
+```bash
+[emon@emon ~]$ docker rmi < imageId >
+[emon@emon ~]$ docker pull emon:5000/hello-world
+```
 
 
 
@@ -1530,6 +1602,133 @@ RUN apt-get install -y mysql-server="${MYSQL_VERSION}" \
 ### 1.7、关键字：VOLUME and EXPOSE
 
 存储和网络。
+
+### 1.8、RUN vs CMD vs ENTRYPOINT
+
+- RUN：执行命令并创建新的 IMAGE Layer
+
+- CMD：设置容器启动后默认执行的命令和参数
+  - 容器启动时默认执行的命令
+  - 如果docker run指定了其他命令，CMD命令被忽略
+  - 如果定义了多个CMD，只有最后一个会执行
+
+- ENTRYPOINT：设置容器启动时运行的命令
+
+  - 让容器以应用程序或者服务的形式运行
+  - 不会被忽略，一定被执行
+  - 最佳实践：写一个shell脚本作为entrypoint
+
+  ```dockerfile
+  COPY docker-entrypoint.sh /usr/local/bin/
+  ENTRYPOINT [ "docker-entrypoint.sh" ]
+  
+  EXPOSE 27017
+  CMD [ "mongod" ]
+  ```
+
+
+
+#### 1.8.1、ENTRYPOINT之Shell格式
+
+```bash
+[emon@emon ~]$ mkdir -pv ~/dockerdata/entrypoint_shell
+[emon@emon ~]$ cd ~/dockerdata/entrypoint_shell/
+[emon@emon entrypoint_shell]$ vim Dockerfile
+```
+
+```dockerfile
+FROM centos:7
+ENV name Docker
+ENTRYPOINT echo "hello $name"
+```
+
+```bash
+[emon@emon entrypoint_shell]$ docker build -t rushing/centos-entrypoint-shell .
+[emon@emon entrypoint_shell]$ docker run rushing/centos-entrypoint-shell
+hello Docker
+```
+
+#### 1.8.2、ENTRYPOINT之Exec格式
+
+```bash
+[emon@emon ~]$ mkdir -pv ~/dockerdata/entrypoint_exec
+[emon@emon ~]$ cd ~/dockerdata/entrypoint_exec/
+[emon@emon entrypoint_exec]$ vim Dockerfile
+```
+
+```dockerfile
+FROM centos:7
+ENV name Docker
+ENTRYPOINT [ "bin/bash", "-c", "echo hello $name" ]
+```
+
+```bash
+[emon@emon entrypoint_exec]$ docker build -t rushing/centos-entrypoint-exec .
+[emon@emon entrypoint_exec]$ docker run rushing/centos-entrypoint-exec
+hello Docker
+```
+
+#### 1.8.3、CMD之Shell
+
+```bash
+[emon@emon ~]$ mkdir -pv ~/dockerdata/cmd_shell
+[emon@emon ~]$ cd ~/dockerdata/cmd_shell/
+[emon@emon cmd_shell]$ vim Dockerfile
+```
+
+```dockerfile
+FROM centos:7
+ENV name Docker
+CMD echo "hello $name"
+```
+
+```bash
+[emon@emon cmd_shell]$ docker build -t rushing/centos-cmd-shell .
+[emon@emon cmd_shell]$ docker run rushing/centos-cmd-shell
+hello Docker
+# 如果指定 /bin/bash 时，会覆盖CMD语句执行
+[emon@emon cmd_shell]$ docker run rushing/centos-cmd-shell /bin/bash
+```
+
+#### 1.8.4、CMD值Exec
+
+```bash
+[emon@emon ~]$ mkdir -pv ~/dockerdata/cmd_exec
+[emon@emon ~]$ cd ~/dockerdata/cmd_exec/
+[emon@emon cmd_exec]$ vim Dockerfile
+```
+
+```dockerfile
+FROM centos:7
+ENV name Docker
+CMD [ "bin/bash", "-c", "echo hello $name" ]
+```
+
+```bash
+[emon@emon cmd_exec]$ docker build -t rushing/centos-cmd-exec .
+[emon@emon cmd_exec]$ docker run rushing/centos-cmd-exec
+hello Docker
+```
+
+
+
+### 1.9、Shell和Exec格式
+
+- Shell格式
+
+```dockerfile
+RUN apt-get install -y vim
+CMD echo "hello docker"
+ENTRYPOINT echo "hello docker"
+```
+
+- Exec格式
+
+```dockerfile
+RUN [ "apt-get", "install", "-y", "vim" ]
+CMD [ "/bin/echo", "hello docker" ]
+ENTRYPOINT [ "/bin/echo", "hello docker" ]
+```
 
 
 
