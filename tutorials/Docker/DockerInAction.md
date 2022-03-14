@@ -2141,11 +2141,11 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t…"   49 seconds ago
 [emon@emon ~]$ sudo ip netns exec test1 ping 192.168.1.2
 ```
 
-## 6.3、Docker bridge详解
+## 6.3、Docker网络
 
-#### 容器间的访问如何实现的？
+### 6.3.1、Docker网络类型列表
 
-- test1网络情况
+- 查看Docker网络列表
 
 ```bash
 [emon@emon ~]$ sudo docker network ls
@@ -2157,7 +2157,7 @@ NETWORK ID          NAME                DRIVER              SCOPE
 [emon@emon ~]$ sudo docker network inspect bridge
 ```
 
-- 安装工具
+- 安装网络工具
 
 ```bash
 [emon@emon ~]$ sudo yum install -y bridge-utils
@@ -2169,6 +2169,10 @@ docker0		8000.02426f6e5033	no		veth3950c82
 
 说明：有两对veth，对应两个容器，通过docker0这个bridge连接起来。拓扑图如下：
 
+### 6.3.2、Docker网络之bridge
+
+#### 容器间互相访问拓扑图
+
 ![image-20220314164344245](images/image-20220314164344245.png)
 
 
@@ -2179,9 +2183,9 @@ docker0		8000.02426f6e5033	no		veth3950c82
 
 
 
-## 6.4、容器之间的link
 
-#### 容器之间通过默认的docker的birdge来link
+
+#### 容器间通过默认的birdge来link
 
 - 删除并重新创建test2，把test2通过link方式连接到test1容器
 
@@ -2202,7 +2206,7 @@ PING test1 (172.17.0.2): 56 data bytes
 [emon@emon ~]$ docker run -d --name test2 busybox /bin/sh -c "while true; do sleep 3600; done"
 ```
 
-#### 容器之间通过自定义的docker的bridge来link
+#### 容器间通过自定义的bridge来link
 
 - 创建新的bridge
 
@@ -2250,13 +2254,99 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-## 6.5、容器的端口映射
+### 6.3.3、容器的端口映射
 
 - 创建一个nginx的容器
 
 ```docker
 [emon@emon ~]$ docker run --name web -d -p 80:80 nginx
 ```
+
+
+
+### 6.3.4、Docker网络之none
+
+初始化环境：
+
+```bash
+# 清理容器
+[emon@emon ~]$ docker rm -f $(docker ps -qa)
+# 清理自定义bridge
+[emon@emon ~]$ docker network rm my-bridge
+
+[emon@emon ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+4350d5c6e428        bridge              bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+[emon@emon ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
+
+- 创建容器基于none
+
+```bash
+[emon@emon ~]$ docker run -d --name test1 --network none busybox /bin/sh -c "while true; do sleep 3600; done"
+# 查看网络none的详情
+[emon@emon ~]$ docker network inspect none
+# 查看test1的网络命名空间
+[emon@emon ~]$ docker exec -it test1 /bin/sh
+/ # ip a 查看得到：孤立的容器
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+```
+
+### 6.3.5、Docker网络之host
+
+初始化环境：
+
+```bash
+# 清理容器
+[emon@emon ~]$ docker rm -f $(docker ps -qa)
+
+[emon@emon ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+4350d5c6e428        bridge              bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+[emon@emon ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
+
+- 创建容器基于host
+
+```bash
+[emon@emon ~]$ docker run -d --name test1 --network host busybox /bin/sh -c "while true; do sleep 3600; done"
+# 查看网络host的详情
+[emon@emon ~]$ docker network inspect host
+# 查看test1的网络命名空间
+[emon@emon ~]$ docker exec -it test1 /bin/sh
+/ # ip a 可以得知共享了宿主机器的网络命名空间
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast qlen 1000
+    link/ether 00:0c:29:57:cc:44 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.116/24 brd 192.168.1.255 scope global noprefixroute ens33
+       valid_lft forever preferred_lft forever
+    inet6 2409:8a28:cbc:b580:1d13:cc6f:fd77:6e75/64 scope global dynamic noprefixroute 
+       valid_lft 86393sec preferred_lft 14393sec
+    inet6 fe80::4964:c0da:32bd:1d54/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue 
+    link/ether 02:42:6f:6e:50:33 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:6fff:fe6e:5033/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+## 6.4、多容器复杂应用的部署演示
 
 
 
@@ -2268,7 +2358,7 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-# 九、端口映射与容器互联、
+# 九、端口映射与容器互联
 
 
 
