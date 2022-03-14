@@ -1834,7 +1834,7 @@ if __name__ == '__main__':
 
 ```dockerfile
 FROM python:2.7
-LABEL "maintainer=emon<emon@163.com>"
+LABEL maintainer="emon<emon@163.com>"
 RUN pip install flask
 COPY app.py /app
 WORKDIR /app
@@ -2347,6 +2347,90 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ```
 
 ## 6.4、多容器复杂应用的部署演示
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/flask-redis
+[emon@emon ~]$ cd dockerdata/flask-redis/
+```
+
+2：编写内容
+
+- 创建app.py
+
+```bash
+[emon@emon flask-redis]$ vim app.py
+```
+
+```python
+from flask import Flask
+from redis import Redis
+import os
+import socket
+
+app = Flask(__name__)
+redis = Redis(host=os.environ.get('REDIS_HOST', '127.0.0.1'), port=6379)
+
+
+@app.route('/')
+def hello():
+    redis.incr('hits')
+    return 'Hello Container World! I have been seen %s times and my hostname is %s.\n' % (redis.get('hits'),socket.gethostname())
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+3：创建Dockerfile
+
+```bash
+[emon@emon flask-redis]$ vim Dockerfile
+```
+
+```dockerfile
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+COPY . /app
+WORKDIR /app
+RUN pip install flask redis
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+4：创建redis容器
+
+```bash
+[emon@emon flask-redis]$ docker run -d --name redis redis
+```
+
+5：创建镜像
+
+```bash
+[emon@emon flask-redis]$ docker build -t rushing/flask-redis .
+```
+
+6：运行镜像
+
+```bash
+[emon@emon flask-redis]$ docker run -d -p 5000:5000 --link redis --name flask-redis -e REDIS_HOST=redis rushing/flask-redis
+# 访问容器
+[emon@emon flask-redis]$ docker exec -it flask-redis /bin/bash
+# 查看env
+root@f37f93de0bcb:/app# env|grep REDIS_HOST
+REDIS_HOST=redis
+# 运行代码
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+Hello Container World! I have been seen 1 times and my hostname is f37f93de0bcb.
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+Hello Container World! I have been seen 2 times and my hostname is f37f93de0bcb.
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+
+# 在宿主机器访问
+[emon@emon flask-redis]$ curl 127.0.0.1:5000
+Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
+```
 
 
 
