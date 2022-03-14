@@ -1935,17 +1935,340 @@ CMD []
 
 
 
-# 六、仓库
+# 六、网络
+
+## 6.1、网络的基础知识
+
+### 6.1.1、网络的分类
+
+- 单机
+  - Bridge Network
+  - Host Network
+  - None Network
+- 多机
+  - Overlay Network
+
+### 6.1.2、网络的分层
+
+![image-20220314093103079](images/image-20220314093103079.png)
+
+### 6.1.3、公有IP和私有IP
+
+- Public IP：互联网上的唯一标识，可以访问internet
+- Private IP：不可在互联网上使用，仅供机构内部使用
+
+| 类别 | 网段                         | 示例           |
+| ---- | ---------------------------- | -------------- |
+| A类  | 10.0.0.0--10.255.255.255     | 10.0.0.0/8     |
+| B类  | 172.16.0.0--172.31.255.255   | 172.16.0.0/12  |
+| C类  | 192.168.0.0--192.168.255.255 | 192.168.0.0/16 |
+
+### 6.1.4、网络地址转换NAT
+
+![image-20220314124559772](images/image-20220314124559772.png)
+
+### 6.1.5、ping和telnet以及wireshark
+
+- ping(ICMP)：验证IP的可达性
+- telnet：验证服务的可用性
+- wireshark：抓包工具
 
 
 
-# 七、数据管理
+## 6.2、Linux网络命名空间
+
+### 6.2.1、docker的网络命名空间
+
+启动一个容器作为演示环境：
+
+```bash
+# 创建并启动容器
+[emon@emon ~]$ docker run -d --name test1 busybox /bin/sh -c "while true; do sleep 3600; done"
+# 查看容器
+[emon@emon ~]$ docker ps 
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+c77a3a22a9b8        busybox             "/bin/sh -c 'while t…"   49 seconds ago      Up 48 seconds                           test1
+# 进入容器
+[emon@emon ~]$ docker exec -it c77a3a22a9b8 /bin/sh
+# 输入命令 ip a （等效ip addr）
+/ # ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+96: eth0@if97: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+```
+
+如上，ip a展示的结果，就是test1这个容器的网络命名空间。
 
 
 
-# 八、端口映射与容器互联
+再启动一个容器：
+
+```bash
+[emon@emon ~]$ docker run -d --name test2 busybox /bin/sh -c "while true; do sleep 3600; done"
+# 查看test2容器的网络命名空间
+[emon@emon ~]$ docker exec -it b966b6ee1664 ip a
+```
+
+### 6.2.2、linux的网络命名空间
+
+#### 如何添加两个命名空间？
+
+- 查看网络命名空间列表
+
+```bash
+[emon@emon ~]$ sudo ip netns list
+```
+
+- 添加网络命名空间
+
+```bash
+[emon@emon ~]$ sudo ip netns add test1
+[emon@emon ~]$ sudo ip netns add test2
+```
+
+- 查看某个网络命名空间详情
+
+```bash
+[emon@emon ~]$ sudo ip netns exec test1 ip a
+# 命令行输出结果
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+[emon@emon ~]$ sudo ip netns exec test1 ip link
+# 命令行输出结果
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+```
+
+- 唤醒lo
+
+```bash
+[emon@emon ~]$ sudo ip netns exec test1 ip link set dev lo up
+[emon@emon ~]$ sudo ip netns exec test1 ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+```
+
+#### 如何打通两个命名空间？
+
+- 宿主机添加veth pair
+
+```bash
+# 在宿主机生成veth pair
+[emon@emon ~]$ sudo ip link add veth-test1 type veth peer name veth-test2
+# 查看宿主机ip link，可以看到veth-test1和veth-test2
+[emon@emon ~]$ sudo ip link
+
+# 添加veth-test1到test1命名空间
+[emon@emon ~]$ sudo ip link set veth-test1 netns test1
+# 查看test1命名空间下的ip link
+[emon@emon ~]$ sudo ip netns exec test1 ip link
+
+# 添加veth-test2到test2命名空间
+[emon@emon ~]$ sudo ip link set veth-test2 netns test2
+# 查看test2命名空间下的ip link
+[emon@emon ~]$ sudo ip netns exec test2 ip link
+
+# 再次查看宿主机ip link，看不到veth-test1和veth-test2
+[emon@emon ~]$ sudo ip link
+```
+
+图解：
+
+![image-20220314155521836](images/image-20220314155521836.png)
 
 
+
+- 为命名空间test1和test2添加IP地址
+
+```bash
+# 为test1命名空间上的veth-test1添加IP地址
+[emon@emon ~]$ sudo ip netns exec test1 ip addr add 192.168.1.1/24 dev veth-test1
+# 为test2命名空间上的veth-test2添加IP地址
+[emon@emon ~]$ sudo ip netns exec test2 ip addr add 192.168.1.2/24 dev veth-test2
+
+# 唤醒test1上的veth-test1
+[emon@emon ~]$ sudo ip netns exec test1 ip link set dev veth-test1 up
+# 唤醒test2上的veth-test2
+[emon@emon ~]$ sudo ip netns exec test2 ip link set dev veth-test2 up
+
+# ==================================================
+# 查看test1和test2的ip link
+[emon@emon ~]$ sudo ip netns exec test1 ip link
+# 命令行输出结果
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+101: veth-test1@if100: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether fa:6e:7e:58:57:03 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+[emon@emon ~]$ sudo ip netns exec test2 ip link
+# 命令行输出结果
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+100: veth-test2@if101: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether fe:ca:9f:29:72:0b brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    
+# 查看test1和test2的ip a
+[emon@emon ~]$ sudo ip netns exec test1 ip a
+# 命令行输出结果
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+101: veth-test1@if100: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether fa:6e:7e:58:57:03 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+    inet 192.168.1.1/24 scope global veth-test1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::f86e:7eff:fe58:5703/64 scope link 
+       valid_lft forever preferred_lft forever
+[emon@emon ~]$ sudo ip netns exec test2 ip a
+# 命令行输出结果
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+100: veth-test2@if101: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether fe:ca:9f:29:72:0b brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.168.1.2/24 scope global veth-test2
+       valid_lft forever preferred_lft forever
+    inet6 fe80::fcca:9fff:fe29:720b/64 scope link 
+       valid_lft forever preferred_lft forever
+       
+# 从test1连通test2验证
+[emon@emon ~]$ sudo ip netns exec test1 ping 192.168.1.2
+```
+
+## 6.3、Docker bridge详解
+
+#### 容器间的访问如何实现的？
+
+- test1网络情况
+
+```bash
+[emon@emon ~]$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+4350d5c6e428        bridge              bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+# 查看bridge详细信息中的 Containers 属性包含的容器信息
+[emon@emon ~]$ sudo docker network inspect bridge
+```
+
+- 安装工具
+
+```bash
+[emon@emon ~]$ sudo yum install -y bridge-utils
+[emon@emon ~]$ brctl show
+bridge name	bridge id		STP enabled	interfaces
+docker0		8000.02426f6e5033	no		veth3950c82
+										veth4b7c084
+```
+
+说明：有两对veth，对应两个容器，通过docker0这个bridge连接起来。拓扑图如下：
+
+![image-20220314164344245](images/image-20220314164344245.png)
+
+
+
+#### 容器如何访问的外网？
+
+![image-20220314165401819](images/image-20220314165401819.png)
+
+
+
+## 6.4、容器之间的link
+
+#### 容器之间通过默认的docker的birdge来link
+
+- 删除并重新创建test2，把test2通过link方式连接到test1容器
+
+```bash
+[emon@emon ~]$ docker rm -f test2
+[emon@emon ~]$ docker run -d --name test2 --link test1 busybox /bin/sh -c "while true; do sleep 3600; done"
+# 可以通过test1的名称连通
+[emon@emon ~]$ docker exec -it test2 /bin/sh
+/ # ping test1
+PING test1 (172.17.0.2): 56 data bytes
+64 bytes from 172.17.0.2: seq=0 ttl=64 time=0.056 ms
+```
+
+- 复原test2
+
+```bash
+[emon@emon ~]$ docker rm -f test2
+[emon@emon ~]$ docker run -d --name test2 busybox /bin/sh -c "while true; do sleep 3600; done"
+```
+
+#### 容器之间通过自定义的docker的bridge来link
+
+- 创建新的bridge
+
+```bash
+[emon@emon ~]$ docker network create -d bridge my-bridge
+```
+
+- 创建容器并指定到新建的bridge
+
+```bash
+[emon@emon ~]$ docker run -d --name test3 --network my-bridge busybox /bin/sh -c "while true; do sleep 3600; done"
+# 查看容器与bridge绑定关系
+[emon@emon ~]$ brctl show
+bridge name	bridge id		STP enabled	interfaces
+br-1c371c5eabde		8000.02426de4ab41	no		veth911f9ea
+docker0		8000.02426f6e5033	no		veth3950c82
+										veth4b7c084
+# 查看my-bridge详细信息中的 Containers 属性包含的容器信息
+[emon@emon ~]$ sudo docker network inspect my-bridge
+```
+
+- 调整已有容器test2连接到my-bridge
+
+```bash
+[emon@emon ~]$ docker network connect my-bridge test2
+# 查看my-bridge详细信息中的 Containers 属性包含的容器信息；发现test2仍旧和bridge保持连接
+[emon@emon ~]$ sudo docker network inspect bridge
+# 查看my-bridge详细信息中的 Containers 属性包含的容器信息；发现test2也连接到my-bridge了
+[emon@emon ~]$ sudo docker network inspect my-bridge
+```
+
+- 如果两个容器连接到自定义bridge，可以通过name来ping通对方
+
+```bash
+[emon@emon ~]$ docker exec -it test3 /bin/sh
+/ # ping test2
+PING test2 (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.058 ms
+
+[emon@emon ~]$ docker exec -it test2 /bin/sh
+/ # ping test3
+PING test3 (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.053 ms
+```
+
+
+
+## 6.5、容器的端口映射
+
+- 创建一个nginx的容器
+
+```docker
+[emon@emon ~]$ docker run --name web -d -p 80:80 nginx
+```
+
+
+
+# 七、仓库
+
+
+
+# 八、数据管理
+
+
+
+# 九、端口映射与容器互联、
 
 
 
