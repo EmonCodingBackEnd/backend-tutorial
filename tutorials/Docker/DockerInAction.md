@@ -2511,7 +2511,7 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 ```properties
 #[Member]
-# 每个机器填写自己主机名，取 hostname -s 值即可
+# 集群实例名称：每个机器填写自己主机名，取 hostname -s 值即可
 ETCD_NAME="emon"
 # 服务运行数据保存的路径，默认为 `$name}.etcd`
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
@@ -2527,7 +2527,7 @@ ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.116:2380"
 ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.116:2379,http://localhost:2379"
 # 启动集群时，使用静态连接方法，定义每个 member 主机名 endpoint
 ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
-# 用于标记集群唯一性的token
+# 集群名称：用于标记集群唯一性的token
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 # 表示初始化集群
 ETCD_INITIAL_CLUSTER_STATE="new"
@@ -2543,7 +2543,7 @@ ETCD_INITIAL_CLUSTER_STATE="new"
 
 ```properties
 #[Member]
-# 每个机器填写自己主机名，取 hostname -s 值即可
+# 集群实例名称：每个机器填写自己主机名，取 hostname -s 值即可
 ETCD_NAME="emon2"
 # 服务运行数据保存的路径，默认为 `$name}.etcd`
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
@@ -2559,13 +2559,15 @@ ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.117:2380"
 ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.117:2379,http://localhost:2379"
 # 启动集群时，使用静态连接方法，定义每个 member 主机名 endpoint
 ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
-# 用于标记集群唯一性的token
+# 集群名称：用于标记集群唯一性的token
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 # 表示初始化集群
 ETCD_INITIAL_CLUSTER_STATE="new"
 ```
 
 3：启动集群
+
+确保emon和emon2机器能互通，且防火墙未限制！
 
 ```bash
 # 启动etcd服务
@@ -2645,14 +2647,18 @@ etcdctl get hello
 etcdctl ls /
 ```
 
+- 查看etcdctl更多用法
+
+```bash
+etcdctl help
+```
+
 - 关闭集群
 
 ```bash
 # 若需要对etcd集群进行重置，最简单的方式是关闭集群后，删除所有 etcd member 中的 ETCD_DATA_DIR 配置中定义的所有子目录。
 [emon@emon ~]$ sudo systemctl stop etcd
 ```
-
-
 
 4：切换IP环境
 
@@ -2702,6 +2708,8 @@ PS : 步骤不能错 , 所以如果有可能 , 请新加节点之后 , 集群重启一下 , 比较不容易错
 ### 6.5.3、创建overlay network
 
 #### 重启docker服务
+
+**重要提示**：最好emon和emon2服务器的docker版本一致！如果不一致可能导致两台机器作为docker集群时通讯格式问题！
 
 ```bash
 # emon宿主机重启
@@ -2866,9 +2874,94 @@ a99463bedc7d   demo      overlay   global
 
 ### 6.5.4、基于overlay创建docker容器
 
+- 在emon服务器创建容器
+
 ```bash
 [emon@emon ~]$ docker run -d --name test1 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
+# 命令行输出结果
+0387344d96227605c6bf53376cc2db97fd345b9bc6a3f4bfe656d8d81c094c08
 ```
+
+- 在emon2服务器创建容器
+
+会提示test1容器已存在，这再次表明了emon和emon2服务器组合成了集群。
+
+```bash
+[emon@emon2 ~]$ docker run -d --name test1 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
+# 命令行输出结果
+/usr/bin/docker: Error response from daemon: Conflict. The container name "/test1" is already in use by container "d3701896a1dc65d50d26ffddbbb947f7a2d70c22e0daa7aed885b0f7205ea5fa". You have to remove (or rename) that container to be able to reuse that name.
+See '/usr/bin/docker run --help'.
+# 创建名称为test2的容器
+[emon@emon2 ~]$ docker run -d --name test2 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
+```
+
+- 对比emon和emon2上容器的IP地址
+
+```bash
+# emon上容器test1的ip地址是：10.0.0.2
+[emon@emon ~]$ docker exec test1 ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+157: eth0@if158: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1450 qdisc noqueue 
+    link/ether 02:42:0a:00:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.2/24 brd 10.0.0.255 scope global eth0
+       valid_lft forever preferred_lft forever
+160: eth1@if161: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.2/16 brd 172.18.255.255 scope global eth1
+       valid_lft forever preferred_lft forever
+
+# emon2上容器test2的ip地址是：10.0.0.3
+[emon@emon2 ~]$ docker exec test2 ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+6: eth0@if7: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1450 qdisc noqueue 
+    link/ether 02:42:0a:00:00:03 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.3/24 brd 10.0.0.255 scope global eth0
+       valid_lft forever preferred_lft forever
+9: eth1@if10: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.2/16 brd 172.18.255.255 scope global eth1
+       valid_lft forever preferred_lft forever
+       
+# 查看网络命名空间demo的详细信息
+[emon@emon ~]$ sudo docker network inspect demo
+......省略......
+        "Containers": {
+            "0387344d96227605c6bf53376cc2db97fd345b9bc6a3f4bfe656d8d81c094c08": {
+                "Name": "test1",
+                "EndpointID": "0085dc0851d2df72fa5f45be92afc77f624b2c6b946152a610fe1b34dbdd29fa",
+                "MacAddress": "02:42:0a:00:00:02",
+                "IPv4Address": "10.0.0.2/24",
+                "IPv6Address": ""
+            },
+            "ep-7031fbe0e5201a4a55a6adb98fa3aac81ea12bb8e650ab4e14117870d9ab3315": {
+                "Name": "test2",
+                "EndpointID": "7031fbe0e5201a4a55a6adb98fa3aac81ea12bb8e650ab4e14117870d9ab3315",
+                "MacAddress": "02:42:0a:00:00:03",
+                "IPv4Address": "10.0.0.3/24",
+                "IPv6Address": ""
+            }
+        },
+......省略......
+
+# emon上容器test1和emon2上容器test2已打通
+[emon@emon ~]$ docker exec test1 ping 10.0.0.3
+PING 10.0.0.3 (10.0.0.3): 56 data bytes
+64 bytes from 10.0.0.3: seq=0 ttl=64 time=1.018 ms
+
+[emon@emon ~]$ docker exec test1 ping test2
+PING test2 (10.0.0.3): 56 data bytes
+64 bytes from 10.0.0.3: seq=0 ttl=64 time=0.328 ms
+```
+
+
+
+
 
 # 七、仓库
 
