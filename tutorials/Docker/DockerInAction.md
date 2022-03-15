@@ -2369,7 +2369,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
        valid_lft forever preferred_lft forever
 ```
 
-## 6.4、案例：多容器复杂应用的部署演示
+## 6.4、案例：多容器复杂应用的部署演示（单机多容器版）
 
 初始化环境：
 
@@ -2959,7 +2959,7 @@ PING test2 (10.0.0.3): 56 data bytes
 64 bytes from 10.0.0.3: seq=0 ttl=64 time=0.328 ms
 ```
 
-
+## 6.6、案例：多容器复杂应用的部署演示（多机多容器版）
 
 
 
