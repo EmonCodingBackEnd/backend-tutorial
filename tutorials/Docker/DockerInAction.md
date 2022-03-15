@@ -1781,7 +1781,7 @@ ENTRYPOINT [ "/bin/echo", "hello docker" ]
 
 参考示例：https://github.com/docker-library/mysql
 
-### 2.1、flask-demo服务镜像
+### 2.1、案例：flask-demo服务镜像
 
 1：创建目录
 
@@ -1899,7 +1899,7 @@ CMD ["python", "app.py"]
  * Debugger PIN: 471-935-875
 ```
 
-### 2.2、ubuntu-stress工具镜像
+### 2.2、案例：ubuntu-stress工具镜像
 
 1：创建目录
 
@@ -2346,7 +2346,22 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
        valid_lft forever preferred_lft forever
 ```
 
-## 6.4、多容器复杂应用的部署演示
+## 6.4、案例：多容器复杂应用的部署演示
+
+初始化环境：
+
+```bash
+# 清理容器
+[emon@emon ~]$ docker rm -f $(docker ps -qa)
+
+[emon@emon ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+4350d5c6e428        bridge              bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+[emon@emon ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
 
 1：创建目录
 
@@ -2433,6 +2448,404 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 ```
 
 
+
+## 6.5、Overlay和Underlay的通俗解释
+
+**环境准备：emon和emon2环境。两台机器上docker恢复到没有容器在运行的状态。并安装etcd集群。**
+
+### 6.5.1、多机器通信（Vxlan）
+
+![image-20220315081508907](images/image-20220315081508907.png)
+
+- underlay：可以理解为宿主机之间的通信；
+- overlay：可以理解为不同宿主机中docker容器之间的通信；
+
+### 6.5.2、安装etcd集群
+
+| 机器名 | IP1-家庭      | IP2-公司   | 部署内容     |
+| ------ | ------------- | ---------- | ------------ |
+| emon   | 192.168.1.116 | 10.0.0.116 | docker-node1 |
+| emon2  | 192.168.1.117 | 10.0.0.117 | docker-node2 |
+
+1：安装etcd
+
+```bash
+# emon主机安装
+[emon@emon ~]$ sudo yum install -y etcd
+# emon2主机安装
+[emon@emon2 ~]$ sudo yum install -y etcd
+```
+
+2：修改配置
+
+- emon宿主机：docker-node1
+
+```bash
+# 备份原配置文件并编辑
+[emon@emon ~]$ sudo cp /etc/etcd/etcd.conf /etc/etcd/etcd.conf.bak
+[emon@emon ~]$ sudo vim /etc/etcd/etcd.conf 
+```
+
+```properties
+#[Member]
+# 每个机器填写自己主机名，取 hostname -s 值即可
+ETCD_NAME="emon"
+# 服务运行数据保存的路径，默认为 `$name}.etcd`
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_WAL_DIR="/var/lib/etcd/default.etcd/wal"
+# 用于监听其他 etcd member 连接：特别注意，ip地址不能使用主机名替代
+ETCD_LISTEN_PEER_URLS="http://10.0.0.116:2380"
+# 用于 etcdctl 命令连接，其中 localhost 用于本地连接
+ETCD_LISTEN_CLIENT_URLS="http://10.0.0.116:2379,http://localhost:2379"
+
+#[Clustering]
+# 本地用于监听并连接其他 member 的地址
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.116:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.116:2379,http://localhost:2379"
+# 启动集群时，使用静态连接方法，定义每个 member 主机名 endpoint
+ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
+# 用于标记集群唯一性的token
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+# 表示初始化集群
+ETCD_INITIAL_CLUSTER_STATE="new"
+```
+
+- emon2宿主机：docker-node2
+
+```bash
+# 备份原配置文件并编辑
+[emon@emon2 ~]$ sudo cp /etc/etcd/etcd.conf /etc/etcd/etcd.conf.bak
+[emon@emon2 ~]$ sudo vim /etc/etcd/etcd.conf 
+```
+
+```properties
+#[Member]
+# 每个机器填写自己主机名，取 hostname -s 值即可
+ETCD_NAME="emon2"
+# 服务运行数据保存的路径，默认为 `$name}.etcd`
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_WAL_DIR="/var/lib/etcd/default.etcd/wal"
+# 用于监听其他 etcd member 连接：特别注意，ip地址不能使用主机名替代
+ETCD_LISTEN_PEER_URLS="http://10.0.0.117:2380"
+# 用于 etcdctl 命令连接，其中 localhost 用于本地连接
+ETCD_LISTEN_CLIENT_URLS="http://10.0.0.117:2379,http://localhost:2379"
+
+#[Clustering]
+# 本地用于监听并连接其他 member 的地址
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.117:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.117:2379,http://localhost:2379"
+# 启动集群时，使用静态连接方法，定义每个 member 主机名 endpoint
+ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
+# 用于标记集群唯一性的token
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+# 表示初始化集群
+ETCD_INITIAL_CLUSTER_STATE="new"
+```
+
+3：启动集群
+
+```bash
+# 启动etcd服务
+[emon@emon ~]$ sudo systemctl start etcd
+[emon@emon2 ~]$ sudo systemctl start etcd
+
+# 设置开机启动
+[emon@emon ~]$ sudo systemctl enable etcd
+[emon@emon2 ~]$ sudo systemctl enable etcd
+```
+
+注意 , 第一台启动的etcd(master节点)(isLeader=true)会等待第二台启动之后 ,才会启动成功；在此之前会卡主。
+
+- 查看版本
+
+```bash
+[emon@emon ~]$ etcd --version
+# 命令行输出结果
+etcd Version: 3.3.11
+Git SHA: 2cf9e51
+Go Version: go1.10.3
+Go OS/Arch: linux/amd64
+```
+
+- 服务状态检测
+
+```bash
+[emon@emon ~]$ sudo systemctl status etcd
+```
+
+- 查看集群健康检测
+
+```bash
+[emon@emon ~]$ etcdctl cluster-health
+# 命令行输出结果
+member 122b032f3d6b6b6 is healthy: got healthy result from http://10.0.0.117:2379
+member 85cea699a6c68067 is healthy: got healthy result from http://10.0.0.116:2379
+```
+
+- 查看集群所有节点
+
+```bash
+[emon@emon ~]$ etcdctl member list
+# 命令行输出结果
+122b032f3d6b6b6: name=emon2 peerURLs=http://10.0.0.117:2380 clientURLs=http://10.0.0.117:2379,http://localhost:2379 isLeader=false
+85cea699a6c68067: name=emon peerURLs=http://10.0.0.116:2380 clientURLs=http://10.0.0.116:2379,http://localhost:2379 isLeader=true
+```
+
+- 把一台设备移除出集群，后面是集群节点号，使用list可以查看到
+
+```bash
+# 移除之后，该节点的etcd服务自动关闭
+etcdctl member remove 122b032f3d6b6b6
+```
+
+- 更新一个节点
+
+```bash
+etcdctl member update 122b032f3d6b6b6
+```
+
+- 设置key=hello,value=world
+
+```bash
+etcdctl set hello world
+```
+
+- 查看key的值
+
+```bash
+etcdctl get hello
+```
+
+- 查看key列表
+
+```bash
+etcdctl ls /
+```
+
+- 关闭集群
+
+```bash
+# 若需要对etcd集群进行重置，最简单的方式是关闭集群后，删除所有 etcd member 中的 ETCD_DATA_DIR 配置中定义的所有子目录。
+[emon@emon ~]$ sudo systemctl stop etcd
+```
+
+
+
+4：切换IP环境
+
+- companys切换到houses
+
+```bash
+[emon@emon ~]$ sudo sed -n 's/10.0.0/192.168.1/gp' /etc/etcd/etcd.conf
+[emon@emon ~]$ sudo sed -i 's/10.0.0/192.168.1/g' /etc/etcd/etcd.conf
+```
+
+- houses切换到companys
+
+```bash
+[emon@emon ~]$ sudo sed -n 's/192.168.1/10.0.0/gp' /etc/etcd/etcd.conf
+[emon@emon ~]$ sudo sed -i 's/192.168.1/10.0.0/g' /etc/etcd/etcd.conf
+```
+
+5：集群新增额外节点（临时节点）
+
+步骤1：加入成员
+
+```bash
+etcdctl member add name=emon3 --peer-urls="http://10.0.0.118:2380"
+```
+
+步骤2：删除新节点的data目录
+
+```bash
+# 注意，在新节点服务器操作
+rm -rf /var/lib/etcd/default.etcd
+```
+
+步骤3：新节点增加配置etcd.conf
+
+注意，里面的 `ETCD_INITIAL_CLUSTER_STATE="existing"`代表已存在节点。
+
+步骤4：启动新节点的etcd服务
+
+```bash
+systemctl start etcd
+```
+
+PS : 步骤不能错 , 所以如果有可能 , 请新加节点之后 , 集群重启一下 , 比较不容易错
+
+
+
+### 6.5.3、创建overlay network
+
+#### 重启docker服务
+
+```bash
+# emon宿主机重启
+[emon@emon ~]$ sudo systemctl stop docker
+# 说明：如果第一次执行时，输出了类似 [1] 31966 时就没有信息了，要再试一次
+[emon@emon ~]$ sudo dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --cluster-store=etcd://10.0.0.116:2379 --cluster-advertise=10.0.0.116:2375&
+
+# emon2宿主机重启
+[emon@emon2 ~]$ sudo systemctl stop docker
+# 命令行输出结果
+Warning: Stopping docker.service, but it can still be activated by:
+  docker.socket
+# 停止docker.socket服务
+[emon@emon2 ~]$ sudo systemctl stop docker.socket
+# 说明：如果第一次执行时，输出了类似 [1] 31966 时就没有信息了，要再试一次
+[emon@emon2 ~]$ sudo dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --cluster-store=etcd://10.0.0.117:2379 --cluster-advertise=10.0.0.117:2375&
+```
+
+#### 创建overlay network
+
+在emon宿主机上创建一个demo的overlay network
+
+```bash
+[emon@emon ~]$ sudo docker network ls 
+NETWORK ID          NAME                DRIVER              SCOPE
+b685c764ea40        bridge              bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+[emon@emon ~]$ sudo docker network create -d overlay demo
+a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454
+[emon@emon ~]$ sudo docker network ls 
+NETWORK ID          NAME                DRIVER              SCOPE
+b685c764ea40        bridge              bridge              local
+a99463bedc7d        demo                overlay             global
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+[emon@emon ~]$ docker network inspect demo
+[
+    {
+        "Name": "demo",
+        "Id": "a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454",
+        "Created": "2022-03-15T11:33:36.272826446+08:00",
+        "Scope": "global",
+        "Driver": "overlay",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "10.0.0.0/24",
+                    "Gateway": "10.0.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+```
+
+我们会看到在emon2上，这个demo的overlay network会被同步创建。
+
+```bash
+[emon@emon2 ~]$ sudo docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+986acb0bb4f2   bridge    bridge    local
+a99463bedc7d   demo      overlay   global
+82cc9a054945   host      host      local
+490e5622c907   none      null      local
+[emon@emon2 ~]$ docker network inspect demo
+[
+    {
+        "Name": "demo",
+        "Id": "a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454",
+        "Created": "2022-03-15T11:33:36.272826446+08:00",
+        "Scope": "global",
+        "Driver": "overlay",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "10.0.0.0/24",
+                    "Gateway": "10.0.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+```
+
+通过查看etcd的key-value，我们获取到，这个demo的network是通过etcd从emon同步到emon2的。
+
+```bash
+[emon@emon2 ~]$ etcdctl ls /docker
+/docker/network
+/docker/nodes
+[emon@emon2 ~]$ etcdctl ls /docker/nodes
+/docker/nodes/10.0.0.116:2375
+/docker/nodes/10.0.0.117:2375
+[emon@emon2 ~]$ etcdctl ls /docker/network
+/docker/network/v1.0
+[emon@emon2 ~]$ etcdctl ls /docker/network/v1.0
+/docker/network/v1.0/ipam
+/docker/network/v1.0/idm
+/docker/network/v1.0/overlay
+/docker/network/v1.0/network
+/docker/network/v1.0/endpoint_count
+/docker/network/v1.0/endpoint
+[emon@emon2 ~]$ etcdctl ls /docker/network/v1.0/network
+/docker/network/v1.0/network/a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454
+# 依赖jq输出友好json格式，安装jq：sudo yum install -y jq
+[emon@emon2 ~]$ etcdctl get /docker/network/v1.0/network/a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454|jq .
+{
+  "addrSpace": "GlobalDefault",
+  "attachable": false,
+  "configFrom": "",
+  "configOnly": false,
+  "created": "2022-03-15T11:33:36.272826446+08:00",
+  "enableIPv6": false,
+  "generic": {
+    "com.docker.network.enable_ipv6": false,
+    "com.docker.network.generic": {}
+  },
+  "id": "a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454",
+  "inDelete": false,
+  "ingress": false,
+  "internal": false,
+  "ipamOptions": {},
+  "ipamType": "default",
+  "ipamV4Config": "[{\"PreferredPool\":\"\",\"SubPool\":\"\",\"Gateway\":\"\",\"AuxAddresses\":null}]",
+  "ipamV4Info": "[{\"IPAMData\":\"{\\\"AddressSpace\\\":\\\"GlobalDefault\\\",\\\"Gateway\\\":\\\"10.0.0.1/24\\\",\\\"Pool\\\":\\\"10.0.0.0/24\\\"}\",\"PoolID\":\"GlobalDefault/10.0.0.0/24\"}]",
+  "labels": {},
+  "loadBalancerIP": "",
+  "name": "demo",
+  "networkType": "overlay",
+  "persist": true,
+  "postIPv6": false,
+  "scope": "global"
+}
+```
+
+### 6.5.4、基于overlay创建docker容器
+
+```bash
+[emon@emon ~]$ docker run -d --name test1 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
+```
 
 # 七、仓库
 
