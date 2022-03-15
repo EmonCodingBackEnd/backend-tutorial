@@ -413,6 +413,29 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 [emon@emon ~]$ sudo docker run hello-world
 ```
 
+> 说明：如果docker info有提示：
+> WARNING: bridge-nf-call-iptables is disabled
+> WARNING: bridge-nf-call-ip6tables is disabled
+
+解决办法：
+
+```bash
+[emon@emon2 ~]$ sudo vim /etc/sysctl.conf 
+```
+
+```bash
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+```
+
+使之生效：
+
+```bash
+[emon@emon2 ~]$ sudo sysctl -p
+```
+
+无需重启，此时docker info就看不到此报错了。
+
 ### 1.3、配置docker加速器
 
 - 配置
