@@ -2959,8 +2959,129 @@ PING test2 (10.0.0.3): 56 data bytes
 64 bytes from 10.0.0.3: seq=0 ttl=64 time=0.328 ms
 ```
 
-## 6.6、案例：多容器复杂应用的部署演示（多机多容器版）
+### 6.5.5、overlay网络扩展
 
+在创建了test1容器后，emon宿主机查看如下：
+
+```bash
+# 多了一个 docker_gwbridge
+[emon@emon ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+1a1afc340c27        bridge              bridge              local
+d92a2f5020c6        demo                overlay             global
+c735a7979dca        docker_gwbridge     bridge              local
+4913d65f0331        host                host                local
+5dddd8fbaae8        none                null                local
+# 一探究竟：注意 eth0和eth1
+[emon@emon ~]$ docker exec test1 ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+157: eth0@if158: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1450 qdisc noqueue 
+    link/ether 02:42:0a:00:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.2/24 brd 10.0.0.255 scope global eth0
+       valid_lft forever preferred_lft forever
+160: eth1@if161: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.2/16 brd 172.18.255.255 scope global eth1
+       valid_lft forever preferred_lft forever
+```
+
+大体如下：
+
+![image-20220315160025535](images/image-20220315160025535.png)
+
+
+
+## 6.6、案例：多容器复杂应用的部署演示（多机多容器版）
+### 6.6.1、emon2宿主机创建redis容器
+
+```bash
+[emon@emon2 ~]$ docker run -d --name redis --network demo redis
+```
+
+
+
+### 6.6.2、emon宿主机创建flask-redis容器
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/flask-redis
+[emon@emon ~]$ cd dockerdata/flask-redis/
+```
+
+2：编写内容
+
+- 创建app.py
+
+```bash
+[emon@emon flask-redis]$ vim app.py
+```
+
+```python
+from flask import Flask
+from redis import Redis
+import os
+import socket
+
+app = Flask(__name__)
+redis = Redis(host=os.environ.get('REDIS_HOST', '127.0.0.1'), port=6379)
+
+
+@app.route('/')
+def hello():
+    redis.incr('hits')
+    return 'Hello Container World! I have been seen %s times and my hostname is %s.\n' % (redis.get('hits'),socket.gethostname())
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+3：创建Dockerfile
+
+```bash
+[emon@emon flask-redis]$ vim Dockerfile
+```
+
+```dockerfile
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+COPY . /app
+WORKDIR /app
+RUN pip install flask redis
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+4：创建镜像
+
+```bash
+[emon@emon flask-redis]$ docker build -t rushing/flask-redis .
+```
+
+5：运行镜像
+
+```bash
+[emon@emon flask-redis]$ docker run -d -p 5000:5000 --link redis --name flask-redis --network demo -e REDIS_HOST=redis rushing/flask-redis
+# 访问容器
+[emon@emon flask-redis]$ docker exec -it flask-redis /bin/bash
+# 查看env
+root@f37f93de0bcb:/app# env|grep REDIS_HOST
+REDIS_HOST=redis
+# 运行代码
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+Hello Container World! I have been seen 1 times and my hostname is f37f93de0bcb.
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+Hello Container World! I have been seen 2 times and my hostname is f37f93de0bcb.
+root@f37f93de0bcb:/app# curl 127.0.0.1:5000
+
+# 在宿主机器访问
+[emon@emon flask-redis]$ curl 127.0.0.1:5000
+Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
+```
 
 
 # 七、仓库
