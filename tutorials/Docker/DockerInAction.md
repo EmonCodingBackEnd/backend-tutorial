@@ -3600,9 +3600,92 @@ wordpress_wordpress_1   wordpress    latest   c3c92cc3dcb1   616 MB
 
 ## 5、案例：docker-compse版flask-redis
 
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir -p dockerdata/compose/flask-redis
+[emon@emon ~]$ cd dockerdata/compose/flask-redis/
+```
+
+2：编写内容
+
+- 创建app.py
+
+```bash
+[emon@emon flask-redis]$ vim app.py
+```
+
+```python
+from flask import Flask
+from redis import Redis
+import os
+import socket
+
+app = Flask(__name__)
+redis = Redis(host=os.environ.get('REDIS_HOST', '127.0.0.1'), port=6379)
 
 
+@app.route('/')
+def hello():
+    redis.incr('hits')
+    return 'Hello Container World! I have been seen %s times and my hostname is %s.\n' % (redis.get('hits'),socket.gethostname())
 
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+3：创建Dockerfile
+
+```bash
+[emon@emon flask-redis]$ vim Dockerfile 
+```
+
+```bash
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+COPY . /app
+WORKDIR /app
+RUN pip install flask redis
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+4：创建镜像
+
+```bash
+[emon@emon flask-redis]$ docker build -t rushing/flask-redis .
+```
+
+5：编写`docker-compose.yml`文件
+
+```bash
+[emon@emon flask-redis]$ vim docker-compose.yml
+```
+
+```yaml
+version: "3"
+
+services:
+
+  redis:
+    image: redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:5000
+    environment:
+      REDIS_HOST: redis      
+```
+
+6：启动
+
+```bash
+[emon@emon flask-redis]$ docker-compose up
+```
 
 
 
