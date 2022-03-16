@@ -508,8 +508,6 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
 ### 5.6、metaspace中对象的信息及其占用量
 
-### 5.6、metaspace中对象的信息及其占用量
-
 ```bash
 [emon@emon ~]$ jstat -gcmetacapacity 61572
    MCMN       MCMX        MC       CCSMN      CCSMX       CCSC     YGC   FGC    FGCT     GCT   
