@@ -1958,11 +1958,11 @@ CMD []
 
 
 
-# 六、网络
+# 六、网络：端口映射与容器互联
 
-## 6.1、网络的基础知识
+## 1、网络的基础知识
 
-### 6.1.1、网络的分类
+### 1.1、网络的分类
 
 - 单机
   - Bridge Network
@@ -1971,11 +1971,11 @@ CMD []
 - 多机
   - Overlay Network
 
-### 6.1.2、网络的分层
+### 1.2、网络的分层
 
 ![image-20220314093103079](images/image-20220314093103079.png)
 
-### 6.1.3、公有IP和私有IP
+### 1.3、公有IP和私有IP
 
 - Public IP：互联网上的唯一标识，可以访问internet
 - Private IP：不可在互联网上使用，仅供机构内部使用
@@ -1986,11 +1986,11 @@ CMD []
 | B类  | 172.16.0.0--172.31.255.255   | 172.16.0.0/12  |
 | C类  | 192.168.0.0--192.168.255.255 | 192.168.0.0/16 |
 
-### 6.1.4、网络地址转换NAT
+### 1.4、网络地址转换NAT
 
 ![image-20220314124559772](images/image-20220314124559772.png)
 
-### 6.1.5、ping和telnet以及wireshark
+### 1.5、ping和telnet以及wireshark
 
 - ping(ICMP)：验证IP的可达性
 - telnet：验证服务的可用性
@@ -1998,9 +1998,9 @@ CMD []
 
 
 
-## 6.2、Linux网络命名空间
+## 2、Linux网络命名空间
 
-### 6.2.1、docker的网络命名空间
+### 2.1、docker的网络命名空间
 
 启动一个容器作为演示环境：
 
@@ -2037,7 +2037,7 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t…"   49 seconds ago
 [emon@emon ~]$ docker exec -it b966b6ee1664 ip a
 ```
 
-### 6.2.2、linux的网络命名空间
+### 2.2、linux的网络命名空间
 
 #### 如何添加两个命名空间？
 
@@ -2164,9 +2164,9 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t…"   49 seconds ago
 [emon@emon ~]$ sudo ip netns exec test1 ping 192.168.1.2
 ```
 
-## 6.3、Docker网络
+## 3、Docker网络
 
-### 6.3.1、Docker网络类型列表
+### 3.1、Docker网络类型列表
 
 - 查看Docker网络列表
 
@@ -2192,7 +2192,7 @@ docker0		8000.02426f6e5033	no		veth3950c82
 
 说明：有两对veth，对应两个容器，通过docker0这个bridge连接起来。拓扑图如下：
 
-### 6.3.2、Docker网络之bridge
+### 3.2、Docker网络之bridge
 
 #### 容器间互相访问拓扑图
 
@@ -2277,7 +2277,7 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-### 6.3.3、容器的端口映射
+### 3.3、容器的端口映射
 
 - 创建一个nginx的容器
 
@@ -2287,7 +2287,7 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-### 6.3.4、Docker网络之none
+### 3.4、Docker网络之none
 
 初始化环境：
 
@@ -2321,7 +2321,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
        valid_lft forever preferred_lft forever
 ```
 
-### 6.3.5、Docker网络之host
+### 3.5、Docker网络之host
 
 初始化环境：
 
@@ -2369,7 +2369,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
        valid_lft forever preferred_lft forever
 ```
 
-## 6.4、案例：多容器复杂应用的部署演示（单机多容器版）
+## 4、案例：多容器复杂应用的部署演示（单机多容器版）
 
 初始化环境：
 
@@ -2472,18 +2472,18 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 
 
-## 6.5、Overlay和Underlay的通俗解释
+## 5、Overlay和Underlay的通俗解释
 
 **环境准备：emon和emon2环境。两台机器上docker恢复到没有容器在运行的状态。并安装etcd集群。**
 
-### 6.5.1、多机器通信（Vxlan）
+### 5.1、多机器通信（Vxlan）
 
 ![image-20220315081508907](images/image-20220315081508907.png)
 
 - underlay：可以理解为宿主机之间的通信；
 - overlay：可以理解为不同宿主机中docker容器之间的通信；
 
-### 6.5.2、安装etcd集群
+### 5.2、安装etcd集群
 
 | 机器名 | IP1-家庭      | IP2-公司   | 部署内容     |
 | ------ | ------------- | ---------- | ------------ |
@@ -2705,7 +2705,7 @@ PS : 步骤不能错 , 所以如果有可能 , 请新加节点之后 , 集群重启一下 , 比较不容易错
 
 
 
-### 6.5.3、创建overlay network
+### 5.3、创建overlay network
 
 #### 重启docker服务
 
@@ -2872,7 +2872,7 @@ a99463bedc7d   demo      overlay   global
 }
 ```
 
-### 6.5.4、基于overlay创建docker容器
+### 5.4、基于overlay创建docker容器
 
 - 在emon服务器创建容器
 
@@ -2959,7 +2959,7 @@ PING test2 (10.0.0.3): 56 data bytes
 64 bytes from 10.0.0.3: seq=0 ttl=64 time=0.328 ms
 ```
 
-### 6.5.5、overlay网络扩展
+### 5.5、overlay网络扩展
 
 在创建了test1容器后，emon宿主机查看如下：
 
@@ -2994,8 +2994,8 @@ c735a7979dca        docker_gwbridge     bridge              local
 
 
 
-## 6.6、案例：多容器复杂应用的部署演示（多机多容器版）
-### 6.6.1、emon2宿主机创建redis容器
+## 6、案例：多容器复杂应用的部署演示（多机多容器版）
+### 6.1、emon2宿主机创建redis容器
 
 ```bash
 [emon@emon2 ~]$ docker run -d --name redis --network demo redis
@@ -3003,7 +3003,7 @@ c735a7979dca        docker_gwbridge     bridge              local
 
 
 
-### 6.6.2、emon宿主机创建flask-redis容器
+### 6.2、emon宿主机创建flask-redis容器
 
 1：创建目录
 
@@ -3096,9 +3096,9 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 
 
-## 7.1、Docker持久化数据的方案
+## 1、Docker持久化数据的方案
 
-### 7.1.1、Volume存储位置
+### 1.1、Volume存储位置
 
 - 基于本地文件系统的Volume
 
@@ -3108,14 +3108,14 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 支持第三方存储方案，比如NAS，AWS，阿里云等等。
 
-### 7.1.2、Volume的类型
+### 1.2、Volume的类型
 
 - 受管理的data Volume，由docker后台自动创建。
 - 绑定挂在的Volume，具体挂在位置可以由用户指定。
 
-## 7.2、数据持久化：Data Volume
+## 2、数据持久化：Data Volume
 
-### 7.2.1、不指定volume
+### 2.1、不指定volume
 
 - 查看volume
 
@@ -3156,7 +3156,7 @@ local               97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95d
 [emon@emon ~]$ docker volume rm 97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95dd692
 ```
 
-### 7.2.2、指定volume
+### 2.2、指定volume
 
 - 创建mysql容器
 
@@ -3237,7 +3237,7 @@ mysql> show databases;
 5 rows in set (0.00 sec)
 ```
 
-## 7.3、数据持久化：Bind Mouting
+## 3、数据持久化：Bind Mouting
 
 1：创建目录
 
@@ -3340,17 +3340,267 @@ Dockerfile  index.html  test.txt
 
 
 
-## 7.4、开发者利器：Docker+Bind Mouting
+## 4、开发者利器：Docker+Bind Mouting
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/flask-skeleton
+[emon@emon ~]$ cd dockerdata/flask-skeleton/
+```
+
+2：编写内容
+
+一个PythonFlask项目。
+
+https://github.com/EmonCodingBackEnd/demo-docker-source01
+
+3：创建Dockerfile
+
+```bash
+[emon@emon flask-skeleton]$ vim Dockerfile 
+```
+
+```dockerfile
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+
+COPY . /skeleton
+WORKDIR /skeleton
+RUN pip3 install -r requirements.txt
+EXPOSE 5000
+ENTRYPOINT ["scripts/dev.sh"]
+```
+
+4：创建镜像
+
+```bash
+[emon@emon flask-skeleton]$ docker build -t rushing/flask-skeleton .
+```
+
+5：创建容器
+
+```bash
+[emon@emon flask-skeleton]$ docker run -d -p 80:5000 -v $(pwd):/skeleton --name flask rushing/flask-skeleton
+```
+
+## 5、综合演练：WordPress部署
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir dockerdata/WordPress
+[emon@emon ~]$ cd dockerdata/WordPress/
+```
+
+2：创建MySQL容器
+
+```bash
+[emon@emon WordPress]$ docker run -d --name mysql -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root123 -e MYSQL_DATABASE=wordpress mysql
+```
+
+3：创建WordPress容器
+
+```bash
+[emon@emon WordPress]$ docker run -d --name wordpress -e WORDPRESS_DB_HOST=mysql:3306 -e WORDPRESS_DB_USER=root -e  WORDPRESS_DB_PASSWORD=root123 --link mysql -p 8080:80 wordpress
+```
 
 
 
+# 八、Docker Compose
+
+## 1、为什么诞生Docker Compose
+
+### 1.1、多个容器的APP好难搞！
+
+- 要从Dockerfile build image或者Dockerhub拉取image
+- 要创建多个container
+- 要管理这些container（启动停止删除）
+
+所以，Docker Compose诞生了！
+
+### 1.2、Docker Compose是什么
+
+- Docker Compose是一个工具
+- 这个工具可以通过一个yml文件定义多容器的docker应用
+- 通过一条命令就可以根据yml文件的定义去创建或者管理这多个容器
+
+## 2、docker-compose配置文件
+
+- docker-compose.yml
+
+  - Services
+    - 一个Service代表一个container，这个container可以从dockerhub的image来创建，或者从本地的Dockerfile build出来的image来创建。
+    - Service的启动类似docker run，我们可以给其指定network和volume，所以可以给service指定network和Volume的引用。
+  - Networks
+  - Volumes
+
+## 3、安装docker-compose
+
+1：下载
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+2：添加可执行权限
+
+```bash
+[emon@emon ~]$ sudo chmod +x /usr/local/bin/docker-compose
+```
+
+3：配置alias
+
+- 配置永久的alias
+
+```bash
+alias docker-compose="sudo /usr/local/bin/docker-compose"
+```
+
+- 使之生效
+
+```bash
+[emon@emon ~]$ source .bashrc 
+```
+
+4：测试
+
+```bash
+[emon@emon ~]$ docker-compose --version
+docker-compose version 1.29.2, build 5becea4c
+```
+
+## 4、案例：docker-compose版wordpress
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir -p dockerdata/compose/wordpress
+[emon@emon ~]$ cd dockerdata/compose/wordpress/
+```
+
+2：编写`docker-compose.yml`文件
+
+```bash
+[emon@emon wordpress]$ vim docker-compose.yml
+```
+
+```yaml
+version: '3'
+
+services:
+
+  wordpress:
+    image: wordpress
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_PASSWORD: root
+    networks:
+      - my-bridge
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - my-bridge
+
+volumes:
+  mysql-data:
+
+networks:
+  my-bridge:
+    driver: bridge
+```
+
+3：启动
+
+```bash
+[emon@emon wordpress]$ docker-compose -f docker-compose.yml up -d
+# 或者
+[emon@emon wordpress]$ docker-compose up -d
+```
+
+4：查看docker-compose启动状态
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml ps
+        Name                       Command               State          Ports        
+-------------------------------------------------------------------------------------
+wordpress_mysql_1       docker-entrypoint.sh mysqld      Up      3306/tcp, 33060/tcp 
+wordpress_wordpress_1   docker-entrypoint.sh apach ...   Up      0.0.0.0:8080->80/tcp
+```
+
+5：停止并保留服务实例，然后查看状态（注意：docker ps已经无法查看到了）
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml stop
+Stopping wordpress_wordpress_1 ... done
+Stopping wordpress_mysql_1     ... done
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml ps
+        Name                       Command               State    Ports
+-----------------------------------------------------------------------
+wordpress_mysql_1       docker-entrypoint.sh mysqld      Exit 0        
+wordpress_wordpress_1   docker-entrypoint.sh apach ...   Exit 0 
+```
+
+6：启动
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml start
+Starting mysql     ... done
+Starting wordpress ... done
+```
+
+7：停止并移除服务实例，然后查看状态（注意：docker ps已经无法查看到了）
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml down
+Stopping wordpress_wordpress_1 ... done
+Stopping wordpress_mysql_1     ... done
+Removing wordpress_wordpress_1 ... done
+Removing wordpress_mysql_1     ... done
+Removing network wordpress_my-bridge
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml ps
+Name   Command   State   Ports
+------------------------------
+```
+
+8：其他命令
+
+- 查看compose对应镜像
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml images
+      Container         Repository    Tag       Image Id       Size  
+---------------------------------------------------------------------
+wordpress_mysql_1       mysql        5.7      c20987f18b13   448.3 MB
+wordpress_wordpress_1   wordpress    latest   c3c92cc3dcb1   616 MB
+```
+
+- 查看日志
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml logs
+```
+
+- 进入某个服务
+
+```bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml exec mysql bash
+[emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml exec wordpress bash
+```
+
+## 5、案例：docker-compse版flask-redis
 
 
-# 八、数据管理
-
-
-
-# 九、端口映射与容器互联
 
 
 
