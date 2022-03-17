@@ -3854,13 +3854,115 @@ Hello Container World! I have been seen 11 times and my hostname is 357f9f38876b
 
 ## 6：案例：复杂Docker Compose演示
 
+![image-20220317092852804](images/architecture.png)
+
+1：创建目录
+
+```
+[emon@emon ~]$ mkdir -p dockerdata/compose/example-voting-app
+[emon@emon ~]$ cd dockerdata/compose/example-voting-app
+```
+
+2：准备项目
+
+一个PythonFlask项目。
+
+https://github.com/EmonCodingBackEnd/demo-docker-source01
+
+3：编写`docker-compose.yml`文件
+
+```bash
+version: "3"
+
+services:
+  voting-app:
+    build: ./voting-app/.
+    volumes:
+     - ./voting-app:/app
+    ports:
+      - "5000:80"
+    links:
+      - redis
+    networks:
+      - front-tier
+      - back-tier
+
+  result-app:
+    build: ./result-app/.
+    volumes:
+      - ./result-app:/app
+    ports:
+      - "5001:80"
+    links:
+      - db
+    networks:
+      - front-tier
+      - back-tier
+
+  worker:
+    build: ./worker
+    links:
+      - db
+      - redis
+    networks:
+      - back-tier
+
+  redis:
+    image: redis
+    ports: ["6379"]
+    networks:
+      - back-tier
+
+  db:
+    image: postgres:9.4
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - back-tier
+
+volumes:
+  db-data:
+
+networks:
+  front-tier:
+  back-tier:
+```
+
+4：运行
+
+```bash
+```
 
 
 
 
 
+# 九十九、其他
+
+- 查看docker占用空间
+
+```bash
+sudo du -sh /var/lib/docker
+```
 
 
+
+- 清理docker的`/var/lib/docker`目录
+
+如果碰到问题：no space left on device
+
+```bash
+docker system prune -a -f
+```
+
+- 清理docker的volume
+
+```bash
+# 清理单个
+docker volume rm < VOLUME NAME >
+# 或者清理很多
+docker volume prune
+```
 
 
 
