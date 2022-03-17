@@ -3948,6 +3948,35 @@ Node left the swarm.
 
 ## 9.4、Service的创建维护和水平扩展
 
+- 创建一个service
+
+```bash
+[emon@emon ~]$ docker service create --name demo busybox sh -c "while true; do sleep 3600; done"
+```
+
+- 查看service
+
+```bash
+# 查看service列表
+[emon@emon ~]$ docker service ls
+# 查看service详情，其中demo表示serviceId或serviceName
+[emon@emon ~]$ docker service ps demo
+```
+
+- 水平扩展
+
+```bash
+# 可以确保5个实例
+[emon@emon ~]$ docker service scale demo=5
+```
+
+- 删除service
+
+```bash
+# 其中demo表示serviceId或serviceName
+[emon@emon ~]$ docker service rm demo
+```
+
 
 
 
