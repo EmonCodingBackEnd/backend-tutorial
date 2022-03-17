@@ -3651,13 +3651,7 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-4：创建镜像
-
-```bash
-[emon@emon flask-redis]$ docker build -t rushing/flask-redis .
-```
-
-5：编写`docker-compose.yml`文件
+4：编写`docker-compose.yml`文件
 
 ```bash
 [emon@emon flask-redis]$ vim docker-compose.yml
@@ -3681,7 +3675,7 @@ services:
       REDIS_HOST: redis      
 ```
 
-6：启动
+5：启动
 
 ```bash
 [emon@emon flask-redis]$ docker-compose up
