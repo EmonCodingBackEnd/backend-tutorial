@@ -3407,7 +3407,7 @@ ENTRYPOINT ["scripts/dev.sh"]
 
 
 
-# 八、Docker Compose
+# 八、Docker Compose：单机编排
 
 ## 1、为什么诞生Docker Compose
 
@@ -3856,82 +3856,97 @@ Hello Container World! I have been seen 11 times and my hostname is 357f9f38876b
 
 ![image-20220317092852804](images/architecture.png)
 
-1：创建目录
 
-```
-[emon@emon ~]$ mkdir -p dockerdata/compose/example-voting-app
-[emon@emon ~]$ cd dockerdata/compose/example-voting-app
-```
 
-2：准备项目
+# 九、容器编排Swarm：多机编排
 
-一个PythonFlask项目。
+## 9.1、使用Docker的问题
 
-https://github.com/EmonCodingBackEnd/demo-docker-source01
+- 怎么去管理这么多容器？
 
-3：编写`docker-compose.yml`文件
+- 怎么能够方便的横向扩展？
+- 如果容器down了，怎么能自动恢复？
+- 如何去更新容器而不影响业务？
+- 如何去监控追踪这些容器？
+- 怎么去调度容器的创建？
+- 保护隐私数据？
 
-```bash
-version: "3"
 
-services:
-  voting-app:
-    build: ./voting-app/.
-    volumes:
-     - ./voting-app:/app
-    ports:
-      - "5000:80"
-    links:
-      - redis
-    networks:
-      - front-tier
-      - back-tier
 
-  result-app:
-    build: ./result-app/.
-    volumes:
-      - ./result-app:/app
-    ports:
-      - "5001:80"
-    links:
-      - db
-    networks:
-      - front-tier
-      - back-tier
+## 9.2、Docker Swarm Mode Architecture
 
-  worker:
-    build: ./worker
-    links:
-      - db
-      - redis
-    networks:
-      - back-tier
+![image-20220317162956598](images/image-20220317162956598.png)
 
-  redis:
-    image: redis
-    ports: ["6379"]
-    networks:
-      - back-tier
+## 9.3、Service和Replicas
 
-  db:
-    image: postgres:9.4
-    volumes:
-      - "db-data:/var/lib/postgresql/data"
-    networks:
-      - back-tier
+![image-20220317164111098](images/image-20220317164111098.png)
 
-volumes:
-  db-data:
+![image-20220317164304135](images/image-20220317164304135.png)
 
-networks:
-  front-tier:
-  back-tier:
-```
+## 9.3、创建一个三节点Swarm
 
-4：运行
+- emon：初始化swarm
 
 ```bash
+[emon@emon ~]$ docker swarm init --advertise-addr=10.0.0.116
+# 命令行输出结果
+Swarm initialized: current node (p4p7wgokuibrd13f7g1aydfxi) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3jk4rzfw8491m0zf9djo8n7c35ncl9u3b1byxavhq1ms81g083-9k6i7t40cffw59gtty6ad6yl4 10.0.0.116:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
+
+- emon2：加入worker
+
+```bash
+[emon@emon2 ~]$ docker swarm join --token SWMTKN-1-3jk4rzfw8491m0zf9djo8n7c35ncl9u3b1byxavhq1ms81g083-9k6i7t40cffw59gtty6ad6yl4 10.0.0.116:2377
+# 命令行输出结果
+This node joined a swarm as a worker.
+```
+
+- emon3：加入worker
+
+```bash
+[emon@emon3 ~]$ docker swarm join --token SWMTKN-1-3jk4rzfw8491m0zf9djo8n7c35ncl9u3b1byxavhq1ms81g083-9k6i7t40cffw59gtty6ad6yl4 10.0.0.116:2377
+# mlh输出结果
+This node joined a swarm as a worker.
+```
+
+- emon：在swarm的manager节点上查看swarm节点
+
+```bash
+[emon@emon ~]$ docker node ls
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+p4p7wgokuibrd13f7g1aydfxi *   emon                Ready               Active              Leader              18.06.3-ce
+jn5d90oue9zmwq8l9csa2ihpc     emon2               Ready               Active                                  18.06.3-ce
+```
+
+- 解散swarm集群
+
+```bash
+# 解除emon3节点
+[emon@emon3 ~]$ docker swarm leave
+Node left the swarm.
+# 解除emon2节点
+[emon@emon2 ~]$ docker swarm leave
+Node left the swarm.
+# 查看目前情况
+[emon@emon ~]$ docker node ls
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+p4p7wgokuibrd13f7g1aydfxi *   emon                Ready               Active              Leader              18.06.3-ce
+jn5d90oue9zmwq8l9csa2ihpc     emon2               Down                Active                                  18.06.3-ce
+r0xio3dgdcksegy5s7f8jaxjz     emon3               Down                Active                                  18.06.3-ce
+# 解散emon管理节点，解散集群
+[emon@emon ~]$ docker swarm leave --force
+Node left the swarm.
+```
+
+
+
+## 9.4、Service的创建维护和水平扩展
 
 
 
