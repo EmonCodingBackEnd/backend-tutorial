@@ -3600,6 +3600,8 @@ wordpress_wordpress_1   wordpress    latest   c3c92cc3dcb1   616 MB
 
 ## 5、案例：docker-compse版flask-redis
 
+### 5.1、单个实例
+
 1：创建目录
 
 ```bash
@@ -3680,6 +3682,185 @@ services:
 ```bash
 [emon@emon flask-redis]$ docker-compose up
 ```
+
+
+
+### 5.2、多个实例
+
+![image-20220317092852804](images/image-20220317092852804.png)
+
+- 修改`docker-compose.yml`
+
+```bash
+[emon@emon flask-redis]$ vim docker-compose.yml
+```
+
+```yaml
+version: "3"
+
+services:
+
+  redis:
+    image: redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+#    ports:
+#      - 8080:5000
+    environment:
+      REDIS_HOST: redis      
+```
+
+- 启动3个web实例
+
+```bash
+[emon@emon flask-redis]$ docker-compose up -d --scale web=3
+# 命令行输出结果
+Starting flask-redis_redis_1 ... done
+Starting flask-redis_web_1   ... done
+Creating flask-redis_web_2   ... done
+Creating flask-redis_web_3   ... done
+```
+
+- 扩展到10个web实例
+
+```bash
+# 不需要停止，直接执行如下命令即可
+[emon@emon flask-redis]$ docker-compose up -d --scale web=10
+# 命令行输出结果
+flask-redis_redis_1 is up-to-date
+Creating flask-redis_web_4  ... done
+Creating flask-redis_web_5  ... done
+Creating flask-redis_web_6  ... done
+Creating flask-redis_web_7  ... done
+Creating flask-redis_web_8  ... done
+Creating flask-redis_web_9  ... done
+Creating flask-redis_web_10 ... done
+```
+
+### 5.3、HAProxy模式
+
+1：创建目录
+
+```bash
+[emon@emon ~]$ mkdir -p dockerdata/compose/lb-scale
+[emon@emon ~]$ cd dockerdata/compose/lb-scale/
+```
+
+2：编写内容
+
+- 创建app.py
+
+```bash
+[emon@emon lb-scale]$ vim app.py
+```
+
+```python
+from flask import Flask
+from redis import Redis
+import os
+import socket
+
+app = Flask(__name__)
+redis = Redis(host=os.environ.get('REDIS_HOST', '127.0.0.1'), port=6379)
+
+
+@app.route('/')
+def hello():
+    redis.incr('hits')
+    return 'Hello Container World! I have been seen %s times and my hostname is %s.\n' % (redis.get('hits'),socket.gethostname())
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=80, debug=True)
+```
+
+3：创建Dockerfile
+
+```bash
+[emon@emon lb-scale]$ vim Dockerfile
+```
+
+```bash
+FROM python:2.7
+LABEL maintainer="emon<emon@163.com>"
+COPY . /app
+WORKDIR /app
+RUN pip install flask redis
+EXPOSE 80
+CMD [ "python", "app.py" ]
+```
+
+4：编写`docker-compose.yml`文件
+
+```bash
+[emon@emon lb-scale]$ vim docker-compose.yml
+```
+
+```yaml
+version: "3"
+
+services:
+
+  redis:
+    image: redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      REDIS_HOST: redis
+
+  lb:
+    image: dockercloud/haproxy
+    links:
+      - web
+    ports:
+      - 8080:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+```
+
+5：启动
+
+```bash
+[emon@emon lb-scale]$ docker-compose up -d --scale web=3
+```
+
+6：访问并测试负载均衡
+
+```bash
+[emon@emon lb-scale]$ curl 127.0.0.1:8080
+Hello Container World! I have been seen 3 times and my hostname is 90ccc9fef955.
+[emon@emon lb-scale]$ curl 127.0.0.1:8080
+Hello Container World! I have been seen 4 times and my hostname is 7f0dfd6e4da5.
+[emon@emon lb-scale]$ curl 127.0.0.1:8080
+Hello Container World! I have been seen 5 times and my hostname is 357f9f38876b.
+[emon@emon lb-scale]$ curl 127.0.0.1:8080
+Hello Container World! I have been seen 6 times and my hostname is 90ccc9fef955.
+
+[emon@emon lb-scale]$ for i in `seq 5`; do curl 127.0.0.1:8080; done
+Hello Container World! I have been seen 7 times and my hostname is 7f0dfd6e4da5.
+Hello Container World! I have been seen 8 times and my hostname is 357f9f38876b.
+Hello Container World! I have been seen 9 times and my hostname is 90ccc9fef955.
+Hello Container World! I have been seen 10 times and my hostname is 7f0dfd6e4da5.
+Hello Container World! I have been seen 11 times and my hostname is 357f9f38876b.
+```
+
+
+
+## 6：案例：复杂Docker Compose演示
+
+
+
+
+
+
+
+
 
 
 
