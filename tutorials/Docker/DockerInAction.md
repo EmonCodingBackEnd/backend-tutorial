@@ -4014,6 +4014,70 @@ Node left the swarm.
 [emon@emon ~]$ docker service create --name wordpress -p 80:80 --env WORDPRESS_DB_USER=root --env WORDPRESS_DB_PASSWORD=root --env WORDPRESS_DB_HOST=mysql --network demo wordpress
 ```
 
+- 访问
+
+访问swarm的任一节点即可访问！
+
+- 查看网络
+
+```bash
+[emon@emon ~]$ docker network ls
+# 命令行输出
+NETWORK ID          NAME                DRIVER              SCOPE
+68b3c334e418        bridge              bridge              local
+61p94kyce782        demo                overlay             swarm
+f99f3ea28b9c        docker_gwbridge     bridge              local
+4913d65f0331        host                host                local
+zu0on261vwvj        ingress             overlay             swarm
+5dddd8fbaae8        none                null                local
+```
+
+
+
+## 9.6、集群服务间通信之Routing Mesh
+
+![image-20220318133418863](images/image-20220318133418863.png)
+
+- 创建名为whoami的Service
+
+```bash
+[emon@emon ~]$ docker service create --name whoami -p 8000:8000 --network demo -d jwilder/whoami
+# 发现在emon机器
+[emon@emon ~]$ docker service ps whoami
+ID                  NAME                IMAGE                   NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
+wjm68kk7gdrk        whoami.1            jwilder/whoami:latest   emon                Running             Running 6 minutes ago                       
+```
+
+- 创建名为client的Service
+
+```bash
+[emon@emon ~]$ docker service create --name client -d --network demo busybox sh -c "while true; do sleep 3600; done"
+# 发现在emon2机器
+[emon@emon ~]$ docker service ps client
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
+pazc25bkf58y        client.1            busybox:latest      emon2               Running             Running 3 minutes ago
+```
+
+- 在client去ping一下whoami发现可以通
+
+```bash
+[emon@emon2 ~]$ docker exec -it a671f0eb5e4c sh
+/ # ping whoami
+PING whoami (10.0.0.19): 56 data bytes
+64 bytes from 10.0.0.19: seq=0 ttl=64 time=0.098 ms
+64 bytes from 10.0.0.19: seq=1 ttl=64 time=0.064 ms
+```
+
+- 增加whoami到2个实例
+
+```bash
+[emon@emon ~]$ docker service scale whoami=2
+```
+
+
+
+# 十、Kubernetes
+
 
 
 # 九十九、其他
