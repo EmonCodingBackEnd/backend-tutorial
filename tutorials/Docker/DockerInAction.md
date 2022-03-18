@@ -4076,10 +4076,6 @@ PING whoami (10.0.0.19): 56 data bytes
 
 
 
-# 十、Kubernetes
-
-
-
 # 九十九、其他
 
 - 查看docker占用空间
