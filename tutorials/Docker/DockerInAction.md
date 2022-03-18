@@ -3888,6 +3888,7 @@ Hello Container World! I have been seen 11 times and my hostname is 357f9f38876b
 - emon：初始化swarm
 
 ```bash
+# 可以使用IP地址或者网络interface
 [emon@emon ~]$ docker swarm init --advertise-addr=10.0.0.116
 # 命令行输出结果
 Swarm initialized: current node (p4p7wgokuibrd13f7g1aydfxi) is now a manager.
@@ -3918,10 +3919,19 @@ This node joined a swarm as a worker.
 - emon：在swarm的manager节点上查看swarm节点
 
 ```bash
+# 查看swarm的节点信息
 [emon@emon ~]$ docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
 p4p7wgokuibrd13f7g1aydfxi *   emon                Ready               Active              Leader              18.06.3-ce
 jn5d90oue9zmwq8l9csa2ihpc     emon2               Ready               Active                                  18.06.3-ce
+# 查看网络列表，注意产生了docker_gwbridge和ingress两个命名空间
+[emon@emon ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+68b3c334e418        bridge              bridge              local
+f99f3ea28b9c        docker_gwbridge     bridge              local
+4913d65f0331        host                host                local
+zu0on261vwvj        ingress             overlay             swarm
+5dddd8fbaae8        none                null                local
 ```
 
 - 解散swarm集群
@@ -3963,6 +3973,12 @@ Node left the swarm.
 [emon@emon ~]$ docker service ps demo
 ```
 
+- 查看logs
+
+```bash
+[emon@emon ~]$ docker service logs demo
+```
+
 - 水平扩展
 
 ```bash
@@ -3977,7 +3993,26 @@ Node left the swarm.
 [emon@emon ~]$ docker service rm demo
 ```
 
+## 9.5、swarm版wordpress
 
+- 创建overlay
+
+```bash
+# wordpress服务需要依赖mysql服务，且是跨机器的，先创建一个overlay的网络命名空间
+[emon@emon ~]$ docker network create -d overlay demo
+```
+
+- 创建MySQL的Service
+
+```bash
+[emon@emon ~]$ docker service create --name mysql --env MYSQL_ROOT_PASSWORD=root --env MYSQL_DATABASE=wordpress --network demo --mount type=volume,source=mysql-data,destination=/var/lib/mysql mysql
+```
+
+- 创建WordPress的Service
+
+```bash
+[emon@emon ~]$ docker service create --name wordpress -p 80:80 --env WORDPRESS_DB_USER=root --env WORDPRESS_DB_PASSWORD=root --env WORDPRESS_DB_HOST=mysql --network demo wordpress
+```
 
 
 
@@ -4010,3 +4045,4 @@ docker volume prune
 
 
 
+![image-20220317230903156](images/image-20220317230903156.png)
