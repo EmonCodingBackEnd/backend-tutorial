@@ -708,12 +708,12 @@ emon3
 
 ## 4、Ansible常用命令
 
-### 4.1、Ansible命令集
+### 4.1、ansible命令集
 
 ```bash
 # -1不是-l
 [emon@emon ~]$ ls -1 /usr/local/python3/bin/ansible*
-# 命令行输出结果
+# 命令行输出结果，其中 AD-hoc：表示临时命令模式
 /usr/local/python3/bin/ansible # Ansible AD-Hoc临时命令执行工具，常用于临时命令的执行
 /usr/local/python3/bin/ansible-config 
 /usr/local/python3/bin/ansible-connection
@@ -745,7 +745,7 @@ ansible-doc -h # 获取ansible-doc命令的全部用法
 [emon@emon ~]$ ansible-doc -s mysql_user
 ```
 
-### 4.3、Ansible命令详解
+### 4.3、ansible命令详解
 
 - 命令的具体格式如下：
 
@@ -1426,7 +1426,97 @@ emon3
 }
 ```
 
+## 6、Ansible Playbook
 
+### 6.1、Ansible Playbook介绍
+
+Playbooks与adhoc相比，是一种完全不同的运用ansible的方式，类似于saltstack的state状态文件。ad-hoc无法持久使用，playbook可以持久使用。
+
+Playbook是由一个或多个play组成的列表，play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓的task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联合起来按事先编排的机制完成某一个任务。
+
+### 6.2、Playbook核心元素
+
+- Hosts：执行的远程主机列表
+- Tasks：任务集
+- Variables：内置变量或自定义变量在playbook中调用
+- Templates：模板，即使用模板语法的文件，比如配置文件等
+- Handlers和notity结合使用，由特定条件出发的操作，满足条件方才执行，否则不执行
+- tags：标签，指定某条任务执行，用于选择运行playbook中的部分代码
+
+
+
+### 6.3、Playbook语法
+
+playbook使用yaml语法格式，后缀可以是yaml，也可以是yml。
+
+- 在单一一个playbook文件中，可以连续三个连子号（`---`）区分多个play。还有选择性的连续三个点号（`...`）用来表示play的结尾，也可以省略。
+
+- 次行开始正常写playbook的内容，一般都会写上描述该playbook的功能。
+
+- 使用#号注释代码。
+- 缩进必须统一，不能空格和tab混用。
+- 缩进的级别也必须是一致的，同样的缩进代表同样的级别，程序判别配置的级别是通过缩进结合换行实现的。
+- YAML文件内容和Linux系统大小写判断方式保持一致，是区分大小写的，`k/v`的值均需大小写敏感。
+- `k/v`的值可同行写也可以换行写。同行使用`:`分隔。
+- `v`可以是一个字符串，也可以是一个列表
+- 一个完整的代码块功能需要最少元素包括：`name:task`
+
+
+
+### 6.4、一个简单的示例
+
+```yaml
+---								# 固定格式
+- hosts: 192.168.1.31			# 定义需要执行的主机
+  remote_user: root				# 远程用户
+  vars:							# 定义变量
+    http_port: 8088				# 变量
+    
+  tasks:						# 定义一个任务的开始
+    - name: create new file		# 定义任务的名称
+      file: name=/tmp/playtest.txt state=touch	# 调用模块，具体要做的事情
+    - name: create new user
+      user: name=test02 system=yes shell=/sbin/nologin
+    - name: install package
+      yum: name=httpd
+    - name: config httpd
+      template: src=./httpd.conf dest=/etc/httpd/conf/httpd.conf
+      notify:								# 定义执行一个动作（action）让handlers来引用执行，与handlers配合使用
+        - restart apache					# notify要执行的动作，这里必须与handlers中的name定义内容一致
+    - name: copy index.html
+      copy: src=/var/www/html/index.html dest/var/www/html/index.html
+    - name: start https
+      service: name=httpd state=started
+  handlers:									# 处理器：对应tasks中notify定义的action触发执行相应的处理动作
+    - name: restart apache					# 要与notify定义的内容相同
+      service: name=httpd state=restarted	# 触发要执行的动作
+```
+
+### 6.5、Playbook的运行方式
+
+通过`ansible-playbook`命令运行
+
+格式：`ansible-playbook <filename.yml> ... [options]`
+
+> -C, --check # 只检测可能会发生的改变，但不真正执行该操作
+>
+>  --list-hosts # 列出运行任务的主机
+>
+>  --list-tags  # 列出playbook文件中定义的所有的tags
+>
+>  --list-tasks # 列出playbook文件中定义的所有的tasks
+>
+>  --skip-tags SKIP_TAGS # 跳过指定的tags
+>
+> -f # 指定并发数，默认为5个
+>
+> -t # 指定playbook中定义的tags运行，运行某个或者多个tags。
+>
+> -v # 显示过程 -vv或者-vvv更详细
+
+### 6.6、Playbook中元素属性
+
+#### 6.6.1、主机与用户
 
 
 
