@@ -2964,7 +2964,7 @@ export PATH=$PYTHON_HOME/bin:$PATH
 Python 2.7.15
 ```
 
-### 10.2、安装Python3.7版本
+### 10.2、安装Python3.9版本
 
 Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个版本。
 
@@ -2972,15 +2972,20 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 
 ```bash
 # 3.7版本需要一个新的包 libffi-devel，否则make install报错： ModuleNotFoundError: No module named '_ctypes'
-[emon@emon ~]$ sudo yum install -y libffi-devel
+[emon@emon ~]$ sudo yum install -y libffi-devel gcc-c++
 ```
+
+如果是直接安装Python，还需要安装 `gcc-c++`，否则在configure时报错：
+
+> configure: error: in `/usr/local/Python/Python-3.9.9':
+> configure: error: no acceptable C compiler found in $PATH
 
 2. 下载
 
 下载页地址： <https://www.python.org/ftp/python/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.7.7/Python-3.7.7.tar.xz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz
 ```
 
 3. 创建解压目录
@@ -2992,7 +2997,7 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.7.7.tar.xz -C /usr/local/Python/
+[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.9.9.tar.xz -C /usr/local/Python/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -3000,8 +3005,8 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Python/Python-3.7.7/
-[emon@emon Python-3.7.7]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python3.7.7
+[emon@emon ~]$ cd /usr/local/Python/Python-3.9.9/
+[emon@emon Python-3.9.9]$ ./configure --prefix=/usr/local/Python/Python3.9.9
 ```
 
 命令解释：`--enable-optimizations`：启用优化安装。
@@ -3009,22 +3014,40 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 编译
 
 ```bash
-[emon@emon Python-3.7.7]$ make
+[emon@emon Python-3.9.9]$ make
 ```
+
+> 安装3.9.9版本时make报错：
+
+SystemError: <built-in function compile> returned NULL without setting an error
+generate-posix-vars failed
+make[1]: *** [pybuilddir.txt] 错误 1
+make[1]: 离开目录“/usr/local/Python/Python-3.9.9”
+make: *** [profile-opt] 错误 2
+
+> 导致原因：
+>
+> - 在低版本的gcc版本中带有 `--enable-optimizations `参数时会出现上面问题
+> - gcc 8.1.0修复此问题
+
+> 解决方法如下：
+>
+> - 1、升级gcc至8.1.0【不推荐】
+> - 2、`./configure`参数中去掉 `--enable-optimizations`
 
 - 安装
 
 ```bash
-[emon@emon Python-3.7.7]$ make install
-[emon@emon Python-3.7.7]$ cd
-[emon@emon ~]$ ls /usr/local/Python/Python3.7.7/
+[emon@emon Python-3.9.9]$ make install
+[emon@emon Python-3.9.9]$ cd
+[emon@emon ~]$ ls /usr/local/Python/Python3.9.9/
 bin  include  lib  share
 ```
 
 6. 修改软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Python/Python3.7.7/ /usr/local/python3
+[emon@emon ~]$ ln -snf /usr/local/Python/Python3.9.9/ /usr/local/python3
 ```
 
 7. 配置环境变量
@@ -3048,7 +3071,7 @@ export PATH=$PYTHON_HOME/bin:$PATH
 
 ```bash
 [emon@emon ~]$ python3 -V
-Python 3.7.7
+Python 3.9.9
 ```
 
 ### 10.3、Python工具
@@ -3059,7 +3082,7 @@ Python 3.7.7
 >
 > [emon@emon ~]$ mkdir /usr/local/PythonPyPI
 
-#### 10.3.1、安装setuptools模块
+#### 10.3.1、安装setuptools模块【Python3.9.9无需安装】
 
 在安装其他模块之前，首先要安装setuptools模块，否则会报错：`ImportError: No module named setuptools`
 
@@ -3075,7 +3098,7 @@ Python 3.7.7
 [emon@emon setuptools-46.1.3]$ cd
 ```
 
-#### 10.3.2、安装easy_install
+#### 10.3.2、安装easy_install【Python3.9.9无需安装】
 
 1. 下载并安装
 
@@ -3098,7 +3121,7 @@ Python 3.7.7
 | easy_install -m <package name> | 卸载套件 |
 | easy_install --help            | 显示说明 |
 
-#### 10.3.3、安装pip
+#### 10.3.3、安装pip【Python3.9.9无需安装】
 
 1. 下载并安装
 
@@ -3114,7 +3137,7 @@ Python 3.7.7
 pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1-py3.7.egg/pip (python 3.7)
 ```
 
-2. pip命令
+2. pip命令【不推荐】
 
 | 命令                          | 说明           |
 | ----------------------------- | -------------- |
@@ -3125,17 +3148,45 @@ pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1
 | pip help                      | 显示说明       |
 | pip list                      | 列出安装过的包 |
 
-3. pip3命令
+3. pip3命令【推荐】
 
-| 命令                                  | 说明         |
-| ------------------------------------- | ------------ |
-| pip3 install <package name>           | 安装套件     |
-| pip3 install -U <package name>        | 更新套件     |
-| pip3 install --upgrade <package name> | 更新套件     |
-| pip3 uninstall <package name>         | 卸载套件     |
-| pip3 search <package name>            | 搜索套件     |
-| pip3 help                             | 显示说明     |
-| pip3 show <package name>              | 显示套件详情 |
+| 命令                                  | 说明             |
+| ------------------------------------- | ---------------- |
+| pip3 install <package name>           | 安装套件         |
+| pip3 install -U <package name>        | 更新套件         |
+| pip3 install --upgrade <package name> | 更新套件         |
+| pip3 uninstall <package name>         | 卸载套件         |
+| pip3 search <package name>            | 搜索套件         |
+| pip3 help                             | 显示说明         |
+| pip3 show <package name>              | 显示套件详情     |
+| pip freeze                            | 查看安装了哪些包 |
+| pip install -r package.txt            |                  |
+
+- 获取已安装的包
+
+```bash
+pip freeze
+# 或者
+pip list
+```
+
+- 保存已安装列表
+
+```bash
+pip freeze > packages.txt
+```
+
+- 批量卸载
+
+```bash
+pip uninstall -r packages.txt
+```
+
+- 批量安装
+
+```bash
+pip install -r packages.txt
+```
 
 
 

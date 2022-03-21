@@ -1037,7 +1037,7 @@ RUN yum install -y vim
 对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：
 
 ```bash
-# 在EnvironmentFile后面一行追加
+# 在ExecStart后面一行追加
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
