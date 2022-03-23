@@ -10,7 +10,7 @@
 
 
 
-# 二、安装包管理工具Conda
+# 二、安装包管理工具Conda【不推荐】
 
 1. 安装包下载地址
 
@@ -164,26 +164,27 @@ show_channel_urls: true
 
 7、conda命令
 
-| 命令                                                      | 说明                                 |
-| --------------------------------------------------------- | ------------------------------------ |
-| conda info                                                | 查看conda信息                        |
-| conda-env list 或者 conda info --envs 或者 conda env list | 查看已有虚拟环境                     |
-| which python                                              | 进入虚拟环境后，最好检查下当前环境   |
-| conda list                                                | 查看环境下已有的安装包               |
-| conda create -n py39 python=3.9                           | 创建名称为 py39 的虚拟环境           |
-| conda remove -n py39 --all                                | 删除py39虚拟环境                     |
-| conda activate py39                                       | 激活py39虚拟环境                     |
-| conda deactivate                                          | 退出虚拟环境                         |
-| conda create -n py39latest --clone py39                   | 将py39重命名为py39latest             |
-| conda remove -n py39 --all                                | 再删除py39虚拟环境，达到重命名的效果 |
-| conda install <pkg>                                       | 安装包                               |
-| conda uninstall <pkg>                                     | 卸载包                               |
-| conda update conda <pkg>                                  | 更新包                               |
-| conda update --all                                        | 更新所有包                           |
+| 命令                                                      | 说明                                     |
+| --------------------------------------------------------- | ---------------------------------------- |
+| conda info                                                | 查看conda信息                            |
+| conda info --envs                                         | 查看环境信息                             |
+| conda-env list 或者 conda info --envs 或者 conda env list | 查看已有虚拟环境                         |
+| which python                                              | 进入虚拟环境后，最好检查下当前环境       |
+| conda list                                                | 查看环境下已有的安装包                   |
+| conda create -n py39 python=3.9                           | 创建名称为 py39 的虚拟环境               |
+| conda remove -n py39 --all                                | 删除py39虚拟环境                         |
+| conda activate [py39]                                     | 激活虚拟环境，如果指定则激活py39虚拟环境 |
+| conda deactivate                                          | 退出虚拟环境                             |
+| conda create -n py39latest --clone py39                   | 将py39重命名为py39latest                 |
+| conda remove -n py39 --all                                | 再删除py39虚拟环境，达到重命名的效果     |
+| conda install <pkg>                                       | 安装包                                   |
+| conda uninstall <pkg>                                     | 卸载包                                   |
+| conda update conda <pkg>                                  | 更新包                                   |
+| conda update --all                                        | 更新所有包                               |
 
 
 
-## conda虚拟环境下安装其他包
+## conda虚拟环境下安装其他包【不推荐】
 
 ### 1、安装Scrapy
 

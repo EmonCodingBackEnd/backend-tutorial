@@ -4103,6 +4103,27 @@ docker volume rm < VOLUME NAME >
 docker volume prune
 ```
 
+- 查看docker磁盘使用情况
+
+```bash
+[emon@emon ~]$ docker system df
+# 命令行输出结果
+TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+Images              4                   4                   1.852GB             0B (0%)
+Containers          4                   1                   149.2MB             149.2MB (99%)
+Local Volumes       4                   1                   2.584GB             758MB (29%)
+Build Cache         0                   0                   0B                  0B
+```
+
+- 清理
+
+```bash
+# 清理docker无用数据：会清理停止的容器，但不会清理镜像
+[emon@emon ~]$ docker system prune
+# 清理docker无用数据：会清理停止的容器，也会清理镜像
+[emon@emon ~]$ docker system prune -a
+```
+
 
 
 ![image-20220317230903156](images/image-20220317230903156.png)
