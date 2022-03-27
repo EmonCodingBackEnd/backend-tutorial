@@ -1079,6 +1079,126 @@ latest: digest: sha256:77042e6c954be4845eaf2181e4c7cb6d51441fb00cf2c45513b1040cb
 [emon@emon ~]$ docker pull emon:5000/hello-world
 ```
 
+## 12、镜像私服Harbor【推荐】
+
+1. 下载地址
+
+https://github.com/goharbor/harbor/releases
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-offline-installer-v2.4.2.tgz
+```
+
+2. 创建解压目录
+
+```bash
+# 创建Harbor解压目录
+[emon@emon ~]$ mkdir /usr/local/Harbor
+# 创建Harbor的volume目录
+[emon@emon ~]$ mkdir /usr/local/dockerv/harbor_home
+```
+
+3. 解压
+
+```bash
+[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.4.2.tgz -C /usr/local/Harbor/
+```
+
+4. 修改解压名称
+
+```bash
+[emon@emon ~]$ mv /usr/local/Harbor/harbor/ /usr/local/Harbor/harbor-2.4.2
+```
+
+5. 创建软连接
+
+```bash
+[emon@emon ~]$ ln -snf /usr/local/Harbor/harbor-2.4.2/ /usr/local/harbor
+```
+
+6. 创建自签名证书
+
+- 创建证书存放目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/harbor/cert && cd /usr/local/harbor/cert
+```
+
+- 创建CA根证书
+
+```bash
+# 其中C是Country，ST是State，L是local，O是Origanization，OU是Organization Unit，CN是common name(eg, your name or your server's hostname)
+[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
+# 命令行输出结果
+Generating a 4096 bit RSA private key
+...........................................................................................................................................................................................................................++
+.............................................................................................++
+writing new private key to 'ca.key'
+-----
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key
+```
+
+- 生成一个证书签名，设置访问域名为 hub.emon.vip
+
+```bash
+[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout hub.emon.vip.key -out hub.emon.vip.csr \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=hub.emon.vip"
+# 命令行输出结果
+Generating a 4096 bit RSA private key
+......................................................................................................................................................................................++
+.....................++
+writing new private key to 'hub.emon.vip.key'
+-----
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key  hub.emon.vip.csr  hub.emon.vip.key
+```
+
+- 生成主机的证书
+
+```bash
+[emon@emon cert]$ openssl x509 -req -days 3650 -in hub.emon.vip.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out hub.emon.vip.crt
+# 命令行输出结果
+Signature ok
+subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=hub.emon.vip
+Getting CA Private Key
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key  ca.srl  hub.emon.vip.crt  hub.emon.vip.csr  hub.emon.vip.key
+```
+
+6. 编辑配置
+
+```bash
+[emon@emon ~]$ cp /usr/local/harbor/harbor.yml.tmpl /usr/local/harbor/harbor.yml
+[emon@emon ~]$ vim /usr/local/harbor/harbor.yml
+```
+
+```yaml
+# 修改
+# hostname: reg.mydomain.com
+hostname: hub.emon.vip
+# 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
+# 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: '/hostfs/usr/local/harbor/cert/hub.emon.vip.key'
+  # certificate: /your/certificate/path
+  # private_key: /your/private/key/path
+  certificate: /usr/local/Harbor/harbor-2.4.2/cert/hub.emon.vip.crt
+  private_key: /usr/local/Harbor/harbor-2.4.2/cert/hub.emon.vip.key
+# 修改
+# data_volume: /data
+data_volume: /usr/local/dockerv/harbor_home
+```
+
+7. 安装
+
+```bash
+# 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+[emon@emon ~]$ sudo /usr/local/harbor/install.sh --with-chartmuseum --with-trivy
+```
+
 
 
 # 四、容器
@@ -1758,7 +1878,7 @@ hello Docker
 [emon@emon cmd_shell]$ docker run rushing/centos-cmd-shell /bin/bash
 ```
 
-#### 1.8.4、CMD值Exec
+#### 1.8.4、CMD之Exec
 
 ```bash
 [emon@emon ~]$ mkdir -pv ~/dockerdata/cmd_exec
@@ -3447,6 +3567,8 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 
 ```bash
 [emon@emon ~]$ sudo chmod +x /usr/local/bin/docker-compose
+# 创建软连，避免安装Harbor时报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+[emon@emon ~]$ sudo ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
 3：配置alias
