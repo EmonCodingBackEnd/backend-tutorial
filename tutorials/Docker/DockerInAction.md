@@ -868,6 +868,12 @@ centos              7                   b5b4d78bc90c        2 days ago          
 
 	命令含义：会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。哪怕基于该镜像启动了容器，也会删除镜像。但不影响容器。
 
+- 批量删除满足条件的镜像
+
+```bash
+[emon@emon harbor]$ docker rmi $(docker images goharbor/* -q)
+```
+
 ## 8、创建镜像
 
 	创建镜像的方法主要有三种：基于已有镜像的容器创建、基于本地模板导入、基于Dockerfile创建。
@@ -1086,7 +1092,7 @@ latest: digest: sha256:77042e6c954be4845eaf2181e4c7cb6d51441fb00cf2c45513b1040cb
 https://github.com/goharbor/harbor/releases
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-offline-installer-v2.4.2.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
 2. 创建解压目录
@@ -1101,29 +1107,17 @@ https://github.com/goharbor/harbor/releases
 3. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.4.2.tgz -C /usr/local/Harbor/
+[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
 [emon@emon ~]$ ls /usr/local/Harbor/harbor
-common.sh  harbor.v2.4.2.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
+common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
-4. 修改解压名称
-
-```bash
-[emon@emon ~]$ mv /usr/local/Harbor/harbor/ /usr/local/Harbor/harbor-2.4.2
-```
-
-5. 创建软连接
-
-```bash
-[emon@emon ~]$ ln -snf /usr/local/Harbor/harbor-2.4.2/ /usr/local/harbor
-```
-
-6. 创建自签名证书
+4. 创建自签名证书【参考实现，建议走正规渠道的CA证书】【缺少证书无法浏览器登录】
 
 - 创建证书存放目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/harbor/cert && cd /usr/local/harbor/cert
+[emon@emon ~]$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
 ```
 
 - 创建CA根证书
@@ -1143,68 +1137,70 @@ writing new private key to 'ca.key'
 ca.crt  ca.key
 ```
 
-- 生成一个证书签名，设置访问域名为 hub.emon.vip
+- 生成一个证书签名，设置访问域名为 emon
 
 ```bash
-[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout hub.emon.vip.key -out hub.emon.vip.csr \
--subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=hub.emon.vip"
+[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
 # 命令行输出结果
 Generating a 4096 bit RSA private key
 ......................................................................................................................................................................................++
 .....................++
-writing new private key to 'hub.emon.vip.key'
+writing new private key to 'emon.key'
 -----
 # 查看结果
 [emon@emon cert]$ ls
-ca.crt  ca.key  hub.emon.vip.csr  hub.emon.vip.key
+ca.crt  ca.key  emon.csr  emon.key
 ```
 
 - 生成主机的证书
 
 ```bash
-[emon@emon cert]$ openssl x509 -req -days 3650 -in hub.emon.vip.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out hub.emon.vip.crt
+[emon@emon cert]$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
 # 命令行输出结果
 Signature ok
-subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=hub.emon.vip
+subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon
 Getting CA Private Key
 # 查看结果
 [emon@emon cert]$ ls
-ca.crt  ca.key  ca.srl  hub.emon.vip.crt  hub.emon.vip.csr  hub.emon.vip.key
+ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
-6. 编辑配置
+5. 编辑配置
 
 ```bash
-[emon@emon ~]$ cp /usr/local/harbor/harbor.yml.tmpl /usr/local/harbor/harbor.yml
-[emon@emon ~]$ vim /usr/local/harbor/harbor.yml
+[emon@emon ~]$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
+[emon@emon ~]$ vim /usr/local/Harbor/harbor/harbor.yml
 ```
 
 ```yaml
 # 修改
 # hostname: reg.mydomain.com
-hostname: hub.emon.vip
+hostname: emon
 # 修改
   # port: 80
   port: 5080
 # 修改
+# https:
+  # https port for harbor, default is 443
   # port: 443
-  port: 5443
-# 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
-# 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: '/hostfs/usr/local/harbor/cert/hub.emon.vip.key'
+  # The path of cert and key files for nginx
   # certificate: /your/certificate/path
   # private_key: /your/private/key/path
-  certificate: /usr/local/Harbor/harbor-2.4.2/cert/hub.emon.vip.crt
-  private_key: /usr/local/Harbor/harbor-2.4.2/cert/hub.emon.vip.key
+  # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
+  # 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: 
+  certificate: /usr/local/Harbor/cert/emon.crt
+  private_key: /usr/local/Harbor/cert/emon.key
 # 修改
 # data_volume: /data
 data_volume: /usr/local/dockerv/harbor_home
 ```
 
-7. 安装
+6. 安装
 
 ```bash
 # 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
-[emon@emon ~]$ sudo /usr/local/harbor/install.sh --with-chartmuseum --with-trivy
+[emon@emon ~]$ sudo /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
 # 查看服务状态
 [emon@emon harbor]$ docker-compose ps
 # 命令行输出结果
@@ -1225,8 +1221,6 @@ trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 
 8. 登录
 
-访问：https://hub.emon.vip:5080 (需要配置hub.emon.vip的本地DSN解析）
-
 访问：http://emon:5080 （会被跳转到http://emon:5443）
 
 用户名密码： admin/Harbor12345
@@ -1238,11 +1232,53 @@ harbor数据库密码： root123
 9. 修改配置重启
 
 ```bash
-[emon@emon ~]$ cd /usr/local/harbor/
+[emon@emon ~]$ cd /usr/local/Harbor/harbor/
 [emon@emon harbor]$ docker-compose down -v
-# 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。
-[emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
+# 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。目前，v2.2.4版本可以正确重启，无需删除pg13
+# [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
 [emon@emon harbor]$ docker-compose up -d
+```
+
+10. 私服安全控制
+
+对文件 `/etc/docker/daemon.json` 追加 `insecure-registries`内容：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/docker/daemon.json
+```
+
+```bash
+{
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "insecure-registries": ["emon:5080"]
+}
+```
+
+对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：
+
+```bash
+[emon@emon ~]$ sudo vim /lib/systemd/system/docker.service 
+```
+
+```bash
+# 在ExecStart后面一行追加
+EnvironmentFile=-/etc/docker/daemon.json
+```
+
+重启Docker服务：
+
+```bash
+[emon@emon hello-world]$ sudo systemctl daemon-reload
+[emon@emon hello-world]$ sudo systemctl restart docker
+```
+
+10. 推送镜像
+
+登录harbor后，先创建devops-learning项目，并创建emon用户。
+
+```bash
+[emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
+[emon@emon harbor]$ docker push emon:5080/devops-learning/openjdk:8-jre
 ```
 
 
