@@ -1102,6 +1102,8 @@ https://github.com/goharbor/harbor/releases
 
 ```bash
 [emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.4.2.tgz -C /usr/local/Harbor/
+[emon@emon ~]$ ls /usr/local/Harbor/harbor
+common.sh  harbor.v2.4.2.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
 4. 修改解压名称
@@ -1181,6 +1183,12 @@ ca.crt  ca.key  ca.srl  hub.emon.vip.crt  hub.emon.vip.csr  hub.emon.vip.key
 # 修改
 # hostname: reg.mydomain.com
 hostname: hub.emon.vip
+# 修改
+  # port: 80
+  port: 5080
+# 修改
+  # port: 443
+  port: 5443
 # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
 # 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: '/hostfs/usr/local/harbor/cert/hub.emon.vip.key'
   # certificate: /your/certificate/path
@@ -1197,6 +1205,44 @@ data_volume: /usr/local/dockerv/harbor_home
 ```bash
 # 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 [emon@emon ~]$ sudo /usr/local/harbor/install.sh --with-chartmuseum --with-trivy
+# 查看服务状态
+[emon@emon harbor]$ docker-compose ps
+# 命令行输出结果
+      Name                     Command                  State                           Ports                     
+------------------------------------------------------------------------------------------------------------------
+chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
+harbor-core         /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-db           /docker-entrypoint.sh 96 13      Up (healthy)                                                 
+harbor-jobservice   /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-log          /bin/sh -c /usr/local/bin/ ...   Up (healthy)   127.0.0.1:1514->10514/tcp                     
+harbor-portal       nginx -g daemon off;             Up (healthy)                                                 
+nginx               nginx -g daemon off;             Up (healthy)   0.0.0.0:5080->8080/tcp, 0.0.0.0:5443->8443/tcp
+redis               redis-server /etc/redis.conf     Up (healthy)                                                 
+registry            /home/harbor/entrypoint.sh       Up (healthy)                                                 
+registryctl         /home/harbor/start.sh            Up (healthy)                                                 
+trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
+```
+
+8. 登录
+
+访问：https://hub.emon.vip:5080 (需要配置hub.emon.vip的本地DSN解析）
+
+访问：http://emon:5080 （会被跳转到http://emon:5443）
+
+用户名密码： admin/Harbor12345
+
+harbor数据库密码： root123
+
+登录后创建了用户：emon/Emon@123
+
+9. 修改配置重启
+
+```bash
+[emon@emon ~]$ cd /usr/local/harbor/
+[emon@emon harbor]$ docker-compose down -v
+# 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。
+[emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
+[emon@emon harbor]$ docker-compose up -d
 ```
 
 
