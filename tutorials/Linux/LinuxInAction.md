@@ -143,13 +143,34 @@ emon
 [root@emon ~]# nmcli con modify house +ipv4.dns 211.140.188.188
 ```
 
-4. 编辑网卡会话
+4. 配置通用net8会话
+
+- 检查net8的网络信息
+
+【VMWare】==>【编辑】==>【虚拟网络编辑器（N）...】==>右下角【更改设置（C）】==>选中【VMnet8】==>【NAT设置（S）...】==>弹出的新窗口，可看到如下信息：
+
+网络：vmnet8
+
+子网IP：192.168.200.0
+
+子网掩码：255.255.255.0
+
+网关IP（G）：192.168.200.2
+
+此时，可配置如下：
+
+```bash
+[root@emon ~]# nmcli connection add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.1.2
+[root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.220.2
+```
+
+5. 编辑网卡会话
 
 ```bash
 [root@emon ~]# nmtui
 ```
 
-5. 删除网卡会话
+6. 删除网卡会话
 
 ```bash
 [root@emon ~]# nmcliconn delete company

@@ -1107,7 +1107,9 @@ https://github.com/goharbor/harbor/releases
 3. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
+# 推荐v2.2.4版本，更高版本比如2.3和2.4有docker-compose down -v ==> down-compose up -d时postgresql服务启动不了的bug，数据库重启失败！
+[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C 
+/usr/local/Harbor/
 [emon@emon ~]$ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
@@ -1277,8 +1279,14 @@ EnvironmentFile=-/etc/docker/daemon.json
 登录harbor后，先创建devops-learning项目，并创建emon用户。
 
 ```bash
+# 打标签
 [emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
-[emon@emon harbor]$ docker push emon:5080/devops-learning/openjdk:8-jre
+# 登录
+[emon@emon ~]$ docker login -u emon -p Emon@123 emon:5080
+# 上传镜像
+[emon@emon ~]$ docker push emon:5080/devops-learning/openjdk:8-jre
+# 退出登录
+[emon@emon ~]$ docker logout emon:5080
 ```
 
 
