@@ -639,14 +639,14 @@ http://www.tomcats.com/static/img/zx.jpg
 
 ```bash
 # 由于是https，直接获取时提示 “错误: 无法验证 www.keepalived.org 的”，需要加上 --no-check-certificate 选项
-[emon@emon ~]$ wget --no-check-certificate -cP /usr/local/src/ https://www.keepalived.org/software/keepalived-2.2.4.tar.gz
+[emon@emon ~]$ wget --no-check-certificate -cP /usr/local/src/ https://www.keepalived.org/software/keepalived-2.2.7.tar.gz
 ```
 
 2. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list libnl libnl-devel
-[emon@emon ~]$ sudo yum -y install libnl libnl-devel
+[emon@emon ~]$ yum list libnl libnl-devel openssl-devel
+[emon@emon ~]$ sudo yum -y install libnl libnl-devel openssl-devel
 ```
 
 3. 创建解压目录
@@ -658,7 +658,7 @@ http://www.tomcats.com/static/img/zx.jpg
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/keepalived-2.2.4.tar.gz -C /usr/local/Keepalived/
+[emon@emon ~]$ tar -zxvf /usr/local/src/keepalived-2.2.7.tar.gz -C /usr/local/Keepalived/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -666,8 +666,8 @@ http://www.tomcats.com/static/img/zx.jpg
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Keepalived/keepalived-2.2.4/
-[emon@emon keepalived-2.2.4]$ ./configure --prefix=/usr/local/Keepalived/keepalived2.2.4 --sysconf=/etc
+[emon@emon ~]$ cd /usr/local/Keepalived/keepalived-2.2.7/
+[emon@emon keepalived-2.2.7]$ ./configure --prefix=/usr/local/Keepalived/keepalived2.2.7 --sysconf=/etc
 ```
 
 命令解释： `--sysconf`指定核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了。在`/var/log/message`中会报错！
@@ -675,16 +675,16 @@ http://www.tomcats.com/static/img/zx.jpg
 - 编译
 
 ```bash
-[emon@emon keepalived-2.2.4]$ make
+[emon@emon keepalived-2.2.7]$ make
 ```
 
 - 安装
 
 ```bash
 # 因为要在 /etc 目录下写入目录和文件，所以使用 root 权限
-[emon@emon keepalived-2.2.4]$ sudo make install
-[emon@emon keepalived-2.2.4]$ cd
-[emon@emon ~]$ ls /usr/local/Keepalived/keepalived2.2.4/
+[emon@emon keepalived-2.2.7]$ sudo make install
+[emon@emon keepalived-2.2.7]$ cd
+[emon@emon ~]$ ls /usr/local/Keepalived/keepalived2.2.7/
 bin  sbin  share
 ```
 
@@ -702,16 +702,10 @@ keepalived.conf  samples
 keepalived: /etc/keepalived
 ```
 
-- 备份主配置文件`/etc/keepalived/keepalived.conf`
-
-```bash
-[emon@emon ~]$ sudo cp -a /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
-```
-
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Keepalived/keepalived2.2.4/ /usr/local/keepalived
+[emon@emon ~]$ ln -snf /usr/local/Keepalived/keepalived2.2.7/ /usr/local/keepalived
 ```
 
 ## 2.9、Nginx的Keepalived配置
@@ -736,7 +730,7 @@ vrrp_instance VI_1 {
     state MASTER
     # 当前实例绑定的网卡，通过 ip addr 查看自己的ip是对应哪一个网卡
     interface ens33
-    # 保证主备节点一直
+    # 保证主备节点一致
     virtual_router_id 51
     # 优先级/权重，谁的优先级高，在MASTER挂掉以后，就能成为MASTER
     priority 100

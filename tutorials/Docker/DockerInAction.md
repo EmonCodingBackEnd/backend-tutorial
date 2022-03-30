@@ -346,6 +346,8 @@ sudo yum remove docker \
                   docker-latest-logrotate \
                   docker-logrotate \
                   docker-engine
+# 必要时：清理yum安装的新版本docker
+yum remote -y docker* container-selinux
 ```
 
 如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
@@ -460,7 +462,7 @@ net.bridge.bridge-nf-call-iptables = 1
 
   点击【镜像搜索】按钮，自动跳转到控制台的镜像搜索，根据提示注册并登录：
 
-  在左侧【镜像中心】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
+  在左侧【镜像工具】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
 
   ```bash
   sudo tee /etc/docker/daemon.json <<-'EOF'
