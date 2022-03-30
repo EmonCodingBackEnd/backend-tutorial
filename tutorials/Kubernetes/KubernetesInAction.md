@@ -173,7 +173,9 @@ EnvironmentFile=-/etc/docker/daemon.json
 ```bash
 # 创建docker存储路径：非必须
 mkdir /usr/local/lib/docker
-# 调整docker配置
+# 调整docker配置（可选）
+# - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+# - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
 vim /etc/docker/daemon.json
 ```
 
@@ -181,6 +183,7 @@ vim /etc/docker/daemon.json
 {
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
   "graph": "/usr/local/lib/docker",
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
   "insecure-registries": ["emon:5080"]
 }
 ```
@@ -217,7 +220,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 exclude=kube*
 EOF
 # 安装工具
-yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+yum install -y kubelet-1.23.5 kubeadm-1.23.5 kubectl-1.23.5 --disableexcludes=kubernetes
 # 启动kubelet
 systemctl enable kubelet && systemctl start kubelet
 ```
@@ -243,23 +246,110 @@ yum install -y kubele t kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable kubelet && systemctl start kubelet
 ```
 
-
-
-## 5、准备配置文件（任意节点）
-
-### 5.1、下载配置文件
-
-
-
-## 6、预先下载镜像（科学上网的同学请跳过）
+## 5、预先下载镜像（科学上网的同学请跳过）
 
 kubeadm方式构建的服务都是通过容器的方式运行的，而镜像都会从google的仓库中拉取，非科学上网的同学会有镜像下载的问题。
 
+所以，先从国内已经存在的仓库中下载，然后再tag成kubeadm中显示的镜像。
 
+### 5.1、下载国内镜像（仅k8s-master节点）
 
+- 编写下载镜像的脚本
 
+```bash
+vim download-k8s-image.sh
+```
+
+```bash
+#!/bin/bash
+images=(
+    kube-apiserver-amd64:v1.23.5          
+    kube-controller-manager-amd64:v1.23.5 
+    kube-scheduler-amd64:v1.23.5          
+    kube-proxy-amd64:v1.23.5              
+    pause-amd64:3.3                       
+    etcd-amd64:3.4.9                      
+    coredns:1.9.1         
+    kubernetes-dashboard-amd64:v1.8.3
+)
+echo "=====开始下载镜像====="
+for imageName in ${image[@]}; do
+	docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
+done
+docker pull registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-node:v3.1.3
+docker pull registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-cni:v3.1.3
+docker pull registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-typha:v0.7.4
+
+echo "=====开始打标签====="
+for imageName in ${image[@]}; do
+	docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+done
+docker tag registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-node:v3.1.3 quay.io/calico/node:v3.1.3
+docker tag registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-cni:v3.1.3 quay.io/calico/cni:v3.1.3
+docker tag registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-typha:v0.7.4 quay.io/calico/typha:v0.7.4
+
+echo "=====移除非k8s标签====="
+for imageName in ${image[@]}; do
+	docker rmi registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+done
+docker rmi registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-node:v3.1.3
+docker rmi registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-cni:v3.1.3
+docker rmi registry.cn-hangzhou.aliyuncs.com/liuyi01/calico-typha:v0.7.4
+```
+
+- 给脚本添加可执行权限
+
+```bash
+chmod u+x download-k8s-image.sh
+```
+
+- 执行脚本
+
+```bash
+./download-k8s-image.sh
+```
+
+- 删除脚本
+
+```bash
+rm download-k8s-image.sh
+```
 
 # 三、高可用集群部署
+
+## 1、部署keepalived - 保证apiserver高可用（任选两个master几点）
+
+由于目前是3节点集群，只有1个master节点，并不是高可用的，忽略！
+
+## 2、部署第一个主节点
+
+- 准备配置文件
+
+```bash
+# 导出配置文件
+# kubeadm config print init-defaults --kubeconfig ClusterConfiguration > kubeadm.yml
+vim kubeadm-config.yaml
+```
+
+```yaml
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: v1.23.5
+controlPlaneEndpoint: "192.168.200.116:6443"
+networking:
+    # This CIDR is a Calico default. Substitute or remove for your CNI provider.
+    podSubnet: "172.22.0.0/16"
+imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+```
+
+- 执行
+
+```bash
+# ssh到第一个主节点，执行kubeadm初始化系统（注意保存最后打印的加入集群的命令）
+kubeadm init --config=kubeadm-config.yaml --experimental-upload-certs
+```
+
+
 
 
 
