@@ -160,7 +160,7 @@ emon
 此时，可配置如下：
 
 ```bash
-[root@emon ~]# nmcli connection add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.1.2
+[root@emon ~]# nmcli connection add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.200.2
 [root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.220.2
 ```
 

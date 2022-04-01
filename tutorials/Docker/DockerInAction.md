@@ -465,9 +465,16 @@ net.bridge.bridge-nf-call-iptables = 1
   在左侧【镜像工具】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
 
   ```bash
+  # - registry-mirrors：加速器地址
+  # - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+  # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
+  # - insecure-registries：设置私服可信地址
   sudo tee /etc/docker/daemon.json <<-'EOF'
   {
-    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"]
+    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+    "graph": "/usr/local/lib/docker",
+    "exec-opts": ["native.cgroupdriver=cgroupfs"],
+    "insecure-registries": ["emon:5080"]
   }
   EOF
   ```
