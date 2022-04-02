@@ -447,8 +447,8 @@ $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubelet
 
 # ÏÂÔØetcd×é¼þ
-$ wget -cP /usr/local/src https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz
-$ tar -zxvf /usr/local/src/etcd-v3.4.10-linux-amd64.tar.gz -C .
+$ wget https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz
+$ tar -zxvf etcd-v3.4.10-linux-amd64.tar.gz -C .
 $ mv etcd-v3.4.10-linux-amd64/etcd* .
 $ rm -rf etcd-v3.4.10-linux-amd64
 
