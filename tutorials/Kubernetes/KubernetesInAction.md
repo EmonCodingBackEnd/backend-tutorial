@@ -415,7 +415,7 @@ $ rm -f /etc/docker/daemon.json
 $ rm -rf /var/lib/docker/
 ```
 
-### 1.3、准备k8s软件包
+### 1.3、准备k8s软件包（仅master节点emon）
 
 #### 1.3.0、切换目录
 
@@ -948,7 +948,6 @@ kubernetes的认证配置文件，也叫kubeconfigs，用于让kubernetes的客户端定位kube-apis
 ### 3.0、切换目录
 
 ```bash
-# 创建目录
 $ cd
 $ mkdir -pv k8s_soft && cd k8s_soft
 ```
@@ -1188,6 +1187,10 @@ $ ETCDCTL_API=3 etcdctl member list \
   --cacert=/etc/etcd/ca.pem \
   --cert=/etc/etcd/kubernetes.pem \
   --key=/etc/etcd/kubernetes-key.pem
+# 命令行输出结果
+3bae6ef756268744, started, emon2, https://192.168.200.117:2380, https://192.168.200.117:2379, false
+48fd167b46c04497, started, emon3, https://192.168.200.118:2380, https://192.168.200.118:2379, false
+7d04ddf76c096e96, started, emon, https://192.168.200.116:2380, https://192.168.200.116:2379, false
 ```
 
 
@@ -1416,7 +1419,6 @@ $ kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=sy
 ### 6.0、切换目录（仅中转节点）
 
 ```bash
-# 创建目录
 $ cd
 $ mkdir -pv k8s_soft && cd k8s_soft
 ```
@@ -1719,9 +1721,15 @@ EOF
 ```bash
 $ systemctl daemon-reload
 $ systemctl enable kubelet kube-proxy
+
+# 在emon3节点，非常推荐先pull下nginx镜像：crictl pull docker.io/library/nginx:1.19  再启动
+# 在emon2和emon3节点，非常推荐先pull下pause镜像，再启动；pause镜像pull方法参见下面！！！
+
 $ systemctl restart kubelet kube-proxy
 $ journalctl -f -u kubelet
 $ journalctl -f -u kube-proxy
+
+# 截止目前结果：crictl ps emon3仅有nginx启动，emon2并无容器启动。
 ```
 
 > journalctl -f -u kubelet
@@ -1783,7 +1791,7 @@ $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pa
 
 
 
-## 7、网络插件-Calico
+## 7、网络插件-Calico（在主节点emon）
 
 这部分我们部署kubernetes的网络查件 CNI。
 
@@ -1794,6 +1802,915 @@ $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pa
 文档中有两个配置，50以下节点和50以上节点，它们的主要区别在于这个：typha。
 当节点数比较多的情况下，Calico 的 Felix组件可通过 Typha 直接和 Etcd 进行数据交互，不通过 kube-apiserver，降低kube-apiserver的压力。大家根据自己的实际情况选择下载。
 下载后的文件是一个all-in-one的yaml文件，我们只需要在此基础上做少许修改即可。
+
+```bash
+# 下载calico.yaml文件
+$ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
+```
+
+### 7.2、修改IP自动发现
+
+> 当kubelet的启动参数中存在--node-ip的时候，以host-network模式启动的pod的status.hostIP字段就会自动填入kubelet中指定的ip地址。
+
+修改前：
+
+```bash
+- name: IP
+  value: "autodetect"
+```
+
+修改后：
+
+```bash
+- name: IP
+  valueFrom:
+    fieldRef:
+      fieldPath: status.hostIP
+```
+
+### 7.3、修改CIDR
+
+修改前：
+
+```bash
+# - name: CALICO_IPV4POOL_CIDR
+#   value: "192.168.0.0/16"
+```
+
+修改后（修改成你自己的value，我这里是10.200.0.0/16）
+
+```bash
+- name: CALICO_IPV4POOL_CIDR
+  value: "10.200.0.0/16"
+```
+
+### 7.4、使之生效
+
+```bash
+# 生效之前查看
+$ kubectl get nodes
+NAME    STATUS     ROLES    AGE     VERSION
+emon2   NotReady   <none>   5m39s   v1.20.2
+emon3   NotReady   <none>   5m35s   v1.20.2
+# 使之生效
+$ kubectl apply -f calico.yaml
+# 查看node
+$ kubectl get nodes
+NAME    STATUS     ROLES    AGE     VERSION
+emon2   NotReady   <none>   4h52m   v1.20.2
+emon3   NotReady   <none>   4h44m   v1.20.2
+# 查看pod信息
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS     RESTARTS   AGE
+calico-kube-controllers-858c9597c8-lm45b   0/1     Pending    0          42s
+calico-node-cnt7b                          0/1     Init:0/3   0          42s
+calico-node-l7xgf                          0/1     Init:0/3   0          42s
+nginx-proxy-emon3                          1/1     Running    0          4h44m
+# ===================================================================================================
+# 过几分钟再次查看
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-858c9597c8-lm45b   1/1     Running   0          3m32s
+calico-node-cnt7b                          1/1     Running   0          3m32s
+calico-node-l7xgf                          1/1     Running   0          3m32s
+nginx-proxy-emon3                          1/1     Running   0          4h47m
+# 再次查看node
+$ kubectl get nodes
+NAME    STATUS   ROLES    AGE     VERSION
+emon2   Ready    <none>   4h56m   v1.20.2
+emon3   Ready    <none>   4h48m   v1.20.2
+```
+
+
+
+## 8、DNS插件-CoreDNS（在主节点emon）
+
+这部分我们部署kubernetes的DNS插件 - CoreDNS。
+
+在早期的版本中dns组件以pod形式独立运行，为集群提供dns服务，所有的pod都会请求同一个dns服务。
+从kubernetes 1.18版本开始NodeLocal DnsCache功能进入stable状态。
+NodeLocal DNSCache通过daemon-set的形式运行在每个工作节点，作为节点上pod的dns缓存代理，从而避免了iptables的DNAT规则和connection tracking。极大提升了dns的性能。
+
+### 8.0、切换目录
+
+```bash
+$ cd
+$ mkdir -pv k8s_soft && cd k8s_soft
+```
+
+### 8.1、部署CoreDNS
+
+```bash
+# 设置 coredns 的 cluster-ip
+$ COREDNS_CLUSTER_IP=10.233.0.10
+# 下载coredns配置all-in-one（addons/coredns.yaml）：参考下面的 coredns.yaml文件
+# 替换cluster-ip
+$ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" coredns.yaml
+# 创建 coredns
+$ kubectl apply -f coredns.yaml
+```
+
+
+
+### 8.2、部署NodeLocal DNSCache
+
+```bash
+# 设置 coredns 的 cluster-ip
+$ COREDNS_CLUSTER_IP=10.233.0.10
+# 下载nodelocaldns配置all-in-one(addons/nodelocaldns.yaml)：参考下面的 nodelocaldns.yaml文件
+# 替换cluster-ip
+$ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" nodelocaldns.yaml
+# 创建 nodelocaldns
+$ kubectl apply -f nodelocaldns.yaml
+```
+
+
+
+### 8.3、验证
+
+```bash
+# 查看pod信息
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-858c9597c8-vdc7n   1/1     Running   0          6m57s
+calico-node-4qz8m                          1/1     Running   0          6m57s
+calico-node-q5x6w                          1/1     Running   0          6m57s
+coredns-84646c885d-ghjsk                   1/1     Running   0          116s
+coredns-84646c885d-plqbz                   1/1     Running   0          116s
+nginx-proxy-emon3                          1/1     Running   0          12m
+nodelocaldns-72nns                         1/1     Running   0          62s
+nodelocaldns-n6fqj                         1/1     Running   0          62s
+
+# 此时，emon2启动的容器如下：
+$ crictl ps
+CONTAINER           IMAGE               CREATED             STATE               NAME                ATTEMPT             POD ID
+c48922e60a868       90f9d984ec9a3       4 minutes ago       Running             node-cache          0                   5ed3cb8b8d249
+54c7c7c3ad922       67da37a9a360e       5 minutes ago       Running             coredns             0                   33d271c6a6f5b
+95f0d92df2c56       7a71aca7b60fc       9 minutes ago       Running             calico-node         0                   75a971d7d731d
+# 此时，emon3启动的容器如下：
+$ crictl ps
+CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID
+af46c12946807       90f9d984ec9a3       4 minutes ago       Running             node-cache                0                   a9de1d50e76d1
+4a58b042b9887       67da37a9a360e       5 minutes ago       Running             coredns                   0                   0202b404f9e97
+cd668919ab62b       c0c6672a66a59       9 minutes ago       Running             calico-kube-controllers   0                   f1a7cbc5c54c5
+28ae265580655       7a71aca7b60fc       9 minutes ago       Running             calico-node               0                   1f0c2fc445512
+acb35f522c6d6       f0b8a9a541369       17 minutes ago      Running             nginx-proxy               0                   0c96cb3f33875
+```
+
+- 其他验证
+
+```bash
+# 查看pod分布详情
+$ kubectl get po -n kube-system -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
+calico-kube-controllers-858c9597c8-vdc7n   1/1     Running   0          16m   10.200.161.1      emon3   <none>           <none>
+calico-node-4qz8m                          1/1     Running   0          16m   192.168.200.117   emon2   <none>           <none>
+calico-node-q5x6w                          1/1     Running   0          16m   192.168.200.118   emon3   <none>           <none>
+coredns-84646c885d-ghjsk                   1/1     Running   0          11m   10.200.161.2      emon3   <none>           <none>
+coredns-84646c885d-plqbz                   1/1     Running   0          11m   10.200.108.65     emon2   <none>           <none>
+nginx-proxy-emon3                          1/1     Running   0          21m   192.168.200.118   emon3   <none>           <none>
+nodelocaldns-72nns                         1/1     Running   0          10m   192.168.200.117   emon2   <none>           <none>
+nodelocaldns-n6fqj                         1/1     Running   0          10m   192.168.200.118   emon3   <none>           <none>
+```
+
+
+
+
+
+**官方文档地址**
+
+**coredns官方文档**：https://coredns.io/plugins/kubernetes/
+**NodeLocal DNSCache**：https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/
+
+
+
+**coredns.yaml**
+
+```yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+  labels:
+      addonmanager.kubernetes.io/mode: EnsureExists
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health {
+            lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+          prefer_udp
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coredns
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+    addonmanager.kubernetes.io/mode: Reconcile
+  name: system:coredns
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+      - services
+      - pods
+      - namespaces
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+    addonmanager.kubernetes.io/mode: EnsureExists
+  name: system:coredns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:coredns
+subjects:
+  - kind: ServiceAccount
+    name: coredns
+    namespace: kube-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns
+  namespace: kube-system
+  labels:
+    k8s-app: kube-dns
+    kubernetes.io/name: "coredns"
+    addonmanager.kubernetes.io/mode: Reconcile
+  annotations:
+    prometheus.io/port: "9153"
+    prometheus.io/scrape: "true"
+spec:
+  selector:
+    k8s-app: kube-dns
+  clusterIP: ${COREDNS_CLUSTER_IP}
+  ports:
+    - name: dns
+      port: 53
+      protocol: UDP
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+    - name: metrics
+      port: 9153
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "coredns"
+  namespace: kube-system
+  labels:
+    k8s-app: "kube-dns"
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/name: "coredns"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 10%
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-dns
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
+    spec:
+      priorityClassName: system-cluster-critical
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: coredns
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                k8s-app: kube-dns
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - ""
+      containers:
+      - name: coredns
+        image: "docker.io/coredns/coredns:1.6.7"
+        imagePullPolicy: IfNotPresent
+        resources:
+          # TODO: Set memory limits when we've profiled the container for large
+          # clusters, then set request = limit to keep this container in
+          # guaranteed class. Currently, this container falls into the
+          # "burstable" category so the kubelet doesn't backoff from restarting it.
+          limits:
+            memory: 170Mi
+          requests:
+            cpu: 100m
+            memory: 70Mi
+        args: [ "-conf", "/etc/coredns/Corefile" ]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/coredns
+        ports:
+        - containerPort: 53
+          name: dns
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 9153
+          name: metrics
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8181
+            scheme: HTTP
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 10
+      dnsPolicy: Default
+      volumes:
+        - name: config-volume
+          configMap:
+            name: coredns
+            items:
+            - key: Corefile
+              path: Corefile
+```
+
+
+
+**nodelocaldns.yaml**
+
+```bash
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nodelocaldns
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+
+data:
+  Corefile: |
+    cluster.local:53 {
+        errors
+        cache {
+            success 9984 30
+            denial 9984 5
+        }
+        reload
+        loop
+        bind 169.254.25.10
+        forward . ${COREDNS_CLUSTER_IP} {
+            force_tcp
+        }
+        prometheus :9253
+        health 169.254.25.10:9254
+    }
+    in-addr.arpa:53 {
+        errors
+        cache 30
+        reload
+        loop
+        bind 169.254.25.10
+        forward . ${COREDNS_CLUSTER_IP} {
+            force_tcp
+        }
+        prometheus :9253
+    }
+    ip6.arpa:53 {
+        errors
+        cache 30
+        reload
+        loop
+        bind 169.254.25.10
+        forward . ${COREDNS_CLUSTER_IP} {
+            force_tcp
+        }
+        prometheus :9253
+    }
+    .:53 {
+        errors
+        cache 30
+        reload
+        loop
+        bind 169.254.25.10
+        forward . /etc/resolv.conf
+        prometheus :9253
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nodelocaldns
+  namespace: kube-system
+  labels:
+    k8s-app: kube-dns
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  selector:
+    matchLabels:
+      k8s-app: nodelocaldns
+  template:
+    metadata:
+      labels:
+        k8s-app: nodelocaldns
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9253'
+    spec:
+      priorityClassName: system-cluster-critical
+      serviceAccountName: nodelocaldns
+      hostNetwork: true
+      dnsPolicy: Default  # Don't use cluster DNS.
+      tolerations:
+      - effect: NoSchedule
+        operator: "Exists"
+      - effect: NoExecute
+        operator: "Exists"
+      containers:
+      - name: node-cache
+        image: "registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/dns_k8s-dns-node-cache:1.16.0"
+        resources:
+          limits:
+            memory: 170Mi
+          requests:
+            cpu: 100m
+            memory: 70Mi
+        args: [ "-localip", "169.254.25.10", "-conf", "/etc/coredns/Corefile", "-upstreamsvc", "coredns" ]
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 53
+          name: dns
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 9253
+          name: metrics
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            host: 169.254.25.10
+            path: /health
+            port: 9254
+            scheme: HTTP
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            host: 169.254.25.10
+            path: /health
+            port: 9254
+            scheme: HTTP
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 10
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/coredns
+        - name: xtables-lock
+          mountPath: /run/xtables.lock
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nodelocaldns
+            items:
+            - key: Corefile
+              path: Corefile
+        - name: xtables-lock
+          hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
+      # Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a "force
+      # deletion": https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods.
+      terminationGracePeriodSeconds: 0
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 20%
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nodelocaldns
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+```
+
+
+
+## 9、集群冒烟测试（在主节点emon操作）
+
+### 9.1、创建nginx ds
+
+```bash
+ # 写入配置
+$ cat > nginx-ds.yml <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ds
+  labels:
+    app: nginx-ds
+spec:
+  type: NodePort
+  selector:
+    app: nginx-ds
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-ds
+spec:
+  selector:
+    matchLabels:
+      app: nginx-ds
+  template:
+    metadata:
+      labels:
+        app: nginx-ds
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+EOF
+
+# 创建ds
+$ kubectl apply -f nginx-ds.yml
+```
+
+### 9.2、检查各种ip连通性
+
+```bash
+# 检查各 Node 上的 Pod IP 连通性
+$ kubectl get pods -o wide
+
+# 在每个worker节点上ping pod ip
+$ ping <pod-ip>
+
+# 检查service可达性
+$ kubectl get svc
+
+# 在每个worker节点上访问服务
+$ curl <service-ip>:<port>
+
+# 在每个节点检查node-port可用性
+$ curl <node-ip>:<port>
+```
+
+### 9.3、检查dns可用性
+
+```bash
+# 创建一个nginx pod
+$ cat > pod-nginx.yaml <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: docker.io/library/nginx:1.19
+    ports:
+    - containerPort: 80
+EOF
+
+# 创建pod
+$ kubectl apply -f pod-nginx.yaml
+
+# 进入pod，查看dns
+$ kubectl exec nginx -it -- /bin/bash
+
+# 查看dns配置
+root@nginx:/# cat /etc/resolv.conf
+
+# 查看名字是否可以正确解析
+root@nginx:/# curl nginx-ds
+```
+
+### 9.4、日志功能
+
+测试使用kubectl查看pod的容器日志
+
+```bash
+$ kubectl get pods
+$ kubectl logs <pod-name>
+```
+
+### 9.5、Exec功能
+
+测试kubectl的exec功能
+
+```bash
+$ kubectl get pods -l app=nginx-ds
+$ kubectl exec -it <nginx-pod-name> -- nginx -v
+```
+
+
+
+# 四、Harbor镜像私服
+
+1. 下载地址
+
+https://github.com/goharbor/harbor/releases
+
+```bash
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
+```
+
+2. 创建解压目录
+
+```bash
+# 创建Harbor解压目录
+[emon@emon ~]$ mkdir /usr/local/Harbor
+# 创建Harbor的volume目录
+[emon@emon ~]$ mkdir /usr/local/dockerv/harbor_home
+```
+
+3. 解压
+
+```bash
+# 推荐v2.2.4版本，更高版本比如2.3和2.4有docker-compose down -v ==> down-compose up -d时postgresql服务启动不了的bug，数据库重启失败！
+[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C 
+/usr/local/Harbor/
+[emon@emon ~]$ ls /usr/local/Harbor/harbor
+common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
+```
+
+4. 创建自签名证书【参考实现，建议走正规渠道的CA证书】【缺少证书无法浏览器登录】
+
+- 创建证书存放目录
+
+```bash
+[emon@emon ~]$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
+```
+
+- 创建CA根证书
+
+```bash
+# 其中C是Country，ST是State，L是local，O是Origanization，OU是Organization Unit，CN是common name(eg, your name or your server's hostname)
+[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
+# 命令行输出结果
+Generating a 4096 bit RSA private key
+...........................................................................................................................................................................................................................++
+.............................................................................................++
+writing new private key to 'ca.key'
+-----
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key
+```
+
+- 生成一个证书签名，设置访问域名为 emon
+
+```bash
+[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
+# 命令行输出结果
+Generating a 4096 bit RSA private key
+......................................................................................................................................................................................++
+.....................++
+writing new private key to 'emon.key'
+-----
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key  emon.csr  emon.key
+```
+
+- 生成主机的证书
+
+```bash
+[emon@emon cert]$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
+# 命令行输出结果
+Signature ok
+subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon
+Getting CA Private Key
+# 查看结果
+[emon@emon cert]$ ls
+ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
+```
+
+5. 编辑配置
+
+```bash
+[emon@emon ~]$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
+[emon@emon ~]$ vim /usr/local/Harbor/harbor/harbor.yml
+```
+
+```yaml
+# 修改
+# hostname: reg.mydomain.com
+hostname: emon
+# 修改
+  # port: 80
+  port: 5080
+# 修改
+# https:
+  # https port for harbor, default is 443
+  # port: 443
+  # The path of cert and key files for nginx
+  # certificate: /your/certificate/path
+  # private_key: /your/private/key/path
+  # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
+  # 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: 
+  certificate: /usr/local/Harbor/cert/emon.crt
+  private_key: /usr/local/Harbor/cert/emon.key
+# 修改
+# data_volume: /data
+data_volume: /usr/local/dockerv/harbor_home
+```
+
+6. 安装
+
+```bash
+# 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+[emon@emon ~]$ sudo /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
+# 查看服务状态
+[emon@emon harbor]$ docker-compose ps
+# 命令行输出结果
+      Name                     Command                  State                           Ports                     
+------------------------------------------------------------------------------------------------------------------
+chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
+harbor-core         /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-db           /docker-entrypoint.sh 96 13      Up (healthy)                                                 
+harbor-jobservice   /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-log          /bin/sh -c /usr/local/bin/ ...   Up (healthy)   127.0.0.1:1514->10514/tcp                     
+harbor-portal       nginx -g daemon off;             Up (healthy)                                                 
+nginx               nginx -g daemon off;             Up (healthy)   0.0.0.0:5080->8080/tcp, 0.0.0.0:5443->8443/tcp
+redis               redis-server /etc/redis.conf     Up (healthy)                                                 
+registry            /home/harbor/entrypoint.sh       Up (healthy)                                                 
+registryctl         /home/harbor/start.sh            Up (healthy)                                                 
+trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
+```
+
+8. 登录
+
+访问：http://emon:5080 （会被跳转到http://emon:5443）
+
+用户名密码： admin/Harbor12345
+
+harbor数据库密码： root123
+
+登录后创建了用户：emon/Emon@123
+
+9. 修改配置重启
+
+```bash
+[emon@emon ~]$ cd /usr/local/Harbor/harbor/
+[emon@emon harbor]$ docker-compose down -v
+# 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。目前，v2.2.4版本可以正确重启，无需删除pg13
+# [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
+[emon@emon harbor]$ docker-compose up -d
+```
+
+10. 私服安全控制
+
+对文件 `/etc/docker/daemon.json` 追加 `insecure-registries`内容：
+
+```bash
+[emon@emon ~]$ sudo vim /etc/docker/daemon.json
+```
+
+```bash
+{
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "insecure-registries": ["emon:5080"]
+}
+```
+
+对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：
+
+```bash
+[emon@emon ~]$ sudo vim /lib/systemd/system/docker.service 
+```
+
+```bash
+# 在ExecStart后面一行追加
+EnvironmentFile=-/etc/docker/daemon.json
+```
+
+重启Docker服务：
+
+```bash
+[emon@emon hello-world]$ sudo systemctl daemon-reload
+[emon@emon hello-world]$ sudo systemctl restart docker
+```
+
+10. 推送镜像
+
+登录harbor后，先创建devops-learning项目，并创建emon用户。
+
+```bash
+# 打标签
+[emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
+# 登录
+[emon@emon ~]$ docker login -u emon -p Emon@123 emon:5080
+# 上传镜像
+[emon@emon ~]$ docker push emon:5080/devops-learning/openjdk:8-jre
+# 退出登录
+[emon@emon ~]$ docker logout emon:5080
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
