@@ -2488,32 +2488,210 @@ $ kubectl exec -it <nginx-pod-name> -- nginx -v
 
 
 
-# 四、Harbor镜像私服
+# 四、Docker的安装与配置（在emon主机root用户安装）
+
+## 1、安装Docker
+
+[查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
+
+## 1.0、删除旧版Docker
+
+```bash
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+# 必要时：清理yum安装的新版本docker
+yum remote -y docker* container-selinux
+```
+
+如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
+
+### 1.1、安装要求
+
+安装Docker的基本要求如下：
+
+- Dockr只支持64位的CPU架构的计算机，目前不支持32位CPU
+- 建议系统的Linux内核版本为3.10及以上
+- Linux内核需要开启cgroups和namespace功能
+- 对于非Linux内核的平台，如Microsoft Windows和OS X，需要安装使用Boot2Docker工具
+
+### 1.2、CentOS环境下安装Docker
+
+	Docker目前只能运行在64位平台上，并且要求内核版本不低于3.10，实际上内核版本越新越好，过低的内核版本容易造成功能不稳定。
+	
+	用户可以通过如下命令检查自己的内核版本详细信息：
+
+```shell
+$ uname -a
+Linux emon 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+$ cat /proc/version
+Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) #1 SMP Fri Apr 20 16:44:24 UTC 2018
+```
+
+1. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
+
+```shell
+$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+2. 设置yum源
+
+```shell
+$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
+
+```shell
+$ yum list docker-ce --showduplicates |sort -r
+```
+
+4. 安装docker
+
+```shell
+# 安装最新
+# $ sudo yum install -y docker-ce
+# 安装指定版本
+$ sudo yum install -y docker-ce-18.06.3.ce
+```
+
+5. 启动
+
+```shell
+$ sudo systemctl start docker
+```
+
+6. 验证安装
+
+```shell
+$ sudo docker version
+$ sudo docker info
+$ sudo docker run hello-world
+```
+
+> 说明：如果docker info有提示：
+> WARNING: bridge-nf-call-iptables is disabled
+> WARNING: bridge-nf-call-ip6tables is disabled
+
+解决办法：
+
+```bash
+[emon@emon2 ~]$ sudo vim /etc/sysctl.conf 
+```
+
+```bash
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+```
+
+使之生效：
+
+```bash
+[emon@emon2 ~]$ sudo sysctl -p
+```
+
+无需重启，此时docker info就看不到此报错了。
+
+### 1.3、配置docker加速器
+
+- 配置
+
+  - DaoCloud
+
+  采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
+
+  登录DaoCloud，找到小火箭图标，根据说明操作：
+
+  ```bash
+  $ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
+  docker version >= 1.12
+  {"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
+  Success.
+  You need to restart docker to take effect: sudo systemctl restart docker
+  ```
+
+  - 阿里云
+
+  登录阿里开发者平台： https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
+
+  点击【镜像搜索】按钮，自动跳转到控制台的镜像搜索，根据提示注册并登录：
+
+  在左侧【镜像工具】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
+
+  ```bash
+  # - registry-mirrors：加速器地址
+  # - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+  # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
+  # - insecure-registries：设置私服可信地址
+  tee /etc/docker/daemon.json <<-'EOF'
+  {
+    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+    "graph": "/usr/local/lib/docker",
+    "exec-opts": ["native.cgroupdriver=cgroupfs"],
+    "insecure-registries": ["192.168.200.116:5080"]
+  }
+  EOF
+  ```
+
+- 查看
+
+```bash
+$ cat /etc/docker/daemon.json 
+```
+
+## 2、安装docker-compose
+
+1：下载
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+2：添加可执行权限
+
+```bash
+$ sudo chmod +x /usr/local/bin/docker-compose
+# 创建软连，避免安装Harbor时报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+$ sudo ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
+
+33：测试
+
+```bash
+$ docker-compose --version
+docker-compose version 1.29.2, build 5becea4c
+```
+
+# 五、Harbor镜像私服（在emon主机root用户安装）
 
 1. 下载地址
 
 https://github.com/goharbor/harbor/releases
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
+$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
 2. 创建解压目录
 
 ```bash
 # 创建Harbor解压目录
-[emon@emon ~]$ mkdir /usr/local/Harbor
+$ mkdir /usr/local/Harbor
 # 创建Harbor的volume目录
-[emon@emon ~]$ mkdir /usr/local/dockerv/harbor_home
+$ mkdir -p /usr/local/DockerV/harbor_home
 ```
 
 3. 解压
 
 ```bash
 # 推荐v2.2.4版本，更高版本比如2.3和2.4有docker-compose down -v ==> down-compose up -d时postgresql服务启动不了的bug，数据库重启失败！
-[emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C 
-/usr/local/Harbor/
-[emon@emon ~]$ ls /usr/local/Harbor/harbor
+$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
+$ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
@@ -2522,60 +2700,45 @@ common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 - 创建证书存放目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
+# 切换目录
+$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
 ```
 
 - 创建CA根证书
 
 ```bash
 # 其中C是Country，ST是State，L是local，O是Origanization，OU是Organization Unit，CN是common name(eg, your name or your server's hostname)
-[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# 命令行输出结果
-Generating a 4096 bit RSA private key
-...........................................................................................................................................................................................................................++
-.............................................................................................++
-writing new private key to 'ca.key'
------
 # 查看结果
-[emon@emon cert]$ ls
+$ ls
 ca.crt  ca.key
 ```
 
 - 生成一个证书签名，设置访问域名为 emon
 
 ```bash
-[emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# 命令行输出结果
-Generating a 4096 bit RSA private key
-......................................................................................................................................................................................++
-.....................++
-writing new private key to 'emon.key'
------
 # 查看结果
-[emon@emon cert]$ ls
+$ ls
 ca.crt  ca.key  emon.csr  emon.key
 ```
 
 - 生成主机的证书
 
 ```bash
-[emon@emon cert]$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
-# 命令行输出结果
-Signature ok
-subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon
-Getting CA Private Key
+$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
 # 查看结果
-[emon@emon cert]$ ls
+$ ls
 ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
 5. 编辑配置
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
-[emon@emon ~]$ vim /usr/local/Harbor/harbor/harbor.yml
+$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
+$ vim /usr/local/Harbor/harbor/harbor.yml
 ```
 
 ```yaml
@@ -2605,9 +2768,11 @@ data_volume: /usr/local/dockerv/harbor_home
 
 ```bash
 # 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
-[emon@emon ~]$ sudo /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
+$ /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
+# 切换目录
+$  cd /usr/local/Harbor/harbor/
 # 查看服务状态
-[emon@emon harbor]$ docker-compose ps
+$ docker-compose ps
 # 命令行输出结果
       Name                     Command                  State                           Ports                     
 ------------------------------------------------------------------------------------------------------------------
@@ -2637,7 +2802,7 @@ harbor数据库密码： root123
 9. 修改配置重启
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Harbor/harbor/
+$ cd /usr/local/Harbor/harbor/
 [emon@emon harbor]$ docker-compose down -v
 # 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。目前，v2.2.4版本可以正确重启，无需删除pg13
 # [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
@@ -2649,20 +2814,22 @@ harbor数据库密码： root123
 对文件 `/etc/docker/daemon.json` 追加 `insecure-registries`内容：
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/docker/daemon.json
+$ vim /etc/docker/daemon.json
 ```
 
 ```bash
 {
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
-  "insecure-registries": ["emon:5080"]
+  "graph": "/usr/local/lib/docker",
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
+  "insecure-registries": ["192.168.200.116:5080"]
 }
 ```
 
 对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：
 
 ```bash
-[emon@emon ~]$ sudo vim /lib/systemd/system/docker.service 
+$ vim /lib/systemd/system/docker.service 
 ```
 
 ```bash
@@ -2673,8 +2840,8 @@ EnvironmentFile=-/etc/docker/daemon.json
 重启Docker服务：
 
 ```bash
-[emon@emon hello-world]$ sudo systemctl daemon-reload
-[emon@emon hello-world]$ sudo systemctl restart docker
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
 ```
 
 10. 推送镜像
@@ -2682,14 +2849,17 @@ EnvironmentFile=-/etc/docker/daemon.json
 登录harbor后，先创建devops-learning项目，并创建emon用户。
 
 ```bash
+# 下载
+$ docker pull nginx:1.13.12
 # 打标签
-[emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
+$ docker tag nginx:1.13.12 192.168.200.116:5080/devops-learning/nginx:1.13.12
+$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
 # 登录
-[emon@emon ~]$ docker login -u emon -p Emon@123 emon:5080
+$ docker login -u emon -p Emon@123 192.168.200.116:5080
 # 上传镜像
-[emon@emon ~]$ docker push emon:5080/devops-learning/openjdk:8-jre
+$ docker push emon:5080/devops-learning/openjdk:8-jre
 # 退出登录
-[emon@emon ~]$ docker logout emon:5080
+$ docker logout emon:5080
 ```
 
 
