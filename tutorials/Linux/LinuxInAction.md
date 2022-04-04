@@ -162,6 +162,8 @@ emon
 ```bash
 [root@emon ~]# nmcli connection add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.200.2
 [root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.220.2
+# 配置开机自动启动该会话
+[root@emon ~]# nmcli conn mod net8 connection.autoconnect yes 
 ```
 
 5. 编辑网卡会话

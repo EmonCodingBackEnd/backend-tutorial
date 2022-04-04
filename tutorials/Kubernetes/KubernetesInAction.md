@@ -421,7 +421,7 @@ $ rm -rf /var/lib/docker/
 
 ```bash
 $ cd
-$ mkdir -pv k8s_soft && cd k8s_soft
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
 #### 1.3.1、软件包下载
@@ -446,14 +446,30 @@ $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kube-proxy
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubelet
 
-# 下载etcd组件
-$ wget https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz
-$ tar -zxvf etcd-v3.4.10-linux-amd64.tar.gz -C .
-$ mv etcd-v3.4.10-linux-amd64/etcd* .
-$ rm -rf etcd-v3.4.10-linux-amd64
+# =================================================================================================
+# 下载etcd组件，另一个版本： v3.4.10
+$ export VERSION=v3.5.2
+$ wget https://github.com/etcd-io/etcd/releases/download/${VERSION}/etcd-${VERSION}-linux-amd64.tar.gz
+$ tar -zxvf etcd-${VERSION}-linux-amd64.tar.gz -C .
+$ mv etcd-${VERSION}-linux-amd64/etcd* .
+$ rm -rf etcd-${VERSION}-linux-amd64
 
+# =================================================================================================
 # 统一修改文件权限为可执行
 $ chmod +x kube*
+
+# 下载
+$ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64
+$ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssljson_1.6.1_linux_amd64
+
+# 修改为可执行权限
+$ chmod +x cfssl_1.6.1_linux_amd64 cfssljson_1.6.1_linux_amd64
+
+# =================================================================================================
+# 设定containerd的版本号，另一个版本： 1.4.3
+$ VERSION=1.6.2
+# 下载压缩包
+$ wget https://github.com/containerd/containerd/releases/download/v${VERSION}/cri-containerd-cni-${VERSION}-linux-amd64.tar.gz
 ```
 
 #### 1.3.2、软件包分发
@@ -476,7 +492,7 @@ done
 # 把etcd组件分发到etcd节点
 $ ETCDS=(emon emon2 emon3)
 for instance in ${ETCDS[@]}; do
-  scp etcd etcdctl root@${instance}:/usr/local/bin/
+  scp etcd etcdctl etcdutl root@${instance}:/usr/local/bin/
 done
 ```
 
@@ -484,7 +500,7 @@ done
 
 ## 2、生成证书（仅中转节点）
 
-如下操作，都在`/root/k8s_soft`目录执行。
+如下操作，都在`/root/k8s_soft/k8s_v1.20.2`目录执行。
 
 ### 2.0、安装cfssl
 
@@ -493,12 +509,9 @@ done
 cfssl是非常好用的CA工具，我们用它来生成证书和秘钥文件 安装过程比较简单，如下：
 
 ```bash
-# 下载
-$ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 -O /usr/local/bin/cfssl
-$ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssljson_1.6.1_linux_amd64 -O /usr/local/bin/cfssljson
-
-# 修改为可执行权限
-$ chmod +x /usr/local/bin/cfssl /usr/local/bin/cfssljson
+# 加入可执行目录
+$ cp cfssl_1.6.1_linux_amd64 /usr/local/bin/cfssl
+$ cp cfssljson_1.6.1_linux_amd64 /usr/local/bin/cfssljson
 
 # 验证
 $ cfssl version
@@ -949,7 +962,7 @@ kubernetes的认证配置文件，也叫kubeconfigs，用于让kubernetes的客户端定位kube-apis
 
 ```bash
 $ cd
-$ mkdir -pv k8s_soft && cd k8s_soft
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
 ### 3.1、kubelet
@@ -1061,7 +1074,7 @@ ls -1tr|tail -n 1
 kube-scheduler.kubeconfig
 ```
 
-### 2.5、admin用户配置
+### 3.5、admin用户配置
 
 为admin用户生成kubeconfig配置
 
@@ -1089,9 +1102,9 @@ $ ls -1tr|tail -n 1
 admin.kubeconfig
 ```
 
-### 2.6、分发配置文件
+### 3.6、分发配置文件
 
-#### 2.6.1、把kubelet和kube-proxy需要的kubeconfig配置分发到每个worker节点
+#### 3.6.1、把kubelet和kube-proxy需要的kubeconfig配置分发到每个worker节点
 
 ```bash
 $ WORKERS="emon2 emon3"
@@ -1100,7 +1113,7 @@ for instance in ${WORKERS}; do
 done
 ```
 
-#### 2.6.2、把kube-controller-manager和kube-scheduler需要的kubeconfig配置分发到master节点
+#### 3.6.2、把kube-controller-manager和kube-scheduler需要的kubeconfig配置分发到master节点
 
 ```bash
 $ MASTERS="emon emon2"
@@ -1420,7 +1433,7 @@ $ kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=sy
 
 ```bash
 $ cd
-$ mkdir -pv k8s_soft && cd k8s_soft
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
 ### 6.1、Container Runtime - Containerd
@@ -1482,6 +1495,31 @@ $ systemctl enable containerd
 $ systemctl restart containerd
 # 检查状态
 $ systemctl status containerd
+```
+
+#### 6.1.5、配置镜像加速器
+
+https://help.aliyun.com/document_detail/60750.html
+
+```bash
+# 备份源文件 
+$ cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
+# 修改配置文件：搜索 registry，调整如下
+$ vim /etc/containerd/config.toml
+```
+
+```toml
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+          #endpoint = ["https://registry-1.docker.io"]
+          endpoint = ["https://pyk8pf3k.mirror.aliyuncs.com"]
+```
+
+- 重启k8s使配置生效
+
+```bash
+systemctl restart containerd
 ```
 
 
@@ -1895,7 +1933,7 @@ NodeLocal DNSCache通过daemon-set的形式运行在每个工作节点，作为节点上pod的dns缓存
 
 ```bash
 $ cd
-$ mkdir -pv k8s_soft && cd k8s_soft
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
 ### 8.1、部署CoreDNS
@@ -2375,6 +2413,12 @@ metadata:
 
 ## 9、集群冒烟测试（在主节点emon操作）
 
+### 9.0、网络环境切换后k8s网络不通小妙招
+
+```bash
+$ systemctl restart NetworkManager
+```
+
 ### 9.1、创建nginx ds
 
 ```bash
@@ -2536,13 +2580,13 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 1. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
 
 ```shell
-$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+$ yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
 2. 设置yum源
 
 ```shell
-$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
 
 3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
@@ -2557,21 +2601,21 @@ $ yum list docker-ce --showduplicates |sort -r
 # 安装最新
 # $ sudo yum install -y docker-ce
 # 安装指定版本
-$ sudo yum install -y docker-ce-18.06.3.ce
+$ yum install -y docker-ce-18.06.3.ce
 ```
 
 5. 启动
 
 ```shell
-$ sudo systemctl start docker
+$ systemctl start docker
 ```
 
 6. 验证安装
 
 ```shell
-$ sudo docker version
-$ sudo docker info
-$ sudo docker run hello-world
+$ docker version
+$ docker info
+$ docker run hello-world
 ```
 
 > 说明：如果docker info有提示：
@@ -2581,7 +2625,7 @@ $ sudo docker run hello-world
 解决办法：
 
 ```bash
-[emon@emon2 ~]$ sudo vim /etc/sysctl.conf 
+$ vim /etc/sysctl.conf 
 ```
 
 ```bash
@@ -2592,7 +2636,7 @@ net.bridge.bridge-nf-call-iptables = 1
 使之生效：
 
 ```bash
-[emon@emon2 ~]$ sudo sysctl -p
+$ sysctl -p
 ```
 
 无需重启，此时docker info就看不到此报错了。
@@ -2644,20 +2688,29 @@ net.bridge.bridge-nf-call-iptables = 1
 $ cat /etc/docker/daemon.json 
 ```
 
+- 重启
+
+```bash
+$ rm -rf /var/lib/docer/
+$ systemctl restart docker
+```
+
+
+
 ## 2、安装docker-compose
 
 1：下载
 
 ```bash
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 
 2：添加可执行权限
 
 ```bash
-$ sudo chmod +x /usr/local/bin/docker-compose
+$ chmod +x /usr/local/bin/docker-compose
 # 创建软连，避免安装Harbor时报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
-$ sudo ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
+$ ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
 33：测试
@@ -2744,7 +2797,7 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```yaml
 # 修改
 # hostname: reg.mydomain.com
-hostname: emon
+hostname: 192.168.200.116
 # 修改
   # port: 80
   port: 5080
@@ -2791,7 +2844,7 @@ trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 
 8. 登录
 
-访问：http://emon:5080 （会被跳转到http://emon:5443）
+访问：http://192.168.200.116:5080 （会被跳转到http://192.168.200.116:5443）
 
 用户名密码： admin/Harbor12345
 
@@ -2833,7 +2886,7 @@ $ vim /lib/systemd/system/docker.service
 ```
 
 ```bash
-# 在ExecStart后面一行追加
+# 在ExecStart后面一行追加：经验证daemon.json配置了insecure-registries即可，无需这里再配置
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
@@ -2850,33 +2903,502 @@ $ sudo systemctl restart docker
 
 ```bash
 # 下载
-$ docker pull nginx:1.13.12
+$ docker pull openjdk:8-jre
 # 打标签
-$ docker tag nginx:1.13.12 192.168.200.116:5080/devops-learning/nginx:1.13.12
-$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
+$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
 # 登录
 $ docker login -u emon -p Emon@123 192.168.200.116:5080
 # 上传镜像
-$ docker push emon:5080/devops-learning/openjdk:8-jre
+$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
 # 退出登录
-$ docker logout emon:5080
+$ docker logout 192.168.200.116:5080
+```
+
+# 六、Kubernetes的服务发现
+
+![image-20220403131408465](images/image-20220403131408465.png)
+
+## 0、切换目录
+
+```bash
+$ cd
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
+```
+
+## 1、ingress-nginx
+
+- 安装插件（master节点）
+
+```bash
+# 由于mandatory.yaml添加了 nodeSelector，对node进行了label选择，这里必须添加标签，否则：
+# Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
+$ kubectl label node emon2 app=ingress
+$ kubectl label node emon3 app=ingress
+
+# 配置资源
+$ kubectl apply -f mandatory.yaml
+# 查看
+$ kubectl get all -n ingress-nginx
+```
+
+- 关于镜像：建议先下载，后执行上面的命令（worker节点）
+
+```bash
+# 镜像下载一直是老大难问题，先下载吧
+# 查看所需镜像
+$ grep image mandatory.yaml
+# 手工下载所需镜像：注意第一个镜像本来应该是 k8s.gcr.io/defaultbackend-amd64:1.5
+$ crictl pull registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5
+$ crictl pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.19.0
+# 对第一个镜像重新打标签才能使用
+$ ctr -n k8s.io i tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
+```
+
+- mandatory.yaml
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-http-backend
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-http-backend
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-http-backend
+        app.kubernetes.io/part-of: ingress-nginx
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: default-http-backend
+          # Any image is permissible as long as:
+          # 1. It serves a 404 page at /
+          # 2. It serves 200 on a /healthz endpoint
+          image: k8s.gcr.io/defaultbackend-amd64:1.5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 10m
+              memory: 20Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-clusterrole
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - nodes
+      - pods
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nginx-ingress-role
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+      - secrets
+      - namespaces
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      # Defaults to "<election-id>-<ingress-class>"
+      # Here: "<ingress-controller-leader>-<nginx>"
+      # This has to be adapted if you change either parameter
+      # when launching the nginx-ingress-controller.
+      - "ingress-controller-leader-nginx"
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nginx-ingress-role-nisa-binding
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nginx-ingress-role
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-clusterrole-nisa-binding
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+      nodeSelector:
+        app: ingress
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.19.0
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            # www-data -> 33
+            runAsUser: 33
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+
+---
 ```
 
 
 
 
 
+# 九十、Containerd全面上手实践
+
+- ctr命令讲解
+
+containerd提供的工具
+
+```bash
+# 查看ctr命令帮助
+$ ctr -h
+# 查看镜像操作帮助
+$ ctr i -h
+# 查看镜像列表
+$ ctr i ls
+# 查看指定命令空间下镜像列表
+$ ctr -n default i ls
+# 下载镜像
+$ ctr i pull docker.io/library/redis:alpine
+# 查看命名空间帮助
+$ ctr ns -h
+# 查看命名空间
+$ ctr ns ls
+# 启动容器，指定容器ID
+$ ctr run -t -d docker.io/library/redis:alpine redis
+# 查看容器列表
+$ ctr c ls
+# 查看容器任务列表
+$ ctr t ls
+# 停掉容器任务
+$ ctr t kill redis
+# 删除容器任务（不是容器）
+$ ctr t rm redis
+# 删除容器
+$ ctr c rm redis
+```
+
+- crictl
+
+k8s提供的工具
+
+```bash
+# 查看crictl命令帮助
+$ crictl -h
+# 查看镜像
+$ crictl images
+# 查看pod
+$ crictl pods
+```
+
+- kubectl
+
+```bash
+# 查看客户端和服务器侧版本信息
+$ kubectl version
+# 以group/version的格式显示服务器侧所支持的API版本
+$ kubectl api-versions
+# 显示资源文档信息
+$ kubectl explain
+
+# 取得确认对象信息列表
+$ kubectl get < xxx >
+# 显示node的信息
+$ kubectl get nodes -o wide
+# 列出namespace信息
+$ kubectl get namespaces
+# 列出deployment信息
+$ kubectl get deployment -n ingress-nginx
 
 
+# 取得确认对象的详细信息
+$ kubectl describe < xxx > < xxx >
+# 列出node详细信息
+$ kubectl describe node emon2
+# 列出某一个pod详细信息：-n指定命名空间
+$ kubectl describe pod ingress-nginx-admission-patch-kpnds -n ingress-nginx
+# 列出某一个deployment详细信息
+$ kubectl describe deployment ingress-nginx-controller -n ingress-nginx
 
+# 取得pod中容器的log信息
+$ kubectl logs < xxx >
+$ kubectl logs nginx-ds-tbtkz
 
+# 在容器中执行一条命令
+$ kubectl exec < xxx >
+$ kubectl exec -it nginx-ds-tbtkz -- nginx -v
 
+# 从容器中拷贝出或向容器拷贝入文件
+$ kubectl cp
+# Attach到一个运行中的容器上
+$ kubectl attach
 
-
-
-
-
-
+# 查看某个命名空间所有信息
+$ kubectl get all -n ingress-nginx
+# 配置资源
+$ kubectl apply -f < xxx.yaml >
+# 删除资源
+$ kubectl delete -f < xxx.yaml >
+# 给节点打标签
+$ kubectl label node emon2 disktype=ssd
+# 查看节点上的标签
+$ kubectl get node emon2 --show-labels
+# 查看所有节点上的标签列表，按标签分组
+$ kubectl get node --show-labels
+# 删除标签：注意标签名后面跟上 - 表示删除
+$ kubectl label node emon2 disktype-
+```
 
 
 
