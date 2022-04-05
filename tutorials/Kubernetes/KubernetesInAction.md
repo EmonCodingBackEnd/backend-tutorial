@@ -447,8 +447,8 @@ $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubelet
 
 # =================================================================================================
-# ÏÂÔØetcd×é¼ş£¬ÁíÒ»¸ö°æ±¾£º v3.4.10
-$ export VERSION=v3.5.2
+# ÏÂÔØetcd×é¼ş
+$ export VERSION=v3.4.10
 $ wget https://github.com/etcd-io/etcd/releases/download/${VERSION}/etcd-${VERSION}-linux-amd64.tar.gz
 $ tar -zxvf etcd-${VERSION}-linux-amd64.tar.gz -C .
 $ mv etcd-${VERSION}-linux-amd64/etcd* .
@@ -466,8 +466,8 @@ $ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssljson_1.
 $ chmod +x cfssl_1.6.1_linux_amd64 cfssljson_1.6.1_linux_amd64
 
 # =================================================================================================
-# Éè¶¨containerdµÄ°æ±¾ºÅ£¬ÁíÒ»¸ö°æ±¾£º 1.4.3
-$ VERSION=1.6.2
+# Éè¶¨containerdµÄ°æ±¾ºÅ
+$ VERSION=1.4.3
 # ÏÂÔØÑ¹Ëõ°ü
 $ wget https://github.com/containerd/containerd/releases/download/v${VERSION}/cri-containerd-cni-${VERSION}-linux-amd64.tar.gz
 ```
@@ -908,7 +908,7 @@ EOF
 #### Éú³ÉÖ¤Êé
 
 ```bash
-  $ cfssl gencert \
+$ cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
@@ -1228,10 +1228,10 @@ $ cd
 # ´´½¨kubernetes±ØÒªÄ¿Â¼
 $ mkdir -p /etc/kubernetes/ssl
 # ×¼±¸Ö¤ÊéÎÄ¼ş
-$ mv ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem \
+$ cp ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem \
     service-account-key.pem service-account.pem \
     proxy-client.pem proxy-client-key.pem \
-    /etc/kubernetes/ssl
+    /etc/kubernetes/ssl/
 
 # ÅäÖÃkube-apiserver.service
 # ±¾»úÄÚÍøip
@@ -1298,7 +1298,7 @@ EOF
 
 ```bash
 # ×¼±¸kubeconfigÅäÖÃÎÄ¼ş
-$ mv kube-controller-manager.kubeconfig /etc/kubernetes/
+$ cp kube-controller-manager.kubeconfig /etc/kubernetes/
 
 # ´´½¨ kube-controller-manager.service
 $ cat <<EOF > /etc/systemd/system/kube-controller-manager.service
@@ -1333,7 +1333,7 @@ EOF
 
 ```bash
 # ×¼±¸kubeconfigÅäÖÃÎÄ¼ş
-$ mv kube-scheduler.kubeconfig /etc/kubernetes
+$ cp kube-scheduler.kubeconfig /etc/kubernetes/
 
 # ´´½¨ scheduler service ÎÄ¼ş
 $ cat <<EOF > /etc/systemd/system/kube-scheduler.service
@@ -1371,7 +1371,7 @@ $ systemctl restart kube-apiserver kube-controller-manager kube-scheduler
 
 ```bash
 # ¸÷¸ö×é¼şµÄ¼àÌı¶Ë¿Ú
-[root@emon ~]# netstat -tnlp
+$ netstat -tnlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
 tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      17094/master        
@@ -1396,7 +1396,7 @@ tcp6       0      0 :::22                   :::*                    LISTEN      
 $ journalctl -f
 ```
 
-### 5.6¡¢ÅäÖÃkubectl£¨emonÕâ¸ömaster½Úµã¼´¿É£¬Ò²¿ÉËùÓĞmaster½Úµã£©
+### 5.6¡¢ÅäÖÃkubectl£¨emonÕâ¸ömaster½Úµã¼´¿É£©
 
 kubectlÊÇÓÃÀ´¹ÜÀíkubernetes¼¯ÈºµÄ¿Í»§¶Ë¹¤¾ß£¬Ç°ÃæÎÒÃÇÒÑ¾­ÏÂÔØµ½ÁËËùÓĞµÄmaster½Úµã¡£ÏÂÃæÎÒÃÇÀ´ÅäÖÃÕâ¸ö¹¤¾ß£¬ÈÃËü¿ÉÒÔÊ¹ÓÃ¡£
 
@@ -1404,7 +1404,7 @@ kubectlÊÇÓÃÀ´¹ÜÀíkubernetes¼¯ÈºµÄ¿Í»§¶Ë¹¤¾ß£¬Ç°ÃæÎÒÃÇÒÑ¾­ÏÂÔØµ½ÁËËùÓĞµÄmaster½Úµ
 # ´´½¨kubectlµÄÅäÖÃÄ¿Â¼
 $ mkdir ~/.kube/
 # °Ñ¹ÜÀíÔ±µÄÅäÖÃÎÄ¼şÒÆ¶¯µ½kubectlµÄÄ¬ÈÏÄ¿Â¼
-$ mv ~/admin.kubeconfig ~/.kube/config
+$ cp ~/admin.kubeconfig ~/.kube/config
 # ²âÊÔ
 $ kubectl get nodes
 # ÃüÁîĞĞÊä³ö½á¹û£ºÄ¿Ç°£¬Õı³££¡
@@ -1437,7 +1437,7 @@ $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 
 ```bash
 # Éè¶¨containerdµÄ°æ±¾ºÅ£¬·Ö·¢µ½Á½¸öwork½Úµã
-$ VERSION=1.6.2
+$ VERSION=1.4.3
 WORKERS="emon2 emon3"
 for instance in ${WORKERS}; do
     scp cri-containerd-cni-${VERSION}-linux-amd64.tar.gz ${instance}:~/
@@ -1449,7 +1449,7 @@ done
 ÏÂÔØºóµÄÎÄ¼şÊÇÒ»¸ötar.gz£¬ÊÇÒ»¸öallinoneµÄ°ü£¬°üÀ¨ÁËrunc¡¢circtl¡¢ctr¡¢containerdµÈÈİÆ÷ÔËĞĞÊ±ÒÔ¼°cniÏà¹ØµÄÎÄ¼ş£¬½âÑ¹Ëõµ½Ò»¸ö¶ÀÁ¢µÄÄ¿Â¼ÖĞ
 
 ```bash
-$ VERSION=1.6.2
+$ VERSION=1.4.3
 # ´´½¨½âÑ¹Ä¿Â¼
 $ mkdir containerd
 # ½âÑ¹Ëõ
@@ -1521,9 +1521,8 @@ systemctl restart containerd
 
 ```bash
 $ mkdir -p /etc/kubernetes/ssl/
-# ÔÚemon2½ÚµãÖ´ĞĞ»áÌáÊ¾ ca.pem ºÍ ca-key.pem Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼£¬ÊÇÒòÎªÇ°ÃæÒÑ¾­ÒÆ¹ıÈ¥ÁË£¬Ã´¹ØÏµ
-$ mv ${HOSTNAME}-key.pem ${HOSTNAME}.pem ca.pem ca-key.pem /etc/kubernetes/ssl/
-$ mv ${HOSTNAME}.kubeconfig /etc/kubernetes/kubeconfig
+$ cp ${HOSTNAME}-key.pem ${HOSTNAME}.pem ca.pem ca-key.pem /etc/kubernetes/ssl/
+$ cp ${HOSTNAME}.kubeconfig /etc/kubernetes/kubeconfig
 $ IP=192.168.200.117 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
 # Ğ´ÈëkubeletÅäÖÃÎÄ¼ş
 $ cat <<EOF > /etc/kubernetes/kubelet-config.yaml
@@ -1661,7 +1660,7 @@ EOF
 #### 6.3.2¡¢nginx manifest
 
 ```bash
-# ¡¾ÌØÊâ¡¿£º¸ÃÎÄ¼ş¼ĞÔÚemon2Ò²ĞèÒª´´½¨
+# ¡¾ÌØÊâ¡¿£º¸ÃÎÄ¼ş¼ĞÔÚemon2Ò²ĞèÒª´´½¨£¬nginx-proxy.yaml²»ĞèÒª
 $ mkdir -p /etc/kubernetes/manifests/
 $ cat <<EOF > /etc/kubernetes/manifests/nginx-proxy.yaml
 apiVersion: v1
@@ -1764,6 +1763,10 @@ $ journalctl -f -u kube-proxy
 # ½ØÖ¹Ä¿Ç°½á¹û£ºcrictl ps emon3½öÓĞnginxÆô¶¯£¬emon2²¢ÎŞÈİÆ÷Æô¶¯¡£
 ```
 
+> ÌØÊâËµÃ÷£ºÒÔÏÂÊÇ¸öÈË¼ÇÂ¼µÄÎÊÌâ£¬ºóÀ´ÓÅ»¯ÁË¾µÏñÀ­È¡ÌáÇ°£¬Æô¶¯ºó5ÃëÖ®ÄÚ¾ÍÕı³£ÁË£¬²»ÔÙÓĞÈçÏÂ2¸öÎÊÌâ£¡£¡£¡ÇĞ¼Ç£¡£¡£¡
+>
+> 
+>
 > journalctl -f -u kubelet
 >
 > ÎÊÌâÒ»¡¢
@@ -1776,7 +1779,7 @@ $ journalctl -f -u kube-proxy
 >
 > emon3½Úµã±¨´í£ºkubelet.go:2243] node "emon3" not found
 >
-> ÃüÁîcrictl images ·¢ÏÖ£¬ÓÉÓÚ¾µÏñ nginx:1.19 ÉĞÎ´ÏÂÔØÆô¶¯£¬µÈ´ı¼´¿É£¡
+> ÃüÁîcrictl images ·¢ÏÖ£¬ÓÉÓÚ¾µÏñ pause:3.2 ÉĞÎ´ÏÂÔØÆô¶¯£¬µÈ´ı¼´¿É£¡
 >
 > ¾­ÑéÖ®Ì¸£¡£¡£¡
 >
@@ -1812,7 +1815,7 @@ $ journalctl -f -u kube-proxy
 >
 > Ñ§Ï°£¬ĞèÒªÏ¸ĞÄ£¬Ò²ĞèÒªÄÍĞÄ£¡£¡£¡2022Äê04ÔÂ01ÈÕ£¬ÓŞÈË½Ú¿ìÀÖ£¡¸ãÁËÇ°ºó3Ìì£¬²ÅÅöÇÉ¸ã¶¨µÄÎÊÌâ£¬¼ÇÂ¼ÏÂ£¡£¡£¡
 
-### 6.6¡¢ÊÖ¶¯ÏÂÔØ¾µÏñ£¨·şÎñÆ÷ÎŞ·¨·ÃÎÊÍâÍøÇé¿ö£©
+### 6.6¡¢ÊÖ¶¯ÏÂÔØ¾µÏñ£¨·şÎñÆ÷ÎŞ·¨·ÃÎÊÍâÍøÇé¿ö£©£¨±¾°²×°½Ì³ÌÒÑ¾­ÌáÇ°ÏÂÔØ¾µÏñ£©
 
 ÔÚÃ¿¸ö¹¤×÷½ÚµãÏÂÔØpause¾µÏñ£¬ÎªºóÃæ´ò»ù´¡£¡£¡£¡
 
@@ -1943,10 +1946,13 @@ $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 # ÉèÖÃ coredns µÄ cluster-ip
 $ COREDNS_CLUSTER_IP=10.233.0.10
 # ÏÂÔØcorednsÅäÖÃall-in-one£¨addons/coredns.yaml£©£º²Î¿¼ÏÂÃæµÄ coredns.yamlÎÄ¼ş
+$ vim coredns.yaml
 # Ìæ»»cluster-ip
 $ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" coredns.yaml
 # ´´½¨ coredns
 $ kubectl apply -f coredns.yaml
+# ²é¿´pod
+$ kubectl get po -n kube-system
 ```
 
 
@@ -1957,10 +1963,13 @@ $ kubectl apply -f coredns.yaml
 # ÉèÖÃ coredns µÄ cluster-ip
 $ COREDNS_CLUSTER_IP=10.233.0.10
 # ÏÂÔØnodelocaldnsÅäÖÃall-in-one(addons/nodelocaldns.yaml)£º²Î¿¼ÏÂÃæµÄ nodelocaldns.yamlÎÄ¼ş
+$ vim nodelocaldns.yaml
 # Ìæ»»cluster-ip
 $ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" nodelocaldns.yaml
 # ´´½¨ nodelocaldns
 $ kubectl apply -f nodelocaldns.yaml
+# ²é¿´pod
+$ kubectl get po -n kube-system
 ```
 
 
@@ -2417,6 +2426,7 @@ metadata:
 ### 9.0¡¢ÍøÂç»·¾³ÇĞ»»ºók8sÍøÂç²»Í¨Ğ¡ÃîÕĞ
 
 ```bash
+# Èç¹û·¢ÏÖÃ°ÑÌ²âÊÔ²»Í¨£¬ÔÙ³¢ÊÔ
 $ systemctl restart NetworkManager
 ```
 
@@ -2511,6 +2521,9 @@ root@nginx:/# cat /etc/resolv.conf
 
 # ²é¿´Ãû×ÖÊÇ·ñ¿ÉÒÔÕıÈ·½âÎö
 root@nginx:/# curl nginx-ds
+
+# ÍË³ö²âÊÔ
+root@nginx:/# exit
 ```
 
 ### 9.4¡¢ÈÕÖ¾¹¦ÄÜ
@@ -2519,6 +2532,13 @@ root@nginx:/# curl nginx-ds
 
 ```bash
 $ kubectl get pods
+# ÃüÁîĞĞÊä³ö½á¹û
+NAME             READY   STATUS    RESTARTS   AGE
+nginx            1/1     Running   0          54s
+nginx-ds-dkfjm   1/1     Running   0          2m54s
+nginx-ds-rx6mj   1/1     Running   0          2m54s
+
+# ²é¿´ÈÕÖ¾
 $ kubectl logs <pod-name>
 ```
 
@@ -2529,6 +2549,17 @@ $ kubectl logs <pod-name>
 ```bash
 $ kubectl get pods -l app=nginx-ds
 $ kubectl exec -it <nginx-pod-name> -- nginx -v
+```
+
+### 9.6¡¢É¾³ıÅäÖÃµÄ²âÊÔ×ÊÔ´
+
+```bash
+$ kubectl delete -f pod-nginx.yaml
+$ kubectl delete -f nginx-ds.yml
+# ²é¿´ÊÇ·ñÇåÀíÍê³É
+$ kubectl get pods
+# ÃüÁîĞĞÊä³ö½á¹û
+No resources found in default namespace.
 ```
 
 
@@ -2692,8 +2723,9 @@ $ cat /etc/docker/daemon.json
 - ÖØÆô
 
 ```bash
-$ rm -rf /var/lib/docer/
 $ systemctl restart docker
+# É¾µô¾ÉµÄ´æ´¢Î»ÖÃ
+$ rm -rf /var/lib/docker/
 ```
 
 
@@ -2718,17 +2750,25 @@ $ ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 ```bash
 $ docker-compose --version
+# ÃüÁîĞĞÊä³ö½á¹û
 docker-compose version 1.29.2, build 5becea4c
 ```
 
 # Îå¡¢Harbor¾µÏñË½·ş£¨ÔÚemonÖ÷»úrootÓÃ»§°²×°£©
+
+0. ÇĞ»»Ä¿Â¼
+
+```bash
+$ cd
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
+```
 
 1. ÏÂÔØµØÖ·
 
 https://github.com/goharbor/harbor/releases
 
 ```bash
-$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
+$ wget https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
 2. ´´½¨½âÑ¹Ä¿Â¼
@@ -2744,7 +2784,7 @@ $ mkdir -p /usr/local/DockerV/harbor_home
 
 ```bash
 # ÍÆ¼öv2.2.4°æ±¾£¬¸ü¸ß°æ±¾±ÈÈç2.3ºÍ2.4ÓĞdocker-compose down -v ==> down-compose up -dÊ±postgresql·şÎñÆô¶¯²»ÁËµÄbug£¬Êı¾İ¿âÖØÆôÊ§°Ü£¡
-$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
+$ tar -zxvf harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
 $ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
@@ -2798,7 +2838,7 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```yaml
 # ĞŞ¸Ä
 # hostname: reg.mydomain.com
-hostname: 192.168.200.116
+hostname: emon
 # ĞŞ¸Ä
   # port: 80
   port: 5080
@@ -2857,15 +2897,15 @@ harborÊı¾İ¿âÃÜÂë£º root123
 
 ```bash
 $ cd /usr/local/Harbor/harbor/
-[emon@emon harbor]$ docker-compose down -v
+$ docker-compose down -v
 # Èç¹ûÅöµ½ postgresql ·şÎñ²»ÊÇUP×´Ì¬£¬µ¼ÖÂµÇÂ¼ÌáÊ¾£ººËĞÄ·şÎñ²»¿ÉÓÃ¡£ ÇëÖ´ĞĞÏÂÃæÃüÁî£¨¸ù¾İdata_volumeÅäÖÃµ÷ÕûÂ·¾¶£©£¬Õâ¸öÊÇ¸Ã°æ±¾µÄbug¡£Ä¿Ç°£¬v2.2.4°æ±¾¿ÉÒÔÕıÈ·ÖØÆô£¬ÎŞĞèÉ¾³ıpg13
 # [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
-[emon@emon harbor]$ docker-compose up -d
+$ docker-compose up -d
 ```
 
 10. Ë½·ş°²È«¿ØÖÆ
 
-¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ£º
+- ¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ£º
 
 ```bash
 $ vim /etc/docker/daemon.json
@@ -2876,11 +2916,11 @@ $ vim /etc/docker/daemon.json
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
   "graph": "/usr/local/lib/docker",
   "exec-opts": ["native.cgroupdriver=cgroupfs"],
-  "insecure-registries": ["192.168.200.116:5080"]
+  "insecure-registries": ["emon:5080"]
 }
 ```
 
-¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º
+- ¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º¡¾¿ÉÊ¡ÂÔ¡¿
 
 ```bash
 $ vim /lib/systemd/system/docker.service 
@@ -2906,13 +2946,13 @@ $ sudo systemctl restart docker
 # ÏÂÔØ
 $ docker pull openjdk:8-jre
 # ´ò±êÇ©
-$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
 # µÇÂ¼
-$ docker login -u emon -p Emon@123 192.168.200.116:5080
+$ docker login -u emon -p Emon@123 emon:5080
 # ÉÏ´«¾µÏñ
-$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker push emon:5080/devops-learning/openjdk:8-jre
 # ÍË³öµÇÂ¼
-$ docker logout 192.168.200.116:5080
+$ docker logout emon:5080
 ```
 
 # Áù¡¢KubernetesµÄ·şÎñ·¢ÏÖ
@@ -2933,7 +2973,6 @@ $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```bash
 # ÓÉÓÚmandatory.yamlÌí¼ÓÁË nodeSelector£¬¶Ônode½øĞĞÁËlabelÑ¡Ôñ£¬ÕâÀï±ØĞëÌí¼Ó±êÇ©£¬·ñÔò£º
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
-$ kubectl label node emon2 app=ingress
 $ kubectl label node emon3 app=ingress
 
 # ÅäÖÃ×ÊÔ´
@@ -2955,7 +2994,97 @@ $ crictl pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.1
 $ ctr -n k8s.io i tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
 ```
 
-- mandatory.yaml
+## 2¡¢²âÊÔhostNetwork
+
+### 2.1¡¢ingress-demo.yamlÅäÖÃ
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-demo
+spec:
+  selector:
+    matchLabels:
+      app: tomcat-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tomcat-demo
+    spec:
+      containers:
+      - name: tomcat-demo
+        image: registry.cn-hangzhou.aliyuncs.com/liuyi01/tomcat:8.0.51-alpine
+        ports:
+        - containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-demo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat-demo
+
+---
+#ingress
+#old version: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tomcat-demo
+spec:
+  rules:
+  - host: tomcat.mooc.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat-demo
+            port:
+              number: 80
+```
+
+ÅäÖÃ×ÊÔ´ÉúĞ§£º
+
+```bash
+# Ó¦ÓÃ×ÊÔ´ 
+$ kubectl create -f ingress-demo.yaml
+# ²é¿´·¢ÏÖingressÆô¶¯ÔÚemon3ÉÏ
+$ kubectl get po -n ingress-nginx -o wide
+# ²é¿´ingress-demoµÄpod×´Ì¬
+$ kubectl get pod -o wide
+
+# ÅäÖÃ±¾µØDNS£º·ÃÎÊemon3µÄDNS
+$ vim /etc/hosts
+192.168.200.118 tomcat.mooc.com
+192.168.200.118 api.mooc.com
+
+# ·ÃÎÊ
+http://tomcat.mooc.com # ¿´µ½Õı³£tomcat½çÃæ
+http://apiu.mooc.com # ¿´µ½ default backend - 404
+
+# É¾³ı×ÊÔ´
+$  kubectl delete -f ingress-demo.yaml
+kubectl apply -f k8s-demo/cronjob-demo/cronjob.yaml
+```
+
+
+
+
+
+## 99¡¢ÅäÖÃ¸½¼ş
+
+### 99.1¡¢mandatory.yaml
 
 ```yaml
 apiVersion: v1
@@ -3403,7 +3532,341 @@ $ kubectl label node emon2 disktype-
 
 
 
+# ¾ÅÊ®Îå¡¢°²×°ÆäËûÒÀÀµ»·¾³
 
+## 1¡¢°²×°Git
 
+1. ¼ì²é°²×°Çé¿ö
 
+```bash
+$ yum list git|tail -n 2
+¿É°²×°µÄÈí¼ş°ü
+git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
+```
 
+2. ÏÂÔØ
+
+ÏÂÔØµØÖ·£º  https://www.kernel.org/pub/software/scm/git/
+
+```bash
+$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz
+```
+
+3. ÒÀÀµ¼ì²éÓë°²×°
+
+```bash
+$ yum list gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+$ yum install -y gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+```
+
+4. ´´½¨½âÑ¹Ä¿Â¼
+
+```bash
+$ mkdir /usr/local/Git
+```
+
+5. ½âÑ¹
+
+```bash
+$ tar -zxvf /usr/local/src/git-2.26.2.tar.gz -C /usr/local/Git/
+```
+
+6. Ö´ĞĞÅäÖÃ½Å±¾£¬²¢±àÒë°²×°
+
+- ÇĞ»»Ä¿Â¼²¢Ö´ĞĞ½Å±¾
+
+```bash
+$ cd /usr/local/Git/git-2.26.2/
+$ ./configure --prefix=/usr/local/Git/git2.26.2
+```
+
+- ±àÒë
+
+```bash
+$ make
+```
+
+- °²×°
+
+```bash
+$ make install
+$ cd
+$ ls /usr/local/Git/git2.26.2/
+bin  libexec  share
+```
+
+7. ´´½¨ÈíÁ¬½Ó
+
+```bash
+$ ln -snf /usr/local/Git/git2.26.2/ /usr/local/git
+```
+
+8. ÅäÖÃ»·¾³±äÁ¿
+
+```bash
+$ vim /etc/profile.d/git.sh
+```
+
+```bash
+export GIT_HOME=/usr/local/git
+export GIT_EDITOR=vim
+export PATH=$GIT_HOME/bin:$PATH
+```
+
+Ê¹Ö®ÉúĞ§£º
+
+```bash
+$ source /etc/profile
+```
+
+9. ÉèÖÃÕË»§ĞÅÏ¢
+
+```bash
+$ git config --global user.name "emon"
+$ git config --global user.email "[ÓÊÏä]"
+```
+
+10. ÅäÖÃSSHĞÅÏ¢
+
+- ¼ì²éSSH keysÊÇ·ñ´æÔÚ£º
+
+```bas
+$ ls -a ~/.ssh/
+.  ..  known_hosts
+```
+
+- Èç¹û²»´æÔÚ£¬Éú³ÉSSH keys£º
+
+```bash
+$ ssh-keygen -t rsa -b 4096 -C "[ÓÊÏä]"
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/emon/.ssh/id_rsa): `[Ä¬ÈÏ]`
+Enter passphrase (empty for no passphrase): `[ÊäÈë¿ÚÁî£¬ÆäËûÓÃ»§ÇĞ»»µ½emon»áÌáÊ¾ÊäÈë]`
+Enter same passphrase again: `[È·ÈÏ¿ÚÁî]`
+Your identification has been saved in /home/emon/.ssh/id_rsa.
+Your public key has been saved in /home/emon/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:+hdO9yUj/Cm0IAaJcUqkPgXNY50lXZFIkdKZH7LhKIs liming20110711@163.com
+The key's randomart image is:
++---[RSA 4096]----+
+|  .+...*+Boo     |
+|   oB =.X o      |
+|  .o.* = = .     |
+| . .+ + o .      |
+|  o. o .S  .     |
+|  E..  .o + = o .|
+|      .. + = = = |
+|       .  o o +  |
+|        ..   .   |
++----[SHA256]-----+
+```
+
+- ¿½±´¹«Ô¿µ½GitHubÉÏ¡¾ĞèÒªÓĞGitHubÕË»§²Å¿ÉÒÔÅäÖÃ¡¿
+
+```bash
+$ cat ~/.ssh/id_rsa.pub
+```
+
+¿½±´ÁË¹«Ô¿£¬´ò¿ªGitHubÅäÖÃSSH keysµÄÒ³Ãæ£º https://github.com/settings/keys ¡¾Settings->SSH and GPG keys->New SSH key->Ğ´ÈëTitle£¬Õ³ÌùKey¡¿
+
+| Title           | Key                |
+| --------------- | ------------------ |
+| centos-emon-rsa | ¡¾¸Õ²Å¿½±´µÄ¹«Ô¿¡¿ |
+
+µã»÷Add SSH key£¬È·¶¨Ìí¼Ó¡£
+
+- ÑéÖ¤SSHÁ¬½Ó
+
+```bash
+$ ssh -T git@github.com
+The authenticity of host 'github.com (13.250.177.223)' can't be established.
+RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
+RSA key fingerprint is MD5:16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'github.com,13.250.177.223' (RSA) to the list of known hosts.
+Enter passphrase for key '/home/emon/.ssh/id_rsa': `[Éú³ÉSSH keysÊ±ÉèÖÃµÄ¿ÚÁî]`
+Hi Rushing0711! You've successfully authenticated, but GitHub does not provide shell access.
+$ ls -a ~/.ssh/
+.  ..  id_rsa  id_rsa.pub  known_hosts
+```
+
+11. Ğ£Ñé
+
+```bash
+$ git --version
+git version 2.26.2
+```
+
+## 2¡¢°²×°JDK
+
+1. ¼ì²éÊÇ·ñÒÑ°²×°
+
+```bash
+$ rpm -qa|grep jdk
+```
+
+2. ÏÂÔØ
+
+ÏÂÃæµÄÏÂÔØµØÖ·£¬¿ÉÒÔÍ¨¹ıORACLE¹ÙÍøÏÂÔØÒ³£¬µÇÂ¼ºó»ñÈ¡£º
+
+¹ÙÍøÏÂÔØÒ³µØÖ·£º http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+```bash
+$ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u251-linux-x64.tar.gz
+```
+
+3. ´´½¨°²×°Ä¿Â¼
+
+```bash
+$ mkdir /usr/local/Java
+```
+
+4. ½âÑ¹°²×°
+
+```bash
+$ tar -zxvf /usr/local/src/jdk-8u251-linux-x64.tar.gz -C /usr/local/Java/
+```
+
+5. ´´½¨ÈíÁ¬½Ó
+
+```bash
+$ ln -snf /usr/local/Java/jdk1.8.0_251/ /usr/local/java
+```
+
+6. ÅäÖÃ»·¾³±äÁ¿
+
+ÔÚ`/etc/profile.d`Ä¿Â¼´´½¨`jdk.sh`ÎÄ¼ş£º
+
+```bash
+$ vim /etc/profile.d/jdk.sh
+```
+
+```bash
+export JAVA_HOME=/usr/local/java
+export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+Ê¹Ö®ÉúĞ§£º
+
+```bash
+$ source /etc/profile
+```
+
+7. Ğ£Ñé
+
+```bash
+$ java -version
+java version "1.8.0_171"
+Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
+Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
+```
+
+## 3¡¢°²×°Maven
+
+1. ÏÂÔØ
+
+ÏÂÔØµØÖ·»ñÈ¡Ò³Ãæ£º https://maven.apache.org/download.cgi
+
+```bash
+$ wget -cP /usr/local/src/ http://mirrors.hust.edu.cn/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+```
+
+2. ´´½¨°²×°Ä¿Â¼
+
+```bash
+$ mkdir /usr/local/Maven
+```
+
+3. ½âÑ¹°²×°
+
+```bash
+$ tar -zxvf /usr/local/src/apache-maven-3.6.3-bin.tar.gz -C /usr/local/Maven/
+```
+
+4. ´´½¨ÈíÁ¬½Ó
+
+```bash
+$ ln -snf /usr/local/Maven/apache-maven-3.6.3/ /usr/local/maven
+```
+
+5. ÅäÖÃ»·¾³±äÁ¿
+
+ÔÚ`/etc/profile.d`Ä¿Â¼´´½¨`mvn.sh`ÎÄ¼ş£º
+
+```bash
+$ vim /etc/profile.d/mvn.sh
+```
+
+```bash
+export MAVEN_HOME=/usr/local/maven
+export PATH=$MAVEN_HOME/bin:$PATH
+```
+
+Ê¹Ö®ÉúĞ§£º
+
+```bash
+$ source /etc/profile
+```
+
+6. Ğ£Ñé
+
+```bash
+$ mvn -v
+```
+
+7. ÅäÖÃ
+
+- ´´½¨repo´æ·ÅÄ¿Â¼
+
+```bash
+$ mkdir /usr/local/maven/repository
+```
+
+- ÅäÖÃ´æ·Årepo
+
+  ```bash
+  $ vim /usr/local/maven/conf/settings.xml 
+  ```
+
+  - ÅäÖÃ`localRepository`¡¾¶àÓÃ»§·ÃÎÊ²»½¨ÒéÅäÖÃ¡¿
+
+  ```xml
+    <!-- localRepository
+     | The path to the local repository maven will use to store artifacts.
+     |
+     | Default: ${user.home}/.m2/repository
+    <localRepository>/path/to/local/repo</localRepository>
+    -->
+    <localRepository>/usr/local/maven/repository</localRepository>
+  ```
+
+  **ËµÃ÷£º**ĞèÒªĞŞ¸Ä`/usr/local/maven/repository`Îª`jenkins`ÓÃ»§È¨ÏŞ¡£
+
+  > $ sudo chown jenkins.jenkins /usr/local/maven/repository
+  
+  - ÅäÖÃ`mirror`
+  
+  ```xml
+    <mirrors>
+      <!-- mirror
+       | Specifies a repository mirror site to use instead of a given repository. The repository that
+       | this mirror serves has an ID that matches the mirrorOf element of this mirror. IDs are used
+       | for inheritance and direct lookup purposes, and must be unique across the set of mirrors.
+       |
+      <mirror>
+        <id>mirrorId</id>
+        <mirrorOf>repositoryId</mirrorOf>
+        <name>Human Readable Name for this Mirror.</name>
+        <url>http://my.repository.com/repo/path</url>
+      </mirror>
+       -->
+      <mirror>
+          <id>nexus</id>
+          <mirrorOf>*,!cloudera</mirrorOf>
+          <name>nexus maven</name>
+          <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+          <!--<url>http://localhost:8081/repository/maven-public/</url>-->
+      </mirror>
+    </mirrors>
+  ```
