@@ -1361,13 +1361,8 @@ EOF
 ### 5.4、启动服务
 
 ```bash
-$ systemctl daemon-reload
-$ systemctl enable kube-apiserver
-$ systemctl enable kube-controller-manager
-$ systemctl enable kube-scheduler
-$ systemctl restart kube-apiserver
-$ systemctl restart kube-controller-manager
-$ systemctl restart kube-scheduler
+$ systemctl daemon-reload && systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+$ systemctl restart kube-apiserver kube-controller-manager kube-scheduler
 ```
 
 ### 5.5、服务验证
@@ -1401,7 +1396,7 @@ tcp6       0      0 :::22                   :::*                    LISTEN      
 $ journalctl -f
 ```
 
-### 5.6、配置kubectl（emon这个master节点即可）
+### 5.6、配置kubectl（emon这个master节点即可，也可所有master节点）
 
 kubectl是用来管理kubernetes集群的客户端工具，前面我们已经下载到了所有的master节点。下面我们来配置这个工具，让它可以使用。
 
@@ -1441,13 +1436,9 @@ $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 #### 6.1.1、软件包下载（仅中转节点）
 
 ```bash
-# 设定containerd的版本号
-$ VERSION=1.4.3
-# 下载压缩包
-$ wget https://github.com/containerd/containerd/releases/download/v${VERSION}/cri-containerd-cni-${VERSION}-linux-amd64.tar.gz
-
-# 分发到两个work节点
-$ WORKERS="emon2 emon3"
+# 设定containerd的版本号，分发到两个work节点
+$ VERSION=1.6.2
+WORKERS="emon2 emon3"
 for instance in ${WORKERS}; do
     scp cri-containerd-cni-${VERSION}-linux-amd64.tar.gz ${instance}:~/
 done
@@ -1458,7 +1449,7 @@ done
 下载后的文件是一个tar.gz，是一个allinone的包，包括了runc、circtl、ctr、containerd等容器运行时以及cni相关的文件，解压缩到一个独立的目录中
 
 ```bash
-$ VERSION=1.4.3
+$ VERSION=1.6.2
 # 创建解压目录
 $ mkdir containerd
 # 解压缩
@@ -1475,15 +1466,16 @@ $ cp -r containerd/usr /
 $ mkdir -p /etc/containerd
 # 默认配置生成配置文件
 $ containerd config default > /etc/containerd/config.toml
+
 # 定制化配置（可选）
+# 创建镜像目录
+$ mkdir /usr/local/lib/containerd
 $ vi /etc/containerd/config.toml
 ```
 
 修改默认镜像目录（非必须）【忽略】
 
 ```bash
-# 创建镜像目录
-mkdir /usr/local/lib/containerd
 # 调整config.toml配置
 root = "/var/lib/containerd" ==> root = "/usr/local/lib/containerd"
 ```
@@ -1491,13 +1483,12 @@ root = "/var/lib/containerd" ==> root = "/usr/local/lib/containerd"
 #### 6.1.4、启动containerd
 
 ```bash
-$ systemctl enable containerd
-$ systemctl restart containerd
+$ systemctl enable containerd && systemctl restart containerd
 # 检查状态
 $ systemctl status containerd
 ```
 
-#### 6.1.5、配置镜像加速器
+#### 6.1.5、配置镜像加速器（暂未验证）
 
 https://help.aliyun.com/document_detail/60750.html
 
@@ -1530,6 +1521,7 @@ systemctl restart containerd
 
 ```bash
 $ mkdir -p /etc/kubernetes/ssl/
+# 在emon2节点执行会提示 ca.pem 和 ca-key.pem 没有那个文件或目录，是因为前面已经移过去了，么关系
 $ mv ${HOSTNAME}-key.pem ${HOSTNAME}.pem ca.pem ca-key.pem /etc/kubernetes/ssl/
 $ mv ${HOSTNAME}.kubeconfig /etc/kubernetes/kubeconfig
 $ IP=192.168.200.117 # IP地址替换为具体节点IP地址
@@ -1669,7 +1661,7 @@ EOF
 #### 6.3.2、nginx manifest
 
 ```bash
-# 特殊：该文件夹在emon2也需要创建
+# 【特殊】：该文件夹在emon2也需要创建
 $ mkdir -p /etc/kubernetes/manifests/
 $ cat <<EOF > /etc/kubernetes/manifests/nginx-proxy.yaml
 apiVersion: v1
@@ -1757,12 +1749,14 @@ EOF
 ### 6.5、启动服务
 
 ```bash
-$ systemctl daemon-reload
-$ systemctl enable kubelet kube-proxy
+# 【特殊】：emon2不需要，仅在emon3节点非常推荐先pull下nginx镜像：crictl pull docker.io/library/nginx:1.19  再启动
+$ crictl pull docker.io/library/nginx:1.19
 
-# 在emon3节点，非常推荐先pull下nginx镜像：crictl pull docker.io/library/nginx:1.19  再启动
 # 在emon2和emon3节点，非常推荐先pull下pause镜像，再启动；pause镜像pull方法参见下面！！！
+$ crictl pull registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pause:3.2
+$ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pause:3.2 k8s.gcr.io/pause:3.2
 
+$ systemctl daemon-reload && systemctl enable kubelet kube-proxy
 $ systemctl restart kubelet kube-proxy
 $ journalctl -f -u kubelet
 $ journalctl -f -u kube-proxy
@@ -1782,7 +1776,7 @@ $ journalctl -f -u kube-proxy
 >
 > emon3节点报错：kubelet.go:2243] node "emon3" not found
 >
-> 命令crictl images 发现，由于镜像 pause:3.2 尚未下载启动，等待即可！
+> 命令crictl images 发现，由于镜像 nginx:1.19 尚未下载启动，等待即可！
 >
 > 经验之谈！！！
 >
@@ -1830,6 +1824,13 @@ $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pa
 
 
 ## 7、网络插件-Calico（在主节点emon）
+
+### 7.0、切换目录
+
+```bash
+$ cd
+$ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
+```
 
 这部分我们部署kubernetes的网络查件 CNI。
 
