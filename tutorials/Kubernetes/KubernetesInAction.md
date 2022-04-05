@@ -1505,6 +1505,14 @@ $ vim /etc/containerd/config.toml
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
           #endpoint = ["https://registry-1.docker.io"]
           endpoint = ["https://pyk8pf3k.mirror.aliyuncs.com"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.66.4"]
+          endpoint = ["https://192.168.66.4:443"]
+      [plugins."io.containerd.grpc.v1.cri".registry.configs]
+   		[plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.66.4".tls]
+          insecure_skip_verify = true
+       	[plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.66.4".auth]
+          username = "admin"
+          password = "Harbor12345"
 ```
 
 - 重启k8s使配置生效
