@@ -1488,7 +1488,7 @@ $ systemctl enable containerd && systemctl restart containerd
 $ systemctl status containerd
 ```
 
-#### 6.1.5、配置镜像加速器（暂未验证）
+#### 6.1.5、配置镜像加速器（已验证）
 
 https://help.aliyun.com/document_detail/60750.html
 
@@ -1505,12 +1505,12 @@ $ vim /etc/containerd/config.toml
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
           #endpoint = ["https://registry-1.docker.io"]
           endpoint = ["https://pyk8pf3k.mirror.aliyuncs.com"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.66.4"]
-          endpoint = ["https://192.168.66.4:443"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.200.116:5080"]
+          endpoint = ["https://192.168.200.116:5443"]
       [plugins."io.containerd.grpc.v1.cri".registry.configs]
-   		[plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.66.4".tls]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.200.116:5443".tls]
           insecure_skip_verify = true
-       	[plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.66.4".auth]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.200.116:5443".auth]
           username = "admin"
           password = "Harbor12345"
 ```
@@ -2846,18 +2846,18 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```yaml
 # 修改
 # hostname: reg.mydomain.com
-hostname: emon
+hostname: 192.168.200.116
 # 修改
   # port: 80
   port: 5080
 # 修改
-# https:
+https:
   # https port for harbor, default is 443
-  # port: 443
+  port: 5443
   # The path of cert and key files for nginx
   # certificate: /your/certificate/path
   # private_key: /your/private/key/path
-  # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.4.2
+  # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.2.4
   # 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: 
   certificate: /usr/local/Harbor/cert/emon.crt
   private_key: /usr/local/Harbor/cert/emon.key
@@ -2954,13 +2954,17 @@ $ sudo systemctl restart docker
 # 下载
 $ docker pull openjdk:8-jre
 # 打标签
-$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
+$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
 # 登录
-$ docker login -u emon -p Emon@123 emon:5080
+$ docker login -u emon -p Emon@123 192.168.200.116:5080
 # 上传镜像
-$ docker push emon:5080/devops-learning/openjdk:8-jre
+$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
 # 退出登录
-$ docker logout emon:5080
+$ docker logout 192.168.200.116:5080
+
+机器人账户：
+token：  
+XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
 # 六、Kubernetes的服务发现
@@ -2974,13 +2978,14 @@ $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-## 1、ingress-nginx
+## 1、安装ingress-nginx
 
 - 安装插件（master节点）
 
 ```bash
 # 由于mandatory.yaml添加了 nodeSelector，对node进行了label选择，这里必须添加标签，否则：
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
+$ kubectl label node emon2 app=ingress
 $ kubectl label node emon3 app=ingress
 
 # 配置资源
@@ -3002,7 +3007,7 @@ $ crictl pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.1
 $ ctr -n k8s.io i tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
 ```
 
-## 2、测试hostNetwork
+## 2、测试服务
 
 ### 2.1、ingress-demo.yaml配置
 
@@ -3083,7 +3088,6 @@ http://apiu.mooc.com # 看到 default backend - 404
 
 # 删除资源
 $  kubectl delete -f ingress-demo.yaml
-kubectl apply -f k8s-demo/cronjob-demo/cronjob.yaml
 ```
 
 
