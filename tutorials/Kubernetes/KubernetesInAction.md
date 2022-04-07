@@ -4150,3 +4150,15 @@ PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin
 1：M2_HOME 环境变量名字是固定的，不允许写其他的变量名; 标识Maven在系统内的家目录；
 
 2：PATH+EXTRA 引用上面Maven家目录，变量名固定，不能更改。
+
+
+
+### 6.3、pipline
+
+1：创建脚本
+
+```bash
+$ mkdir -pv /root/script
+$ vim /root/script/build-image-web.sh
+```
+
