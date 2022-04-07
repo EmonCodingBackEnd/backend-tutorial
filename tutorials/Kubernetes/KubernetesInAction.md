@@ -2555,6 +2555,7 @@ $ kubectl logs <pod-name>
 测试kubectl的exec功能
 
 ```bash
+# 查询指定标签的pod
 $ kubectl get pods -l app=nginx-ds
 $ kubectl exec -it <nginx-pod-name> -- nginx -v
 ```
@@ -2785,7 +2786,7 @@ $ wget https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offlin
 # 创建Harbor解压目录
 $ mkdir /usr/local/Harbor
 # 创建Harbor的volume目录
-$ mkdir -p /usr/local/DockerV/harbor_home
+$ mkdir -p /usr/local/dockerv/harbor_home
 ```
 
 3. 解压
@@ -2971,6 +2972,12 @@ XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 
 ![image-20220403131408465](images/image-20220403131408465.png)
 
+
+
+![image-20220407103050136](images/image-20220407103050136.png)
+
+
+
 ## 0、切换目录
 
 ```bash
@@ -3070,7 +3077,7 @@ spec:
 配置资源生效：
 
 ```bash
-# 应用资源 
+# 应用资源：仅创建并使用，可调整为 create -> apply  具有使用和创建并使用的效果
 $ kubectl create -f ingress-demo.yaml
 # 查看发现ingress启动在emon3上
 $ kubectl get po -n ingress-nginx -o wide
@@ -3084,7 +3091,7 @@ $ vim /etc/hosts
 
 # 访问
 http://tomcat.mooc.com # 看到正常tomcat界面
-http://apiu.mooc.com # 看到 default backend - 404
+http://api.mooc.com # 看到 default backend - 404
 
 # 删除资源
 $  kubectl delete -f ingress-demo.yaml
@@ -3498,8 +3505,16 @@ $ kubectl explain
 $ kubectl get < xxx >
 # 显示node的信息
 $ kubectl get nodes -o wide
+
 # 列出namespace信息
 $ kubectl get namespaces
+# 命令行输出结果
+NAME              STATUS   AGE
+default           Active   45h
+kube-node-lease   Active   45h
+kube-public       Active   45h
+kube-system       Active   45h
+
 # 列出deployment信息
 $ kubectl get deployment -n ingress-nginx
 
@@ -3540,6 +3555,20 @@ $ kubectl get node emon2 --show-labels
 $ kubectl get node --show-labels
 # 删除标签：注意标签名后面跟上 - 表示删除
 $ kubectl label node emon2 disktype-
+
+# 查看默认命名空间下所有资源
+$ kubectl get all
+# 查看指定命名空间下所有资源
+$ kubectl get all -n kube-system
+# 查看集群秘钥
+$ kubectl get secret -n default
+```
+
+- iptables
+
+```bash
+# 可以通过 iptables-save 命令打印出当前节点的 iptables 规则
+$ iptables-save
 ```
 
 
@@ -3882,3 +3911,242 @@ $ mkdir /usr/local/maven/repository
       </mirror>
     </mirrors>
   ```
+
+## 4、Zookeeper单节点（Apache版）
+
+1. 下载
+
+官网地址： https://zookeeper.apache.org/index.html
+
+下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
+
+```bash
+$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.9/apache-zookeeper-3.5.9-bin.tar.gz --no-check-certificate
+```
+
+2. 创建安装目录
+
+```bash
+$ mkdir /usr/local/ZooKeeper
+```
+
+3. 解压安装
+
+```bash
+$ tar -zxvf /usr/local/src/apache-zookeeper-3.5.9-bin.tar.gz -C /usr/local/ZooKeeper/
+```
+
+4. 创建软连接
+
+```bash
+$ ln -snf /usr/local/ZooKeeper/apache-zookeeper-3.5.9-bin/ /usr/local/zoo
+```
+
+5. 配置环境变量
+
+在`/etc/profile.d`目录创建`zoo.sh`文件：
+
+```bash
+$ sudo vim /etc/profile.d/zoo.sh
+```
+
+```bash
+export ZK_HOME=/usr/local/zoo
+export PATH=$ZK_HOME/bin:$PATH
+```
+
+使之生效：
+
+```bash
+$ source /etc/profile
+```
+
+6. 配置文件
+
+- 复制`zoo_sample.cfg`到`zoo.cfg`
+
+```bash
+$ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
+```
+
+- 编辑`zoo.cfg`文件
+
+```bash
+$ vim /usr/local/zoo/conf/zoo.cfg
+```
+
+```bash
+# [修改]
+dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
+```
+
+7. 启动与停止
+
+- 启动（端口号2181）
+
+```bash
+$ zkServer.sh start
+```
+
+- 校验
+
+```bash
+$ jps
+44611 QuorumPeerMain
+```
+
+- 停止
+
+```bash
+$ zkServer.sh stop
+```
+
+- 状态
+
+```bash
+$ zkServer.sh status
+```
+
+8. 连接
+
+- 远程链接
+
+```bash
+$ zkCli.sh -server emon:2181
+```
+
+- 本地连接
+
+```bash
+$ zkCli.sh
+```
+
+- 退出（连接成功后，使用命令quit退出）
+
+```bash
+[zk: localhost:2181(CONNECTED) 0] quit
+```
+
+- 查看根节点下内容
+
+```bash
+[zk: localhost:2181(CONNECTED) 1] ls /
+```
+
+- 创建节点test并存储数据hello
+
+```bash
+[zk: localhost:2181(CONNECTED) 2] create /test hello
+```
+
+- 查看节点test内容
+
+```bash
+[zk: localhost:2181(CONNECTED) 6] get /test
+# 命令行输出结果
+hello
+```
+
+- 删除节点
+
+```bash
+# 递归删除
+[zk: localhost:2181(CONNECTED) 7] deleteall /test
+# 普通删除
+[zk: localhost:2181(CONNECTED) 7] delete /test
+```
+
+## 5、Maven仓库预留位置
+
+
+
+## 6、搭建Jenkins
+
+### 6.1、安装
+
+- 使用Docker
+
+注意，在hub.docker.com上搜索jenkins时，点击官方版本后看到提示：
+
+DEPRECATED; use "jenkins/jenkins:lts" instead
+
+```bash
+# 创建宿主机挂载点
+$ mkdir /usr/local/dockerv/jenkins_home
+# -v /usr/local/dockerv/jenkins_home:/var/jenkins_home 指定宿主机目录为Jenkins工作目录
+# -v /etc/localtime:/etc/localtime 让容器使用和服务器同样的时间设置
+# -v /usr/local/maven:/usr/local/maven 映射宿主机的maven
+# -v /usr/local/java:/usr/local/java 映射宿主机的java
+# 也可以使用 jenkins/jenkins:lts-centos7-jdk8 镜像
+$ docker run --name jenkins -d -p 8080:8080 -p 50000:50000 -v /usr/local/dockerv/jenkins_home:/var/jenkins_home -v /etc/localtime:/etc/localtime -v /usr/local/maven:/usr/local/maven -v /usr/local/java:/usr/local/java jenkins/jenkins:lts
+```
+
+- 查看密码
+
+```bash
+$ docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+# 命令行输出结果
+b273ae2aadaf491e834d1fce52b90e65
+```
+
+- 安装推荐插件
+
+![image-20220407163042485](images/image-20220407163042485.png)
+
+- 创建用户
+
+访问：http://emon:8080
+
+安装推荐的插件==>创建用户：jenkins/jenkins123
+
+- 重启Jenkins
+
+http://emon:8080/restart
+
+
+
+### 6.2、常用插件安装与环境配置
+
+#### 6.2.1、常用插件安装
+
+- 待定
+
+安装完成后，点击【安装完成后重启Jenkins】，触发重启操作。
+
+#### 6.2.2、环境配置
+
+##### Global Tool Configuration（全局工具配置）
+
+- 配置JDK
+
+配置路径：Manage Jenkins==>Global Tool Configuration==>JDK==>勾掉自动安装==>
+
+JDK别名=java1.8
+
+JAVA_HOME=/usr/local/java
+
+- 配置Maven
+
+配置路径：Manage Jenkins==>Global Tool Configuration==>Maven==>勾掉自动安装==>
+
+JDK别名=maven3.6.3
+
+MAVEN_HOME=/usr/local/maven
+
+##### Configure System（系统配置）
+
+- 全局属性==>环境变量
+
+配置路径：Manage Jenkins==>Configure System==>全局属性==>勾选环境变量==>添加键值对列表==>
+
+JAVA_HOME=/usr/local/java
+
+M2_HOME=/usr/local/maven
+
+PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin
+
+注意：
+
+1：M2_HOME 环境变量名字是固定的，不允许写其他的变量名; 标识Maven在系统内的家目录；
+
+2：PATH+EXTRA 引用上面Maven家目录，变量名固定，不能更改。

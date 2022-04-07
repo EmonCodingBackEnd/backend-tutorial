@@ -340,6 +340,9 @@ server.3=emon3:2888:3888
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/zoo.sh
+```
+
+```bash
 export ZK_HOME=/usr/local/zoo
 export PATH=$ZK_HOME/bin:$PATH
 ```
