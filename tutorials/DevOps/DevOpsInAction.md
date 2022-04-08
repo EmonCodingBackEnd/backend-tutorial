@@ -224,10 +224,6 @@ DEPRECATED; use "jenkins/jenkins:lts" instead
 ```bash
 # 创建宿主机挂载点
 [emon@emon ~]$ mkdir /usr/local/dockerv/jenkins_home
-# 调整jenkins_home目录的属主，避免问题：
-# touch: cannot touch '/var/jenkins_home/copy_reference_file.log': Permission denied
-# Can not write to /var/jenkins_home/copy_reference_file.log. Wrong volume permissions?
-$ chown -R 1000:1000 /usr/local/dockerv/jenkins_home/
 # -v /usr/local/dockerv/jenkins_home:/var/jenkins_home 指定宿主机目录为Jenkins工作目录
 # -v /etc/localtime:/etc/localtime 让容器使用和服务器同样的时间设置
 # -v /usr/local/maven:/usr/local/maven 映射宿主机的maven

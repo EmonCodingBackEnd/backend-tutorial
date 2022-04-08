@@ -2992,7 +2992,6 @@ $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```bash
 # 由于mandatory.yaml添加了 nodeSelector，对node进行了label选择，这里必须添加标签，否则：
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
-$ kubectl label node emon2 app=ingress
 $ kubectl label node emon3 app=ingress
 
 # 配置资源
@@ -3840,8 +3839,8 @@ $ vim /etc/profile.d/mvn.sh
 ```
 
 ```bash
-export MAVEN_HOME=/usr/local/maven
-export PATH=$MAVEN_HOME/bin:$PATH
+export M2_HOME=/usr/local/maven
+export PATH=$M2_HOME/bin:$PATH
 ```
 
 使之生效：
@@ -4064,7 +4063,7 @@ hello
 
 ### 6.1、安装
 
-- 使用Docker
+#### 6.1.1、使用Docker
 
 注意，在hub.docker.com上搜索jenkins时，点击官方版本后看到提示：
 
@@ -4073,12 +4072,67 @@ DEPRECATED; use "jenkins/jenkins:lts" instead
 ```bash
 # 创建宿主机挂载点
 $ mkdir /usr/local/dockerv/jenkins_home
+# 调整jenkins_home目录的属主，避免问题：
+# touch: cannot touch '/var/jenkins_home/copy_reference_file.log': Permission denied
+# Can not write to /var/jenkins_home/copy_reference_file.log. Wrong volume permissions?
+# $ chown -R 1000:1000 /usr/local/dockerv/jenkins_home/
 # -v /usr/local/dockerv/jenkins_home:/var/jenkins_home 指定宿主机目录为Jenkins工作目录
 # -v /etc/localtime:/etc/localtime 让容器使用和服务器同样的时间设置
 # -v /usr/local/maven:/usr/local/maven 映射宿主机的maven
 # -v /usr/local/java:/usr/local/java 映射宿主机的java
 # 也可以使用 jenkins/jenkins:lts-centos7-jdk8 镜像
-$ docker run --name jenkins -d -p 8080:8080 -p 50000:50000 -v /usr/local/dockerv/jenkins_home:/var/jenkins_home -v /etc/localtime:/etc/localtime -v /usr/local/maven:/usr/local/maven -v /usr/local/java:/usr/local/java jenkins/jenkins:lts
+$ docker run --name jenkins --user=root \
+-d -p 8080:8080 -p 50000:50000 \
+-v /usr/local/dockerv/jenkins_home:/var/jenkins_home \
+-v /etc/localtime:/etc/localtime \
+-v /usr/local/maven:/usr/local/maven \
+-v /usr/local/java:/usr/local/java \
+-v /root/jenkins:/root/jenkins \
+-v /usr/bin/docker:/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
+-v /usr/local/bin/kubectl:/usr/local/bin/kubectl \
+jenkins/jenkins:lts
+```
+
+#### 6.1.2、使用docker-compose
+
+```bash
+# 创建宿主机挂载点
+$ mkdir /usr/local/dockerv/jenkins_home
+# 创建docker-compose目录
+$ mkdir /usr/local/Jenkins
+$ vim /usr/local/Jenkins/docker-compose.yml
+```
+
+```yaml
+version: '3'
+services:
+  jenkins:
+    image: 'jenkins/jenkins:lts'
+    container_name: jenkins
+    restart: always
+    user: root
+    ports:
+      - 80:8080
+      - 50000:50000
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - '/usr/local/dockerv/jenkins_home:/var/jenkins_home'
+      - '/etc/localtime:/etc/localtime'
+      - '/usr/local/maven:/usr/local/maven'
+      - '/usr/local/java:/usr/local/java'
+      - '/root/jenkins:/root/jenkins'
+      - '/usr/bin/docker:/bin/docker'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+```
+
+```bash
+# 后台启动
+$ docker-compose -f /usr/local/Jenkins/docker-compose.yml up -d
+# 停止
+$ docker-compose -f /usr/local/Jenkins/docker-compose.yml down -v
+# 重启：建议走down -v再up -d，二部是restart
+$ docker-compose -f /usr/local/Jenkins/docker-compose.yml restart
 ```
 
 - 查看密码
@@ -4089,7 +4143,119 @@ $ docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 b273ae2aadaf491e834d1fce52b90e65
 ```
 
-- 安装推荐插件
+- 解决jenkins容器访问宿主机docker报错
+
+> 错误：docker: error while loading shared libraries: libltdl.so.7: cannot open shared object file: No such file or directory
+>
+> 解决：
+>
+> $ docker exec -it jenkins /bin/bash
+>
+> 在打开的命令行中，执行命令安装：
+>
+> root@eab33185950a:/# apt-get update && apt-get install -y libltdl7
+>
+> 顺便执行下harbor登录，避免脚本中登录：
+>
+> root@eab33185950a:/# docker login -u emon -p Emon@123 192.168.200.116:5080
+
+
+
+#### 6.1.3、war安装
+
+官网地址：https://www.jenkins.io/
+
+快速安装：
+
+1. 下载war
+
+```bash
+# 创建jenkins安装目录
+$ mkdir /usr/local/Jenkins/
+$ wget https://get.jenkins.io/war-stable/2.332.2/jenkins.war -O /usr/local/Jenkins/jenkins-2.332.2.war
+```
+
+2. 编写启动脚本
+
+- jenkins.sh
+
+```bash
+$ vim /usr/local/Jenkins/jenkins.sh
+```
+
+```bash
+#!/bin/bash
+JAVA_HOME=/usr/local/java
+JENKINS_WAR_NAME=jenkins-2.332.2.war
+JENKINS_WAR=/usr/local/Jenkins/${JENKINS_WAR_NAME}
+JENKINS_LOG=/usr/local/Jenkins/jenkins.log
+pid=$(ps -ef | grep ${JENKINS_WAR_NAME} | grep -v 'grep' | awk '{print $2}' | wc -l)
+if [ "$1" = "start" ]; then
+  if [ $pid -gt 0 ]; then
+    echo 'jenkins is running...'
+  else
+    echo 'jenkins is starting...'
+    nohup $JAVA_HOME/bin/java -jar -Dorg.jenkinsci.plugins.gitclient.Git.timeOut=60 ${JENKINS_WAR} --enable-future-java --httpPort=8080 &>>${JENKINS_LOG} &
+  fi
+elif [ "$1" = "stop" ]; then
+  pid=$(ps -ef | grep ${JENKINS_WAR_NAME} | grep -v grep | awk '{print $2}')
+  if [ -z $pid ]; then
+    echo 'jenkins has stoped'
+  else
+    exec echo $pid | xargs kill -9
+    echo 'jenkins is stop...'
+  fi
+else
+  echo "Please input like this:"./jenkins.sh start" or "./jenkins stop""
+fi
+```
+
+```bash
+$ chmod u+x /usr/local/Jenkins/jenkins.sh
+```
+
+- 创建systemd的service服务文件
+
+```bash
+$ vim /usr/lib/systemd/system/jenkins.service
+```
+
+```bash
+[Unit]
+Description=Jenkins
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/Jenkins/jenkins.sh start
+ExecReload=
+ExecStop=/usr/local/Jenkins/jenkins.sh stop
+PrivateTmp=false
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- 加载服务并设置开机启动
+
+```bash
+$ systemctl daemon-reload && systemctl enable jenkins && systemctl start jenkins
+```
+
+- 查看初始密码
+
+```bash
+$ cat /root/.jenkins/secrets/initialAdminPassword
+dd56c6ccb54a48c285f3f40546726bfb
+```
+
+#### 6.1.4、安装推荐插件
+
+访问：http://emon:8080
+
+输出初始密码并安装推荐插件！
 
 ![image-20220407163042485](images/image-20220407163042485.png)
 
@@ -4105,7 +4271,7 @@ http://emon:8080/restart
 
 
 
-### 6.2、常用插件安装与环境配置
+### 6.2、环境配置
 
 #### 6.2.1、常用插件安装
 
@@ -4115,7 +4281,7 @@ http://emon:8080/restart
 
 #### 6.2.2、环境配置
 
-##### Global Tool Configuration（全局工具配置）
+##### Global Tool Configuration（全局工具配置）【war安装可忽略】
 
 - 配置JDK
 
@@ -4153,12 +4319,234 @@ PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin
 
 
 
-### 6.3、pipline
+### 6.3、Pipeline任务演示
 
-1：创建脚本
+#### 6.3.1、创建镜像构造脚本
 
 ```bash
-$ mkdir -pv /root/script
-$ vim /root/script/build-image-web.sh
+$ mkdir -pv /root/jenkins/script
+$ vim /root/jenkins/script/build-image-web.sh
 ```
+
+```bash
+#!/bin/bash
+
+# 校验依赖的Pipeline环境变量是否已定义
+if [ "${BUILD_DIR}" == "" ];then
+    echo "env 'BUILD_DIR' is not set"
+    exit 1
+fi
+if [ "${MODULE}" == "" ];then
+    echo "env 'MODULE' is not set"
+    exit 1
+fi
+
+# 确定制作镜像的工作目录
+DOCKER_DIR=${BUILD_DIR}/${JOB_NAME}
+if [ ! -d ${DOCKER_DIR} ];then
+    mkdir -p ${DOCKER_DIR}
+fi
+echo "docker wokspace: ${DOCKER_DIR}"
+
+
+# 确定Jenkins中模块的位置
+JENKINS_DIR=${WORKSPACE}/${MODULE}
+echo "jenkins workspace: ${JENKINS_DIR}"
+# 判断目标jar是否存在
+if [ ! -f ${JENKINS_DIR}/target/*.jar ];then
+    echo "target jar file not found ${JENKINS_DIR}/target/*.jar"
+    exit 1
+fi
+
+# 清理制作镜像的工作目录
+cd ${DOCKER_DIR}
+rm -rf *
+
+# 准备镜像制作文件
+K8S_DIR=${JENKINS_DIR}/k8s
+if [ ! -d ${K8S_DIR} ];then
+    echo "env 'K8S_DIR' is not exists"
+    exit 1
+fi
+cp -rv ${K8S_DIR}/* .
+cp ${JENKINS_DIR}/target/*.jar .
+
+
+# 开始制作并上传镜像文件
+
+VERSION=`date +%Y%m%d%H%M%S`
+IMAGE_NAME=192.168.200.116:5080/devops-learning/${JOB_NAME}:${VERSION}
+
+echo "building image: ${IMAGE_NAME}"
+#docker login -u emon -p Emon@123 192.168.200.116:5080
+docker build -t ${IMAGE_NAME} .
+
+docker push ${IMAGE_NAME}
+
+# 保存本次镜像名称
+echo "${IMAGE_NAME}" > ${DOCKER_DIR}/IMAGE
+```
+
+```bash
+# 修改权限，添加属主用户（root）可执行权限
+$ chmod u+x build-image-web.sh
+```
+
+#### 6.3.2、创建k8s部署脚本
+
+- 模板脚本
+
+```bash
+$ mkdir -pv /root/jenkins/script/template
+$ vim /root/jenkins/script/template/web.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{name}}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{name}}
+    spec:
+      containers:
+      - name: {{name}}
+        image: {{image}}
+        ports:
+        - containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: {{name}}
+  type: ClusterIP
+
+---
+#ingress
+#apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{name}}
+spec:
+  rules:
+  - host: {{host}}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{name}}
+            port:
+              number: 80
+```
+
+- k8s部署yaml
+
+```bash
+$ vim /root/jenkins/script/deploy.sh
+```
+
+```bash
+#!/bin/bash
+
+# 校验依赖的Pipeline环境变量是否已定义
+if [ "${BUILD_DIR}" == "" ];then
+    echo "env 'BUILD_DIR' is not set"
+    exit 1
+fi
+if [ "${HOST}" == "" ];then
+    echo "env 'HOST' is not set"
+    exit 1
+fi
+
+# 确定制作镜像的工作目录
+DOCKER_DIR=${BUILD_DIR}/${JOB_NAME}
+if [ ! -d ${DOCKER_DIR} ];then
+    mkdir -p ${DOCKER_DIR}
+fi
+echo "docker workspace: ${DOCKER_DIR}"
+
+# 打印出BASH_DIR路径
+BASH_DIR=$(dirname "${BASH_SOURCE[0]}")
+echo "BASH_DIR=${BASH_DIR}"
+
+# 为模板脚本准备变量
+name=${JOB_NAME}
+image=$(cat ${DOCKER_DIR}/IMAGE)
+host=${HOST}
+
+echo "deploying ... name: ${name}, image: ${image}, host: ${host}"
+
+rm -f ${DOCKER_DIR}/web.yaml
+cp ${BASH_DIR}/template/web.yaml ${DOCKER_DIR}
+
+sed -i "s,{{name}},${name},g" ${DOCKER_DIR}/web.yaml
+sed -i "s,{{image}},${image},g" ${DOCKER_DIR}/web.yaml
+sed -i "s,{{host}},${host},g" ${DOCKER_DIR}/web.yaml
+
+echo "kubectl apply -f ${DOCKER_DIR}/web.yaml"
+kubectl apply -f ${DOCKER_DIR}/web.yaml
+
+# 打印本次部署的web.yaml内容
+cat ${DOCKER_DIR}/web.yaml
+```
+
+```bash
+$ chmod u+x /root/jenkins/script/deploy.sh
+```
+
+#### 6.3.3、创建Pipeline任务
+
+Jenkins登录==>新建任务==>输入名称 k8s-springboot-web-demo 然后选择“流水线”类型==>点击确定创建成功！
+
+- Pipeline script
+
+```bash
+node {
+    env.BUILD_DIR = "/root/jenkins/build_workspace"
+    env.MODULE = "k8s-demo/springboot-web-demo"
+    env.HOST = "springboot.emon.vip"
+    
+    stage('Preparation') {
+        sh 'printenv'
+        git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+    }
+    
+    stage('Maven Build') {
+        sh "mvn -pl ${MODULE} -am clean package -Dmaven.test.skip=true"
+    }
+    
+    stage('Build Image') {
+        sh "/root/jenkins/script/build-image-web.sh"
+    }
+    
+    stage('Deploy') {
+        sh "/root/jenkins/script/deploy.sh"
+    }
+}
+```
+
+
+
+
+
+
 
