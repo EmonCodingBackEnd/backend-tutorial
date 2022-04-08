@@ -3561,6 +3561,8 @@ $ kubectl get all
 $ kubectl get all -n kube-system
 # 查看集群秘钥
 $ kubectl get secret -n default
+# 查看deploy对应yaml详情
+$ kubectl get deploy k8s-springboot-web-demo -o yaml
 ```
 
 - iptables
@@ -4275,7 +4277,7 @@ http://emon:8080/restart
 
 #### 6.2.1、常用插件安装
 
-- 待定
+- Git Parameter
 
 安装完成后，点击【安装完成后重启Jenkins】，触发重启操作。
 
@@ -4392,9 +4394,7 @@ echo "${IMAGE_NAME}" > ${DOCKER_DIR}/IMAGE
 $ chmod u+x build-image-web.sh
 ```
 
-#### 6.3.2、创建k8s部署脚本
-
-- 模板脚本
+#### 6.3.2、创建k8s模板脚本
 
 ```bash
 $ mkdir -pv /root/jenkins/script/template
@@ -4458,7 +4458,7 @@ spec:
               number: 80
 ```
 
-- k8s部署yaml
+#### 6.3.3、创建k8s部署脚本
 
 ```bash
 $ vim /root/jenkins/script/deploy.sh
@@ -4506,16 +4506,46 @@ echo "kubectl apply -f ${DOCKER_DIR}/web.yaml"
 kubectl apply -f ${DOCKER_DIR}/web.yaml
 
 # 打印本次部署的web.yaml内容
+echo "web.yaml content as follows:"
 cat ${DOCKER_DIR}/web.yaml
+
+# 健康检查
+echo "begin health check..."
+success=0
+count=60
+IFS=","
+sleep 5
+while [ ${count} -gt 0 ]
+do
+    replicas=$(kubectl get deploy ${name} -o go-template='{{.status.replicas}},{{.status.updatedReplicas}},{{.status.readyReplicas}},{{.status.availableReplicas}}')
+    echo "replicas: ${replicas}"
+    arr=(${replicas})
+    if [ "${arr[0]}" == "${arr[1]}" -a "${arr[1]}" == "${arr[2]}" -a "${arr[2]}" == "${arr[3]}" ];then
+        echo "health check success!"
+        success=1
+        break
+    fi
+    ((count--))
+    sleep 2
+done
+
+if [ ${success} -ne 1 ];then
+    echo "health check failed!"
+    exit 1
+fi
 ```
 
 ```bash
 $ chmod u+x /root/jenkins/script/deploy.sh
 ```
 
-#### 6.3.3、创建Pipeline任务
+#### 6.3.3、创建Pipeline script任务
 
 Jenkins登录==>新建任务==>输入名称 k8s-springboot-web-demo 然后选择“流水线”类型==>点击确定创建成功！
+
+- Git分支配置：如果下面使用到${params.BRANCH}，这里需要配置，否则不需要【非必须】
+
+![image-20220408230030796](images/image-20220408230030796.png)
 
 - Pipeline script
 
@@ -4527,7 +4557,9 @@ node {
     
     stage('Preparation') {
         sh 'printenv'
-        git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        git branch: "master", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
     }
     
     stage('Maven Build') {
@@ -4544,9 +4576,5 @@ node {
 }
 ```
 
-
-
-
-
-
+#### 6.3.4、创建Pipeline script from SCM任务
 
