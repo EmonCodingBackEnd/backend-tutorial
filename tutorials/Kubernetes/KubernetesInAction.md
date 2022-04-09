@@ -3438,7 +3438,308 @@ spec:
 ---
 ```
 
+# 七、Namespace
 
+## 0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/1-namespace
+$ cd /root/dockerdata/deep-in-kubernetes/1-namespace/
+```
+
+## 1、创建命名空间
+
+- 创建yaml
+
+```bash
+vim namespace-dev.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+```
+
+- 应用yaml
+
+```bash
+$ kubectl create -f namespace-dev.yaml
+# 查看命名空间
+$ kubectl get namespaces
+```
+
+## 2、部署服务到命名空间
+
+- 创建yaml
+
+```bash
+$ vim web-dev.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: sbt-web-demo
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+  - host: sbt-dev.emon.vip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: sbt-web-demo
+            port:
+              number: 80
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-dev.emon.vip/hello?name=emon
+
+```bash
+$ kubectl create -f web-dev.yaml
+# 查看dev命名空间下内容
+$ kubectl get all -n dev
+# 查看deploy详情
+$ kubectl get deploy sbt-web-demo -o yaml -n dev
+```
+
+## 3、命名空间特性
+
+### 3.1、命名空间下通过服务名的访问规则
+
+- 同一个命名空间下的pod通过服务名可以互相访问
+- 不同命名空间下的pod通过服务名不可以互相访问
+
+```bash
+$ kubectl get pods -o wide
+NAME                                      READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
+k8s-springboot-web-demo-7689b896d-pz9mh   1/1     Running   0          71m   10.200.108.119   emon2   <none>           <none>
+tomcat-demo-54cbbcffdb-z9jl5              1/1     Running   0          22m   10.200.161.18    emon3   <none>           <none>
+
+$ kubectl get pods -n dev
+NAME                            READY   STATUS    RESTARTS   AGE
+sbt-web-demo-756b64bb8b-qqp5x   1/1     Running   0          26m
+
+# 查看解析规则：请注意 search default.svc.cluster.local 和 search dev.svc.cluster.local 的区别
+$ kubectl exec -it k8s-springboot-web-demo-7689b896d-pz9mh -- cat /etc/resolv.conf
+search default.svc.cluster.local svc.cluster.local cluster.local
+nameserver 169.254.25.10
+options ndots:5
+$ kubectl exec -it sbt-web-demo-756b64bb8b-qqp5x -n dev -- cat /etc/resolv.conf
+search dev.svc.cluster.local svc.cluster.local cluster.local
+nameserver 169.254.25.10
+options ndots:5
+```
+
+### 3.2、命名空间下通过IP的访问规则
+
+- 不同命名空间下的service和pod通过IP是可以互相访问
+
+```bash
+$ kubectl get svc
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+k8s-springboot-web-demo   ClusterIP   10.233.31.78    <none>        80/TCP    11h
+kubernetes                ClusterIP   10.233.0.1      <none>        443/TCP   3d22h
+tomcat-demo               ClusterIP   10.233.60.100   <none>        80/TCP    14m
+$ kubectl get svc -n dev
+NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+sbt-web-demo   ClusterIP   10.233.175.91   <none>        80/TCP    29m
+
+# dev命名空间下pod可以访问default命名空间下的tomcat-demo服务IP是通的
+$ kubectl exec -it sbt-web-demo-756b64bb8b-qqp5x bash -n dev
+# dev命名空间下pod访问default命名空间下的tomcat-demo的pods的IP也通
+root@sbt-web-demo-756b64bb8b-qqp5x:/# wget 10.233.60.100
+root@sbt-web-demo-756b64bb8b-qqp5x:/# wget 10.200.161.18:8080
+```
+
+## 4、调整用户的默认命名空间
+
+- 备份`.kube/config`
+
+```bash
+$ cp .kube/config .kube/config.bak
+```
+
+- 调整admin用户的默认命名空间
+
+```bash
+# 设置上下文参数：写入并更新文件
+$ kubectl config set-context ctx-dev \
+  --cluster=kubernetes \
+  --user=admin \
+  --namespace=dev \
+  --kubeconfig=/root/.kube/config
+# 设置默认上下文
+$ kubectl config use-context ctx-dev --kubeconfig=/root/.kube/config
+```
+
+## 5、命名空间划分方式
+
+- 按环境划分：dev、test、prod
+- 按团队划分
+- 自定义多级划分
+  - 第一级：环境
+  - 第二级：团队
+
+# 八、Resources
+
+## 0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/2-resource
+$ cd /root/dockerdata/deep-in-kubernetes/2-resource
+```
+
+## 1、初识
+
+- CPU
+- GPU
+- 内存
+- 持久化存储
+
+![image-20220409111711111](images/image-20220409111711111.png)
+
+
+
+## 2、核心设计
+
+- Requests：请求的资源
+- Limits：限制的资源
+
+## 3、部署服务
+
+- 创建一个部署
+
+```bash
+$ vim web-dev.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 100Mi
+            # 1核心的CPU=1000m
+            cpu: 100m
+          limits:
+            memory: 100Mi
+            cpu: 200m
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: sbt-web-demo
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+  - host: sbt-dev.emon.vip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: sbt-web-demo
+            port:
+              number: 80
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f web-dev.yaml
+# 查看dev命名空间下内容
+$ kubectl get all
+# 查看nodes
+$ kubectl get nodes
+# 查看节点上可用资源
+$ kubectl describe node emon2
+```
 
 
 
@@ -3547,11 +3848,11 @@ $ kubectl apply -f < xxx.yaml >
 # 删除资源
 $ kubectl delete -f < xxx.yaml >
 # 给节点打标签
-$ kubectl label node emon2 disktype=ssd
+$ kubectl label nodes emon2 disktype=ssd
 # 查看节点上的标签
-$ kubectl get node emon2 --show-labels
+$ kubectl get nodes emon2 --show-labels
 # 查看所有节点上的标签列表，按标签分组
-$ kubectl get node --show-labels
+$ kubectl get nodes --show-labels
 # 删除标签：注意标签名后面跟上 - 表示删除
 $ kubectl label node emon2 disktype-
 
