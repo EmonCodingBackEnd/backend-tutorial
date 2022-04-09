@@ -3619,6 +3619,16 @@ $ kubectl config set-context ctx-dev \
   --kubeconfig=/root/.kube/config
 # 设置默认上下文
 $ kubectl config use-context ctx-dev --kubeconfig=/root/.kube/config
+
+# 复原
+$ cp .kube/config.bak .kube/config
+$ kubectl config use-context default --kubeconfig=/root/.kube/config
+
+
+# 查看当前默认命名空间
+$ kubectl config get-contexts
+CURRENT   NAME      CLUSTER      AUTHINFO   NAMESPACE
+*         default   kubernetes   admin 
 ```
 
 ## 5、命名空间划分方式
@@ -3734,12 +3744,497 @@ spec:
 ```bash
 $ kubectl apply -f web-dev.yaml
 # 查看dev命名空间下内容
-$ kubectl get all
+$ kubectl get all -n dev
 # 查看nodes
-$ kubectl get nodes
+$ kubectl get nodes -n dev
 # 查看节点上可用资源
-$ kubectl describe node emon2
+$ kubectl describe node emon2 -n dev
 ```
+
+## 4、Requests&Limits的设置与安全等级
+
+- Requests==Limits：安全等级最高
+- 不设置（不建议）
+- Limits > Requests：比较可靠
+
+### 4.0、创建test命名空间用于演示
+
+```bash
+$ kubectl create ns test
+```
+
+### 4.1、创建LimitRange：限制Pod和Container的内存和CPU
+
+- 创建LimitRange
+
+```bash
+$ vim limits-test.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: test-limits
+spec:
+  limits:
+    - max:
+        cpu: 4000m
+        memory: 2Gi
+      min:
+        cpu: 100m
+        memory: 100Mi
+      maxLimitRequestRatio:
+        cpu: 3
+        memory: 2
+      type: Pod
+    - default:
+        cpu: 300m
+        memory: 200Mi
+      defaultRequest:
+        cpu: 200m
+        memory: 100Mi
+      max:
+        cpu: 2000m
+        memory: 1Gi
+      min:
+        cpu: 100m
+        memory: 100Mi
+      maxLimitRequestRatio:
+        cpu: 5
+        memory: 4
+      type: Container
+```
+
+- 应用LimitRange
+
+```bash
+$ kubectl create -f limits-test.yaml -n test
+# 查看test命名空间下的limits
+$ kubectl describe limits -n test
+Name:       test-limits
+Namespace:  test
+Type        Resource  Min    Max  Default Request  Default Limit  Max Limit/Request Ratio
+----        --------  ---    ---  ---------------  -------------  -----------------------
+Pod         memory    100Mi  2Gi  -                -              2
+Pod         cpu       100m   4    -                -              3
+Container   cpu       100m   2    200m             300m           5
+Container   memory    100Mi  1Gi  100Mi            200Mi          4
+```
+
+### 4.2、测试LimitRange
+
+- 创建一个部署
+
+```bash
+$ vim web-test.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f web-test.yaml
+# 查看dev命名空间下内容
+$ kubectl get all -n test
+# 查看部署
+$ kubectl get deploy -n test
+# 查看部署详情
+$ kubectl get deploy -n test sbt-web-demo -o yaml
+# 查看pods详情
+$ kubectl get pods -n test sbt-web-demo-756b64bb8b-pmvmd -o yaml
+```
+
+- 调整部署资源
+
+```bash
+$ vim web-test.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+        # LimitRange超过限定
+        resources:
+          requests:
+            memory: 100Mi
+            # 1核心的CPU=1000m
+            cpu: 100m
+          limits:
+            memory: 1000Mi
+            cpu: 2000m
+```
+
+- 刷新部署
+
+```bash
+$ kubectl apply -f web-test.yaml
+# 查看dev命名空间下内容
+$ kubectl get all -n test
+# 查看部署
+$ kubectl get deploy -n test
+# 查看部署状态
+$ kubectl describe deploy -n test sbt-web-demo
+# 查看部署详情：可以看到 message: 'pods "sbt-web-demo-dcc47d586-7wwbz" is forbidden: 
+$ kubectl get deploy -n test sbt-web-demo -o yaml
+# 查看pods详情
+$ kubectl get pods -n test sbt-web-demo-756b64bb8b-pmvmd -o yaml
+```
+
+
+
+### 4.3、创建ResourceQuota：限制其他资源总量
+
+#### 4.3.1、创建pod以及CPU与内存总配额
+
+- 创建pod以及CPU与内存总配额
+
+```bash
+$ vim compute-resource.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: resource-quota
+spec:
+  hard:
+    pods: 4
+    requests.cpu: 2000m
+    requests.memory: 4Gi
+    limits.cpu: 4000m
+    limits.memory: 8Gi
+```
+
+#### 4.3.2、创建其他资源总配额
+
+- 创建其他资源总配额
+
+```bash
+$ vim object-count.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+spec:
+  hard:
+    configmaps: 10
+    persistentvolumeclaims: 4
+    replicationcontrollers: 20
+    secrets: 10
+    services: 10
+```
+
+#### 4.3.3、应用与查看配额
+
+```bash
+$ kubectl apply -f compute-resource.yaml -n test
+$ kubectl apply -f object-count.yaml -n test
+
+$ kubectl get quota -n test
+NAME             AGE   REQUEST                                                                                                      LIMIT
+object-counts    77s   configmaps: 1/10, persistentvolumeclaims: 0/4, replicationcontrollers: 0/20, secrets: 1/10, services: 0/10   
+resource-quota   83s   pods: 1/4, requests.cpu: 1/2, requests.memory: 500Mi/4Gi                                                     limits.cpu: 2/4, limits.memory: 1000Mi/8Gi
+```
+
+### 4.4、测试ResourceQuota
+
+- 创建一个部署
+
+```bash
+$ vim web-test.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: test
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 100Mi
+            # 1核心的CPU=1000m
+            cpu: 100m
+          limits:
+            memory: 100Mi
+            cpu: 200m
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f web-test.yaml
+# 查看部署
+$ kubectl get deploy -n test
+# 查看部署详情
+$ kubectl get deploy -n test sbt-web-demo -o yaml
+# 查看quota
+$ kubectl describe quota resource-quota -n test
+Name:            resource-quota
+Namespace:       test
+Resource         Used    Hard
+--------         ----    ----
+limits.cpu       2600m   4
+limits.memory    1300Mi  8Gi
+pods             4       4
+requests.cpu     1300m   2
+requests.memory  800Mi   4Gi
+```
+
+## 4.5、Pod驱逐 - Eviction
+
+### 4.5.1、常见驱逐策略配置
+
+```bash
+# 如果内存小于1.5Gi且持续1m30s以上
+--eviction-soft=memory.availabel<1.5Gi
+--eviction-soft-grace-period=memory.availabel=1m30s
+# 如果内存小于100Mi或者磁盘小于1Gi或者inodes不足5%，立即驱逐
+--eviction-hard=memory.availabel<100Mi,nodefs.availabel<1Gi,nodefs.inodesFree<5%
+```
+
+- 磁盘紧缺时处理逻辑
+
+  - 删除死掉的pod、容器
+
+  - 删除没用的镜像
+  - 按优先级、资源占用情况驱逐pod
+
+- 内存紧缺
+
+  - 驱逐不可靠的pod
+  - 驱逐基本可靠的pod
+  - 驱逐可靠的pod
+
+# 九、Label
+
+## 9.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/3-label
+$ cd /root/dockerdata/deep-in-kubernetes/3-label
+```
+
+
+
+
+
+![image-20220409152210334](images/image-20220409152210334.png)
+
+
+
+## 9.1、演示标签的作用
+
+- 创建一个部署
+
+```bash
+$ vim web-dev.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      # 本 deploy只负责具有标签 app=sbt-web-demo 标签的pod
+      app: sbt-web-demo
+    matchExpressions:
+      - {key: group, operator: In, values: [dev, test]}
+  replicas: 1
+  # 本 deploy 根据如下配置创建pod
+  template:
+    metadata:
+      labels:
+        group: dev
+        app: sbt-web-demo
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        ports:
+        - containerPort: 8080
+      # 选择指定 node 部署该 pod
+      nodeSelector:
+        disktype: ssd
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  ports:
+  # service端口，即k8s中服务之间的访问端口
+  - port: 80
+    protocol: TCP
+    # pod （也就是容器）端口
+    targetPort: 8080
+  selector:
+    # 发现 app=sbt-web-demo 标签的pod
+    app: sbt-web-demo
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+  - host: sbt-dev.emon.vip
+    http:
+      paths:
+      - path: /
+        # 匹配类型：Prefix-前缀匹配，还有Exact-精确匹配
+        pathType: Prefix
+        backend:
+          service: 
+            name: sbt-web-demo
+            port:
+              number: 80
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f web-dev.yaml
+# 根据标签过滤pod
+$ kubectl get pods -l group=dev -n dev
+```
+
+# 十、健康检查——高可用的守护者
+
+## 10.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/4-health-check
+$ cd /root/dockerdata/deep-in-kubernetes/4-health-check
+```
+
+## 10.1、示例1
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-cmd.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+        - name: sbt-web-demo
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            # pod 创建10秒后检查存活探针
+            initialDelaySeconds: 10
+            # 如果探针检查失败，最大重试30次
+            failureThreshold: 30
+            successThreshold: 1
+            # 超时时间为10秒
+            timeoutSeconds: 10
+            # 两次重试间隔10秒
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 10
+```
+
+
 
 
 
@@ -3864,6 +4359,21 @@ $ kubectl get all -n kube-system
 $ kubectl get secret -n default
 # 查看deploy对应yaml详情
 $ kubectl get deploy k8s-springboot-web-demo -o yaml
+# 查看quota列表
+$ kubectl get quota -n test
+# 查看quota
+$ kubectl describe quota resource-quota -n test
+# 根据标签过滤pod
+$ kubectl get pods -l group=dev -n dev
+$ kubectl get pods -l 'group in (dev,test)' -n dev
+# 查询所有命名空间中的pods
+$ kubectl get pods -A
+# 查询所有命名空间中的svc
+$ kubectl get svc -A
+# 查询所有命名空间中的deploy
+$ kubectl get deploy -A
+# 查看当前默认命名空间
+$ kubectl config get-contexts
 ```
 
 - iptables
@@ -3872,8 +4382,6 @@ $ kubectl get deploy k8s-springboot-web-demo -o yaml
 # 可以通过 iptables-save 命令打印出当前节点的 iptables 规则
 $ iptables-save
 ```
-
-
 
 # 九十五、安装其他依赖环境
 
