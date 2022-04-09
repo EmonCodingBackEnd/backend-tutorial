@@ -3497,7 +3497,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
 ---
@@ -3691,7 +3691,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
         resources:
@@ -3849,7 +3849,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
 ```
@@ -3893,7 +3893,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
         # LimitRange超过限定
@@ -4010,7 +4010,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
         resources:
@@ -4118,7 +4118,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
         ports:
         - containerPort: 8080
       # 选择指定 node 部署该 pod
@@ -4182,12 +4182,63 @@ $ mkdir -pv /root/dockerdata/deep-in-kubernetes/4-health-check
 $ cd /root/dockerdata/deep-in-kubernetes/4-health-check
 ```
 
-## 10.1、示例1
+## 10.1、CMD方式【SpringBoot不适用】
 
 - 创建部署文件
 
 ```bash
 $ vim web-dev-cmd.yaml
+```
+
+```bash
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+        - name: sbt-web-demo
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          ports:
+            - containerPort: 8080
+          # 存活状态检查
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - ps -ef|grep java|grep -v grep
+            # pod 创建10s后启动第一次探测
+            initialDelaySeconds: 10
+            # 每隔10s启动一次探测
+            periodSeconds: 10
+            # 超时时间3s
+            timeoutSeconds: 3
+            # 成功1次即表示容器健康
+            successThreshold: 1
+            # 连续5次失败，则判定容器不健康，默认3次
+            failureThreshold: 5
+```
+
+
+
+## 10.2、HTTP方式
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-http.yaml
 ```
 
 ```yaml
@@ -4209,32 +4260,91 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409092909
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
           ports:
             - containerPort: 8080
+          # 存活状态检查
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            # pod 创建10秒后检查存活探针
+              scheme: HTTP
+            # pod 创建10s后启动第一次探测
             initialDelaySeconds: 10
-            # 如果探针检查失败，最大重试30次
-            failureThreshold: 30
-            successThreshold: 1
-            # 超时时间为10秒
-            timeoutSeconds: 10
-            # 两次重试间隔10秒
+            # 每隔10s启动一次探测
             periodSeconds: 10
+            # 超时时间3s
+            timeoutSeconds: 3
+            # 成功1次即表示容器健康
+            successThreshold: 1
+            # 连续5次失败，则判定容器不健康，默认3次
+            failureThreshold: 5
+          # 就绪状态检查
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
+			  scheme: HTTP
             initialDelaySeconds: 10
-            timeoutSeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
 ```
 
+- 部署
 
+```bash
+$ kubectl apply -f web-dev-cmd.yaml
+# 查看pods列表
+$ kubectl get pods -o wide -n dev
+# 查看pods详情：多了Liveness 和 Readiness
+$ kubectl describe pods sbt-web-demo-7cfcdddcc5-7ht6x -n dev
+```
+
+## 10.3、TCP方式【SpringBoot不适用】
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-tcp.yaml
+```
+
+```bash
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+        - name: sbt-web-demo
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          ports:
+            - containerPort: 8080
+          # 存活状态检查
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            # pod 创建10s后启动第一次探测
+            initialDelaySeconds: 10
+            # 每隔10s启动一次探测
+            periodSeconds: 10
+            # 超时时间3s
+            timeoutSeconds: 3
+            # 成功1次即表示容器健康
+            successThreshold: 1
+            # 连续5次失败，则判定容器不健康，默认3次
+            failureThreshold: 5
+```
 
 
 
