@@ -4071,18 +4071,16 @@ requests.memory  800Mi   4Gi
 
 # 九、Label
 
+![image-20220409152210334](images/image-20220409152210334.png)
+
+
+
 ## 9.0、切换目录
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/3-label
 $ cd /root/dockerdata/deep-in-kubernetes/3-label
 ```
-
-
-
-
-
-![image-20220409152210334](images/image-20220409152210334.png)
 
 
 
@@ -4346,6 +4344,207 @@ spec:
             failureThreshold: 5
 ```
 
+# 十一、Scheduler
+
+![image-20220410073524383](images/image-20220410073524383.png)
+
+## 11.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/5-scheduler
+$ cd /root/dockerdata/deep-in-kubernetes/5-scheduler
+```
+
+## 11.1、节点调度
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-node.yaml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo-node
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo-node
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo-node
+    spec:
+      containers:
+        - name: sbt-web-demo-node
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          ports:
+            - containerPort: 8080
+      # 亲和性
+      affinity:
+        # 节点亲和性
+        nodeAffinity:
+          # 必须满足
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+          # 最好满足
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: disktype
+                    operator: NotIn
+                    values:
+                      - ssd
+```
+
+- 部署
+
+```bash
+# 查看节点标签详情：发现emon2具有 disktype=ssd 标签
+$ kubectl get node --show-labels
+NAME    STATUS   ROLES    AGE     VERSION   LABELS
+emon2   Ready    <none>   4d19h   v1.20.2   app=ingress,beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=emon2,kubernetes.io/os=linux
+emon3   Ready    <none>   4d19h   v1.20.2   app=ingress,beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=emon3,kubernetes.io/os=linux
+
+$ kubectl apply -f web-dev-node.yaml
+# 查看pod部署到的节点：发现pod部署到了emon3节点
+$ kubectl get pods -o wide -n dev
+# 命令行输出结果
+NAME                                 READY   STATUS    RESTARTS   AGE     IP              NODE    NOMINATED NODE   READINESS GATES
+sbt-web-demo-node-74bdc75d4f-mhrfw   1/1     Running   0          1s      10.200.161.23   emon3   <none>           <none>
+```
+
+## 11.2、pod调度
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-pod.yaml
+```
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo-pod
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo-pod
+    spec:
+      containers:
+        - name: sbt-web-demo-pod
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          ports:
+            - containerPort: 8080
+      # 亲和性
+      affinity:
+        # pod亲和性：podAntiAffinity-反亲和性
+        podAffinity:
+          # 必须满足：这个pod和app=sbt-web-demo的pod运行在同一个节点上
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - sbt-web-demo
+              topologyKey: kubernetes.io/hostname
+          # 最好满足
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - sbt-web-demo-node
+                topologyKey: kubernetes.io/hostname
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f web-dev-pod.yaml
+# 查看pod部署到的节点：发现pod部署到了emon2节点，因为sbt-web-demo这个pod也在emon2节点
+$ kubectl get pods -o wide -n dev
+# 命令行输出结果
+NAME                                 READY   STATUS    RESTARTS   AGE   IP              NODE    NOMINATED NODE   READINESS GATES
+sbt-web-demo-7cfcdddcc5-ll89j        1/1     Running   0          8h    10.200.108.73   emon2   <none>           <none>
+sbt-web-demo-node-74bdc75d4f-srf9f   1/1     Running   0          6m    10.200.161.24   emon3   <none>           <none>
+sbt-web-demo-pod-cd78fb5cf-sglbj     1/1     Running   0          3s    10.200.108.75   emon2   <none>           <none>
+```
+
+## 11.3、taint调度（污点）
+
+- 创建部署文件
+
+```bash
+$ vim web-dev-taint.yaml
+```
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo-taint
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo-taint
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo-taint
+    spec:
+      containers:
+        - name: sbt-web-demo-taint
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          ports:
+            - containerPort: 8080
+      tolerations:
+        - key: "gpu"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+```
+
+
+
+- 部署
+
+```bash
+# 添加节点的污点：NoSchedule-不要调度；PreferNoSchedule-最好不要调度；NoExecute-不要调度，并驱逐该节点上的pod
+$ kubectl taint nodes emon3 gpu=true:NoSchedule
+
+$ kubectl apply -f web-dev-taint.yaml
+# 查看pod部署到的节点：虽然emon3有污点，但副本2个pod，还是上了emon3了，对其选择了容忍
+$ kubectl get pods -o wide -n dev
+$  kubectl get pods -o wide -n dev
+NAME                                  READY   STATUS    RESTARTS   AGE     IP              NODE    NOMINATED NODE   READINESS GATES
+sbt-web-demo-taint-7d69cf4fff-pq8pf   1/1     Running   0          5s      10.200.108.83   emon2   <none>           <none>
+sbt-web-demo-taint-7d69cf4fff-t95cx   1/1     Running   0          5s      10.200.161.33   emon3   <none>           <none>
+```
+
 
 
 # 九十、Containerd全面上手实践
@@ -4426,8 +4625,10 @@ $ kubectl get deployment -n ingress-nginx
 
 # 取得确认对象的详细信息
 $ kubectl describe < xxx > < xxx >
-# 列出node详细信息
+# 描述node详细信息
 $ kubectl describe node emon2
+# 获取node对应yaml详情
+$ kubectl get node emon2 -o yaml
 # 列出某一个pod详细信息：-n指定命名空间
 $ kubectl describe pod ingress-nginx-admission-patch-kpnds -n ingress-nginx
 # 列出某一个deployment详细信息
@@ -4484,6 +4685,13 @@ $ kubectl get svc -A
 $ kubectl get deploy -A
 # 查看当前默认命名空间
 $ kubectl config get-contexts
+
+# 添加节点的污点：NoSchedule-不要调度；PreferNoSchedule-最好不要调度；NoExecute-不要调度，并驱逐该节点上的pod
+$ kubectl taint nodes emon3 gpu=true:NoSchedule
+# 查看污点
+$ kubectl describe nodes emon3
+# 删除污点
+$ kubectl taint nodes emon3 gpu=true:NoSchedule-
 ```
 
 - iptables
