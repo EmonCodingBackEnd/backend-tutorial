@@ -4998,6 +4998,139 @@ $ kubectl get pods -o wide
 
 # 十四、深入Ingress-Nginx
 
+# 14.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
+$ cd /root/dockerdata/deep-in-kubernetes/8-ingress
+```
+
+## 14.1、Ingress-Nginx使用优化
+
+- nginx-ingress-controller的部署方式
+- 四层代理服务发现
+- 定制配置
+- Https证书
+- 访问控制
+
+## 14.2、调整为DaemonSet
+
+- 调整nginx-ingress-controller.yaml
+
+```bash
+# 主要调整两点：
+# 第一点	kind: Deployment ==> kind: DaemonSet
+# 第二点	去掉 replicas: 1
+$ vim nginx-ingress-controller.yaml
+```
+
+```bash
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+      nodeSelector:
+        app: ingress
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.19.0
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            # www-data -> 33
+            runAsUser: 33
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+
+---
+```
+
+- 部署
+
+```bash
+# 查询deploy
+$ kubectl get deploy -n ingress-nginx
+# 删除deploy
+$ kubectl delete deploy nginx-ingress-controller -n ingress-nginx
+# 应用调整
+$ kubectl apply -f nginx-ingress-controller.yaml
+
+# 查看deploy的部署信息
+$ kubectl get ds -n ingress-nginx
+# 查看pods
+$ kubectl get pods -n ingress-nginx -o wide
+# 获取 ConfigMap 配置列表
+$ kubectl get cm -n ingress-nginx
+# 获取 ConfigMap 配置详情数据
+$ kubectl get cm -n ingress-nginx tcp-services
+```
+
+
+
+
+
 
 
 
@@ -5150,6 +5283,13 @@ $ kubectl taint nodes emon3 gpu=true:NoSchedule-
 
 # 重新部署
 $ kubectl replace --force -f course-service.yaml
+
+# 查看deploy的部署信息
+$ kubectl get ds -n ingress-nginx
+# 获取 ConfigMap 配置列表
+$ kubectl get cm -n ingress-nginx
+# 获取 ConfigMap 配置详情数据
+$ kubectl get cm -n ingress-nginx tcp-services
 ```
 
 - iptables
