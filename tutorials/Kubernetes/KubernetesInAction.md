@@ -3497,7 +3497,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
 ---
@@ -3691,7 +3691,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         resources:
@@ -3849,7 +3849,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
 ```
@@ -3893,7 +3893,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         # LimitRange超过限定
@@ -4010,7 +4010,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         resources:
@@ -4116,7 +4116,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
       # 选择指定 node 部署该 pod
@@ -4207,7 +4207,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # 存活状态检查
@@ -4258,7 +4258,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # 存活状态检查
@@ -4325,7 +4325,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # 存活状态检查
@@ -4381,7 +4381,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-node
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       # 亲和性
@@ -4450,7 +4450,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-pod
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       # 亲和性
@@ -4518,7 +4518,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-taint
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:20220409230509
+          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       tolerations:
@@ -4527,8 +4527,6 @@ spec:
           value: "true"
           effect: "NoSchedule"
 ```
-
-
 
 - 部署
 
@@ -4544,6 +4542,463 @@ NAME                                  READY   STATUS    RESTARTS   AGE     IP   
 sbt-web-demo-taint-7d69cf4fff-pq8pf   1/1     Running   0          5s      10.200.108.83   emon2   <none>           <none>
 sbt-web-demo-taint-7d69cf4fff-t95cx   1/1     Running   0          5s      10.200.161.33   emon3   <none>           <none>
 ```
+
+# 十二、部署策略实践
+
+## 12.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/6-deployment
+$ cd /root/dockerdata/deep-in-kubernetes/6-deployment
+```
+
+## 12.1、滚动部署RollingUpdate：滚动更新【默认方式】
+
+- 创建部署文件
+
+```bash
+$ vim web-rollingupdate.yaml
+```
+
+```bash
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-rollingupdate
+  namespace: dev
+spec:
+  strategy: # 默认策略是RollingUpdate，滚动配置是 maxSurge:25%和 maxUnavailable:25%
+    rollingUpdate:
+      # 最大超出服务实例数的百分比，如果有4个服务，25%表示最多只能超出1个示例；也可以设设置为数字，比如1表示最多1个超出
+      maxSurge: 25%
+      # 最大不可用服务实例数的百分比，如果有4个服务，至少有3个是可用的
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: sbt-web-rollingupdate
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: sbt-web-rollingupdate
+    spec:
+      containers:
+        - name: sbt-web-rollingupdate
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: 1024Mi
+              cpu: 500m
+            limits:
+              memory: 2048Mi
+              cpu: 2000m
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /hello?name=test
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 1
+            successThreshold: 1
+            timeoutSeconds: 5
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-rollingupdate
+  namespace: dev
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: sbt-web-rollingupdate
+  type: ClusterIP
+
+---
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-rollingupdate
+  namespace: dev
+spec:
+  rules:
+    - host: sbt-web-rollingupdate.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-rollingupdate
+                port:
+                  number: 80
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-web-rollingupdate.emon.vip/hello?name=emon
+```bash
+$ kubectl apply -f web-rollingupdate.yaml
+# 查看pods
+$ kubectl get pods -o wide -n dev
+# 暂停发布
+$ kubectl rollout pause deploy sbt-web-rollingupdate -n dev
+# 恢复发布
+$ kubectl rollout resume deploy sbt-web-rollingupdate -n dev
+# 回滚发布
+$ kubectl rollout undo deploy sbt-web-rollingupdate -n dev
+```
+
+## 12.2、重建部署Recreate【使用场景不多】
+
+- 创建部署文件
+
+```bash
+$ vim web-recreate.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-recreate
+  namespace: dev
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sbt-web-recreate
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: sbt-web-recreate
+    spec:
+      containers:
+        - name: sbt-web-recreate
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
+          ports:
+            - containerPort: 8080
+          # 存活状态检查
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            # pod 创建10s后启动第一次探测
+            initialDelaySeconds: 10
+            # 每隔10s启动一次探测
+            periodSeconds: 10
+            # 超时时间3s
+            timeoutSeconds: 3
+            # 成功1次即表示容器健康
+            successThreshold: 1
+            # 连续5次失败，则判定容器不健康，默认3次
+            failureThreshold: 5
+          # 就绪状态检查
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+			  scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-recreate
+  namespace: dev
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: sbt-web-recreate
+  type: ClusterIP
+
+---
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-recreate
+  namespace: dev
+spec:
+  rules:
+    - host: sbt-web-recreate.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-recreate
+                port:
+                  number: 80
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-web-recreate.emon.vip/hello?name=emon
+
+```bash
+$ kubectl apply -f web-recreate.yaml
+# 查看pods
+$ kubectl get pods -o wide -n dev
+```
+
+## 12.3、蓝绿部署
+
+### 12.3.1、部署V1版本
+
+- 创建部署文件
+
+```bash
+$ vim web-bluegreen.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-bluegreen-v1.0
+  namespace: dev
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: sbt-web-bluegreen
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: sbt-web-bluegreen
+        version: v1.0
+    spec:
+      containers:
+        - name: sbt-web-bluegreen
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: 1024Mi
+              cpu: 500m
+            limits:
+              memory: 2048Mi
+              cpu: 2000m
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /hello?name=test
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 1
+            successThreshold: 1
+            timeoutSeconds: 5
+```
+
+- 创建service文件
+
+```bash
+$ vim bluegreen-service.yaml
+```
+
+```yaml
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-bluegreen
+  namespace: dev
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: sbt-web-bluegreen
+    version: v1.0
+  type: ClusterIP
+
+---
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-bluegreen
+  namespace: dev
+spec:
+  rules:
+    - host: sbt-web-bluegreen.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-bluegreen
+                port:
+                  number: 80
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-web-bluegreen.emon.vip/hello?name=emon
+```bash
+$ kubectl apply -f web-bluegreen.yaml
+$ kubectl apply -f bluegreen-service.yaml
+```
+
+### 12.3.2、部署V2版本
+
+- 调整部署文件
+
+```bash
+# 修改V1版本几处地方
+$ vim web-bluegreen.yaml
+```
+
+```bash
+# 第一处：Deployment名称
+name: sbt-web-bluegreen-v1.0 
+==> 
+name: sbt-web-bluegreen-v2.0
+# 第二次：Pod标签
+version: v2.0
+# 第三次：镜像版本
+image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+==>
+image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+```
+
+- 调整service文件
+
+```bash
+# 修改V1版本几处地方
+$ vim bluegreen-service.yaml
+```
+
+```bash
+# 第一处：匹配的pod版本
+version: v1.0
+==>
+version: v2.0
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-web-bluegreen.emon.vip/hello?name=emon
+
+```bash
+$ kubectl apply -f web-bluegreen.yaml
+$ kubectl apply -f bluegreen-service.yaml
+```
+
+## 12.4、金丝雀
+
+在蓝绿部署基础上，调整service文件，去掉version: v2.0标签，重新发布service，得到的结果就是金丝雀发布！！！
+
+# 十三、深入Pod【未完待续】
+
+## 13.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/7-pod
+$ cd /root/dockerdata/deep-in-kubernetes/7-pod
+```
+
+## 13.1、设计思想
+
+- Pod是最小调度单位
+- 本质还是容器的隔离
+- Pause容器
+
+# 13.2、network
+
+- 创建部署文件
+
+```bash
+$ vim pod-network.yaml
+```
+
+```yaml
+ apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-network
+spec:
+  containers:
+    - name: sbt-v1
+      image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+      ports:
+        - containerPort: 8080
+    - name: sbt-v2
+      image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+      args: [ "--server.port=8081" ]
+      ports:
+        - containerPort: 8081
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f pod-network.yaml
+$ kubectl get pods -o wide
+```
+
+# 十四、深入Ingress-Nginx
+
+
 
 
 
@@ -4692,6 +5147,9 @@ $ kubectl taint nodes emon3 gpu=true:NoSchedule
 $ kubectl describe nodes emon3
 # 删除污点
 $ kubectl taint nodes emon3 gpu=true:NoSchedule-
+
+# 重新部署
+$ kubectl replace --force -f course-service.yaml
 ```
 
 - iptables
