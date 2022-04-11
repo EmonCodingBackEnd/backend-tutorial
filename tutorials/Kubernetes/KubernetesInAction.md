@@ -3497,7 +3497,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
         ports:
         - containerPort: 8080
 ---
@@ -5005,33 +5005,365 @@ $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress
 ```
 
-## 14.1、导出 nginx-ingress-controller.yaml
+## 14.1、重新安装Ingress-Nginx（调整Ingress-Nginx）
+
+安装方式：DaemonSet
+
+安装版本：0.23.0
+
+- 安装之前删除旧的Ingress-Nginx
 
 ```bash
-# 导出 nginx-ingress-controller 的yaml描述文件
-$ kubectl get ds nginx-ingress-controller -n ingress-nginx -o yaml > nginx-ingress-controller.yaml
+# 【重点】请先删除mandatory.yaml对应的资源
+$ kubectl delete apply -d mandatory.yaml
 ```
 
-## 14.2、调整Ingress-Nginx部署为DaemonSet
-
-- 调整nginx-ingress-controller.yaml
+- 调整mandatory.yaml
 
 ```bash
-# 主要调整两点：
-# 第一点	kind: Deployment ==> kind: DaemonSet
-# 第二点	去掉 replicas: 1
-$ vim nginx-ingress-controller.yaml
+# 然后基于第六章，调整2处
+$ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-http-backend
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-http-backend
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-http-backend
+        app.kubernetes.io/part-of: ingress-nginx
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: default-http-backend
+          # Any image is permissible as long as:
+          # 1. It serves a 404 page at /
+          # 2. It serves 200 on a /healthz endpoint
+          image: k8s.gcr.io/defaultbackend-amd64:1.5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 10m
+              memory: 20Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-clusterrole
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - nodes
+      - pods
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nginx-ingress-role
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+      - secrets
+      - namespaces
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      # Defaults to "<election-id>-<ingress-class>"
+      # Here: "<ingress-controller-leader>-<nginx>"
+      # This has to be adapted if you change either parameter
+      # when launching the nginx-ingress-controller.
+      - "ingress-controller-leader-nginx"
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nginx-ingress-role-nisa-binding
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nginx-ingress-role
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-clusterrole-nisa-binding
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+# 第一处：调整 Deployment ==> DaemonSet
+kind: DaemonSet
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+      nodeSelector:
+        app: ingress
+      containers:
+        - name: nginx-ingress-controller
+          # 第二处：调整 0.19.0 ==> 0.23.0
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            # www-data -> 33
+            runAsUser: 33
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+
+---
 ```
 
 - 部署
 
 ```bash
-# 查询deploy
-$ kubectl get deploy -n ingress-nginx
-# 删除deploy
-$ kubectl delete deploy nginx-ingress-controller -n ingress-nginx
-# 应用调整
-$ kubectl apply -f nginx-ingress-controller.yaml
+$  kubectl apply -f mandatory.yaml
 
 # 查看deploy的部署信息
 $ kubectl get ds -n ingress-nginx
@@ -5052,7 +5384,7 @@ $ kubectl get cm -n ingress-nginx tcp-services
 $ kubectl get cm -n ingress-nginx tcp-services -o yaml
 ```
 
-## 14.3、四层代理(对应cm=tcp-services）
+## 14.2、四层代理(对应cm=tcp-services）
 
 - 创建部署文件
 
@@ -5097,7 +5429,9 @@ $ crictl exec -it <containerId> /bin/bash
 www-data@emon3:/etc/nginx$ more /etc/nginx/nginx.conf
 ```
 
-## 14.4、基本专属配置演示(对应cm=nginx-configuration）
+## 14.3、Ingress-Nginx配置文件
+
+### 14.3.1、基本专属配置演示
 
 - 创建部署文件
 
@@ -5128,7 +5462,7 @@ data:
 $ kubectl apply -f nginx-config.yaml
 ```
 
-## 14.5、全局配置(对应cm=nginx-configuration）
+### 14.3.2、全局配置
 
 - 创建部署文件
 
@@ -5166,7 +5500,7 @@ metadata:
 $ kubectl apply -f custom-header-global.yaml
 ```
 
-## 14.6、专属配置(对应cm=nginx-configuration）
+### 14.3.3、专属配置
 
 - 创建部署文件
 
@@ -5205,28 +5539,295 @@ spec:
 $ kubectl apply -f custom-header-spec-ingress.yaml
 ```
 
-## 14.7、调整Ingress-Nginx部署为外部nginx.tmpl
+### 14.3.4、自定义Nginx模板（调整Ingress-Nginx）
 
 参考：https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/custom-template/
 
-- 调整nginx-ingress-controller.yaml
+- 调整mandatory.yaml
 
 ```bash
-# 按照官方文档，增加 volumeMounts 和 volumes 元素
-# 第一处	搜索 - --annotations-prefix=nginx.ingress.kubernetes.io 内容，在该内容下添加 volumeMounts
-# 第二处	搜索 terminationGracePeriodSeconds: 30 内容，在该内容下添加 volumes
-$ vim nginx-ingress-controller.yaml
+# 然后基于 14.1 ，调整2处
+$ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
 ```
 
 ```yaml
-# 第一处调整结果
-        - --annotations-prefix=nginx.ingress.kubernetes.io
-        volumeMounts:
-          - mountPath: /etc/nginx/template
-            name: nginx-template-volume
-            readOnly: true
-# 第二处调整结果
-      terminationGracePeriodSeconds: 30
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-http-backend
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-http-backend
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-http-backend
+        app.kubernetes.io/part-of: ingress-nginx
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: default-http-backend
+          # Any image is permissible as long as:
+          # 1. It serves a 404 page at /
+          # 2. It serves 200 on a /healthz endpoint
+          image: k8s.gcr.io/defaultbackend-amd64:1.5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 10m
+              memory: 20Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-clusterrole
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - nodes
+      - pods
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nginx-ingress-role
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+      - secrets
+      - namespaces
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      # Defaults to "<election-id>-<ingress-class>"
+      # Here: "<ingress-controller-leader>-<nginx>"
+      # This has to be adapted if you change either parameter
+      # when launching the nginx-ingress-controller.
+      - "ingress-controller-leader-nginx"
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nginx-ingress-role-nisa-binding
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nginx-ingress-role
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-clusterrole-nisa-binding
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+      nodeSelector:
+        app: ingress
+	  # 第一处：调整 Deployment ==> DaemonSet
       volumes:
         - name: nginx-template-volume
           configMap:
@@ -5234,13 +5835,78 @@ $ vim nginx-ingress-controller.yaml
             items:
             - key: nginx.tmpl
               path: nginx.tmpl
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
+          # 第二处：增加 volumeMounts
+          volumeMounts:
+            - mountPath: /etc/nginx/template
+              name: nginx-template-volume
+              readOnly: true
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            # www-data -> 33
+            runAsUser: 33
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+
+---
 ```
 
 - 部署之前先创建ConfigMap
 
 ```bash
+# 查看 nginx-ingress-controller 的pods
+$ kubectl get pods -n ingress-nginx|grep nginx-ingress-controller
+# 命令行输出结果
+nginx-ingress-controller-68tms          1/1     Running   0          49m
+
 # 从容器中拷贝出或向容器拷贝入文件
-$ kubectl cp nginx-ingress-controller-82mlt:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
+$ kubectl cp nginx-ingress-controller-68tms:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
+
 # 创建ConfigMap
 $ kubectl create cm nginx-template --from-file nginx.tmpl -n ingress-nginx
 # 查看ConfigMap
@@ -5252,20 +5918,12 @@ $ kubectl get cm -n ingress-nginx nginx-template -o yaml
 - 部署
 
 ```bash
-# 应用调整
-$ kubectl apply -f nginx-ingress-controller.yaml
-
+# 使调整生效
+$ kubectl apply -f mandatory.yaml
 # 查看deploy的部署信息
 $ kubectl get ds -n ingress-nginx
 # 查看pods
 $ kubectl get pods -n ingress-nginx -o wide
-
-# 获取 ConfigMap 配置列表
-$ kubectl get cm -n ingress-nginx
-# 获取 ConfigMap 配置数据情况
-$ kubectl get cm -n ingress-nginx nginx-template
-# 获取 ConfigMap 配置数据情况，yaml格式
-$ kubectl get cm -n ingress-nginx nginx-template -o yaml
 
 # 修改 ConfigMap 配置
 $ kubectl edit cm -n ingress-nginx nginx-template
@@ -5273,21 +5931,25 @@ $ kubectl edit cm -n ingress-nginx nginx-template
 
 # 查找 nginx-ingress-controller 这个pods，并进入该容器
 $ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
-$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
-# 在容器内查看 types_hash_max_size 的值是否正确
+# 命令行输出结果
+nginx-ingress-controller-mswq2          1/1     Running   0          96s
+
+# 进入容器查看
+$ kubectl exec -it nginx-ingress-controller-mswq2 -n ingress-nginx -- bash
+# 在容器内查看 types_hash_max_size 的值是否正确：验证得到4096，但宿主机的nginx.tmpl不变，切记！区分！
 www-data@emon3:/etc/nginx$ more /etc/nginx/template/nginx.tmpl 
 ```
 
-## 14.8、Https证书：配置tls
+## 14.4、Https证书：配置tls（调整Ingress-Nginx）
 
-### 14.8.0、切换目录
+### 14.4.0、切换目录
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/tls
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/tls
 ```
 
-### 14.8.1、配置tls与验证
+### 14.4.1、配置tls与验证
 
 - 生成证书
 
@@ -5305,28 +5967,17 @@ $ kubectl get secret emon-tls -n dev
 $ kubectl get secret emon-tls -o yaml -n dev
 ```
 
-- 配置证书，调整nginx-ingress-controller.yaml
+- 配置证书，调整mandatory.yaml
 
 ```bash
-# 查找 nginx-ingress-controller 这个pods，并进入该容器
-$ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
-$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
-# 在容器内，查看nginx-ingress-controller的使用帮助，找到如何配置证书
-www-data@emon3:/etc/nginx$ /nginx-ingress-controller --help
-
-# =====开始调整=====
-# 第一处	搜索 - --annotations-prefix=nginx.ingress.kubernetes.io 内容，在该内容下添加 volumeMounts
-$ vim ../nginx-ingress-controller.yaml
+# 然后基于 14.3.4 ，调整1处
+$ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
 ```
 
 ```yaml
 # 第一处调整结果：指定证书
-		- --annotations-prefix=nginx.ingress.kubernetes.io
-        - --default-ssl-certificate=dev/emon-tls
-        volumeMounts:
-          - mountPath: /etc/nginx/template
-            name: nginx-template-volume
-            readOnly: true
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --default-ssl-certificate=dev/emon-tls
 ```
 
 - 配置Ingress
@@ -5378,16 +6029,16 @@ $ kubectl get ds -n ingress-nginx
 $ kubectl get pods -n ingress-nginx -o wide
 ```
 
-## 14.9、Session保持
+## 14.5、Session保持
 
-### 14.9.0、切换目录
+### 14.5.0、切换目录
 
 ```bash
-$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
-$ cd /root/dockerdata/deep-in-kubernetes/8-ingress
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/session
+$ cd /root/dockerdata/deep-in-kubernetes/8-ingress/session
 ```
 
-### 14.9.1、多版本环境准备
+### 14.5.1、多版本环境准备
 
 目标：一个域名访问的pods有多种，得到的结果也有多种！！！
 
@@ -5502,7 +6153,7 @@ $ kubectl get deploy sbt-web-demo -o yaml -n dev
 由于两台服务版本不一致，访问时会反复出现不同的内容：
 https://sbt-dev.emon.vip/hello?name=emon
 
-### 14.9.2、如何让session保持？
+### 14.5.2、如何让session保持？
 
 - 创建Ingress文件
 
@@ -5550,19 +6201,51 @@ https://sbt-dev.emon.vip/hello?name=emon
 $ kubectl apply -f ingress-session.yaml
 ```
 
-## 14.10、流量控制
+## 14.6、流量控制
 
-### 14.10.0、切换目录
+### 14.6.0、切换目录
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 ```
 
-### 14.10.1、更新nginx-ingress-controller到0.23.0版本
+### 14.6.1、闪闪
+
+- 部署
 
 ```bash
+# 删除nginx-ingress-controller
+$ kubectl delete -f ../nginx-ingress-controller.yaml
+# 应用调整
+$ kubectl apply -f ../nginx-ingress-controller.yaml
+
+# 查看deploy的部署信息
+$ kubectl get ds -n ingress-nginx
+# 查看pods
+$ kubectl get pods -n ingress-nginx -o wide
+
+# 获取 ConfigMap 配置列表
+$ kubectl get cm -n ingress-nginx
+# 获取 ConfigMap 配置数据情况
+$ kubectl get cm -n ingress-nginx nginx-template
+# 获取 ConfigMap 配置数据情况，yaml格式
+$ kubectl get cm -n ingress-nginx nginx-template -o yaml
+
+# 修改 ConfigMap 配置
+$ kubectl edit cm -n ingress-nginx nginx-template
+# 搜索并调整 types_hash_max_size 的值为 4096
+
+# 查找 nginx-ingress-controller 这个pods，并进入该容器
+$ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
+$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
+# 在容器内查看 types_hash_max_size 的值是否正确
+www-data@emon3:/etc/nginx$ more /etc/nginx/template/nginx.tmpl 
 ```
+
+
+
+
 
 
 
@@ -5728,8 +6411,11 @@ $ kubectl taint nodes emon3 gpu=true:NoSchedule-
 # 重新部署
 $ kubectl replace --force -f course-service.yaml
 
-# 查看deploy的部署信息
+# 查看 DaemonSet 部署列表
 $ kubectl get ds -n ingress-nginx
+# 导出 nginx-ingress-controller 的yaml描述文件
+$ kubectl get ds -n ingress-nginx nginx-ingress-controller -o yaml > nginx-ingress-controller.yaml
+
 # 获取 ConfigMap 配置列表
 $ kubectl get cm -n ingress-nginx
 # 获取 ConfigMap 配置数据情况
