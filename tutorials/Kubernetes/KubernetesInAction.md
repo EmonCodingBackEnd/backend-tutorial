@@ -6210,48 +6210,374 @@ $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 ```
 
-### 14.6.1、闪闪
+### 14.6.1、限流环境准备
+
+- 创建canary命名空间
+
+```bash
+$ kubectl create ns canary
+```
+
+- 创建部署文件A
+
+```bash
+$ vim web-canary-a.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-canary-a
+  namespace: canary
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: web-canary-a
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-canary-a
+    spec:
+      containers:
+        - name: web-canary-a
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /hello?name=test
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 1
+            successThreshold: 1
+            timeoutSeconds: 5
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-canary-a
+  namespace: canary
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: web-canary-a
+  type: ClusterIP
+```
+
+- 部署A
+
+```bash
+$ kubectl apply -f web-canary-a.yaml
+```
+
+- 创建部署文件B
+
+```bash
+$ vim web-canary-b.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-canary-b
+  namespace: canary
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: web-canary-b
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-canary-b
+    spec:
+      containers:
+        - name: web-canary-b
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /hello?name=test
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 1
+            successThreshold: 1
+            timeoutSeconds: 5
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-canary-b
+  namespace: canary
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: web-canary-b
+  type: ClusterIP
+```
+
+- 部署B
+
+```yaml
+$ kubectl apply -f web-canary-b.yaml
+```
+
+### 14.6.2、ingress-common.yaml
+
+- 创建部署文件
+
+```bash
+$ vim ingress-common.yaml
+```
+
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-canary-a
+  namespace: canary
+spec:
+  rules:
+    - host: canary.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-canary-a
+                port:
+                  number: 80
+```
 
 - 部署
 
+部署成功后，访问：全部是v1.0版本的应答
+
+https://sbt-dev.emon.vip/hello?name=emon
+
 ```bash
-# 删除nginx-ingress-controller
-$ kubectl delete -f ../nginx-ingress-controller.yaml
-# 应用调整
-$ kubectl apply -f ../nginx-ingress-controller.yaml
-
-# 查看deploy的部署信息
-$ kubectl get ds -n ingress-nginx
-# 查看pods
-$ kubectl get pods -n ingress-nginx -o wide
-
-# 获取 ConfigMap 配置列表
-$ kubectl get cm -n ingress-nginx
-# 获取 ConfigMap 配置数据情况
-$ kubectl get cm -n ingress-nginx nginx-template
-# 获取 ConfigMap 配置数据情况，yaml格式
-$ kubectl get cm -n ingress-nginx nginx-template -o yaml
-
-# 修改 ConfigMap 配置
-$ kubectl edit cm -n ingress-nginx nginx-template
-# 搜索并调整 types_hash_max_size 的值为 4096
-
-# 查找 nginx-ingress-controller 这个pods，并进入该容器
-$ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
-$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
-# 在容器内查看 types_hash_max_size 的值是否正确
-www-data@emon3:/etc/nginx$ more /etc/nginx/template/nginx.tmpl 
+$ kubectl apply -f ingress-common.yaml
 ```
 
+### 14.6.3、分流Ingress：ingress-weight.yaml
 
+- 创建部署文件
 
+```bash
+$ vim ingress-common.yaml
+```
 
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-canary-b
+  namespace: canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "90"
+spec:
+  rules:
+    - host: canary.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-canary-b
+                port:
+                  number: 80
+```
 
+- 部署
 
+部署成功后，访问：发现有大概率是v2.0版本的应答
 
+https://sbt-dev.emon.vip/hello?name=emon
 
+```bash
+$ kubectl apply -f ingress-common.yaml
+```
 
+### 14.6.4、定向流量控制：ingress-cookie.yaml
 
+- 创建部署文件
+
+```bash
+$ vim ingress-cookie.yaml
+```
+
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-canary-b
+  namespace: canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-by-cookie: "web-canary"
+spec:
+  rules:
+    - host: canary.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-canary-b
+                port:
+                  number: 80
+```
+
+- 部署
+
+部署成功后，访问：未设置cookies时应答v1.0，设置cookie信息web-canary=always后，应答v2.0
+
+https://sbt-dev.emon.vip/hello?name=emon
+
+```bash
+$ kubectl apply -f ingress-cookie.yaml
+```
+
+### 14.6.5、定向流量控制：ingress-header.yaml
+
+- 创建部署文件
+
+```bash
+$ vim ingress-header.yaml
+```
+
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-canary-b
+  namespace: canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-by-header: "web-canary"
+spec:
+  rules:
+    - host: canary.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-canary-b
+                port:
+                  number: 80
+
+```
+
+- 部署
+
+部署成功后，访问：未设置cookies时应答v1.0，设置header信息web-canary=always后，应答v2.0
+
+`curl -H 'web-canary:always' http://canary.emon.vip/hello?name=emon`
+
+```bash
+$ kubectl apply -f ingress-header.yaml
+```
+
+### 14.6.6、定向流量控制：ingress-compose.yaml
+
+- 创建部署文件
+
+```bash
+$ vim  ingress-compose.yaml
+```
+
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-canary-b
+  namespace: canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-by-header: "web-canary"
+    nginx.ingress.kubernetes.io/canary-by-cookie: "web-canary"
+    nginx.ingress.kubernetes.io/canary-weight: "90"
+spec:
+  rules:
+    - host: canary.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-canary-b
+                port:
+                  number: 80
+```
+
+- 部署
+
+控制优先级：header>cookie>权重
+
+```bash
+$ kubectl apply -f ingress-compose.yaml
+```
 
 # 九十、Containerd全面上手实践
 
