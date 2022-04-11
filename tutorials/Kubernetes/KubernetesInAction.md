@@ -4998,22 +4998,21 @@ $ kubectl get pods -o wide
 
 # 十四、深入Ingress-Nginx
 
-# 14.0、切换目录
+## 14.0、切换目录
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress
 ```
 
-## 14.1、Ingress-Nginx使用优化
+## 14.1、导出 nginx-ingress-controller.yaml
 
-- nginx-ingress-controller的部署方式
-- 四层代理服务发现
-- 定制配置
-- Https证书
-- 访问控制
+```bash
+# 导出 nginx-ingress-controller 的yaml描述文件
+$ kubectl get ds nginx-ingress-controller -n ingress-nginx -o yaml > nginx-ingress-controller.yaml
+```
 
-## 14.2、调整为DaemonSet
+## 14.2、调整Ingress-Nginx部署为DaemonSet
 
 - 调整nginx-ingress-controller.yaml
 
@@ -5022,89 +5021,6 @@ $ cd /root/dockerdata/deep-in-kubernetes/8-ingress
 # 第一点	kind: Deployment ==> kind: DaemonSet
 # 第二点	去掉 replicas: 1
 $ vim nginx-ingress-controller.yaml
-```
-
-```bash
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: nginx-ingress-controller
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: ingress-nginx
-      app.kubernetes.io/part-of: ingress-nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: ingress-nginx
-        app.kubernetes.io/part-of: ingress-nginx
-      annotations:
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-    spec:
-      serviceAccountName: nginx-ingress-serviceaccount
-      hostNetwork: true
-      nodeSelector:
-        app: ingress
-      containers:
-        - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.19.0
-          args:
-            - /nginx-ingress-controller
-            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
-            - --configmap=$(POD_NAMESPACE)/nginx-configuration
-            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
-            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
-            - --annotations-prefix=nginx.ingress.kubernetes.io
-          securityContext:
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - NET_BIND_SERVICE
-            # www-data -> 33
-            runAsUser: 33
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - name: http
-              containerPort: 80
-            - name: https
-              containerPort: 443
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-
----
 ```
 
 - 部署
@@ -5123,11 +5039,530 @@ $ kubectl get ds -n ingress-nginx
 $ kubectl get pods -n ingress-nginx -o wide
 # 获取 ConfigMap 配置列表
 $ kubectl get cm -n ingress-nginx
-# 获取 ConfigMap 配置详情数据
+# 命令行输出结果
+NAME                              DATA   AGE
+ingress-controller-leader-nginx   0      3d21h
+kube-root-ca.crt                  1      3d21h
+nginx-configuration               0      3d21h
+tcp-services                      1      3d21h
+udp-services                      0      3d21h
+# 获取 ConfigMap 配置数据情况
 $ kubectl get cm -n ingress-nginx tcp-services
+# 获取 ConfigMap 配置数据情况，yaml格式
+$ kubectl get cm -n ingress-nginx tcp-services -o yaml
 ```
 
+## 14.3、四层代理(对应cm=tcp-services）
 
+- 创建部署文件
+
+```bash
+$ vim tcp-config.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+# 配置要暴露四层代理的服务  
+data:
+  "30000": dev/sbt-web-demo:80
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+http://sbt-web-bluegreen.emon.vip/hello?name=emon
+
+http://sbt-web-bluegreen.emon.vip:30000/hello?name=emon
+
+```bash
+# =====在master节点所在服务器=====
+$ kubectl apply -f tcp-config.yaml
+# 查看服务的yaml详情
+$ kubectl get svc -n dev sbt-web-demo -o yaml
+
+# =====在 nginx-ingress-controller 节点所在服务器=====
+# 查看 nginx-ingress-controller 所在服务器是否有30000端口暴露出来
+$ netstat -tnlp|grep 30000
+
+# 查看 nginx-ingress-controller 容器ID
+$ crictl ps|grep nginx-ingress-controller 
+# 进入 nginx-ingress-controller 容器
+$ crictl exec -it <containerId> /bin/bash
+# 查看在容器内nginx实际配置文件位置为 /etc/nginx/nginx.conf
+www-data@emon3:/etc/nginx$ more /etc/nginx/nginx.conf
+```
+
+## 14.4、基本专属配置演示(对应cm=nginx-configuration）
+
+- 创建部署文件
+
+data的可配置下参考：https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+
+```bash
+$ vim nginx-config.yaml
+```
+
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app: ingress-nginx
+data:
+  proxy-body-size: "64m"
+  proxy-read-timeout: "180"
+  proxy-send-timeout: "180"
+```
+
+- 部署
+
+```bash
+# 配置后可在 nginx-ingress-controller 容器中对应的nginx配置文件查看到
+$ kubectl apply -f nginx-config.yaml
+```
+
+## 14.5、全局配置(对应cm=nginx-configuration）
+
+- 创建部署文件
+
+```bash
+$ vim custom-header-global.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+data:
+  # ingress-nginx/custom-headers:表示把 ingress-nginx 下面的名字为 custom-headers 的配置内容引入作为header设置
+  proxy-set-headers: "ingress-nginx/custom-headers"
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  X-Different-Name: "true"
+  X-Request-Start: t=${msec}
+  X-Using-Nginx-Controller: "true"
+metadata:
+  name: custom-headers
+  namespace: ingress-nginx
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f custom-header-global.yaml
+```
+
+## 14.6、专属配置(对应cm=nginx-configuration）
+
+- 创建部署文件
+
+```bash
+$ vim custom-header-spec-ingress.yaml
+```
+
+```yaml
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Request-Id: $req_id";
+  name: sbt-web-demo
+  namespace: dev
+# 该配置仅在 sbt-dev.emon.vip 下生效
+spec:
+  rules:
+    - host: sbt-dev.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-demo
+                port:
+                  number: 80
+```
+
+- 部署
+
+```bash
+$ kubectl apply -f custom-header-spec-ingress.yaml
+```
+
+## 14.7、调整Ingress-Nginx部署为外部nginx.tmpl
+
+参考：https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/custom-template/
+
+- 调整nginx-ingress-controller.yaml
+
+```bash
+# 按照官方文档，增加 volumeMounts 和 volumes 元素
+# 第一处	搜索 - --annotations-prefix=nginx.ingress.kubernetes.io 内容，在该内容下添加 volumeMounts
+# 第二处	搜索 terminationGracePeriodSeconds: 30 内容，在该内容下添加 volumes
+$ vim nginx-ingress-controller.yaml
+```
+
+```yaml
+# 第一处调整结果
+        - --annotations-prefix=nginx.ingress.kubernetes.io
+        volumeMounts:
+          - mountPath: /etc/nginx/template
+            name: nginx-template-volume
+            readOnly: true
+# 第二处调整结果
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: nginx-template-volume
+          configMap:
+            name: nginx-template
+            items:
+            - key: nginx.tmpl
+              path: nginx.tmpl
+```
+
+- 部署之前先创建ConfigMap
+
+```bash
+# 从容器中拷贝出或向容器拷贝入文件
+$ kubectl cp nginx-ingress-controller-82mlt:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
+# 创建ConfigMap
+$ kubectl create cm nginx-template --from-file nginx.tmpl -n ingress-nginx
+# 查看ConfigMap
+$ kubectl get cm -n ingress-nginx nginx-template
+# 查看ConfigMap的yaml描述
+$ kubectl get cm -n ingress-nginx nginx-template -o yaml
+```
+
+- 部署
+
+```bash
+# 应用调整
+$ kubectl apply -f nginx-ingress-controller.yaml
+
+# 查看deploy的部署信息
+$ kubectl get ds -n ingress-nginx
+# 查看pods
+$ kubectl get pods -n ingress-nginx -o wide
+
+# 获取 ConfigMap 配置列表
+$ kubectl get cm -n ingress-nginx
+# 获取 ConfigMap 配置数据情况
+$ kubectl get cm -n ingress-nginx nginx-template
+# 获取 ConfigMap 配置数据情况，yaml格式
+$ kubectl get cm -n ingress-nginx nginx-template -o yaml
+
+# 修改 ConfigMap 配置
+$ kubectl edit cm -n ingress-nginx nginx-template
+# 搜索并调整 types_hash_max_size 的值为 4096
+
+# 查找 nginx-ingress-controller 这个pods，并进入该容器
+$ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
+$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
+# 在容器内查看 types_hash_max_size 的值是否正确
+www-data@emon3:/etc/nginx$ more /etc/nginx/template/nginx.tmpl 
+```
+
+## 14.8、Https证书：配置tls
+
+### 14.8.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/tls
+$ cd /root/dockerdata/deep-in-kubernetes/8-ingress/tls
+```
+
+### 14.8.1、配置tls与验证
+
+- 生成证书
+
+```bash
+$ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout emon.key -out emon.crt \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip"
+```
+
+- 创建secret
+
+```bash
+$ kubectl create secret tls emon-tls --key emon.key --cert emon.crt -n dev
+# 查看secret
+$ kubectl get secret emon-tls -n dev
+$ kubectl get secret emon-tls -o yaml -n dev
+```
+
+- 配置证书，调整nginx-ingress-controller.yaml
+
+```bash
+# 查找 nginx-ingress-controller 这个pods，并进入该容器
+$ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
+$ kubectl exec -it nginx-ingress-controller-c5qdn -n ingress-nginx -- bash
+# 在容器内，查看nginx-ingress-controller的使用帮助，找到如何配置证书
+www-data@emon3:/etc/nginx$ /nginx-ingress-controller --help
+
+# =====开始调整=====
+# 第一处	搜索 - --annotations-prefix=nginx.ingress.kubernetes.io 内容，在该内容下添加 volumeMounts
+$ vim ../nginx-ingress-controller.yaml
+```
+
+```yaml
+# 第一处调整结果：指定证书
+		- --annotations-prefix=nginx.ingress.kubernetes.io
+        - --default-ssl-certificate=dev/emon-tls
+        volumeMounts:
+          - mountPath: /etc/nginx/template
+            name: nginx-template-volume
+            readOnly: true
+```
+
+- 配置Ingress
+
+```bash
+$ vim web-ingress.yaml
+```
+
+```yaml
+#ingress
+# apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+    - host: sbt-dev.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-demo
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - sbt-dev.emon.vip
+      secretName: emon-tls
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+https://sbt-dev.emon.vip/hello?name=emon
+
+```bash
+# 配置Ingress
+$ kubectl apply -f web-ingress.yaml
+$ kubectl apply -f ../nginx-ingress-controller.yaml
+
+# 查看deploy的部署信息
+$ kubectl get ds -n ingress-nginx
+# 查看pods
+$ kubectl get pods -n ingress-nginx -o wide
+```
+
+## 14.9、Session保持
+
+### 14.9.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
+$ cd /root/dockerdata/deep-in-kubernetes/8-ingress
+```
+
+### 14.9.1、多版本环境准备
+
+目标：一个域名访问的pods有多种，得到的结果也有多种！！！
+
+- 创建yaml
+
+```bash
+$ vim web-dev.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo-v1
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+        version: v1.0
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo-v2
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+        version: v1.0
+    spec:
+      containers:
+      - name: sbt-web-demo
+        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+        ports:
+        - containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: sbt-web-demo
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+  - host: sbt-dev.emon.vip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: sbt-web-demo
+            port:
+              number: 80
+  tls:
+    - hosts:
+        - sbt-dev.emon.vip
+      secretName: emon-tls
+```
+
+- 部署
+
+如果部署成功，可访问：
+
+https://sbt-dev.emon.vip/hello?name=emon
+
+```bash
+$ kubectl apply -f web-dev.yaml
+# 查看dev命名空间下内容
+$ kubectl get all -n dev
+# 查看deploy详情
+$ kubectl get deploy sbt-web-demo -o yaml -n dev
+```
+
+- 说明
+
+由于两台服务版本不一致，访问时会反复出现不同的内容：
+https://sbt-dev.emon.vip/hello?name=emon
+
+### 14.9.2、如何让session保持？
+
+- 创建Ingress文件
+
+```bash
+$ vim ingress-session.yaml
+```
+
+```yaml
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    # 启用会话保持
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+  name: sbt-web-demo
+  namespace: dev
+spec:
+  rules:
+  - host: sbt-dev.emon.vip
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: sbt-web-demo
+            port:
+              number: 80
+  tls:
+    - hosts:
+        - sbt-dev.emon.vip
+      secretName: emon-tls
+```
+
+- 部署
+
+部署成功后，再次访问发现不再反复了，因为请求里面带有名称为route的cookie保持了Session！！！
+
+https://sbt-dev.emon.vip/hello?name=emon
+
+```bash
+$ kubectl apply -f ingress-session.yaml
+```
+
+## 14.10、流量控制
+
+### 14.10.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/canary
+$ cd /root/dockerdata/deep-in-kubernetes/8-ingress/canary
+```
+
+### 14.10.1、更新nginx-ingress-controller到0.23.0版本
+
+```bash
+```
 
 
 
@@ -5228,10 +5663,13 @@ $ kubectl logs nginx-ds-tbtkz
 
 # 在容器中执行一条命令
 $ kubectl exec < xxx >
+# 进入pods
+$ kubectl exec -it nginx-ingress-controller-82mlt -n ingress-nginx -- bash
+# 不进入直接执行命令
 $ kubectl exec -it nginx-ds-tbtkz -- nginx -v
 
 # 从容器中拷贝出或向容器拷贝入文件
-$ kubectl cp
+$ kubectl cp nginx-ingress-controller-82mlt:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
 # Attach到一个运行中的容器上
 $ kubectl attach
 
@@ -5256,8 +5694,14 @@ $ kubectl get all
 $ kubectl get all -n kube-system
 # 查看集群秘钥
 $ kubectl get secret -n default
+# 创建秘钥：注意emon.key和emon.crt要存在
+$ kubectl create secret tls emon-tls --key emon.key --cert emon.crt -n default
+# 删除秘钥
+$ kubectl delete secret emon-tls -n default
 # 查看deploy对应yaml详情
 $ kubectl get deploy k8s-springboot-web-demo -o yaml
+# 编辑deploy
+$ kubectl edit deploy sbt-web-demo -n dev
 # 查看quota列表
 $ kubectl get quota -n test
 # 查看quota
@@ -5288,8 +5732,12 @@ $ kubectl replace --force -f course-service.yaml
 $ kubectl get ds -n ingress-nginx
 # 获取 ConfigMap 配置列表
 $ kubectl get cm -n ingress-nginx
-# 获取 ConfigMap 配置详情数据
+# 获取 ConfigMap 配置数据情况
 $ kubectl get cm -n ingress-nginx tcp-services
+# 获取 ConfigMap 配置数据情况，yaml格式
+$ kubectl get cm -n ingress-nginx tcp-services -o yaml
+# 修改 ConfigMap 配置
+$ kubectl edit cm -n ingress-nginx nginx-template
 ```
 
 - iptables
