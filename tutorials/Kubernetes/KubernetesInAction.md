@@ -463,7 +463,7 @@ $ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
 $ kubectl label node emon3 app=ingress
 
-# ===== 镜像下载一直是老大难问题，先下载吧 beg =====
+# ===== 镜像下载一直是老大难问题，先下载吧 beg =====【仅worker节点下载镜像即可】
 # 查看所需镜像
 $ grep image ingress-nginx.yaml
 # 手工下载所需镜像：注意第一个镜像本来应该是 k8s.gcr.io/defaultbackend-amd64:1.5
@@ -1044,6 +1044,241 @@ $ kubectl delete -f nginx-ds.yml
 $ kubectl get pods
 # 命令行输出结果
 No resources found in default namespace.
+```
+
+## 6、Harbor镜像私服（在emon主机root用户安装）
+
+### 6.1、安装docker-compose
+
+1：下载
+
+```bash
+$ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+2：添加可执行权限
+
+```bash
+$ chmod +x /usr/local/bin/docker-compose
+# 创建软连，避免安装Harbor时报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+$ ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
+
+33：测试
+
+```bash
+$ docker-compose --version
+# 命令行输出结果
+docker-compose version 1.29.2, build 5becea4c
+```
+
+### 6.2、安装Harbor镜像私服
+
+Harbor镜像私服（在emon主机root用户安装）
+
+0. 切换目录
+
+```bash
+$ cd
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+```
+
+1. 下载地址
+
+https://github.com/goharbor/harbor/releases
+
+```bash
+$ wget https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
+```
+
+2. 创建解压目录
+
+```bash
+# 创建Harbor解压目录
+$ mkdir /usr/local/Harbor
+# 创建Harbor的volume目录
+$ mkdir -p /usr/local/dockerv/harbor_home
+```
+
+3. 解压
+
+```bash
+# 推荐v2.2.4版本，更高版本比如2.3和2.4有docker-compose down -v ==> down-compose up -d时postgresql服务启动不了的bug，数据库重启失败！
+$ tar -zxvf harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
+$ ls /usr/local/Harbor/harbor
+common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
+```
+
+4. 创建自签名证书【参考实现，建议走正规渠道的CA证书】【缺少证书无法浏览器登录】
+
+- 创建证书存放目录
+
+```bash
+# 切换目录
+$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
+```
+
+- 创建CA根证书
+
+```bash
+# 其中C是Country，ST是State，L是local，O是Origanization，OU是Organization Unit，CN是common name(eg, your name or your server's hostname)
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
+# 查看结果
+$ ls
+ca.crt  ca.key
+```
+
+- 生成一个证书签名，设置访问域名为 emon
+
+```bash
+$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
+-subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
+# 查看结果
+$ ls
+ca.crt  ca.key  emon.csr  emon.key
+```
+
+- 生成主机的证书
+
+```bash
+$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
+# 查看结果
+$ ls
+ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
+```
+
+5. 编辑配置
+
+```bash
+$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
+$ vim /usr/local/Harbor/harbor/harbor.yml
+```
+
+```yaml
+# 修改
+# hostname: reg.mydomain.com
+hostname: 192.168.200.116
+# 修改
+  # port: 80
+  port: 5080
+# 修改
+https:
+  # https port for harbor, default is 443
+  port: 5443
+  # The path of cert and key files for nginx
+  # certificate: /your/certificate/path
+  # private_key: /your/private/key/path
+  # 修改：注意，这里不能使用软连接目录 /usr/loca/harbor替换/usr/local/Harbor/harbor-2.2.4
+  # 否则会发生证书找不到错误：FileNotFoundError: [Errno 2] No such file or directory: 
+  certificate: /usr/local/Harbor/cert/emon.crt
+  private_key: /usr/local/Harbor/cert/emon.key
+# 修改
+# data_volume: /data
+data_volume: /usr/local/dockerv/harbor_home
+```
+
+6. 安装
+
+```bash
+# 安装时，确保 /usr/bin/docker-compose 存在，否则会报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+$ /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
+# 切换目录
+$  cd /usr/local/Harbor/harbor/
+# 查看服务状态
+$ docker-compose ps
+# 命令行输出结果
+      Name                     Command                  State                           Ports                     
+------------------------------------------------------------------------------------------------------------------
+chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
+harbor-core         /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-db           /docker-entrypoint.sh 96 13      Up (healthy)                                                 
+harbor-jobservice   /harbor/entrypoint.sh            Up (healthy)                                                 
+harbor-log          /bin/sh -c /usr/local/bin/ ...   Up (healthy)   127.0.0.1:1514->10514/tcp                     
+harbor-portal       nginx -g daemon off;             Up (healthy)                                                 
+nginx               nginx -g daemon off;             Up (healthy)   0.0.0.0:5080->8080/tcp, 0.0.0.0:5443->8443/tcp
+redis               redis-server /etc/redis.conf     Up (healthy)                                                 
+registry            /home/harbor/entrypoint.sh       Up (healthy)                                                 
+registryctl         /home/harbor/start.sh            Up (healthy)                                                 
+trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
+```
+
+8. 登录
+
+访问：http://192.168.200.116:5080 （会被跳转到http://192.168.200.116:5443）
+
+用户名密码： admin/Harbor12345
+
+harbor数据库密码： root123
+
+登录后创建了用户：emon/Emon@123
+
+登录后创建了命名空间：devops-learning 并将emon用户用于该命名空间
+
+9. 修改配置重启
+
+```bash
+$ cd /usr/local/Harbor/harbor/
+$ docker-compose down -v
+# 如果碰到 postgresql 服务不是UP状态，导致登录提示：核心服务不可用。 请执行下面命令（根据data_volume配置调整路径），这个是该版本的bug。目前，v2.2.4版本可以正确重启，无需删除pg13
+# [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
+$ docker-compose up -d
+```
+
+10. 私服安全控制
+
+- 对文件 `/etc/docker/daemon.json` 追加 `insecure-registries`内容：
+
+```bash
+$ vim /etc/docker/daemon.json
+```
+
+```bash
+{
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "graph": "/usr/local/lib/docker",
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
+  "insecure-registries": ["192.168.200.116:5080"]
+}
+```
+
+- 对文件 `/lib/systemd/system/docker.service` 追加`EnvironmentFile`：【可省略】
+
+```bash
+$ vim /lib/systemd/system/docker.service 
+```
+
+```bash
+# 在ExecStart后面一行追加：经验证daemon.json配置了insecure-registries即可，无需这里再配置
+EnvironmentFile=-/etc/docker/daemon.json
+```
+
+重启Docker服务：
+
+```bash
+$ systemctl daemon-reload
+$ systemctl restart docker
+```
+
+10. 推送镜像
+
+登录harbor后，先创建devops-learning项目，并创建emon用户。
+
+```bash
+# 下载
+$ docker pull openjdk:8-jre
+# 打标签
+$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
+# 登录
+$ docker login -u emon -p Emon@123 192.168.200.116:5080
+# 上传镜像
+$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
+# 退出登录
+$ docker logout 192.168.200.116:5080
+
+机器人账户：
+token：  
+XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
 # 二、使用Kubespray部署Kubernetes生产集群
@@ -7631,16 +7866,350 @@ $ kubectl apply -f ingress-compose.yaml
 
 # 十七、K8S中的日志处理【未完待续】
 
+在部署完成后 虽然我们能正常的运行我们的服务了 。 但是我们查看日志却是一个很麻烦的事情 ， 我们只能去容器当中查看已经打印好的日志 。这很明显非常的不友好 ， 而且容器中的日志肯定要定时删除的 。 不利于我们日后去查找对应的日志。
+
+目前很主流的是elk的解决方案 ， 但是 l 却有很多不同 这里我使用的是 aliyun的 log-pilot
+
+[log-pilot 官方文档](https://github.com/AliyunContainerService/log-pilot) 这上面有很详细的解释 以及 log-pilot 的优点。
+
+[log-pilot阿里云帮助中心](https://help.aliyun.com/document_detail/208235.html?spm=5176.21213303.J_6704733920.7.312153c9dHMU2p&scm=20140722.S_help%40%40%E6%96%87%E6%A1%A3%40%40208235.S_0%2Bos.ID_208235-RL_logDASpilot-LOC_helpmain-OR_ser-V_2-P0_0)
+
 ## 17.0、切换目录
 
 ```bash
-$ mkdir -pv /root/dockerdata/deep-in-kubernetes/11-logs
-$ cd /root/dockerdata/deep-in-kubernetes/11-logs
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15
+$ cd/root/k8s_soft/k8s_v1.20.15
 ```
 
-# 十八、K8S中的监控
+## 17.1、创建命名空间
+
+```bash
+$ kubectl create ns prod
+```
+
+## 17.2、创建外部ES服务
+
+特殊说明：如果集群网络到ES服务器可直达，该服务可省略！！！
+
+```bash
+$ vim external-es.yaml
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-es
+  namespace: prod
+spec:
+  ports:
+  - port: 80
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  # 和 svc 相同的名称
+  name: external-es
+  namespace: prod
+subsets:
+  - addresses:
+    # es 端口
+    - ip: 192.168.1.66
+    # 还要指定端口号
+    ports:
+    - port: 9200
+```
+
+```bash
+$ kubectl apply -f external-es.yaml
+# 查看
+$ kubectl get all -n prod
+```
+
+## 17.3、创建log-pilot
+
+官方不支持ES7版本，使用这个重新构造镜像使用。
+
+https://gitee.com/Rushing0711/log-pilot
+
+或者：
+
+https://github.com/40kuai/log-pilot/tree/filebeat7.x 【推荐】
+
+对应镜像：dockerhub：heleicool/log-pilot:7.x-filebeat
+
+个人备份：dockerhub：rushing/log-pilot:7.x-filebeat
+
+```bash
+$ vim log-pilot.yaml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: log-pilot
+  labels:
+    app: log-pilot
+  # 设置期望部署的namespace
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: log-pilot
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: log-pilot
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      # 是否允许部署到Master节点上
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: log-pilot
+        # 版本请参考https://github.com/AliyunContainerService/log-pilot/releases
+        # image: registry.cn-hangzhou.aliyuncs.com/acs/log-pilot:0.9.7-filebeat
+        # image: 192.168.200.116:5080/devops-learning/log-pilot:0.9.7-filebeat-7.6.1
+        # image: heleicool/log-pilot:7.x-filebeat
+        image: rushing/log-pilot:7.x-filebeat
+        resources:
+          limits:
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        env:
+          - name: "NODE_NAME"
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: "LOGGING_OUTPUT"
+            value: "elasticsearch"
+          # 请确保集群到ES网络可达
+          - name: "ELASTICSEARCH_HOSTS"
+            value: "192.168.1.66:9200"
+          # 配置ES访问权限
+          #- name: "ELASTICSEARCH_USER"
+          #  value: "{es_username}"
+          #- name: "ELASTICSEARCH_PASSWORD"
+          #  value: "{es_password}"
+        volumeMounts:
+        - name: sock
+          mountPath: /var/run/docker.sock
+        - name: root
+          mountPath: /host
+          readOnly: true
+        - name: varlib
+          mountPath: /var/lib/filebeat
+        - name: varlog
+          mountPath: /var/log/filebeat
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        livenessProbe:
+          failureThreshold: 3
+          exec:
+            command:
+            - /pilot/healthz
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        securityContext:
+          capabilities:
+            add:
+            - SYS_ADMIN
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: sock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: root
+        hostPath:
+          path: /
+      - name: varlib
+        hostPath:
+          path: /var/lib/filebeat
+          type: DirectoryOrCreate
+      - name: varlog
+        hostPath:
+          path: /var/log/filebeat
+          type: DirectoryOrCreate
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+```
+
+```bash
+$ kubectl apply -f log-pilot.yaml
+# 查看
+$ kubectl get po -n kube-system
+
+# 查看日志确认是否部署完成生效
+$ kubectl logs -f log-pilot-27p5w -n kube-system
+# 命令行输出结果
+......省略......
+time="2022-04-13T13:57:53+08:00" level=debug msg="9c4e8aa84be485d59706f4dc84951324ba0500bd16d253fea8f7cc2d749ffbf9 has not log config, skip" 
+```
+
+## 17.4、部署服务查看日志
+
+```bash
+$ vim web-prod.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbt-web-demo
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+      app: sbt-web-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sbt-web-demo
+    spec:
+      containers:
+        - name: sbt-web-demo
+          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:vlog
+          ports:
+            - containerPort: 8080
+          env:
+            # 1、stdout为约定关键字，表示采集标准输出日志
+            # 2、配置标准输出日志采集到ES的catalina索引下
+            - name: aliyun_logs_catalina
+              value: "stdout"
+            # 1、配置采集容器内文件日志，支持通配符
+            # 2、配置该日志采集到ES的access索引下
+            - name: aliyun_logs_access
+              value: "/home/saas/devops/k8s-demo/logs/*.log"
+          # 容器内文件日志路径需要配置emptyDir
+          volumeMounts:
+            - name: log-volume
+              mountPath: /home/saas/devops/k8s-demo/logs
+      volumes:
+        - name: log-volume
+          emptyDir: {}
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sbt-web-demo
+  namespace: prod
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: sbt-web-demo
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sbt-web-demo
+  namespace: prod
+spec:
+  rules:
+    - host: sbt-prod.emon.vip
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sbt-web-demo
+                port:
+                  number: 80
+```
+
+```bash
+$ kubectl apply -f web-prod.yaml
+# 查看
+$ kubectl get po -n prod
+```
+
+## 17.5、Kibana
+
+- 通过cerebro插件查看ES索引：地址需要替换cerebro地址和ES地址
+
+http://192.168.1.66:9000/#/overview?host=http:%2F%2F192.168.1.66:9200
+
+- 在Kibana创建索引
+
+【Management】==>【Kibana】==>【Index Patterns】==>access-*
+
+【Management】==>【Kibana】==>【Index Patterns】==>catalina-*
+
+- 在Kibana查看
+
+【Discover】==>【选择刚创建的Index Patterns】查看
+
+# 十八、K8S中的监控kubectl top
+
+kubectl top 是基础命令，但是需要部署配套的组件才能获取到监控值。
+
+- 1.8以上：部署 [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
+
+0：切换目录
+
+```bash
+$ cd
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+```
 
 
+
+1：下载
+
+```bash
+$ wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.1/components.yaml -O metrics-server-v0.6.1.yaml
+
+$ vim metrics-server-v0.6.1.yaml
+# 配置metrics-server-v0.6.1.yaml，跳过证书
+# 找到 - --metric-resolution=15s 在其后添加
+- --kubelet-insecure-tls
+```
+
+2：安装
+
+```bash
+# ===== 如果是containerd容器 =====
+$ crictl pull registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1
+$ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+
+# ===== 如果是docker容器 =====
+$ docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
+$ docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+
+$ kubectl apply -f metrics-server-v0.6.1.yaml
+```
+
+3：测试
+
+```bash
+# 查看节点的使用情况
+$ kubectl top node
+# 查看pod的使用情况
+$ kubectl top pod
+# 查看具体pod使用情况，--containers可以显示pod内所有的container
+$ kubectl top pod nginx --containers
+```
 
 
 
@@ -7828,37 +8397,6 @@ $ kubectl api-versions
 # 可以通过 iptables-save 命令打印出当前节点的 iptables 规则
 $ iptables-save
 ```
-
-## 90.4、kubectl top
-
-kubectl top 是基础命令，但是需要部署配套的组件才能获取到监控值。
-
-- 1.8以上：部署 [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
-
-安装：
-
-1：下载
-
-```bash
-$ wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.1/components.yaml -O metrics-server-v0.6.1.yaml
-
-$ metrics-server-v0.6.1.yaml
-# 配置metrics-server-v0.6.1.yaml，跳过证书
-# 找到 - --metric-resolution=15s 在其后添加
-- --kubelet-insecure-tls
-```
-
-2：安装
-
-```bash
-# 准备镜像
-$ crictl pull registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1
-$ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
-
-$ kubectl apply -f metrics-server-v0.6.1.yaml
-```
-
-
 
 # 九十一、科学上网
 
@@ -8570,7 +9108,7 @@ b273ae2aadaf491e834d1fce52b90e65
 
 
 
-#### 6.1.3、war安装
+#### 6.1.3、war安装【推荐】
 
 官网地址：https://www.jenkins.io/
 
@@ -8792,16 +9330,21 @@ docker build -t ${IMAGE_NAME} .
 
 docker push ${IMAGE_NAME}
 
+# 上传后删除本地镜像
+docker rmi ${IMAGE_NAME}
+
 # 保存本次镜像名称
 echo "${IMAGE_NAME}" > ${DOCKER_DIR}/IMAGE
 ```
 
 ```bash
 # 修改权限，添加属主用户（root）可执行权限
-$ chmod u+x build-image-web.sh
+$ chmod u+x /root/jenkins/script/build-image-web.sh
 ```
 
 #### 6.3.2、创建k8s模板脚本
+
+- 简单模板
 
 ```bash
 $ mkdir -pv /root/jenkins/script/template
@@ -8814,6 +9357,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{name}}
+  namespace: {{ns}}
 spec:
   selector:
     matchLabels:
@@ -8835,6 +9379,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{name}}
+  namespace: {{ns}}
 spec:
   ports:
   - port: 80
@@ -8851,6 +9396,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{name}}
+  namespace: {{ns}}
 spec:
   rules:
   - host: {{host}}
@@ -8864,6 +9410,120 @@ spec:
             port:
               number: 80
 ```
+
+- SpringBoot模板【该模板放到项目中根目录的k8s目录下使用，这里仅仅是保存一下】
+
+```bash
+# web-custom.yaml 或者 k8s-deploy.yaml 或其他名字
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  selector:
+    matchLabels:
+      app: {{name}}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{name}}
+    spec:
+      containers:
+        - name: {{name}}
+          image: {{image}}
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: 500Mi
+              # 1核心的CPU=1000m
+              cpu: 1000m
+            limits:
+              memory: 500Mi
+              cpu: 1000m
+          # 存活状态检查
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            # pod 创建10s后启动第一次探测
+            initialDelaySeconds: 10
+            # 每隔10s启动一次探测
+            periodSeconds: 10
+            # 超时时间3s
+            timeoutSeconds: 3
+            # 成功1次即表示容器健康
+            successThreshold: 1
+            # 连续5次失败，则判定容器不健康，默认3次
+            failureThreshold: 5
+          # 就绪状态检查
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          env:
+            # 1、stdout为约定关键字，表示采集标准输出日志
+            # 2、配置标准输出日志采集到ES的catalina索引下
+            - name: aliyun_logs_catalina
+              value: "stdout"
+            # 1、配置采集容器内文件日志，支持通配符
+            # 2、配置该日志采集到ES的access索引下
+            - name: aliyun_logs_access
+              value: "/home/saas/devops/k8s-demo/logs/*.log"
+          # 容器内文件日志路径需要配置emptyDir
+          volumeMounts:
+            - name: log-volume
+              mountPath: /home/saas/devops/k8s-demo/logs
+      volumes:
+        - name: log-volume
+          emptyDir: { }
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: {{name}}
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  rules:
+    - host: {{host}}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{name}}
+                port:
+                  number: 80
+
+```
+
+
 
 #### 6.3.3、创建k8s部署脚本
 
@@ -8883,6 +9543,14 @@ if [ "${HOST}" == "" ];then
     echo "env 'HOST' is not set"
     exit 1
 fi
+if [ "${NS}" == "" ];then
+	NS="default"
+    echo "env 'HOST' is not set, use default"
+fi
+if [ "${DEPLOY_YAML}" == "" ];then
+	DEPLOY_YAML="web.yaml"
+    echo "env 'DEPLOY_YAML' is not set, use web.yaml"
+fi
 
 # 确定制作镜像的工作目录
 DOCKER_DIR=${BUILD_DIR}/${JOB_NAME}
@@ -8899,22 +9567,27 @@ echo "BASH_DIR=${BASH_DIR}"
 name=${JOB_NAME}
 image=$(cat ${DOCKER_DIR}/IMAGE)
 host=${HOST}
+ns=${NS}
 
-echo "deploying ... name: ${name}, image: ${image}, host: ${host}"
+echo "deploying ... name: ${name}, image: ${image}, host: ${host}, ns: ${ns}, deploy_yaml: ${DEPLOY_YAML}"
 
-rm -f ${DOCKER_DIR}/web.yaml
-cp ${BASH_DIR}/template/web.yaml ${DOCKER_DIR}
+# 如果是默认模板，从模板库拷贝；否则认为是项目提供了，在项目的k8s目录下，已存在
+if [ "${DEPLOY_YAML}" == "web.yaml" ];then
+    rm -f ${DOCKER_DIR}/${DEPLOY_YAML}
+    cp ${BASH_DIR}/template/web.yaml ${DOCKER_DIR}
+fi
 
-sed -i "s,{{name}},${name},g" ${DOCKER_DIR}/web.yaml
-sed -i "s,{{image}},${image},g" ${DOCKER_DIR}/web.yaml
-sed -i "s,{{host}},${host},g" ${DOCKER_DIR}/web.yaml
+sed -i "s,{{name}},${name},g" ${DOCKER_DIR}/${DEPLOY_YAML}
+sed -i "s,{{image}},${image},g" ${DOCKER_DIR}/${DEPLOY_YAML}
+sed -i "s,{{host}},${host},g" ${DOCKER_DIR}/${DEPLOY_YAML}
+sed -i "s,{{ns}},${ns},g" ${DOCKER_DIR}/${DEPLOY_YAML}
 
-echo "kubectl apply -f ${DOCKER_DIR}/web.yaml"
-kubectl apply -f ${DOCKER_DIR}/web.yaml
+echo "kubectl apply -f ${DOCKER_DIR}/${DEPLOY_YAML}"
+kubectl apply -f ${DOCKER_DIR}/${DEPLOY_YAML}
 
 # 打印本次部署的web.yaml内容
 echo "web.yaml content as follows:"
-cat ${DOCKER_DIR}/web.yaml
+cat ${DOCKER_DIR}/${DEPLOY_YAML}
 
 # 健康检查
 echo "begin health check..."
@@ -8924,7 +9597,7 @@ IFS=","
 sleep 5
 while [ ${count} -gt 0 ]
 do
-    replicas=$(kubectl get deploy ${name} -o go-template='{{.status.replicas}},{{.status.updatedReplicas}},{{.status.readyReplicas}},{{.status.availableReplicas}}')
+    replicas=$(kubectl -n ${ns} get deploy ${name} -o go-template='{{.status.replicas}},{{.status.updatedReplicas}},{{.status.readyReplicas}},{{.status.availableReplicas}}')
     echo "replicas: ${replicas}"
     arr=(${replicas})
     if [ "${arr[0]}" == "${arr[1]}" -a "${arr[1]}" == "${arr[2]}" -a "${arr[2]}" == "${arr[3]}" ];then
@@ -8961,6 +9634,8 @@ node {
     env.BUILD_DIR = "/root/jenkins/build_workspace"
     env.MODULE = "k8s-demo/springboot-web-demo"
     env.HOST = "springboot.emon.vip"
+    env.NS = "default"
+    env.DEPLOY_YAML = ""
     
     stage('Preparation') {
         sh 'printenv'
