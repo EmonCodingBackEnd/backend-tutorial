@@ -4,19 +4,1047 @@
 
 [TOC]
 
-# 一、容器运行时
+# 一、Kubeadmin安装K8S V1.20
 
-## 1、安装Containerd
+单点版本：https://blog.csdn.net/Josh_scott/article/details/121961369?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=3
 
-1. 下载
 
-下载地址：https://github.com/containerd/containerd/releases
+
+高可用版本：https://blog.csdn.net/qq_16538827/article/details/120175489
+
+
+
+Kubeadm是一个K8s部署工具，提供kubeadm init和kubeadm join，用于快速部署Kubernetes集群。
+
+## 1、基础环境准备
+
+### 1.1、服务器规划
+
+| 机器名 | 系统类型  | IP地址          | 内存 | 部署内容 |
+| ------ | --------- | --------------- | ---- | -------- |
+| emon   | CentOS7.7 | 192.168.200.116 | >=2G | master   |
+| emon2  | CentOS7.7 | 192.168.200.117 | >=2G | worker   |
+| emon3  | CentOS7.7 | 192.168.200.118 | >=2G | worker   |
+
+### 1.2、系统设置（所有节点）
+
+#### 1.2.1、主机名
+
+主机名必须每个节点都不一样（建议命名规范：数字+字母+中划线组合，不要包含其他特殊字符）。
 
 ```bash
-[root@emon ~]# wget -cP /usr/local/src/ https://github.com/containerd/containerd/releases/download/v1.6.2/cri-containerd-cni-1.6.2-linux-arm64.tar.gz
+# 查看主机名
+$ hostname
+# 设置主机名：注意修改为具体的主机名
+$ hostnamectl set-hostname emon
+```
+
+#### 1.2.2、本地DNS
+
+配置host，使得所有节点之间可以通过hostname互相访问。
+
+```bash
+$ vim /etc/hosts
+```
+
+```bash
+192.168.200.116 emon
+192.168.200.117 emon2
+192.168.200.118 emon3
+```
+
+#### 1.2.3、安装依赖包
+
+```bash
+# 更新yum
+$ yum update -y
+# 安装依赖包
+$ yum install -y socat conntrack ipvsadm ipset jq sysstat curl iptables libseccomp yum-utils
+```
+
+#### 1.2.4、关闭防火墙、重置iptables、关闭swap、关闭selinux和dnsmasq
+
+```bash
+# 关闭防火墙
+$ systemctl stop firewalld && systemctl disable firewalld
+
+# 设置iptables规则
+$ iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat && iptables -P FORWARD ACCEPT
+
+# 关闭swap
+$ swapoff -a
+# 去掉swap开机启动
+$ sed -i '/swap/s/^\(.*\)$/#\1/g' /etc/fstab
+
+# 关闭selinux
+$ setenforce 0
+# 防止重启恢复
+$ sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+
+# 关闭dnsmasq（否则可能导致docker容器无法解析域名）：如果没有该启动单元，可以忽略！
+$ systemctl stop dnsmasq && systemctl disable dnsmasq
+```
+
+#### 1.2.5、系统参数设置
+
+```bash
+# 制作配置文件
+$ cat > /etc/sysctl.d/kubernetes.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_nonlocal_bind = 1
+net.ipv4.ip_forward = 1
+vm.swappiness = 0
+vm.overcommit_memory = 1
+EOF
+# 生效文件
+$ sysctl -p /etc/sysctl.d/kubernetes.conf
+```
+
+> 如果执行sysctl -p报错：
+>
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: 没有那个文件或目录
+> >
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: 没有那个文件或目录
+>
+> 临时方案！无需重启！
+>
+> > modprobe br_netfilter
+>
+> 永久方案！重启后生效！
+>
+> > cat > /etc/rc.sysinit << EOF
+> > #!/bin/bash
+> > for file in /etc/sysconfig/modules/*.modules ; do
+> > [ -x $file ] && $file
+> > done
+> > EOF
+> > cat > /etc/sysconfig/modules/br_netfilter.modules << EOF
+> > modprobe br_netfilter
+> > EOF
+> > chmod 755 /etc/sysconfig/modules/br_netfilter.modules
+> > lsmod |grep br_netfilter
+
+#### 1.2.6、配置SSH免密登录（仅中转节点）
+
+为了方便文件的copy我们选择一个中转节点（随便一个节点，可以是集群中的也可以是非集群中的），配置好跟其他所有节点的免密登录。这里选择emon节点：
+
+```bash
+# 看看是否已经存在rsa公钥
+$ cat ~/.ssh/id_rsa.pub
+
+# 如果不存在就创建一个新的
+$ ssh-keygen -t rsa
+
+# 把id_rsa.pub文件内容copy到其他机器的授权文件中
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
+```
+
+#### 1.2.7、移除docker相关软件包（可选）
+
+```bash
+$ yum remove -y docker*
+$ rm -f /etc/docker/daemon.json
+$ rm -rf /var/lib/docker/
+```
+
+## 2、基础安装（所有节点）
+
+### 2.1、安装Docker
+
+[查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
+
+####  2.1.0、删除旧版Docker
+
+```bash
+sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+# 必要时：清理yum安装的新版本docker
+yum remote -y docker* container-selinux
+```
+
+如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
+
+#### 2.1.1、CentOS环境下安装Docker
+
+1. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
+
+```shell
+$ yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+2. 设置yum源
+
+```shell
+$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
+
+```shell
+$ yum list docker-ce --showduplicates |sort -r
+```
+
+4. 安装docker
+
+```shell
+# 安装最新
+# $ sudo yum install -y docker-ce
+# 安装指定版本
+$ yum install -y docker-ce-18.06.3.ce
+```
+
+5. 启动
+
+```shell
+$ systemctl start docker
+```
+
+6. 验证安装
+
+```shell
+$ docker version
+$ docker info
+$ docker run hello-world
+```
+
+#### 2.1.2、配置docker加速器
+
+- 阿里云
+
+登录阿里开发者平台： https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
+
+点击【镜像搜索】按钮，自动跳转到控制台的镜像搜索，根据提示注册并登录：
+
+在左侧【镜像工具】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
+
+```bash
+# - registry-mirrors：加速器地址
+# - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+# - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
+# - insecure-registries：设置私服可信地址
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "graph": "/usr/local/lib/docker",
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
+  "insecure-registries": ["192.168.200.116:5080"]
+}
+EOF
+```
+
+- 查看
+
+```bash
+$ cat /etc/docker/daemon.json 
+```
+
+- 重启
+
+```bash
+$ systemctl enable docker && systemctl restart docker
+# 删掉旧的存储位置
+$ rm -rf /var/lib/docker/
+```
+
+### 2.2、安装kubeadm/kubelet/kubectl
+
+#### 2.2.1、安装
+
+1. 设置k8s源
+
+```bash
+$ cat > /etc/yum.repos.d/kubernetes.repo << EOF
+[kubernetes] 
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64 
+enabled=1 
+gpgcheck=0 
+repo_gpgcheck=0 
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg 
+EOF
+$ yum update
+```
+
+2.  安装kubeadm/kubelet/kubectl
+
+```bash
+$ yum install -y kubelet-1.20.15 kubeadm-1.20.15 kubectl-1.20.15
+# 这里不需要启动，在 kubeadm init 后拿到 join 命令，加入后会自动启动
+$ systemctl enable kubelet
 ```
 
 
+
+## 3、部署Kubernetes Mater（仅master节点）
+
+### 3.1、kubeadm init
+
+```bash
+# 在Master上执行，由于默认拉取镜像地址 k8s.gcr.io 国内无法访问，这里指定阿里云镜像仓库地址。
+# 执行该步骤之前，也可以执行 kubeadm config images pull 预下载镜像
+$ kubeadm init \
+--apiserver-advertise-address=192.168.200.116 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.20.0 \
+--service-cidr=10.200.0.0/16 \
+--pod-network-cidr=10.233.0.0/16
+
+# 使用 kubectl 工具（Master&&Node节点）
+$ mkdir -p $HOME/.kube 
+$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+### 3.2、安装网络插件-calico（仅master节点）
+
+#### 3.2.1、切换目录
+
+```bash
+$ cd
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+```
+
+这部分我们部署kubernetes的网络查件 CNI。
+
+文档地址：https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
+
+#### 3.2.2、下载文件与配置调整
+
+文档中有两个配置，50以下节点和50以上节点，它们的主要区别在于这个：typha。
+当节点数比较多的情况下，Calico 的 Felix组件可通过 Typha 直接和 Etcd 进行数据交互，不通过 kube-apiserver，降低kube-apiserver的压力。大家根据自己的实际情况选择下载。
+下载后的文件是一个all-in-one的yaml文件，我们只需要在此基础上做少许修改即可。
+
+```bash
+# 下载calico.yaml文件
+$ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
+```
+
+修改IP自动发现
+
+> 当kubelet的启动参数中存在--node-ip的时候，以host-network模式启动的pod的status.hostIP字段就会自动填入kubelet中指定的ip地址。
+
+修改前：
+
+```bash
+- name: IP
+  value: "autodetect"
+```
+
+修改后：
+
+```bash
+- name: IP
+  valueFrom:
+    fieldRef:
+      fieldPath: status.hostIP
+```
+
+修改CIDR
+
+修改前：
+
+```bash
+# - name: CALICO_IPV4POOL_CIDR
+#   value: "192.168.0.0/16"
+```
+
+修改后（修改成你自己的value，我这里是10.200.0.0/16）
+
+```bash
+- name: CALICO_IPV4POOL_CIDR
+  value: "10.200.0.0/16"
+```
+
+#### 3.2.3、执行安装
+
+```bash
+# 生效之前查看
+$ kubectl get nodes
+NAME   STATUS     ROLES                  AGE     VERSION
+emon   NotReady   control-plane,master   5m31s   v1.20.15
+# 使之生效
+$ kubectl apply -f calico.yaml
+# 查看node
+$ kubectl get nodes
+NAME    STATUS     ROLES                  AGE    VERSION
+emon    Ready      control-plane,master   7m2s   v1.20.15
+
+# ===== 等待加入一个worker节点进来之后，再查看下面信息，否则会看到pending，因为找不到合适的节点部署pod =====
+# 查看pod信息
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS     RESTARTS   AGE
+calico-kube-controllers-858c9597c8-ktgcf   0/1     Pending    0          7s
+calico-node-4282z                          0/1     Init:0/3   0          7s
+coredns-7f89b7bc75-5262d                   0/1     Pending    0          5m30s
+coredns-7f89b7bc75-tf6tl                   0/1     Pending    0          5m30s
+etcd-emon                                  1/1     Running    0          5m45s
+kube-apiserver-emon                        1/1     Running    0          5m45s
+kube-controller-manager-emon               1/1     Running    0          5m45s
+kube-proxy-vwxmm                           1/1     Running    0          5m30s
+kube-scheduler-emon                        1/1     Running    0          5m45s
+# ===================================================================================================
+# 过几分钟再次查看
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-858c9597c8-ktgcf   1/1     Running   0          6m9s
+calico-node-4282z                          1/1     Running   0          6m9s
+calico-node-xjwc4                          1/1     Running   0          5m4s
+coredns-7f89b7bc75-5262d                   1/1     Running   0          11m
+coredns-7f89b7bc75-tf6tl                   1/1     Running   0          11m
+etcd-emon                                  1/1     Running   0          11m
+kube-apiserver-emon                        1/1     Running   0          11m
+kube-controller-manager-emon               1/1     Running   0          11m
+kube-proxy-mcwts                           1/1     Running   0          5m4s
+kube-proxy-vwxmm                           1/1     Running   0          11m
+kube-scheduler-emon                        1/1     Running   0          11m
+# 再次查看node
+$ kubectl get nodes
+NAME    STATUS   ROLES                  AGE     VERSION
+emon    Ready    control-plane,master   12m     v1.20.15
+emon2   Ready    <none>                 5m21s   v1.20.15
+```
+
+### 3.3、加入节点到集群（仅worker节点）
+
+```bash
+# 如下是kubeadm init执行成功后，得到的日志
+......省略......
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.200.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
+    --discovery-token-ca-cert-hash sha256:2ab2809af3d7ea7b684e1dcdea1859b226ec8b9185a82a56344aade4d3000f99
+```
+
+
+
+## 4、安装ingress-nginx（仅master节点）
+
+### 4.0、切换目录
+
+```bash
+$ cd
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+```
+
+### 4.1、安装ingress-nginx
+
+- 安装插件（master节点）
+
+```bash
+# 由于mandatory.yaml添加了 nodeSelector，对node进行了label选择，这里必须添加标签，否则：
+# Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
+$ kubectl label node emon3 app=ingress
+
+# ===== 镜像下载一直是老大难问题，先下载吧 beg =====
+# 查看所需镜像
+$ grep image ingress-nginx.yaml
+# 手工下载所需镜像：注意第一个镜像本来应该是 k8s.gcr.io/defaultbackend-amd64:1.5
+$ docker pull registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5
+$ docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
+# 对第一个镜像重新打标签才能使用
+# 下载不可访问的镜像
+$ docker tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
+# ===== 镜像下载一直是老大难问题，先下载吧 end =====
+
+# 配置资源
+$ kubectl apply -f ingress-nginx.yaml
+# 查看
+$ kubectl get all -n ingress-nginx -o wide
+```
+
+### 4.2、测试服务
+
+#### 4.2.1、ingress-demo.yaml配置
+
+```bash
+$ vim ingress-demo.yaml
+```
+
+```yaml
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-demo
+spec:
+  selector:
+    matchLabels:
+      app: tomcat-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tomcat-demo
+    spec:
+      containers:
+      - name: tomcat-demo
+        image: registry.cn-hangzhou.aliyuncs.com/liuyi01/tomcat:8.0.51-alpine
+        ports:
+        - containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-demo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat-demo
+
+---
+#ingress
+#old version: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tomcat-demo
+spec:
+  rules:
+  - host: tomcat.mooc.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat-demo
+            port:
+              number: 80
+```
+
+配置资源生效：
+
+```bash
+# 应用资源：仅创建并使用，可调整为 create -> apply  具有使用和创建并使用的效果
+$ kubectl create -f ingress-demo.yaml
+# 查看发现ingress启动在emon3上
+$ kubectl get po -n ingress-nginx -o wide
+# 查看ingress-demo的pod状态
+$ kubectl get pod -o wide
+
+# 配置本地DNS：访问emon3的DNS
+$ vim /etc/hosts
+192.168.200.118 tomcat.mooc.com
+192.168.200.118 api.mooc.com
+
+# 访问
+http://tomcat.mooc.com # 看到正常tomcat界面
+http://api.mooc.com # 看到 default backend - 404
+
+# 删除资源
+$ kubectl delete -f ingress-demo.yaml
+```
+
+#### 4.2.3、ingress-nginx.yaml
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-http-backend
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-http-backend
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-http-backend
+        app.kubernetes.io/part-of: ingress-nginx
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: default-http-backend
+          # Any image is permissible as long as:
+          # 1. It serves a 404 page at /
+          # 2. It serves 200 on a /healthz endpoint
+          image: k8s.gcr.io/defaultbackend-amd64:1.5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 10m
+              memory: 20Mi
+            requests:
+              cpu: 10m
+              memory: 20Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: default-http-backend
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-clusterrole
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - nodes
+      - pods
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nginx-ingress-role
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+      - secrets
+      - namespaces
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      # Defaults to "<election-id>-<ingress-class>"
+      # Here: "<ingress-controller-leader>-<nginx>"
+      # This has to be adapted if you change either parameter
+      # when launching the nginx-ingress-controller.
+      - "ingress-controller-leader-nginx"
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nginx-ingress-role-nisa-binding
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nginx-ingress-role
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-clusterrole-nisa-binding
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: nginx-ingress-serviceaccount
+    namespace: ingress-nginx
+
+---
+
+apiVersion: apps/v1
+# 第一处：调整 Deployment ==> DaemonSet
+kind: DaemonSet
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/part-of: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+      nodeSelector:
+        app: ingress
+      containers:
+        - name: nginx-ingress-controller
+          # 第二处：调整 0.19.0 ==> 0.23.0
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
+          args:
+            - /nginx-ingress-controller
+            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            # www-data -> 33
+            runAsUser: 33
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+
+---
+```
+
+## 5、集群冒烟测试（在主节点emon操作）
+
+### 5.0、网络环境切换后k8s网络不通小妙招
+
+```bash
+# 如果发现冒烟测试不通，再尝试
+$ systemctl restart NetworkManager
+```
+
+### 5.1、创建nginx ds
+
+```bash
+ # 写入配置
+$ cat > nginx-ds.yml <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ds
+  labels:
+    app: nginx-ds
+spec:
+  type: NodePort
+  selector:
+    app: nginx-ds
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-ds
+spec:
+  selector:
+    matchLabels:
+      app: nginx-ds
+  template:
+    metadata:
+      labels:
+        app: nginx-ds
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+EOF
+
+# 创建ds
+$ kubectl apply -f nginx-ds.yml
+```
+
+### 5.2、检查各种ip连通性
+
+```bash
+# 检查各 Node 上的 Pod IP 连通性
+$ kubectl get pods -o wide
+
+# 在每个worker节点上ping pod ip
+$ ping <pod-ip>
+
+# 检查service可达性
+$ kubectl get svc
+
+# 在每个worker节点上访问服务
+$ curl <service-ip>:<port>
+
+# 在每个节点检查node-port可用性
+$ curl <node-ip>:<port>
+```
+
+### 5.3、检查dns可用性
+
+```bash
+# 创建一个nginx pod
+$ cat > pod-nginx.yaml <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: docker.io/library/nginx:1.19
+    ports:
+    - containerPort: 80
+EOF
+
+# 创建pod
+$ kubectl apply -f pod-nginx.yaml
+
+# 进入pod，查看dns
+$ kubectl exec nginx -it -- /bin/bash
+
+# 查看dns配置
+root@nginx:/# cat /etc/resolv.conf
+
+# 查看名字是否可以正确解析
+root@nginx:/# curl nginx-ds
+
+# 退出测试
+root@nginx:/# exit
+```
+
+### 5..4、日志功能
+
+测试使用kubectl查看pod的容器日志
+
+```bash
+$ kubectl get pods
+# 命令行输出结果
+NAME             READY   STATUS    RESTARTS   AGE
+nginx            1/1     Running   0          54s
+nginx-ds-dkfjm   1/1     Running   0          2m54s
+nginx-ds-rx6mj   1/1     Running   0          2m54s
+
+# 查看日志
+$ kubectl logs <pod-name>
+```
+
+### 5.5、Exec功能
+
+测试kubectl的exec功能
+
+```bash
+# 查询指定标签的pod
+$ kubectl get pods -l app=nginx-ds
+$ kubectl exec -it <nginx-pod-name> -- nginx -v
+```
+
+### 5.6、删除配置的测试资源
+
+```bash
+$ kubectl delete -f pod-nginx.yaml
+$ kubectl delete -f nginx-ds.yml
+# 查看是否清理完成
+$ kubectl get pods
+# 命令行输出结果
+No resources found in default namespace.
+```
 
 # 二、使用Kubespray部署Kubernetes生产集群
 
@@ -164,19 +1192,18 @@ $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
 
 ```bash
 # 安装基础软件：这一步参见python编译安装，安装后自带pip
-# yum install -y epel-release python36 python36-pip git
-
+# 安装基础软件
+$ yum install -y epel-release python36 python36-pip git
 # 下载kubespray源码
-wget -cP /usr/local/src/ https://github.com/kubernetes-sigs/kubespray/archive/refs/tags/v2.18.1.tar.gz
-mv /usr/local/src/v2.18.1.tar.gz /usr/local/src/kubespray-v2.18.1.tar.gz
+$ wget https://github.com/kubernetes-sigs/kubespray/archive/v2.15.0.tar.gz
 # 解压缩
-tar -zxvf /usr/local/src/kubespray-v2.18.1.tar.gz -C . && cd kubespray-2.18.1
+$ tar -xvf v2.15.0.tar.gz && cd kubespray-2.15.0
 # 安装requirements
-cat requirements.txt
-pip3 install -r requirements.txt
+$ cat requirements.txt
+$ pip3.6 install -r requirements.txt
 
 ## 如果install遇到问题可以先尝试升级pip
-## $ pip3 install --upgrade pip
+$ pip3.6 install --upgrade pip
 ```
 
 ### 3.3、生成配置
@@ -214,11 +1241,11 @@ vim inventory/mycluster/group_vars/all/containerd.yml
 # 3. 全局配置（可以在这配置http(s)代理实现外网访问）
 vim inventory/mycluster/group_vars/all/all.yml
 # 4. k8s集群配置（包括设置容器运行时、svc网段、pod网段等）
-vim inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
+vim inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
 # 5. 修改etcd部署类型为host（默认是docker）
 vim inventory/mycluster/group_vars/etcd.yml
 # 6. 附加组件（ingress、dashboard等）
-vim inventory/mycluster/group_vars/k8s_cluster/addons.yml
+vim inventory/mycluster/group_vars/k8s-cluster/addons.yml
 ```
 
 - `vim inventory/mycluster/group_vars/all/all.yml`
@@ -227,7 +1254,7 @@ vim inventory/mycluster/group_vars/k8s_cluster/addons.yml
 # [新增]
 http_proxy: "http://192.168.200.116:8118"
 # [新增]
-https_proxy: "http://192.168.1200.116:8118"
+https_proxy: "http://192.168.200.116:8118"
 ```
 
 - `vim inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
@@ -238,10 +1265,10 @@ kube_service_addresses: 10.200.0.0/16
 # [修改]
 kube_pods_subnet: 10.233.0.0/16
 # [不变]
-container_manager: containerd
+container_manager: docker
 ```
 
-- `vim inventory/mycluster/group_vars/k8s_cluster/addons.yml`
+- `vim inventory/mycluster/group_vars/k8s-cluster/addons.yml`
 
 ```yaml
 # [新增]
@@ -258,7 +1285,26 @@ ingress_nginx_enabled: true
 
 ```bash
 # -vvvv会打印最详细的日志信息，建议开启
-ansible-playbook -i inventory/mycluster/hosts.yaml  -b cluster.yml -vvvv
+$ ansible-playbook -i inventory/mycluster/hosts.yaml  -b cluster.yml -vvvv
+```
+
+### 3.6、清理代理设置
+
+清理代理设置（运行时不再需要代理，删掉代理配置即可）
+
+##### 删除docker的http代理（在每个节点执行）
+
+```bash
+$ rm -f /etc/systemd/system/containerd.service.d/http-proxy.conf
+$ systemctl daemon-reload
+$ systemctl restart containerd
+```
+
+##### 删除yum代理
+
+```bash
+# 把grep出来的代理配置手动删除即可
+$ grep 8118 -r /etc/yum*
 ```
 
 # 三、kubernetes-the-hard-way
@@ -2732,7 +3778,7 @@ $ cat /etc/docker/daemon.json
 - 重启
 
 ```bash
-$ systemctl restart docker
+$ systemctl enable docker && systemctl restart docker
 # 删掉旧的存储位置
 $ rm -rf /var/lib/docker/
 ```
@@ -6579,9 +7625,30 @@ spec:
 $ kubectl apply -f ingress-compose.yaml
 ```
 
+# 十五、共享存储【未完待续】
+
+# 十六、StatefulSet【未完待续】
+
+# 十七、K8S中的日志处理【未完待续】
+
+## 17.0、切换目录
+
+```bash
+$ mkdir -pv /root/dockerdata/deep-in-kubernetes/11-logs
+$ cd /root/dockerdata/deep-in-kubernetes/11-logs
+```
+
+# 十八、K8S中的监控
+
+
+
+
+
+
+
 # 九十、Containerd全面上手实践
 
-- ctr命令讲解
+## 90.1、ctr命令讲解
 
 containerd提供的工具
 
@@ -6614,7 +7681,7 @@ $ ctr t rm redis
 $ ctr c rm redis
 ```
 
-- crictl
+## 90.2、crictl
 
 k8s提供的工具
 
@@ -6627,7 +7694,7 @@ $ crictl images
 $ crictl pods
 ```
 
-- kubectl
+## 90.3、kubectl
 
 ```bash
 # 查看客户端和服务器侧版本信息
@@ -6750,6 +7817,9 @@ $ kubectl get cm -n ingress-nginx tcp-services
 $ kubectl get cm -n ingress-nginx tcp-services -o yaml
 # 修改 ConfigMap 配置
 $ kubectl edit cm -n ingress-nginx nginx-template
+
+# 查看所有的api-versions
+$ kubectl api-versions
 ```
 
 - iptables
@@ -6758,6 +7828,158 @@ $ kubectl edit cm -n ingress-nginx nginx-template
 # 可以通过 iptables-save 命令打印出当前节点的 iptables 规则
 $ iptables-save
 ```
+
+## 90.4、kubectl top
+
+kubectl top 是基础命令，但是需要部署配套的组件才能获取到监控值。
+
+- 1.8以上：部署 [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
+
+安装：
+
+1：下载
+
+```bash
+$ wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.1/components.yaml -O metrics-server-v0.6.1.yaml
+
+$ metrics-server-v0.6.1.yaml
+# 配置metrics-server-v0.6.1.yaml，跳过证书
+# 找到 - --metric-resolution=15s 在其后添加
+- --kubelet-insecure-tls
+```
+
+2：安装
+
+```bash
+# 准备镜像
+$ crictl pull registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1
+$ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+
+$ kubectl apply -f metrics-server-v0.6.1.yaml
+```
+
+
+
+# 九十一、科学上网
+
+## 91.1、购买在人间
+
+https://dashboard.zrj222.xyz/#/register?code=WQuqlN4W
+
+登录后购买，并获取SS协议：
+
+登录”在人间“网站 -> 左侧菜单树点击”使用文档“ -> 常见问题中“单独获取某个节点的SS/V2的协议连接” -> 复制“SS协议”下的链接地址，并在浏览器中打开，会显示出所有的地址，随便复制一个。
+
+> 比如我的：
+> ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpiZmU5NmVlNS0xZWU5LTRhN2EtYmEyZS1kZWQwZmM3OTgxNDg@ngzyd-1.lovefromgelifen.xyz:30001#%F0%9F%87%AD%F0%9F%87%B0%20%E9%A6%99%E6%B8%AF-2%20%7C%20SS%20%7C%20%E5%B9%BF%E7%A7%BB
+>
+> 其中： ss协议的格式是：`ss://method:password@server:port`
+>
+> 对 `method:password`部分进行解析：
+>
+> Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpiZmU5NmVlNS0xZWU5LTRhN2EtYmEyZS1kZWQwZmM3OTgxNDg
+>
+> base64解码得到：
+>
+> chacha20-ietf-poly1305:bfe96ee5-1ee9-4a7a-ba2e-ded0fc798148
+>
+> 信息解读：
+>
+> 综上，可以得到我的ss服务信息：
+>
+> server: ngzyd-1.lovefromgelifen.xyz
+> server_port: 30001
+> password: bfe96ee5-1ee9-4a7a-ba2e-ded0fc798148 
+> method: chacha20-ietf-poly1305
+
+## 91.2、搞定shadowsocks客户端
+
+```bash
+$ yum install -y libsodium  autoconf  python36
+$ pip3.6 install https://github.com/shadowsocks/shadowsocks/archive/master.zip -U
+$ vim /etc/shadowsocks.json
+```
+
+```bash
+{
+    "server": "ngzyd-1.lovefromgelifen.xyz",
+    "server_port": 30001,
+    "local_address": "127.0.0.1",
+    "local_port": 8118,
+    "password": "bfe96ee5-1ee9-4a7a-ba2e-ded0fc798148",
+    "timeout": 300,
+    "method": "chacha20-ietf-poly1305",
+    "workers": 1
+}
+```
+
+```bash
+# 启动客户端
+$ nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &
+
+# 验证客户端
+$ curl --socks5 127.0.0.1:8118 http://httpbin.org/ip
+# 测试成功：
+{
+  "origin": "203.175.12.131"
+}
+```
+
+## 91.3、搞定本地http代理
+
+上一步有了socks5服务，并不是直接使用，因为我们需要的是http、https代理，所以还需要部署一个代理服务，一头连接socks5服务，一端提供http、https代理
+
+```bash
+# 先下载privoxy
+# 链接: https://pan.baidu.com/s/1OoM-uVpf1jyyb8dRjNDfvg?pwd=aqtf 提取码: aqtf 
+
+$ tar -zxvf privoxy-3.0.26-stable-src.tar.gz
+$ cd privoxy-3.0.26-stable
+# Privoxy 强烈不建议使用 root 用户运行，所以我们使用 useradd privoxy 新建一个用户.
+$ useradd privoxy
+$ autoheader && autoconf
+$ ./configure
+$ make && make install
+
+# 配置
+$ vi /usr/local/etc/privoxy/config
+listen-address 0.0.0.0:8118   # 8118 是默认端口，不用改，下面会用到
+forward-socks5t / 127.0.0.1:8118 . # 这里的端口写 shadowsocks 的本地端口（注意最后那个 . 不要漏了
+
+# 启动
+$ privoxy --user privoxy /usr/local/etc/privoxy/config
+```
+
+## 91.4、愉快的用起来
+
+经过上面的转换，我们就在自己的服务器上有了一个可以提供http/https代理的服务，其他服务器想要访问外网就非常简单了，直接设置两个环境变量就好：
+
+```bash
+$ export http_proxy=http://192.168.200.1:8118
+$ export https_proxy=http://192.168.200.1:8118
+# 测试
+$ curl www.google.com
+```
+
+# 九十二、比科学上网更科学的上网
+
+https://www.kchuhai.com/report/view-6052.html
+
+谷歌云：https://console.cloud.google.com
+
+- 如何下载一个 k8s 镜像？
+
+```bash
+# 前提是浏览器能科学上网，登录谷歌云，并激活 cloud shell，然后在cloud shell下操作
+$ docker pull k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+$ docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
+$ docker tag k8s.gcr.io/metrics-server/metrics-server:v0.6.1 registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
+$ docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
+```
+
+
+
+
 
 # 九十五、安装其他依赖环境
 
