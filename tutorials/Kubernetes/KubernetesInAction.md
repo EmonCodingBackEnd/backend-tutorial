@@ -9312,7 +9312,7 @@ rm -rf *
 # 准备镜像制作文件
 K8S_DIR=${JENKINS_DIR}/k8s
 if [ ! -d ${K8S_DIR} ];then
-    echo "env 'K8S_DIR' is not exists"
+    echo "env 'K8S_DIR' is not exists, please ensure k8s dir in your project"
     exit 1
 fi
 cp -rv ${K8S_DIR}/* .
