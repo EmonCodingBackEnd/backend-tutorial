@@ -278,7 +278,7 @@ $ yum update
 
 ```bash
 $ yum install -y kubelet-1.20.15 kubeadm-1.20.15 kubectl-1.20.15
-# 这里不需要启动，在 kubeadm init 后拿到 join 命令，加入后会自动启动
+# 在 kubeadm init 后拿到 join 命令，kubelet服务会启动，这里不需要手工启动，但需要加入开机启动！！！
 $ systemctl enable kubelet
 ```
 
@@ -295,8 +295,8 @@ $ kubeadm init \
 --apiserver-advertise-address=192.168.200.116 \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.20.0 \
---service-cidr=10.200.0.0/16 \
---pod-network-cidr=10.233.0.0/16
+--service-cidr=10.233.0.0/16 \
+--pod-network-cidr=10.200.0.0/16
 
 # 使用 kubectl 工具（Master&&Node节点）
 $ mkdir -p $HOME/.kube 
@@ -8324,6 +8324,8 @@ $ kubectl attach
 
 # 查看某个命名空间所有信息
 $ kubectl get all -n ingress-nginx
+# 查看某个命名空间下指定类型信息
+$ kubectl get po,svc -n kube-system -o wide
 # 配置资源
 $ kubectl apply -f < xxx.yaml >
 # 删除资源
