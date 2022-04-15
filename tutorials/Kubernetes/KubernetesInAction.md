@@ -8404,6 +8404,56 @@ $ kubectl api-versions
 $ iptables-save
 ```
 
+## 90.4、kubeadm如何加入节点
+
+```bash
+# 1. 重新生成新的token:
+[root@host1 flannel]# kubeadm  token create
+W0514 10:44:17.973722   26813 configset.go:202] WARNING: kubeadm cannot validate component configs for API groups [kubelet.config.k8s.io kubeproxy.config.k8s.io]
+38lqh5.w6csafdt0cqkxz4e
+[root@host1 flannel]# kubeadm  token list
+TOKEN                     TTL         EXPIRES                     USAGES                   DESCRIPTION                                                EXTRA GROUPS
+38lqh5.w6csafdt0cqkxz4e   23h         2021-05-15T10:44:17+08:00   authentication,signing   <none>                                                     system:bootstrappers:kubeadm:default-node-token
+
+# 2. 获取ca证书sha256编码hash值:
+[root@host1 flannel]# openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+84b0d7e02994966eb529731e85809f451f81efbb802a8d2f113ac8ce42770a5d
+
+
+# 3. 节点加入集群:
+  kubeadm join 10.0.0.17:6443 --token 38lqh5.w6csafdt0cqkxz4e --discovery-token-ca-cert-hash sha256:84b0d7e02994966eb529731e85809f451f81efbb802a8d2f113ac8ce42770a5d
+# 几秒钟后，您应该注意到kubectl get nodes在主服务器上运行时输出中的此节点。
+
+
+# 上面的方法比较繁琐，一步到位：
+kubeadm token create --print-join-command
+
+# 第二种方法：
+token=$(kubeadm token generate)
+kubeadm token create $token --print-join-command --ttl=0	#--ttl=0,表示永不失效
+```
+
+## 90.5、kubeadm如何删除节点
+
+```bash
+kubeadm reset -f
+modprobe -r ipip
+lsmod
+rm -rf ~/.kube/
+rm -rf /etc/kubernetes/
+rm -rf /etc/systemd/system/kubelet.service.d
+rm -rf /etc/systemd/system/kubelet.service
+rm -rf /usr/bin/kube*
+rm -rf /etc/cni
+rm -rf /opt/cni
+rm -rf /var/lib/etcd
+rm -rf /var/etcd
+yum clean all
+yum remove kube*
+```
+
+
+
 # 九十一、科学上网
 
 ## 91.1、购买在人间
