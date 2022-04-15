@@ -7864,7 +7864,7 @@ $ kubectl apply -f ingress-compose.yaml
 
 # 十六、StatefulSet【未完待续】
 
-# 十七、K8S中的日志处理【未完待续】
+# 十七、K8S中的日志处理
 
 在部署完成后 虽然我们能正常的运行我们的服务了 。 但是我们查看日志却是一个很麻烦的事情 ， 我们只能去容器当中查看已经打印好的日志 。这很明显非常的不友好 ， 而且容器中的日志肯定要定时删除的 。 不利于我们日后去查找对应的日志。
 
@@ -7884,10 +7884,11 @@ $ cd/root/k8s_soft/k8s_v1.20.15
 ## 17.1、创建命名空间
 
 ```bash
-$ kubectl create ns prod
+# 创建 drill 命名空间，表示训练的空间
+$ kubectl create ns drill
 ```
 
-## 17.2、创建外部ES服务
+## 17.2、创建外部ES服务【忽略】
 
 特殊说明：如果集群网络到ES服务器可直达，该服务可省略！！！
 
@@ -7900,7 +7901,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: external-es
-  namespace: prod
+  namespace: drill
 spec:
   ports:
   - port: 80
@@ -7910,7 +7911,7 @@ kind: Endpoints
 metadata:
   # 和 svc 相同的名称
   name: external-es
-  namespace: prod
+  namespace: drill
 subsets:
   - addresses:
     # es 端口
@@ -7923,7 +7924,7 @@ subsets:
 ```bash
 $ kubectl apply -f external-es.yaml
 # 查看
-$ kubectl get all -n prod
+$ kubectl get all -n drill
 ```
 
 ## 17.3、创建log-pilot
@@ -8060,7 +8061,7 @@ time="2022-04-13T13:57:53+08:00" level=debug msg="9c4e8aa84be485d59706f4dc849513
 ## 17.4、部署服务查看日志
 
 ```bash
-$ vim web-prod.yaml
+$ vim web-drill.yaml
 ```
 
 ```yaml
@@ -8069,7 +8070,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sbt-web-demo
-  namespace: prod
+  namespace: drill
 spec:
   selector:
     matchLabels:
@@ -8107,7 +8108,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sbt-web-demo
-  namespace: prod
+  namespace: drill
 spec:
   ports:
     - port: 80
@@ -8123,10 +8124,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sbt-web-demo
-  namespace: prod
+  namespace: drill
 spec:
   rules:
-    - host: sbt-prod.emon.vip
+    - host: sbt-drill.emon.vip
       http:
         paths:
           - path: /
@@ -8139,9 +8140,9 @@ spec:
 ```
 
 ```bash
-$ kubectl apply -f web-prod.yaml
+$ kubectl apply -f web-drill.yaml
 # 查看
-$ kubectl get po -n prod
+$ kubectl get po -n drill
 ```
 
 ## 17.5、Kibana
@@ -8271,7 +8272,10 @@ $ kubectl version
 # 以group/version的格式显示服务器侧所支持的API版本
 $ kubectl api-versions
 # 显示资源文档信息
-$ kubectl explain
+$ kubectl explain < xxx >
+$ kubectl explain svc
+$ kubectl explain svc.spec
+$ kubectl explain svc
 
 # 取得确认对象信息列表
 $ kubectl get < xxx >
@@ -9632,9 +9636,13 @@ Jenkins登录==>新建任务==>输入名称 k8s-springboot-web-demo 然后选择“流水线”类型
 ```bash
 node {
     env.BUILD_DIR = "/root/jenkins/build_workspace"
+    // 打包镜像时使用的模块
     env.MODULE = "k8s-demo/springboot-web-demo"
+	// 服务发布后，暴露出来的域名
     env.HOST = "springboot.emon.vip"
+    // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
     env.NS = "default"
+    // 如果不指定，默认使用 web.yaml 否则使用指定的配置文件发布k8s服务
     env.DEPLOY_YAML = ""
     
     stage('Preparation') {
