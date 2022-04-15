@@ -9470,7 +9470,7 @@ spec:
 - SpringBoot模板【该模板放到项目中根目录的k8s目录下使用，这里仅仅是保存一下】
 
 ```bash
-# web-custom.yaml 或者 k8s-deploy.yaml 或其他名字
+# web-custom.yaml 或者 k8s-deploy-drill.yaml 或其他名字
 #deploy
 apiVersion: apps/v1
 kind: Deployment
@@ -9491,20 +9491,20 @@ spec:
         - name: {{name}}
           image: {{image}}
           ports:
-            - containerPort: 8080
+            - containerPort: 38781
           resources:
             requests:
-              memory: 500Mi
+              memory: 512Mi
               # 1核心的CPU=1000m
-              cpu: 1000m
+              cpu: 300m
             limits:
-              memory: 500Mi
-              cpu: 1000m
+              memory: 768Mi
+              cpu: 500m
           # 存活状态检查
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 38781
               scheme: HTTP
             # pod 创建10s后启动第一次探测
             initialDelaySeconds: 10
@@ -9520,12 +9520,14 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8080
+              port: 38781
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 3
           env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYMpI8l2puY2mFmiPUyOPDoaxZTDK8 -Dspring.profiles.active={{ns}}"
             # 1、stdout为约定关键字，表示采集标准输出日志
             # 2、配置标准输出日志采集到ES的catalina索引下
             - name: aliyun_logs_catalina
@@ -9533,11 +9535,11 @@ spec:
             # 1、配置采集容器内文件日志，支持通配符
             # 2、配置该日志采集到ES的access索引下
             - name: aliyun_logs_access
-              value: "/home/saas/devops/k8s-demo/logs/*.log"
+              value: "/home/saas/huiba/gaia/huiba-gaia-gateway/logs/*.log"
           # 容器内文件日志路径需要配置emptyDir
           volumeMounts:
             - name: log-volume
-              mountPath: /home/saas/devops/k8s-demo/logs
+              mountPath: /home/saas/huiba/gaia/huiba-gaia-gateway/logs
       volumes:
         - name: log-volume
           emptyDir: { }
@@ -9552,7 +9554,7 @@ spec:
   ports:
     - port: 80
       protocol: TCP
-      targetPort: 8080
+      targetPort: 38781
   selector:
     app: {{name}}
   type: ClusterIP
@@ -9576,7 +9578,6 @@ spec:
                 name: {{name}}
                 port:
                   number: 80
-
 ```
 
 
