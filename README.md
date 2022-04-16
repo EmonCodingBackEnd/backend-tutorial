@@ -57,8 +57,8 @@
     - [HBase](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/HBase)
     - [Flink](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Flink)
 - [DevOps](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/DevOps)
-    - [Docker](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Docker)
-    - [Kubernetes](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/Kubernetes)
+    - [Docker](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/DevOps/Docker)
+    - [Kubernetes](https://github.com/EmonCodingBackEnd/backend-tutorial/tree/master/tutorials/DevOps/Kubernetes)
 
 
 
