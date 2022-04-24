@@ -1601,3 +1601,145 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 # 六、容器化
 
 ![image-20220321225749039](images/image-20220321225749039.png)
+
+# 九十、各种软件的容器化部署
+
+## 1、MySQL
+
+```bash
+# /usr/local/dockerv/mysql_home 目录会自动创建
+$ docker run --name=mysql -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 -v /usr/local/dockerv/mysql_home:/var/lib/mysql -p 3306:3306 -d mysql/mysql-server:5.7
+```
+
+## 2、Redis
+
+- redis配置文件下载地址：https://redis.io/docs/manual/config/
+
+```bash
+# 下载redis.conf
+$ wget -cP /usr/local/dockerv/redis_home/ https://raw.githubusercontent.com/redis/redis/5.0/redis.conf
+# 备份redis.conf
+$ cp /usr/local/dockerv/redis_home/redis.conf /usr/local/dockerv/redis_home/redis.conf.bak
+```
+
+- 调整配置文件
+
+```bash
+$ vim /usr/local/dockerv/redis_home/redis.conf
+```
+
+```bash
+# [修改]
+bind 127.0.0.1
+==>
+bind 0.0.0.0
+# [修改] 默认yes，开启保护模式，限制为本地访问
+protected-mode yes
+==>
+protected-mode no
+# [修改] 默认弄，改为yes意为开启aof持久化
+appendonly no
+==>
+appendonly yes
+# [增加] 开启访问密码
+requirepass redis123
+```
+
+- 启动
+
+```bash
+$ docker run --name=redis \
+-v /usr/local/dockerv/redis_home/data:/data \
+-v /usr/local/dockerv/redis_home/redis.conf:/etc/redis/redis.conf \
+-p 6379:6379 -d redis:5.0 \
+redis-server /etc/redis/redis.conf
+```
+
+- docker命令行访问
+
+```bash
+$ docker exec -it redis redis-cli
+```
+
+## 3、Zookeeper
+
+- 启动
+
+```bash
+$ docker run --name zoo --restart always -p 2181:2181 -d zookeeper:3.5.9
+```
+
+- 连接
+
+```bash
+$ docker exec -it zoo zkCli.sh
+# 退出
+[zk: localhost:2181(CONNECTED) 1] quit
+```
+
+## zkui
+
+- 制作镜像并启动
+
+```bash
+# 制作zkui镜像
+$ mkdir /usr/local/zkui
+$ cd /usr/local/zkui/
+$ git clone https://github.com/DeemOpen/zkui.git
+$ cd zkui
+# 确保本地登录了docker hub
+# 修改 vim Makefile 中 publish 一段
+# ==================================
+publish:
+    docker tag $(NAME):$(VERSION) $(NAME):$(VERSION)
+    docker tag $(NAME):$(VERSION) $(NAME):latest
+    docker tag $(NAME):$(VERSION) $(NAME):latest
+    docker push $(NAME)
+==>
+HUB_NAME = rushing/zkui
+publish:
+    docker tag $(NAME):$(VERSION) $(HUB_NAME):$(VERSION)
+    docker tag $(NAME):$(VERSION) $(HUB_NAME):latest
+    docker push $(HUB_NAME):$(VERSION)
+    docker push $(HUB_NAME)
+# ==================================
+$ make build
+$ make publish
+
+
+# admin/manager 读写账号；appconfig/appconfig 普通用户
+$ docker run -d --name zkui -p 9090:9090 -e ZK_SERVER=192.168.200.116:2181 rushing/zkui
+# 可查看实际配置
+$ docker exec -it zkui /bin/bash
+```
+
+- 登录访问
+
+http://repo.emon.vip:9090
+
+## 4、xxl-job-admin
+
+- 创建依赖数据库
+
+脚本地址：https://github.com/xuxueli/xxl-job/blob/master/doc/db/tables_xxl_job.sql
+
+- 启动
+
+```bash
+# 请确保先执行数据库脚本，创建了xxl_job库和表
+# 如需自定义 mysql 等配置，可通过 "-e PARAMS" 指定，参数格式 PARAMS="--key=value  --key2=value2" ；
+# 配置项参考文件：https://github.com/xuxueli/xxl-job/blob/master/xxl-job-admin/src/main/resources/application.properties
+# 如需自定义 JVM内存参数 等配置，可通过 "-e JAVA_OPTS" 指定，参数格式 JAVA_OPTS="-Xmx512m" ；
+$ docker run --name xxl-job-admin \
+-e PARAMS="--spring.datasource.url=jdbc:mysql://192.168.200.116:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=root123" \
+-v /usr/local/dockerv/xxl-job-admin:/data/applogs \
+-p 8790:8080 -d xuxueli/xxl-job-admin:2.3.0
+```
+
+- 登录访问
+
+http://repo.emon.vip:8790/xxl-job-admin
+
+账号密码：
+
+admin/123456
