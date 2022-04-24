@@ -1743,3 +1743,43 @@ http://repo.emon.vip:8790/xxl-job-admin
 ÕËºÅÃÜÂë£º
 
 admin/123456
+
+## 5¡¢sentinel-dashboard
+
+- ÏÂÔØ
+
+```bash
+$ mkdir /usr/local/sentinel-dashboard && cd /usr/local/sentinel-dashboard/
+$ wget https://github.com/alibaba/Sentinel/releases/download/1.8.4/sentinel-dashboard-1.8.4.jar
+$ vim Dockerfile
+```
+
+```dockerfile
+FROM openjdk:8-jre
+MAINTAINER ÎÊÇï liming2011071@163.com
+
+COPY sentinel-dashboard-1.8.4.jar sentinel-dashboard.jar
+
+ENTRYPOINT ["java", "-Dserver.port=8080", "-Dcsp.sentinel.dashboard.server=localhost:8080" ,"-Dproject.name=sentinel-dashboard", "-jar", "/sentinel-dashboard.jar"]
+```
+
+- ÖÆ×÷¾µÏñ
+
+```bash
+$ docker build -t rushing/sentinel-dashboard:1.8.4 .
+```
+
+- ÔËĞĞ
+
+```bash
+$ docker run --name sentinel -p 8791:8080 -d rushing/sentinel-dashboard:1.8.4
+```
+
+- µÇÂ¼·ÃÎÊ
+
+http://repo.emon.vip:8791
+
+ÕËºÅÃÜÂë£º
+
+sentinel/sentinel
+
