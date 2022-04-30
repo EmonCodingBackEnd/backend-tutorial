@@ -343,7 +343,7 @@ max_binlog_cache_size = 512m
 log_slave_updates
 # 作为从库时生效，中继日志relay-log可以自我修复
 relay_log_recovery = 1
-# 作为从库时生效，主从复制时忽略的错误
+# 作为从库时生效，主从复制时忽略的错误，避免slave端复制中断。如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致
 slave_skip_errors = ddl_exist_errors
 # 值为null，表示限制mysqld不允许导入导出；值为/tmp/，限制mysqld的导入导出只能发生在/tmp/目录下；值为'',不对mysqld的导入导出限制；且注意该参数无法通过set global命令修改。
 secure_file_priv = ''
@@ -1084,7 +1084,7 @@ mysql> select * from t1;
 1 row in set (0.00 sec)
 ```
 
-#### 2.1.2、第二部：配置master2->master1主从复制（升级为主主复制）
+#### 2.1.2、第二步：配置master2->master1主从复制（升级为主主复制）
 
 1. 在`master2`创建专用备份账号
 

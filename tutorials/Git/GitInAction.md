@@ -1069,6 +1069,18 @@ git bisect log
 git remote -v
 ```
 
+## 7.10、git clone项目报错Filename too long
+
+第一步：打开git bash
+
+第二步：执行命令
+
+```bash
+git config --global core.longpaths true
+```
+
+
+
 # 八、Git Flow——以发布为中心的开发模式
 
 ## 8.1 git flow的工作流程

@@ -1606,10 +1606,217 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 
 ## 1、MySQL
 
+### 1.1、单机
+
 ```bash
 # /usr/local/dockerv/mysql_home 目录会自动创建
-$ docker run --name=mysql -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 -v /usr/local/dockerv/mysql_home:/var/lib/mysql -p 3306:3306 -d mysql/mysql-server:5.7
+$ docker run --name=mysql \
+-e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
+-v /usr/local/dockerv/mysql/log:/var/log/mysql \
+-v /usr/local/dockerv/mysql/dada:/var/lib/mysql \
+-v /usr/local/dockerv/mysql/conf:/etc/mysql \
+-p 3307:3306 -d mysql/mysql-server:5.7
 ```
+
+### 1.2、主从
+
+#### 1.2.1、主
+
+1：启动
+
+```bash
+# /usr/local/dockerv/mysql_home 目录会自动创建
+$ docker run --name=mysql-master \
+-e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
+-v /usr/local/dockerv/mysql-master/log:/var/log/mysql \
+-v /usr/local/dockerv/mysql-master/data:/var/lib/mysql \
+-v /usr/local/dockerv/mysql-master/conf:/etc/mysql \
+-p 3307:3306 -d mysql/mysql-server:5.7
+```
+
+2：配置
+
+```bash
+$ vim /usr/local/dockerv/mysql-master/conf/my.cnf
+```
+
+```bash
+[mysqld]
+#========主从复制设置========
+#开启二进制日志功能
+log-bin=mysql-bin
+#设置使用的二进制日志格式（mixed,statement,row）
+binlog_format=row
+# 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
+binlog_row_image = minimal
+#设置server_id，同一局域网中需要唯一
+server_id=1
+
+#二进制日志过期清理时间。默认值为0，表示不自动清理。
+expire_logs_days=7
+# 每个日志文件大小
+max_binlog_size = 100m
+# binlog缓存大小
+binlog_cache_size = 4m
+# 最大binlog缓存大小
+max_binlog_cache_size = 512m
+
+# 在主服务器上允许写入数据，仅对普通用户生效，若限制root请使用super_read_only
+read_only=0
+#指定不需要同步的数据库名称
+binlog_ignore_db = information_schema
+binlog_ignore_db = mysql
+binlog_ignore_db = performance_schema
+binlog_ignore_db = sys
+```
+
+33：重启
+
+```bash
+$ docker restart mysql-master
+```
+
+4：进入mysql-master容器
+
+```bash
+$ docker exec -it mysql-master /bin/bash
+```
+
+在mysql-master容器内创建数据同步用户。
+
+```bash
+bash-4.2# mysql -uroot -proot123
+mysql> create user 'repl'@'%' identified by 'repl123';
+mysql> grant replication slave on *.* to 'repl'@'%';
+show master status;
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB                                | Executed_Gtid_Set |
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+| mysql-bin.000001 |      595 |              | information_schema,mysql,performance_schema,sys |                   |
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+1 row in set (0.00 sec)
+```
+
+#### 1.2.2、从
+
+1：启动
+
+```bash
+# /usr/local/dockerv/mysql_home 目录会自动创建
+$ docker run --name=mysql-slave \
+-e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
+-v /usr/local/dockerv/mysql-slave/log:/var/log/mysql \
+-v /usr/local/dockerv/mysql-slave/data:/var/lib/mysql \
+-v /usr/local/dockerv/mysql-slave/conf:/etc/mysql \
+-p 3308:3306 -d mysql/mysql-server:5.7
+```
+
+2：配置
+
+```bash
+$ vim /usr/local/dockerv/mysql-slave/conf/my.cnf
+```
+
+```bash
+[mysqld]
+#========主从复制设置========
+#开启二进制日志功能
+log-bin=mysql-bin
+#设置使用的二进制日志格式（mixed,statement,row）
+binlog_format=row
+# 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
+binlog_row_image = minimal
+#设置server_id，同一局域网中需要唯一
+server_id=2
+
+#二进制日志过期清理时间。默认值为0，表示不自动清理。
+expire_logs_days=7
+# 每个日志文件大小
+max_binlog_size = 100m
+# binlog缓存大小
+binlog_cache_size = 4m
+# 最大binlog缓存大小
+max_binlog_cache_size = 512m
+
+# 在从服务器上禁止任何用户写入任何数据，仅对普通用户生效，若限制root请使用super_read_only
+read_only = 1
+
+#指定不需要同步的数据库名称
+replicate_ignore_db = information_schema
+replicate_ignore_db = mysql
+replicate_ignore_db = performance_schema
+replicate_ignore_db = sys
+relay_log = mysql-relay-bin
+# 作为从库时生效，想进行级联复制，则需要此参数
+log_slave_updates = on
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+master_info_repository = TABLE
+relay_log_info_repository = TABLE
+```
+
+3：重启
+
+```bash
+$ docker restart mysql-slave
+```
+
+4：进入mysql-slave容器
+
+```bash
+$ docker exec -it mysql-slave /bin/bash
+bash-4.2# mysql -uroot -proot123
+```
+
+5：在mysql-slave中配置主从复制
+
+```bash
+# 注意：MASTER_LOG_FILE和MASTER_LOG_POS是在主库通过 show master status 得到的
+mysql> change master to \
+master_host='192.168.200.116', \
+master_port=3307, \
+master_user='repl', \
+master_password='repl123', \
+MASTER_LOG_FILE='mysql-bin.000001', \
+MASTER_LOG_POS=595; \
+mysql> start slave;
+mysql> show slave status \G
+```
+
+#### 1.2.3、验证
+
+- 登录主容器
+
+```bash
+$ docker exec -it mysql-master /bin/bash
+bash-4.2# mysql -uroot -proot123
+mysql> create database db0;
+mysql> use db0;
+mysql> create table user(id int,name varchar(20),age tinyint);
+mysql> insert into user values(1,'emon',28);
+mysql> select * from user;
++------+------+------+
+| id   | name | age  |
++------+------+------+
+|    1 | emon |   28 |
++------+------+------+
+1 row in set (0.00 sec)
+```
+
+- 登录从库
+
+```bash
+$ docker exec -it mysql-slave /bin/bash
+bash-4.2# mysql -uroot -proot123
+mysql> select * from db0.user;
++------+------+------+
+| id   | name | age  |
++------+------+------+
+|    1 | emon |   28 |
++------+------+------+
+1 row in set (0.00 sec)
+```
+
+
 
 ## 2、Redis
 
@@ -1751,6 +1958,7 @@ admin/123456
 ```bash
 $ mkdir /usr/local/sentinel-dashboard && cd /usr/local/sentinel-dashboard/
 $ wget https://github.com/alibaba/Sentinel/releases/download/1.8.4/sentinel-dashboard-1.8.4.jar
+# 备注：如下使用的不是官方版，因为官方默认不支持限流规则持久化！！！
 $ vim Dockerfile
 ```
 
@@ -1758,21 +1966,24 @@ $ vim Dockerfile
 FROM openjdk:8-jre
 MAINTAINER 问秋 liming2011071@163.com
 
-COPY sentinel-dashboard-1.8.4.jar sentinel-dashboard.jar
+COPY sentinel-dashboard-1.8.0-zookeeper.jar sentinel-dashboard.jar
 
-ENTRYPOINT ["java", "-Dserver.port=8080", "-Dcsp.sentinel.dashboard.server=localhost:8080" ,"-Dproject.name=sentinel-dashboard", "-jar", "/sentinel-dashboard.jar"]
+ENTRYPOINT ["java", "-jar", "/sentinel-dashboard.jar"]
 ```
 
 - 制作镜像
 
 ```bash
-$ docker build -t rushing/sentinel-dashboard:1.8.4 .
+$ docker build -t rushing/sentinel-dashboard:ds-1.8.0 .
+$ docker push rushing/sentinel-dashboard:ds-1.8.0
 ```
 
 - 运行
 
 ```bash
-$ docker run --name sentinel -p 8791:8080 -d rushing/sentinel-dashboard:1.8.4
+$ docker run --name sentinel \
+-e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Ddatasource.provider=zookeeper -Ddatasource.provider.zookeeper.server-addr=192.168.200.116:2181" \
+-p 8791:8791 -d rushing/sentinel-dashboard:ds-1.8.0
 ```
 
 - 登录访问
