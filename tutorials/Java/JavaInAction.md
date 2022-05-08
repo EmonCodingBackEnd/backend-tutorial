@@ -119,15 +119,83 @@ where <option> is one of:
 ### 2.2、输出当前jvm进程的全部参数和系统属性
 
 ```bash
-[emon@emon ~]$ jinfo 61572
+# 输出全部的参数+系统属性
+$ jinfo 61572
+# 输出全部的参数
+$ jinfo -flags 61572
+# 输出系统属性
+$ jinfo -sysprops 61572
 ```
 
 ### 2.3、输出对应名称的参数
 
+- HeapDumpPath
+
 ```bash
-[emon@emon ~]$ jinfo -flag MaxHeapSize 61572
+# 查看
+$ jinfo -flag HeapDumpPath 61572
+# 开启
+$ jinfo -flag HeapDumpPath=/tmp/61572.txt 61572
+# 关闭
+$ jinfo -flag HeapDumpPath 61572
+```
+
+- MaxHeapSize
+
+```bash
+$ jinfo -flag MaxHeapSize 61572
 -XX:MaxHeapSize=268435456
 ```
+
+- PrintGC
+
+```bash
+# 查看
+$ jinfo -flag PrintGC 61572
+# 开启
+$ jinfo -flag +PrintGC 61572
+# 关闭
+$ jinfo -flag -PrintGC 61572
+```
+
+- PrintGCDetails：打印详细的GC日志
+
+```bash
+# 查看
+$ jinfo -flag PrintGCDetails 61572
+# 开启
+$ jinfo -flag +PrintGCDetails 61572
+# 关闭
+$ jinfo -flag -PrintGCDetails 61572
+```
+
+- PrintGCTimeStamps：打印出每次GC发生的时间
+
+```bash
+# 查看
+$ jinfo -flag PrintGCTimeStamps 61572
+# 开启
+$ jinfo -flag +PrintGCTimeStamps 61572
+# 关闭
+$ jinfo -flag -PrintGCTimeStamps 61572
+```
+
+- 其他参数
+
+```bash
+-XX:NewSize=5M
+-XX:MaxNewSize=5M
+-XX:InitialHeapSize=10
+-XX:MaxHeapSize=10
+-XX:SurvivorRatio=8
+-XX:PretenureSizeThreshold=10
+-XX:+UseParNewGC
+-XX:+UseConcMarkSweepGC
+-XX:+PrintGCDetails
+-XX:+PrintGCTimeStamps
+```
+
+
 
 ## 3、jstack命令
 
@@ -163,6 +231,8 @@ Options:
 
 ```bash
 [emon@emon ~]$ jstack -l 61572 > 61572.log
+# 统计各个线程状态数量
+[emon@emon ~]$ grep java.lang.Thread.State 61572.log | awk '{print $2$3$4$5}'|sort|uniq -c
 ```
 
 
@@ -321,10 +391,18 @@ jmap -histo 61572 | sort -n -r -k 2 | head -10
 jmap -histo 61572 | sort -n -r -k 3 | head -10
 ```
 
-### 4.5、生成堆转存快照
+### 4.5、GC频繁时查看
 
 ```bash
-[emon@emon ~]$ jmap -dump:live,format=b,file=61572.hprof 61572
+$ jmap -finalizerinfo 61572
+```
+
+### 4.6、生成堆转存快照
+
+```bash
+$ jmap -dump:live,format=b,file=61572.hprof 61572
+# 解析并查看转存快照的内容，解析成功后可查看： http://repo.emon.vip:7000/
+$ jhat 61572.hprof
 ```
 
 **说明：**以hprof二进制格式转储Java堆到指定的filename文件中。live子选项是可选的。如果指定了live子选项，堆中只有活动的对象会被转储。想要浏览heap dump，可以使用`jpofile`工具读取分析。
@@ -363,6 +441,10 @@ Number of objects pending for finalization: 0
 
 
 ## 5、jstat命令
+
+概念：用于监控虚拟机各种运行状态信息的命令行工具，可以显示在虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据。
+
+用于查询三类虚拟机信息：类装载、垃圾收集、运行期编译状况。
 
 ### 5.1、命令介绍
 
