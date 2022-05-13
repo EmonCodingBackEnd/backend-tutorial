@@ -6296,7 +6296,7 @@ $ cd /root/dockerdata/deep-in-kubernetes/8-ingress
 
 ```bash
 # 【重点】请先删除mandatory.yaml对应的资源
-$ kubectl delete apply -d mandatory.yaml
+$ kubectl delete -f mandatory.yaml
 ```
 
 - 调整mandatory.yaml

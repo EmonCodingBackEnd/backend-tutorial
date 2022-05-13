@@ -6,6 +6,8 @@
 
 # 一、Java项目小贴士
 
+![image-20220508193122322](images/image-20220508193122322.png)
+
 ## 1、Java启动参数
 
 ```bash
@@ -56,6 +58,8 @@ java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.en
 
 # 二、Java项目线上问题排查
 
+Java官方工具文档：https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html
+
 ## 1、jps命令
 
 ### 1.1、命令介绍
@@ -84,6 +88,71 @@ Definitions:
 ```
 
 ## 2、jinfo命令
+
+### 2.0、JVM参数
+
+#### 2.0.1、标准参数
+
+| 参数                           | 说明                                                |
+| ------------------------------ | --------------------------------------------------- |
+| -help                          | 输出此帮助消息                                      |
+| -server                        | 选择 "server" VM                                    |
+| -client                        |                                                     |
+| -version                       | 输出产品版本并退出                                  |
+| -showversion                   | 输出产品版本并继续                                  |
+| -cp -classpath                 | <目录和 zip/jar 文件的类搜索路径>                   |
+| -javaagent:< jarpath>[=<选项>] | 加载 Java 编程语言代理, 请参阅 java.lang.instrument |
+
+#### 2.0.2、X参数：非标准化参数
+
+| 参数    | 说明                                              |
+| ------- | ------------------------------------------------- |
+| -Xint   | 解释执行                                          |
+| -Xcomp  | 第一次使用就编译成本地代码                        |
+| -Xmixed | 混合模式，JVM自己来决定是否编译成本地代码【默认】 |
+
+#### 2.0.3、XX参数：非标准化参数
+
+特点：相对不稳定，主要用于JVM调优和Debug
+
+- Boolean类型
+
+格式：-XX:[+-]< name>表示启用或禁用name属性
+
+| 参数                       | 说明                                           |
+| -------------------------- | ---------------------------------------------- |
+| -XX:+UseConcMarkSweepGC    | 启用CMS垃圾回收器                              |
+| -XX:+UseG1GC               | 启用G1垃圾收集器                               |
+| -XX:+UseParallelGC         | 启用并行垃圾回收器                             |
+| -XX:+PrintFlagsInitial     | 打印所有的默认参数设置                         |
+| -XX:+PrintFlagsFinal       | 打印最终值，如果某个默认值被新值覆盖，显示新值 |
+| -XX:+PrintCommandLineFlags | 打印那些被新值覆盖的项                         |
+
+- 示例
+
+```bash
+# 查看版本时启动的进程信息，查看的信息，如果第三列是":="表示被修改过的值
+$ java -XX:+PrintFlagsFinal -version
+```
+
+
+
+
+
+- 非Boolean类型
+
+格式：-XX:< name>表示name属性的值是value
+
+| 参数                          | 说明                    |
+| ----------------------------- | ----------------------- |
+| -XX:MaxGCPauseMillis=500      | GC最大的停留时间是500ms |
+| -XX:GCTimeRatio=19            |                         |
+| -Xmx等价于-XX:MaxHeapSize     | 最大堆内存大小          |
+| -Xms等价于-XX:InitialHeapSize | 初始堆内存大小          |
+| -Xss等价于-XX:ThreadStackSize | 线程堆栈大小，默认1024K |
+|                               |                         |
+
+
 
 ### 2.1、命令介绍
 
@@ -121,7 +190,7 @@ where <option> is one of:
 ```bash
 # 输出全部的参数+系统属性
 $ jinfo 61572
-# 输出全部的参数
+# 输出全部的参数，仅包含被修改过值的参数
 $ jinfo -flags 61572
 # 输出系统属性
 $ jinfo -sysprops 61572
@@ -508,9 +577,9 @@ Loaded  Bytes  Unloaded  Bytes     Time
 
 - 说明：
   - `Loaded`已经装载的类的数量
-  - `Bytes`已经装载的类的字节数
+  - `Bytes`已经装载的类的字节数（单位KB）
   - `Unloaded`已经卸载的类的数量
-  - `Bytes`已经卸载的类的字节数
+  - `Bytes`已经卸载的类的字节数（单位KB
   - `Time`装载和卸载类所花费的时间
 
 ### 5.3、显示VM实时编译（JIT）的数量等信息
@@ -543,7 +612,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `S0U`年轻代中第一个survivor（幸存区）目前已使用空间（KB）
   - `S1U`年轻代中第二个survivor（幸存区）目前已使用空间（KB）
   - `EC`年轻代中Eden（伊甸园）的容量（KB）
-  - `EU`年轻但中Eden（伊甸园）目前已使用空间（KB）
+  - `EU`年轻代中Eden（伊甸园）目前已使用空间（KB）
   - `OC`Old代的容量（KB）
   - `OU`Old代目前已使用空间（KB）
   - `MC`metaspace（元空间）的容量（KB）
@@ -716,7 +785,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
   - `GCT`系统gc用的总时间(秒)
 
-### 5.10 统计gc信息
+### 5.11 统计gc信息
 
 ```bash
 [emon@emon ~]$ jstat -gcutil 61572
@@ -739,7 +808,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
 
   
 
-### 5.11、显示垃圾回收的相关信息(-gcutil)
+### 5.12、显示垃圾回收的相关信息(-gcutil)
 
 同时显示最后一次或当前正在发生的垃圾回收的诱因。
 
@@ -753,7 +822,7 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `LGCC`最后一次GC原因
   - `GCC`当前GC原因（No GC为当前没有执行GC)
 
-### 5.12、当前VM执行的信息
+### 5.13、当前VM执行的信息
 
 ```bash
 [emon@emon ~]$ jstat -printcompilation 61572
