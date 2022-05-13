@@ -8395,6 +8395,24 @@ $ kubectl edit cm -n ingress-nginx nginx-template
 
 # 查看所有的api-versions
 $ kubectl api-versions
+
+# 查看集群状态
+kubectl version --short=true 查看客户端及服务端程序版本信息
+kubectl cluster-info 查看集群信息
+
+# 创建资源对象
+kubectl run name --image=(镜像名) --replicas=(备份数) --port=(容器要暴露的端口) --labels=(设定自定义标签)
+kubectl create -f **.yaml  陈述式对象配置管理方式
+kubectl apply -f **.yaml  声明式对象配置管理方式（也适用于更新等）
+
+# 查看资源对象
+kubectl delete [pods/services/deployments/...] name 删除指定资源对象
+kubectl delete [pods/services/deployments/...] -l key=value -n kube-system  删除kube-system下指定标签的资源对象
+kubectl delete [pods/services/deployments/...] --all -n kube-system 删除kube-system下所有资源对象
+kubectl delete [pods/services/deployments/...] source_name --force --grace-period=0 -n kube-system 强制删除Terminating的资源对象
+kubectl delete -f xx.yaml
+kubectl apply -f xx.yaml --prune -l <labels>(一般不用这种方式删除)
+kubectl delete rs rs_name --cascade=fale(默认删除控制器会同时删除其管控的所有Pod对象，加上cascade=false就只删除rs)
 ```
 
 - iptables
@@ -9320,6 +9338,12 @@ PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin
 
 2：PATH+EXTRA 引用上面Maven家目录，变量名固定，不能更改。
 
+3：如果需要其他变量，比如npm，可以如下：
+
+PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin:/root/.nvm/versions/node/v12.22.12/bin
+
+其他的类似配置。
+
 
 
 ### 6.3、Pipeline任务演示
@@ -9335,12 +9359,31 @@ $ vim /root/jenkins/script/build-image-web.sh
 #!/bin/bash
 
 # 校验依赖的Pipeline环境变量是否已定义
+BUILD_TYPE_SCOPE=(
+"mvn"
+"npm"
+)
+if [ "${BUILD_TYPE}" == "" ];then
+    echo "env 'BUILD_TYPE' is not set, the support value is mvn or npm"
+    exit 1
+elif [[ ! "${BUILD_TYPE_SCOPE[@]}" =~ "${BUILD_TYPE}" ]];then
+    echo "env 'BUILD_TYPE' must in mvn or npm"
+    exit 1
+fi
 if [ "${BUILD_DIR}" == "" ];then
     echo "env 'BUILD_DIR' is not set"
     exit 1
 fi
-if [ "${MODULE}" == "" ];then
-    echo "env 'MODULE' is not set"
+# 如果是mvn类型，必须指定MODULE
+if [ "${BUILD_TYPE}" == "mvn" ];then
+    if [ "${MODULE}" == "" ];then
+        echo "env 'MODULE' is not set"
+        exit 1
+    fi
+fi
+# 镜像仓库地址
+if [ "${IMAGE_REPO}" == "" ];then
+    echo "env 'IMAGE_REPO' is not set"
     exit 1
 fi
 
@@ -9355,30 +9398,27 @@ echo "docker wokspace: ${DOCKER_DIR}"
 # 确定Jenkins中模块的位置
 JENKINS_DIR=${WORKSPACE}/${MODULE}
 echo "jenkins workspace: ${JENKINS_DIR}"
-# 判断目标jar是否存在
-if [ ! -f ${JENKINS_DIR}/target/*.jar ];then
-    echo "target jar file not found ${JENKINS_DIR}/target/*.jar"
-    exit 1
-fi
 
-# 清理制作镜像的工作目录
-cd ${DOCKER_DIR}
-rm -rf *
-
-# 准备镜像制作文件
-K8S_DIR=${JENKINS_DIR}/k8s
-if [ ! -d ${K8S_DIR} ];then
-    echo "env 'K8S_DIR' is not exists, please ensure k8s dir in your project"
-    exit 1
+if [ "${BUILD_TYPE}" == "mvn" ];then
+    # 判断目标jar是否存在
+    if [ ! -f ${JENKINS_DIR}/target/*.jar ];then
+        echo "target jar file not found ${JENKINS_DIR}/target/*.jar"
+        exit 1
+    fi
+elif [ "${BUILD_TYPE}" == "npm" ];then
+    # 判断目标dist目录是否包含内容
+    if [ ! "$(ls -A ${JENKINS_DIR}dist)" ];then
+        echo "content is empty in dir ${JENKINS_DIR}dist"
+        exit 1
+    fi
 fi
-cp -rv ${K8S_DIR}/* .
-cp ${JENKINS_DIR}/target/*.jar .
 
 
 # 开始制作并上传镜像文件
 
 VERSION=`date +%Y%m%d%H%M%S`
-IMAGE_NAME=192.168.200.116:5080/devops-learning/${JOB_NAME}:${VERSION}
+#IMAGE_NAME=192.168.200.116:5080/devops-learning/${JOB_NAME}:${VERSION}
+IMAGE_NAME=${IMAGE_REPO}/${JOB_NAME}:${VERSION}
 
 echo "building image: ${IMAGE_NAME}"
 #docker login -u emon -p Emon@123 192.168.200.116:5080
@@ -9684,13 +9724,16 @@ Jenkins登录==>新建任务==>输入名称 k8s-springboot-web-demo 然后选择“流水线”类型
 
 ![image-20220408230030796](images/image-20220408230030796.png)
 
-- Pipeline script
+- Pipeline script【SpringBoot项目示例】
 
 ```bash
 node {
+	env.BUILD_TYPE = "mvn"
     env.BUILD_DIR = "/root/jenkins/build_workspace"
     // 打包镜像时使用的模块
     env.MODULE = "k8s-demo/springboot-web-demo"
+    // 镜像仓库地址
+    env.IMAGE_REPO = "192.168.200.116:5080/devops-learning"
 	// 服务发布后，暴露出来的域名
     env.HOST = "springboot.emon.vip"
     // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
@@ -9718,6 +9761,50 @@ node {
     }
 }
 ```
+
+- Pipeline script【Vue项目示例】
+
+```bash
+node {
+    env.BUILD_TYPE="npm"
+    env.BUILD_DIR = "/root/jenkins/build_workspace"
+    // 打包镜像时使用的模块
+    env.MODULE = ""
+    // 镜像仓库地址
+    env.IMAGE_REPO = "gaia-e2-01-registry.cn-shanghai.cr.aliyuncs.com/lishi"
+	// 服务发布后，暴露出来的域名
+    env.HOST = "gyls.gaiaworks.cn"
+    // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
+    env.NS = "lishi-recruitment"
+    // 如果不指定，默认使用 web.yaml 否则使用指定的配置文件发布k8s服务
+    env.DEPLOY_YAML = "k8s-deploy-uat.yaml"
+    
+    stage('Preparation') {
+        sh 'printenv'
+        // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        git branch: "develop", url: 'http://git.ishanshan.com/huiba-frontend/huiba-gaia-web.git'
+    }
+    
+    stage('Npm Install') {
+        sh "npm install"
+    }
+    
+    stage('Npm Build') {
+        sh "npm run build:prod"
+    }
+    
+    stage('Build Image') {
+        sh "/root/jenkins/script/build-image-web.sh"
+    }
+    
+    stage('Deploy') {
+        sh "/root/jenkins/script/deploy.sh"
+    }
+}
+```
+
+
 
 #### 6.3.4、创建Pipeline script from SCM任务
 
