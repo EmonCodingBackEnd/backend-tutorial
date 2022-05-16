@@ -8413,6 +8413,9 @@ kubectl delete [pods/services/deployments/...] source_name --force --grace-perio
 kubectl delete -f xx.yaml
 kubectl apply -f xx.yaml --prune -l <labels>(一般不用这种方式删除)
 kubectl delete rs rs_name --cascade=fale(默认删除控制器会同时删除其管控的所有Pod对象，加上cascade=false就只删除rs)
+
+# 查看ingress配置
+$ kubectl get ing -n lishi-recruitment
 ```
 
 - iptables
@@ -9350,6 +9353,8 @@ PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin:/root/.nvm/versions/node/v12.22.12/bin
 
 #### 6.3.1、创建镜像构造脚本
 
+- 
+
 ```bash
 $ mkdir -pv /root/jenkins/script
 $ vim /root/jenkins/script/build-image-web.sh
@@ -9728,50 +9733,15 @@ Jenkins登录==>新建任务==>输入名称 k8s-springboot-web-demo 然后选择“流水线”类型
 
 ```bash
 node {
-	env.BUILD_TYPE = "mvn"
-    env.BUILD_DIR = "/root/jenkins/build_workspace"
+    env.BUILD_TYPE="mvn"
+    // 确定制作镜像的工作目录
+    env.BUILD_BASE_DIR = "/root/jenkins/build_workspace"
+    
     // 打包镜像时使用的模块
-    env.MODULE = "k8s-demo/springboot-web-demo"
-    // 镜像仓库地址
-    env.IMAGE_REPO = "192.168.200.116:5080/devops-learning"
-	// 服务发布后，暴露出来的域名
-    env.HOST = "springboot.emon.vip"
-    // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
-    env.NS = "default"
-    // 如果不指定，默认使用 web.yaml 否则使用指定的配置文件发布k8s服务
-    env.DEPLOY_YAML = ""
-    
-    stage('Preparation') {
-        sh 'printenv'
-        // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
-        // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
-        git branch: "master", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
-    }
-    
-    stage('Maven Build') {
-        sh "mvn -pl ${MODULE} -am clean package -Dmaven.test.skip=true"
-    }
-    
-    stage('Build Image') {
-        sh "/root/jenkins/script/build-image-web.sh"
-    }
-    
-    stage('Deploy') {
-        sh "/root/jenkins/script/deploy.sh"
-    }
-}
-```
-
-- Pipeline script【Vue项目示例】
-
-```bash
-node {
-    env.BUILD_TYPE="npm"
-    env.BUILD_DIR = "/root/jenkins/build_workspace"
-    // 打包镜像时使用的模块
-    env.MODULE = ""
+    env.MODULE = "huiba-gaia-admin/huiba-gaia-admin-server"
     // 镜像仓库地址
     env.IMAGE_REPO = "gaia-e2-01-registry.cn-shanghai.cr.aliyuncs.com/lishi"
+    
 	// 服务发布后，暴露出来的域名
     env.HOST = "gyls.gaiaworks.cn"
     // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
@@ -9783,7 +9753,57 @@ node {
         sh 'printenv'
         // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
         // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
-        git branch: "develop", url: 'http://git.ishanshan.com/huiba-frontend/huiba-gaia-web.git'
+        git branch: "develop", url: 'http://git.ishanshan.com/huiba-backend/huiba-gaia.git'
+    }
+    
+    stage('Maven Build') {
+        sh "mvn -pl ${MODULE} -am clean package -Dmaven.test.skip=true"
+    }
+    
+    stage('Collect Resource'){
+        sh "/root/jenkins/script/collect-resource.sh"
+    }
+    
+    stage('Build Image') {
+        sh "/root/jenkins/script/build-image.sh"
+    }
+    
+    stage('Deploy') {
+        sh "/root/jenkins/script/deploy.sh"
+    }
+}
+```
+
+- Pipeline script【Vue项目示例】
+
+```bash
+// 常规单项目，可选项都不必填写；如果需要多个项目的编译结果打入同一个镜像，可选项的配置可以做到这一点；示例代码即是这种复杂情况！
+node {
+    env.BUILD_TYPE="npm"
+    // 确定制作镜像的工作目录
+    env.BUILD_BASE_DIR = "/root/jenkins/build_workspace"
+    // 覆盖默认的${JOB_NAME}【可选】
+    env.BUILD_JOB_NAME="gaia-web"
+    // 镜像的资源目录，如果不存在，则使用项目根目录下的k8s目录替代【可选】
+    env.K8S_DIR = "/root/jenkins/k8s/gaia-web"
+    
+    // 打包镜像时使用的模块
+    env.MODULE = ""
+    // 镜像仓库地址
+    env.IMAGE_REPO = "gaia-e2-01-registry.cn-shanghai.cr.aliyuncs.com/lishi"
+    
+	// 服务发布后，暴露出来的域名
+    env.HOST = "gyls.gaiaworks.cn"
+    // 服务发布使用的命名空间 default/drill/dev/test/prod 等等
+    env.NS = "lishi-recruitment"
+    // 如果不指定，默认使用 web.yaml 否则使用指定的配置文件发布k8s服务
+    env.DEPLOY_YAML = "k8s-deploy-uat.yaml"
+    
+    stage('Preparation') {
+        sh 'printenv'
+        // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
+        git branch: "develop", url: 'http://git.ishanshan.com/huiba-frontend/huiba-gaia-h5.git'
     }
     
     stage('Npm Install') {
@@ -9794,11 +9814,17 @@ node {
         sh "npm run build:prod"
     }
     
+    stage('Collect Resource'){
+        sh "/root/jenkins/script/collect-resource.sh"
+    }
+    
     stage('Build Image') {
-        sh "/root/jenkins/script/build-image-web.sh"
+        sh "/root/jenkins/script/build-image.sh"
     }
     
     stage('Deploy') {
+        // 默认部署名称是${JOB_NAME}【可选】
+        env.BUILD_DEPLOY_NAME = "gaia-web"
         sh "/root/jenkins/script/deploy.sh"
     }
 }

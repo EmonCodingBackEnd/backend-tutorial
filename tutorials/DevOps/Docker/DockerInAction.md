@@ -1626,6 +1626,15 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 
 暂略
 
+### 5.4、docker cp
+
+```bash
+$ docker cp a1870eec1273:/usr/local/openjdk-8/lib/security/java.security java.security
+$ docker cp java.security a1870eec1273:/usr/local/openjdk-8/lib/security/java.security
+```
+
+
+
 ## 6、删除容器
 
 可以使用docker rm 命令来删除处于终止或退出状态的容器，命令格式为：
