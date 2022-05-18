@@ -119,14 +119,17 @@ Definitions:
 
 格式：-XX:[+-]< name>表示启用或禁用name属性
 
-| 参数                       | 说明                                           |
-| -------------------------- | ---------------------------------------------- |
-| -XX:+UseConcMarkSweepGC    | 启用CMS垃圾回收器                              |
-| -XX:+UseG1GC               | 启用G1垃圾收集器                               |
-| -XX:+UseParallelGC         | 启用并行垃圾回收器                             |
-| -XX:+PrintFlagsInitial     | 打印所有的默认参数设置                         |
-| -XX:+PrintFlagsFinal       | 打印最终值，如果某个默认值被新值覆盖，显示新值 |
-| -XX:+PrintCommandLineFlags | 打印那些被新值覆盖的项                         |
+| 参数                            | 说明                                           |
+| ------------------------------- | ---------------------------------------------- |
+| -XX:+UseConcMarkSweepGC         | 启用CMS垃圾回收器                              |
+| -XX:+UseG1GC                    | 启用G1垃圾收集器                               |
+| -XX:+UseParallelGC              | 启用并行垃圾回收器                             |
+| -XX:+PrintFlagsInitial          | 打印所有的默认参数设置                         |
+| -XX:+PrintFlagsFinal            | 打印最终值，如果某个默认值被新值覆盖，显示新值 |
+| -XX:+PrintCommandLineFlags      | 打印那些被新值覆盖的项                         |
+| -XX:+PrintGCDetails             | 打印GC细节                                     |
+| -XX:+HeapDumpOnOutOfMemoryError | 表示当JVM发生OOM时，自动生成DUMP文件。         |
+|                                 |                                                |
 
 - 示例
 
@@ -143,14 +146,20 @@ $ java -XX:+PrintFlagsFinal -version
 
 格式：-XX:< name>表示name属性的值是value
 
-| 参数                          | 说明                    |
-| ----------------------------- | ----------------------- |
-| -XX:MaxGCPauseMillis=500      | GC最大的停留时间是500ms |
-| -XX:GCTimeRatio=19            |                         |
-| -Xmx等价于-XX:MaxHeapSize     | 最大堆内存大小          |
-| -Xms等价于-XX:InitialHeapSize | 初始堆内存大小          |
-| -Xss等价于-XX:ThreadStackSize | 线程堆栈大小，默认1024K |
-|                               |                         |
+| 参数                          | 说明                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| -XX:MaxGCPauseMillis=500      | GC最大的停留时间是500ms                                      |
+| -XX:GCTimeRatio=19            |                                                              |
+| -Xmx等价于-XX:MaxHeapSize     | 最大堆内存大小                                               |
+| -Xms等价于-XX:InitialHeapSize | 初始堆内存大小                                               |
+| -Xss等价于-XX:ThreadStackSize | 线程堆栈大小，默认1024K                                      |
+| -XX:MetaspaceSize=256m        | 元空间初始化大小，默认在12M-20M浮动                          |
+| -XX:MaxMetaspaceSize          | 元空间最大大小                                               |
+| -XX:MinMetaspaceFreeRatio=40  | 当Metaspace GC之后，会计算Metaspace空闲占比；如果空闲过低，将增加 |
+| -XX:MaxMetasaceFreeRatio=70   | 当Metaspace GC之后，会计算Metaspace空闲占比；如果空闲过高，将减少 |
+| -XX:MinMetaspaceExpansion     | 增加元空间的时候最小增长幅度，大于332KB                      |
+| -XX:MaxMetaspaceExpansion     | 增加元空间的时候最大增长幅度，大约5MB                        |
+| -XX:HeapDumpPath=./           | 表示DUMP文件路径，默认`java_<pid>_<date>_<time>_heapDump.hprof` |
 
 
 
