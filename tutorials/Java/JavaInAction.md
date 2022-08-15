@@ -119,17 +119,21 @@ Definitions:
 
 格式：-XX:[+-]< name>表示启用或禁用name属性
 
-| 参数                            | 说明                                           |
-| ------------------------------- | ---------------------------------------------- |
-| -XX:+UseConcMarkSweepGC         | 启用CMS垃圾回收器                              |
-| -XX:+UseG1GC                    | 启用G1垃圾收集器                               |
-| -XX:+UseParallelGC              | 启用并行垃圾回收器                             |
-| -XX:+PrintFlagsInitial          | 打印所有的默认参数设置                         |
-| -XX:+PrintFlagsFinal            | 打印最终值，如果某个默认值被新值覆盖，显示新值 |
-| -XX:+PrintCommandLineFlags      | 打印那些被新值覆盖的项                         |
-| -XX:+PrintGCDetails             | 打印GC细节                                     |
-| -XX:+HeapDumpOnOutOfMemoryError | 表示当JVM发生OOM时，自动生成DUMP文件。         |
-|                                 |                                                |
+| 参数                            | 说明                                                         |
+| ------------------------------- | ------------------------------------------------------------ |
+| -XX:+UseConcMarkSweepGC         | 启用CMS垃圾回收器                                            |
+| -XX:+UseG1GC                    | 启用G1垃圾收集器                                             |
+| -XX:+UseParallelGC              | 启用并行垃圾回收器                                           |
+| -XX:+PrintFlagsInitial          | 打印所有的默认参数设置                                       |
+| -XX:+PrintFlagsFinal            | 打印最终值，如果某个默认值被新值覆盖，显示新值               |
+| -XX:+PrintCommandLineFlags      | 打印那些被新值覆盖的项                                       |
+| -XX:+PrintGCDetails             | 打印GC细节                                                   |
+| -XX:+HeapDumpOnOutOfMemoryError | 表示当JVM发生OOM时，自动生成DUMP文件。                       |
+| -XX:+PrintTenuringDistribution  | JVM在每次新生代GC时，打印出幸存区对象的年龄分布。            |
+| -XX:+UseSerialGC                | 启用串行收集器，默认不启用。会间接启用-XX:+UseSerialOldGC    |
+| -XX:+UseParallelGC              | 【吞吐量优先】启用并行收集器，默认启用。Server模式下的默认收集器。会间接启动-XX:+UseParallelOldGC |
+| -XX:+UseConcMarkSweepGC         | 【停顿时间优先】启用并发收集器。CMS收集器。间接打开 -XX:+UseParNewGC |
+| -XX:+UseG1GC                    | 并发收集器之G1收集器                                         |
 
 - 示例
 
@@ -160,6 +164,12 @@ $ java -XX:+PrintFlagsFinal -version
 | -XX:MinMetaspaceExpansion     | 增加元空间的时候最小增长幅度，大于332KB                      |
 | -XX:MaxMetaspaceExpansion     | 增加元空间的时候最大增长幅度，大约5MB                        |
 | -XX:HeapDumpPath=./           | 表示DUMP文件路径，默认`java_<pid>_<date>_<time>_heapDump.hprof` |
+| -XX:MaxTenuringThreshold=15   | 新生代的对象最多经历多少次数，就会晋升到老年代。非必要条件。 |
+| -XX:PretenureSizeThreshold=0  | 大于该值的参数直接在老年代分配； 0表示任何对象都不直接到老年代 |
+| -XX:TargetSurvivorRatio=50    | Survivor区对象使用率，默认是50%                              |
+| -XX:MaxGCPauseMillis=nnn      | 每次GC最大停顿毫秒数，默认不限制                             |
+| -XX:GCTimeRatio=nnn           | 表示希望在GC花费不超过应用程序执行实际的1/(1+nnn)，nnn范围(0,100)，默认99 |
+| -XX:ParallelGCThreads=4       | 表示并行收集器时，垃圾回收线程数。                           |
 
 
 
@@ -313,7 +323,30 @@ Options:
 [emon@emon ~]$ grep java.lang.Thread.State 61572.log | awk '{print $2$3$4$5}'|sort|uniq -c
 ```
 
+### 3.4、jstack得到的线程信息解读
 
+- `prio` Java内存定义的线程的优先级。
+- `os_prio` 操作系统级别的优先级。
+
+- `tid` Java内的线程ID。
+- `nid` 操作系统级别线程的线程ID。
+
+
+
+Linux下十六进制和十进制互相转换：
+
+```bash
+# 16进制转10进制
+$ printf %d 0x1b046
+# 10进制转16进制
+$ printf %x 110662
+# 显示某个进程所有活跃的线程消耗情况。
+$ top -H -p 61572
+```
+
+
+
+![线程状态流转图1](images/线程状态流转图1.jpg)
 
 ## 4、jmap命令
 
@@ -1007,4 +1040,226 @@ thread -n 3 -i 1000
 ```bash
 thread --state WAITING
 ```
+
+
+
+## 7、Linux命令之top命令
+
+### 7.1、top命令简介
+
+top命令是动态查看进程变化，监控linux的系统状况；它是常用的性能分析工具，能够实时显示系统资源各个进程占用状况，类似window的任务管理器。
+
+- 语法
+
+```bash
+[root@emon ~]# top -h
+  procps-ng version 3.3.10
+Usage:
+  top -hv | -bcHiOSs -d secs -n max -u|U user -p pid(s) -o field -w [cols]
+```
+
+- `-h |-v` 显示帮助或者版本信息
+- `-c` 命令行显示程序名以及参数
+- `-d` 启动时设置刷新时间间隔
+- `-H` 设置线程模式
+- `-i` 只显示活跃进程
+- `-n` 显示指定数量的进程
+- `-p` 显示指定PID的进程
+- `-u` 显示指定用户的进程
+
+### 7.2、视图参数含义
+
+```bash
+top - 17:09:27 up 9 days,  8:04,  1 user,  load average: 0.00, 0.02, 0.05
+Tasks: 171 total,   2 running, 169 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.1 sy,  0.0 ni, 99.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  4893456 total,  1122660 free,  1790328 used,  1980468 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.  2801780 avail Mem 
+
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                   
+  1320 root      20   0  963272  25928   1692 S   0.7  0.5 170:39.59 docker-containe                                                           
+     9 root      20   0       0      0      0 R   0.3  0.0  26:49.56 rcu_sched 
+```
+
+从上面的结果可以看出，top视图可以分为两部分：操作系统资源概况信息和进程信息。
+
+我们先利用top命令进入视图，再`f`键看下全称信息，再`q`推出回到top视图。
+
+```bash
+Fields Management for window 1:Def, whose current sort field is %CPU
+   Navigate with Up/Dn, Right selects for move then <Enter> or Left commits,
+   'd' or <Space> toggles display, 's' sets sort.  Use 'q' or <Esc> to end!
+
+* PID     = Process Id             nDRT    = Dirty Pages Count   
+* USER    = Effective User Name    WCHAN   = Sleeping in Function
+* PR      = Priority               Flags   = Task Flags <sched.h>
+* NI      = Nice Value             CGROUPS = Control Groups      
+* VIRT    = Virtual Image (KiB)    SUPGIDS = Supp Groups IDs     
+* RES     = Resident Size (KiB)    SUPGRPS = Supp Groups Names   
+* SHR     = Shared Memory (KiB)    TGID    = Thread Group Id     
+* S       = Process Status         ENVIRON = Environment vars    
+* %CPU    = CPU Usage              vMj     = Major Faults delta  
+* %MEM    = Memory Usage (RES)     vMn     = Minor Faults delta  
+* TIME+   = CPU Time, hundredths   USED    = Res+Swap Size (KiB) 
+* COMMAND = Command Name/Line      nsIPC   = IPC namespace Inode 
+  PPID    = Parent Process pid     nsMNT   = MNT namespace Inode 
+  UID     = Effective User Id      nsNET   = NET namespace Inode 
+  RUID    = Real User Id           nsPID   = PID namespace Inode 
+  RUSER   = Real User Name         nsUSER  = USER namespace Inode
+  SUID    = Saved User Id          nsUTS   = UTS namespace Inode 
+  SUSER   = Saved User Name     
+  GID     = Group Id            
+  GROUP   = Group Name          
+  PGRP    = Process Group Id    
+  TTY     = Controlling Tty     
+  TPGID   = Tty Process Grp Id  
+  SID     = Session Id          
+  nTH     = Number of Threads   
+  P       = Last Used Cpu (SMP) 
+  TIME    = CPU Time            
+  SWAP    = Swapped Size (KiB)  
+  CODE    = Code Size (KiB)     
+  DATA    = Data+Stack (KiB)    
+  nMaj    = Major Page Faults   
+  nMin    = Minor Page Faults 
+```
+
+#### 7.2.1、资源概况
+
+1：操作系统时间、登录用户、负载情况 - top
+
+```bash
+top - 17:09:27 up 9 days,  8:04,  1 user,  load average: 0.00, 0.02, 0.05
+```
+
+- `17:09:27` 当前系统时间。
+- `up 9 days,  8:04,` 操作系统从开机后运行的时间，运行天时分。
+
+- `1 user,` 当前系统有1个用户登录在线。
+- `load average: 0.00, 0.02, 0.05` 系统的1、5、15分钟的平均负载。
+
+2：运行任务概况 - tasks
+
+```bash
+Tasks: 171 total,   2 running, 169 sleeping,   0 stopped,   0 zombie
+```
+
+- `171 total` 系统当前中的进程数。
+- `2 running` 系统当前运行的进程数。
+- `169 sleeping` 睡眠中的进程数。
+
+3：CPU概述：%Cpu(s)表示CPU使用百分比，按照时间占用计算，单位s
+
+```bash
+%Cpu(s):  0.0 us,  0.1 sy,  0.0 ni, 99.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+```
+
+- `us` 用户空间占用cpu时间百分比，如果是多核，这个数值表示占用的平均百分比，可以按1进行多个统计和平均统计切换。
+- `sy` 内核空间占用cpu时间百分比，后续同上。
+- `ni` 用户空间改变过优先级的进程占用cpu时间百分比。
+- `id` 空闲时间占用cpu的百分比。
+- `wa` 等待输入输出占用cpu时间百分比。
+- `hi` 硬中断占用cpu时间百分比。
+- `si` 软中断占用cpu时间百分比。
+
+时间占用百分比=该种类型操作消耗cpu时间/top刷新间隔时间。top每3s刷新一次，用户空间进程在这3秒内使用了cpu时间1.5s，那么us为50%=1.5s/3s。
+
+4：内存概览（KB）
+
+```bash
+KiB Mem :  4893456 total,  1122660 free,  1790328 used,  1980468 buff/cache
+```
+
+- `total` 内存总量。
+- `free` 内存剩余总量。
+- `used` 内存使用数量。
+- `buff/cached` 用于缓冲的内存数量。
+
+5：缓冲区概况（KB）
+
+```bash
+KiB Swap:        0 total,        0 free,        0 used.  2801780 avail Mem 
+```
+
+- `total` 交换区总量。
+- `free` 空闲交换区数量。
+- `used` 使用交换区数量。
+
+#### 7.2.2、进程概况
+
+进程概况的统计是从多个维度进行展示的，其中几个比较重要的参数如下：
+
+- `PID` 进程ID，唯一标识。
+- `USER` 进程所属用户。
+- `%CPU` 自上次top刷新该进程的cpu占用时间百分比。
+- `%MEM` 进程消耗内存百分比。
+- `TIME+` 自进程开始以来，消耗cpu时间，单位1/100s。
+
+#### 7.2.3、top视图中交互命令
+
+- 全局
+  - `Enter/Space` 刷新视图
+  - `O` 是否展示进程区域中的0值，比如%CPU是0的将全部隐藏。
+  - `A` 在全屏模式和多窗口选择模式中切换。
+  - `d` 设置刷新时间间隔。
+  - `E` 切换内存和交换区单位。
+  - `H` 开启/关闭线程模式，以线程的方式展示。
+  - `k` 杀掉指定进程或者线程。
+  - `Z` 改变颜色配置。
+  - `q` 退出
+- 概要区域
+  - `1` 显示CPU平均状态/分开显示各个逻辑CPU状态。
+  - `m` 切换显示内存统计的数据。
+- 进程区域
+  - `x` 切换高亮行的排序位置。
+  - `z` 切换颜色。
+  - `b` 块状标记高亮行。
+  - `c` 切换显示命令/程序名和参数。
+  - `f` 显示field管理。
+  - `u` 按照执行用户显示进程。
+  - `i` 显示所有进程或活跃的进程。
+  - `n` 设置显示的进程数。
+
+#### 7.2.4、top常用场景
+
+```bash
+# 显示某个进程所有活跃的线程消耗情况。
+$ top -H -p pid
+```
+
+
+
+## 8、jvisualvm
+
+如何为Java VisualVM安装插件？
+
+插件地址：https://visualvm.github.io/pluginscenters.html 拷贝对应JDK版本的插件地址。
+
+打开 `jvisualvm` -> 【工具】 -> 【插件】 -> 【设置】 -> 【编辑】 -> 粘贴拷贝的地址，结果如下：
+
+![image-20220522155255976](images/image-20220522155255976.png)
+
+配置之后，点击【可用插件】面板，选择Visual GC 和 BTrace Workbench插件。
+
+其他插件类似。
+
+
+
+BTrace Workbench还需要安装如下：
+
+https://github.com/btraceio/btrace
+
+Windows下载：
+
+JDK11：[btrace-v2.2.2-bin.zip](https://github.com/btraceio/btrace/releases/download/v2.2.2/btrace-v2.2.2-bin.zip)
+
+JDK8：[btrace-bin-1.3.11.3.zip](https://github.com/btraceio/btrace/releases/download/v1.3.11.3/btrace-bin-1.3.11.3.zip)
+
+解压并配置环境变量：
+
+BTRACE_HOME=C:\Job\JobSoftware\btrace-v2.2.2-bin
+
+BTRACE_HOME=C:\Job\JobSoftware\btrace-bin-1.3.11.3
+
+Path 追加 %BTRACE_HOME%\bin
 

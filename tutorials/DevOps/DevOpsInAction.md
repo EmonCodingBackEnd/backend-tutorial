@@ -1994,3 +1994,23 @@ http://repo.emon.vip:8791
 
 sentinel/sentinel
 
+
+
+## 6、Elasticsearch
+
+- 创建网络（同一网络的services互相连接）
+
+```bash
+$ docker network create esnet
+```
+
+- 启动
+
+```bash
+$ docker run --name es --net esnet -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d elasticsearch:7.17.5
+```
+
+
+
+
+

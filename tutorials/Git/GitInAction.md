@@ -1079,6 +1079,13 @@ git remote -v
 git config --global core.longpaths true
 ```
 
+## 7.11、拉取指定commit到一个新分支，会产生新commitId
+
+```bash
+# 拉取指定commit到当前分支，指定的commit可以是任何的其他分支
+git cherry-pick <commit id>
+```
+
 
 
 # 八、Git Flow——以发布为中心的开发模式

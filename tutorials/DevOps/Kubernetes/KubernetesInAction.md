@@ -168,7 +168,7 @@ sudo yum remove docker \
                   docker-logrotate \
                   docker-engine
 # 必要时：清理yum安装的新版本docker
-yum remote -y docker* container-selinux
+yum remove -y docker* container-selinux
 ```
 
 如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
@@ -228,7 +228,7 @@ $ docker run hello-world
 
 ```bash
 # - registry-mirrors：加速器地址
-# - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+# - graph: 设置docker数据目录：选择比较大的分区（如果这里是根目录就不需要配置了，默认为/var/lib/docker）
 # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
 # - insecure-registries：设置私服可信地址
 tee /etc/docker/daemon.json <<-'EOF'
@@ -278,7 +278,7 @@ $ yum update
 
 ```bash
 $ yum install -y kubelet-1.20.15 kubeadm-1.20.15 kubectl-1.20.15
-# 在 kubeadm init 后拿到 join 命令，kubelet服务会启动，这里不需要手工启动，但需要加入开机启动！！！
+# 在 kubeadm init 后 join 命令，kubelet服务会启动，这里不需要手工启动，但需要加入开机启动！！！
 $ systemctl enable kubelet
 ```
 
@@ -302,6 +302,9 @@ $ kubeadm init \
 $ mkdir -p $HOME/.kube 
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# 如果是root用户，可以使用如下配置替换上面：（与上面二选一）
+export KUBECONFIG=/etc/kubernetes/admin.conf
 ```
 
 ### 3.2、安装网络插件-calico（仅master节点）
@@ -9351,13 +9354,18 @@ PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin:/root/.nvm/versions/node/v12.22.12/bin
 
 ### 6.3、Pipeline任务演示
 
-#### 6.3.1、创建镜像构造脚本
-
-- 
+- 创建脚本目录
 
 ```bash
 $ mkdir -pv /root/jenkins/script
-$ vim /root/jenkins/script/build-image-web.sh
+```
+
+#### 6.3.1、创建env检查脚本
+
+- 创建脚本文件
+
+```bash
+$ vim /root/jenkins/script/check-env.sh
 ```
 
 ```bash
@@ -9371,16 +9379,32 @@ BUILD_TYPE_SCOPE=(
 if [ "${BUILD_TYPE}" == "" ];then
     echo "env 'BUILD_TYPE' is not set, the support value is mvn or npm"
     exit 1
-elif [[ ! "${BUILD_TYPE_SCOPE[@]}" =~ "${BUILD_TYPE}" ]];then
+elif [[ ! "${BUILD_TYPE_SCOPE[@]}" =~ "${BUILD_TYPE}" ]];then 
     echo "env 'BUILD_TYPE' must in mvn or npm"
     exit 1
 fi
-if [ "${BUILD_DIR}" == "" ];then
-    echo "env 'BUILD_DIR' is not set"
+# 确定制作镜像的工作目录
+if [ "${BUILD_BASE_DIR}" == "" ];then
+    echo "env 'BUILD_BASE_DIR' is not set"
     exit 1
 fi
+# 覆盖默认的${JOB_NAME}【可选】
+if [ "${BUILD_JOB_NAME}" == "" ];then
+    echo "env 'BUILD_JOB_NAME' is not set, use default value '${JOB_NAME}'"
+fi
+# 镜像的资源目录，如果不存在，则使用项目根目录下的k8s目录替代【可选】
+if [ "${K8S_DIR}" == "" ];then
+    if [ "${MODULE}" == "" ];then
+        K8S_DIR=${WORKSPACE}/k8s
+    else
+        K8S_DIR=${WORKSPACE}/${MODULE}/k8s
+    fi 
+    echo "env 'K8S_DIR' is not set, use default value '$K8S_DIR'"
+fi
+
 # 如果是mvn类型，必须指定MODULE
 if [ "${BUILD_TYPE}" == "mvn" ];then
+    # 打包镜像时使用的模块
     if [ "${MODULE}" == "" ];then
         echo "env 'MODULE' is not set"
         exit 1
@@ -9392,25 +9416,94 @@ if [ "${IMAGE_REPO}" == "" ];then
     exit 1
 fi
 
+
+# 服务发布后，暴露出来的域名
+if [ "${HOST}" == "" ];then
+    echo "env 'HOST' is not set, if you need it, please set!"
+fi
+echo "env.HOST=$HOST"
+# 服务发布使用的命名空间 default/drill/dev/test/prod 等等
+if [ "${NS}" == "" ];then
+    NS="default"
+    echo "env 'NS' is not set, use default"
+fi
+echo "env.NS=$NS"
+# 如果不指定，默认使用 web.yaml 否则使用指定的配置文件发布k8s服务
+if [ "${DEPLOY_YAML}" == "" ];then
+    DEPLOY_YAML="web.yaml"
+    echo "env 'DEPLOY_YAML' is not set, use web.yaml"
+fi
+echo "env.DEPLOY_YAML=$DEPLOY_YAML"
+
+
+# 初始化参数
+# 准备镜像制作文件，镜像的资源目录，如果不存在，则使用项目根目录下的k8s目录替代；如果也不存在，则退出！
+if [ ! -d ${K8S_DIR} ];then
+    echo "env 'K8S_DIR' is not exists, please ensure k8s dir in your project"
+    exit 1
+fi
+
+DEPLOY_NAME=${JOB_NAME}
+if [ -f "${K8S_DIR}/job_name_copy_to_build_dist" ];then
+    echo "file job_name_copy_to_build_dist exists in ${K8S_DIR}, enable custom resource copy"
+    if [ "${BUILD_JOB_NAME}" == "" ];then
+        BUILD_JOB_NAME=${K8S_DIR##*/}
+        echo "env 'BUILD_JOB_NAME' is not set, but file job_name_build_dist is exists, set BUILD_JOB_NAME=$BUILD_JOB_NAME'"
+    fi
+    DEPLOY_NAME=${BUILD_JOB_NAME}
+    if [ -z "${DEPLOY_NAME}" ];then
+        DEPLOY_NAME=${K8S_DIR##*/}
+    fi
+fi
+
 # 确定制作镜像的工作目录
-DOCKER_DIR=${BUILD_DIR}/${JOB_NAME}
+DOCKER_DIR=${BUILD_BASE_DIR}/${JOB_NAME}
+# 覆盖默认的${JOB_NAME}
+if [ -n "${BUILD_JOB_NAME}" ];then
+    DOCKER_DIR=${BUILD_BASE_DIR}/${BUILD_JOB_NAME}
+fi
 if [ ! -d ${DOCKER_DIR} ];then
     mkdir -p ${DOCKER_DIR}
 fi
-echo "docker wokspace: ${DOCKER_DIR}"
+echo "docker workspace: ${DOCKER_DIR}"
 
+# 存放项目编译结果的目录，默认在构建镜像所在的目录
+WEB_ROOT=$DOCKER_DIR
+if [ -n "${BUILD_DIST}" ];then
+    WEB_ROOT=$DOCKER_DIR/$BUILD_DIST
+fi
+echo "web root in the image will be:"$WEB_ROOT
 
 # 确定Jenkins中模块的位置
 JENKINS_DIR=${WORKSPACE}/${MODULE}
 echo "jenkins workspace: ${JENKINS_DIR}"
+```
 
+#### 6.3.2、创建资源收集脚本
+
+- 创建脚本文件
+
+```bash
+$ vim /root/jenkins/script/collect-resource.sh
+```
+
+```bash
+#!/bin/bash
+
+ENTRY_PATH=$(pwd)
+ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
+SCRIPT_BASE_PATH=$(dirname "$0")
+echo "==========开始执行collect-resource.sh脚本：ENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+source $SCRIPT_BASE_PATH/check-env.sh
+
+# 校验资源是否存在
 if [ "${BUILD_TYPE}" == "mvn" ];then
     # 判断目标jar是否存在
     if [ ! -f ${JENKINS_DIR}/target/*.jar ];then
         echo "target jar file not found ${JENKINS_DIR}/target/*.jar"
         exit 1
     fi
-elif [ "${BUILD_TYPE}" == "npm" ];then
+elif [ "${BUILD_TYPE}" == "npm" ];then    
     # 判断目标dist目录是否包含内容
     if [ ! "$(ls -A ${JENKINS_DIR}dist)" ];then
         echo "content is empty in dir ${JENKINS_DIR}dist"
@@ -9419,8 +9512,66 @@ elif [ "${BUILD_TYPE}" == "npm" ];then
 fi
 
 
-# 开始制作并上传镜像文件
+# 清理制作镜像的工作目录
+echo "==========切换目录到：${DOCKER_DIR}=========="
+cd ${DOCKER_DIR}
 
+echo "copy k8s resource from $K8S_DIR to $DOCKER_DIR"
+cp -rv ${K8S_DIR}/* .
+
+if [ "${BUILD_TYPE}" == "mvn" ];then
+    mkdir -p $WEB_ROOT
+    cp ${JENKINS_DIR}/target/*.jar $WEB_ROOT
+elif [ "${BUILD_TYPE}" == "npm" ];then
+    if [ -f job_name_copy_to_build_dist ];then
+        for line in `cat job_name_copy_to_build_dist`
+        do
+            array=(`echo $line | tr '' ' '`)
+            JOB_NAME=${array[0]}
+            BUILD_DIST=${array[1]}
+            JENKINS_DIR=${ENTRY_BASE_PATH}/$JOB_NAME
+            WEB_ROOT=$DOCKER_DIR/$BUILD_DIST
+            echo "JOB_NAME=$JOB_NAME, BUILD_DIST=$BUILD_DIST, JENKINS_DIR=$JENKINS_DIR, WEB_ROOT=$WEB_ROOT"
+
+            if [ -d "${JENKINS_DIR}/dist" ];then
+                echo "cp -rv $JENKINS_DIR/dist/* $WEB_ROOT"
+                mkdir -p $WEB_ROOT
+                cp -rv $JENKINS_DIR/dist/* $WEB_ROOT
+            else
+                echo "dir $JENKINS_DIR/dist does not exists, ignore copy!!!"
+            fi
+        done
+    else
+        mkdir -p $WEB_ROOT
+        cp -rv ${JENKINS_DIR}dist/* $WEB_ROOT
+    fi
+fi
+
+# 保存本次执行进度
+echo "collect-resource" > ${DOCKER_DIR}/PROGRESS
+```
+
+#### 6.3.3、创建镜像构造脚本
+
+- 创建脚本文件
+
+```bash
+$ vim /root/jenkins/script/build-image.sh
+```
+
+```bash
+#!/bin/bash
+
+ENTRY_PATH=$(pwd)
+ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
+SCRIPT_BASE_PATH=$(dirname "$0")
+echo "==========开始执行build-image.sh脚本：ENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+source $SCRIPT_BASE_PATH/check-env.sh
+
+echo "==========切换目录到：${DOCKER_DIR}=========="
+cd ${DOCKER_DIR}
+
+# 开始制作并上传镜像文件
 VERSION=`date +%Y%m%d%H%M%S`
 #IMAGE_NAME=192.168.200.116:5080/devops-learning/${JOB_NAME}:${VERSION}
 IMAGE_NAME=${IMAGE_REPO}/${JOB_NAME}:${VERSION}
@@ -9436,14 +9587,12 @@ docker rmi ${IMAGE_NAME}
 
 # 保存本次镜像名称
 echo "${IMAGE_NAME}" > ${DOCKER_DIR}/IMAGE
+
+# 保存本次执行进度
+echo "build-image" > ${DOCKER_DIR}/PROGRESS
 ```
 
-```bash
-# 修改权限，添加属主用户（root）可执行权限
-$ chmod u+x /root/jenkins/script/build-image-web.sh
-```
-
-#### 6.3.2、创建k8s模板脚本
+#### 6.3.4、创建k8s模板脚本
 
 - 简单模板
 
@@ -9514,7 +9663,7 @@ spec:
 
 - SpringBoot模板【该模板放到项目中根目录的k8s目录下使用，这里仅仅是保存一下】
 
-```bash
+```yaml
 # web-custom.yaml 或者 k8s-deploy-drill.yaml 或其他名字
 #deploy
 apiVersion: apps/v1
@@ -9536,23 +9685,23 @@ spec:
         - name: {{name}}
           image: {{image}}
           ports:
-            - containerPort: 38781
+            - containerPort: 38751
           resources:
             requests:
-              memory: 512Mi
-              # 1核心的CPU=1000m
-              cpu: 300m
-            limits:
               memory: 768Mi
-              cpu: 500m
+              # 1核心的CPU=1000m
+              cpu: 700m
+            limits:
+              memory: 1024Mi
+              cpu: 1000m
           # 存活状态检查
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 38781
+              port: 38751
               scheme: HTTP
             # pod 创建10s后启动第一次探测
-            initialDelaySeconds: 10
+            initialDelaySeconds: 50
             # 每隔10s启动一次探测
             periodSeconds: 10
             # 超时时间3s
@@ -9565,14 +9714,14 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 38781
+              port: 38751
               scheme: HTTP
-            initialDelaySeconds: 10
+            initialDelaySeconds: 50
             periodSeconds: 10
             timeoutSeconds: 3
           env:
             - name: JAVA_TOOL_OPTIONS
-              value: "-Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYMpI8l2puY2mFmiPUyOPDoaxZTDK8 -Dspring.profiles.active={{ns}}"
+              value: "-Xmx768m -Xms768m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYkLpulv58S2mFmXzmyJMXoaxZTDK7 -Dspring.profiles.active=uat"
             # 1、stdout为约定关键字，表示采集标准输出日志
             # 2、配置标准输出日志采集到ES的catalina索引下
             - name: aliyun_logs_catalina
@@ -9580,11 +9729,11 @@ spec:
             # 1、配置采集容器内文件日志，支持通配符
             # 2、配置该日志采集到ES的access索引下
             - name: aliyun_logs_access
-              value: "/home/saas/huiba/gaia/huiba-gaia-gateway/logs/*.log"
+              value: "/home/saas/huiba/gaia/huiba-gaia-admin/logs/*.log"
           # 容器内文件日志路径需要配置emptyDir
           volumeMounts:
             - name: log-volume
-              mountPath: /home/saas/huiba/gaia/huiba-gaia-gateway/logs
+              mountPath: /home/saas/huiba/gaia/huiba-gaia-admin/logs
       volumes:
         - name: log-volume
           emptyDir: { }
@@ -9599,35 +9748,33 @@ spec:
   ports:
     - port: 80
       protocol: TCP
-      targetPort: 38781
+      targetPort: 38751
   selector:
     app: {{name}}
   type: ClusterIP
 
 ---
 #ingress
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{name}}
-  namespace: {{ns}}
-spec:
-  rules:
-    - host: {{host}}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: {{name}}
-                port:
-                  number: 80
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: {{name}}
+#  namespace: {{ns}}
+#spec:
+#  rules:
+#    - host: {{host}}
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              serviceName: {{name}}
+#              servicePort: 80
 ```
 
 
 
-#### 6.3.3、创建k8s部署脚本
+#### 6.3.5、创建k8s部署脚本
 
 ```bash
 $ vim /root/jenkins/script/deploy.sh
@@ -9636,37 +9783,18 @@ $ vim /root/jenkins/script/deploy.sh
 ```bash
 #!/bin/bash
 
-# 校验依赖的Pipeline环境变量是否已定义
-if [ "${BUILD_DIR}" == "" ];then
-    echo "env 'BUILD_DIR' is not set"
-    exit 1
-fi
-if [ "${HOST}" == "" ];then
-    echo "env 'HOST' is not set"
-    exit 1
-fi
-if [ "${NS}" == "" ];then
-	NS="default"
-    echo "env 'HOST' is not set, use default"
-fi
-if [ "${DEPLOY_YAML}" == "" ];then
-	DEPLOY_YAML="web.yaml"
-    echo "env 'DEPLOY_YAML' is not set, use web.yaml"
-fi
-
-# 确定制作镜像的工作目录
-DOCKER_DIR=${BUILD_DIR}/${JOB_NAME}
-if [ ! -d ${DOCKER_DIR} ];then
-    mkdir -p ${DOCKER_DIR}
-fi
-echo "docker workspace: ${DOCKER_DIR}"
+ENTRY_PATH=$(pwd)
+ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
+SCRIPT_BASE_PATH=$(dirname "$0")
+echo "==========开始执行deploy.sh脚本：ENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+source $SCRIPT_BASE_PATH/check-env.sh
 
 # 打印出BASH_DIR路径
 BASH_DIR=$(dirname "${BASH_SOURCE[0]}")
 echo "BASH_DIR=${BASH_DIR}"
 
 # 为模板脚本准备变量
-name=${JOB_NAME}
+name=${DEPLOY_NAME}
 image=$(cat ${DOCKER_DIR}/IMAGE)
 host=${HOST}
 ns=${NS}
@@ -9715,11 +9843,12 @@ if [ ${success} -ne 1 ];then
     echo "health check failed!"
     exit 1
 fi
+
+# 保存本次执行进度
+echo "deploy" > ${DOCKER_DIR}/PROGRESS
 ```
 
-```bash
-$ chmod u+x /root/jenkins/script/deploy.sh
-```
+
 
 #### 6.3.3、创建Pipeline script任务
 
@@ -9782,8 +9911,6 @@ node {
     env.BUILD_TYPE="npm"
     // 确定制作镜像的工作目录
     env.BUILD_BASE_DIR = "/root/jenkins/build_workspace"
-    // 覆盖默认的${JOB_NAME}【可选】
-    env.BUILD_JOB_NAME="gaia-web"
     // 镜像的资源目录，如果不存在，则使用项目根目录下的k8s目录替代【可选】
     env.K8S_DIR = "/root/jenkins/k8s/gaia-web"
     
@@ -9803,7 +9930,7 @@ node {
         sh 'printenv'
         // git 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
         // git branch: "${params.BRANCH}", url: 'git@github.com:EmonCodingBackEnd/backend-devops-learning.git'
-        git branch: "develop", url: 'http://git.ishanshan.com/huiba-frontend/huiba-gaia-h5.git'
+        git branch: "develop", url: 'http://git.ishanshan.com/huiba-frontend/huiba-gaia-web.git'
     }
     
     stage('Npm Install') {
@@ -9823,8 +9950,6 @@ node {
     }
     
     stage('Deploy') {
-        // 默认部署名称是${JOB_NAME}【可选】
-        env.BUILD_DEPLOY_NAME = "gaia-web"
         sh "/root/jenkins/script/deploy.sh"
     }
 }
@@ -9833,4 +9958,367 @@ node {
 
 
 #### 6.3.4、创建Pipeline script from SCM任务
+
+
+
+### 6.3.5、多项目共享镜像的配置
+
+在部署K8S服务时，前端项目有多个，我这里是管理台端和手机端，这两个需要部署到同一个域名下，所以需要打包到同一个镜像下。
+
+管理台项目：huiba-scrm-web
+
+手机端项目：huiba-scrm-h5
+
+- 创建共享项目配置的文件夹
+
+```bash
+$ mkdir -pv /root/jenkins/k8s
+```
+
+- 创建huiba-scrm-web和huiba-scrm-h5的文件夹
+
+```bash
+$ mkdir -pv /root/jenkins/k8s/gaia-web
+```
+
+- 创建Dockerfile
+
+```bash
+$ vim /root/jenkins/k8s/gaia-web/Dockerfile
+```
+
+```dockerfile
+# FROM 192.168.200.116:5080/devops-learning/nginx:1.21
+FROM nginx:1.21
+MAINTAINER 问秋 liming2011071@163.com
+
+COPY mgr/ /usr/share/nginx/html/mgr
+COPY h5/ /usr/share/nginx/html/h5
+COPY dockerfiles/default.conf /etc/nginx/conf.d/default.conf
+```
+
+- 创建k8s-deploy-uat.yaml
+
+```bash
+$ vim /root/jenkins/k8s/gaia-web/k8s-deploy-uat.yaml
+```
+
+```yaml
+# web-custom.yaml 或者 k8s-deploy-drill.yaml 或其他名字
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  selector:
+    matchLabels:
+      app: {{name}}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{name}}
+    spec:
+      containers:
+        - name: {{name}}
+          image: {{image}}
+          ports:
+            - containerPort: 8808
+          resources:
+            requests:
+              memory: 100Mi
+              # 1核心的CPU=1000m
+              cpu: 100m
+            limits:
+              memory: 300Mi
+              cpu: 300m
+#          # 存活状态检查
+#          livenessProbe:
+#            httpGet:
+#              path: /actuator/health/liveness
+#              port: 8808
+#              scheme: HTTP
+#            # pod 创建10s后启动第一次探测
+#            initialDelaySeconds: 35
+#            # 每隔10s启动一次探测
+#            periodSeconds: 10
+#            # 超时时间3s
+#            timeoutSeconds: 3
+#            # 成功1次即表示容器健康
+#            successThreshold: 1
+#            # 连续5次失败，则判定容器不健康，默认3次
+#            failureThreshold: 5
+#          # 就绪状态检查
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health/readiness
+#              port: 8808
+#              scheme: HTTP
+#            initialDelaySeconds: 30
+#            periodSeconds: 10
+#            timeoutSeconds: 3
+#          env:
+#            - name: JAVA_TOOL_OPTIONS
+#              value: "-Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYkLpulv58S2mFmXzmyJMXoaxZTDK7 -Dspring.profiles.active=uat"
+#            # 1、stdout为约定关键字，表示采集标准输出日志
+#            # 2、配置标准输出日志采集到ES的catalina索引下
+#            - name: aliyun_logs_catalina
+#              value: "stdout"
+#            # 1、配置采集容器内文件日志，支持通配符
+#            # 2、配置该日志采集到ES的access索引下
+#            - name: aliyun_logs_access
+#              value: "/home/saas/huiba/gaia/huiba-gaia-admin/logs/*.log"
+#          # 容器内文件日志路径需要配置emptyDir
+#          volumeMounts:
+#            - name: log-volume
+#              mountPath: /home/saas/huiba/gaia/huiba-gaia-admin/logs
+#      volumes:
+#        - name: log-volume
+#          emptyDir: { }
+
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8808
+  selector:
+    app: {{name}}
+  type: ClusterIP
+
+---
+#ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{name}}
+  namespace: {{ns}}
+spec:
+  rules:
+    - host: {{host}}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: {{name}}
+              servicePort: 80
+```
+
+- 创建job_name_copy_to_build_dist
+
+**默认的列分隔符是`\001`，在linux输入是Ctrl+V和Ctrl+A等效于`\001`，该分隔符显示为^A**
+
+该文件对于多个项目打包一个镜像时，收集资源的自定义配置。如下内容表示：
+
+huiba-gaia-web项目的输出结果，收集到gaia-web/mgr目录；
+
+huiba-gaia-h5项目的输出结果，收集到gaia-web/h5目录；
+
+**mgr和h5目录必须存在**
+
+```bash
+$ vim /root/jenkins/k8s/gaia-web/job_name_copy_to_build_dist
+```
+
+```bash
+huiba-gaia-web^Amgr
+huiba-gaia-h5^Ah5
+```
+
+- 创建dockerfiles文件及其内容
+
+```bash
+$ mkdir -pv /root/jenkins/k8s/gaia-web/dockerfiles
+$ vim /root/jenkins/k8s/gaia-web/dockerfiles/default.conf
+```
+
+```nginx
+proxy_cache_path /tmp/nginx levels=1:2 keys_zone=my_zone:200m inactive=3d;
+
+server {
+    listen 8808;
+    server_name localhost gyls.gaiaworks.cn;
+    proxy_cache_key "$scheme$proxy_host$request_uri";
+    access_log  /var/log/nginx/scrm.access.log  main;
+    error_log  /var/log/nginx/scrm.error.log  error;
+
+    location ~ .*\.txt$ {
+          root /home/saas/huiba/scrm/huiba-scrm-web/webroot/;
+    }
+
+    location ^~ /mg/ {
+            rewrite ^/(.*)$  /wx.html last;
+    }
+    location /wx.html {
+        #root html/dist;
+        root /usr/share/nginx/html/h5/;
+        index wx.html wx.htm;
+    }
+    location ^~ /h5/ {
+            rewrite ^/(.*)$  /index.html last;
+    }
+    location /index.html {
+        #root html/dist;
+        root /usr/share/nginx/html/h5/;
+        index index.html index.htm;
+    }
+    location /hs/ {
+        #rewrite ^/(.*)$  /index.html last;
+        alias /usr/share/nginx/html/h5/;
+        index index.html index.htm;
+        try_files $uri $uri/ /hs/index.html;
+    }
+
+    location ^~ /static {
+        #root html/h5create;
+        root /usr/share/nginx/html/mgr/;
+        index index.html index.htm;
+    }
+
+    location ^~ /m {
+        if ($request_uri ~* /static/(js|css|fonts|img)) {
+            rewrite /m/(.*?)/static/(.*) /static/$2 last;
+        }
+        #root   html/h5create;
+        root /usr/share/nginx/html/mgr/;
+        default_type text/html;
+        # access_by_lua_file lua/h5auth_access.lua;
+        # header_filter_by_lua_file lua/h5auth_header.lua;
+        #content_by_lua_block {
+            #local r = require('read_static')
+            #r.readStaticRoot("/h5.html")
+        #}
+    }
+
+    location ^~ /api/hbscrm/ {
+      # add_header Access-Control-Allow-Origin *;
+      # add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
+      #add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+    
+      #if ($request_method = 'OPTIONS') {
+      #    return 204;
+      #}
+    
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto  $scheme;
+      #proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+          proxy_pass http://huiba-gaia-gateway;
+          proxy_http_version 1.1;
+      proxy_read_timeout 7200s;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
+
+    location ^~ /jsapi/pay/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        #proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://huiba-gaia-gateway/api/hbscrm/huiba-scrm-game-provider/jsapi/pay/;
+    }
+
+    location ^~ /jsapi/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        #proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://huiba-gaia-gateway/api/hbscrm/huiba-scrm-game-provider/;
+    }
+
+    location / {
+        rewrite ^/(.*)$  /mgr/scrm.html last;
+    }
+    location ^~ /mgr/ {
+        #rewrite ^/(.*)$  /index.html last;
+        root /usr/share/nginx/html/;
+        index index.html index.htm;
+        add_header Access-Control-Allow-Origin *;
+    }
+    location ^~ /yd/ {
+        #rewrite ^/(.*)$  /index.html last;
+        root /home/saas/huiba/scrm/huiba-scrm-mall-web/webroot/;
+        index index.html index.htm;
+        add_header Access-Control-Allow-Origin *;
+    }
+    location ^~ /wecom/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://huiba-wecom-helper-inner/;
+    }
+    location ^~ /eurekaweb/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://huiba-gaia-eureka/;
+    }
+    location ^~ /eureka/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://huiba-gaia-eureka;
+    }
+
+   location ^~ /gimg {
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://huiba-gimg;
+   }
+   location ^~ /gimg/img/ {
+      proxy_cache my_zone;
+      add_header X-Proxy-Cache $upstream_cache_status;
+      add_header 'Access-Control-Allow-Headers' 'X-Requested-With';
+      add_header 'Access-Control-Allow-Origin' '*';
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://huiba-gimg;
+   }
+
+   location ^~ /gimg/upload {
+      add_header 'Access-Control-Allow-Headers' 'X-Requested-With';
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header Access-Control-Allow-Methods POST;
+      if ($request_method = 'OPTIONS') {
+        return 204;
+      }
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://huiba-gimg;
+   }
+
+   location ^~ /gimg/user/upload {
+      add_header 'Access-Control-Allow-Headers' 'X-Requested-With';
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header Access-Control-Allow-Methods POST;
+      if ($request_method = 'OPTIONS') {
+        return 204;
+      }
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://huiba-gimg;
+   }
+}
+```
+
+
+
+
 
