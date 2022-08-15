@@ -8476,6 +8476,12 @@ yum clean all
 yum remove kube*
 ```
 
+## 90.6、查看kubeadm搭建集群的证书过期时间
+
+```bash
+cd /etc/kubernetes/pki/ && for i in $(ls *.crt); do echo "===== $i ====="; openssl x509 -in $i -text -noout | grep -A 3 'Validity' ; done
+```
+
 
 
 # 九十一、科学上网
