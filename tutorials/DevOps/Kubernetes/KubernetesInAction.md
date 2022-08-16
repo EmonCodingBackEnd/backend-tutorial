@@ -8896,7 +8896,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 下载地址获取页面： https://maven.apache.org/download.cgi
 
 ```bash
-$ wget -cP /usr/local/src/ http://mirrors.hust.edu.cn/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+$ wget -cP /usr/local/src/ https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
 ```
 
 2. 创建安装目录
@@ -8908,13 +8908,13 @@ $ mkdir /usr/local/Maven
 3. 解压安装
 
 ```bash
-$ tar -zxvf /usr/local/src/apache-maven-3.6.3-bin.tar.gz -C /usr/local/Maven/
+$ tar -zxvf /usr/local/src/apache-maven-3.8.6-bin.tar.gz -C /usr/local/Maven/
 ```
 
 4. 创建软连接
 
 ```bash
-$ ln -snf /usr/local/Maven/apache-maven-3.6.3/ /usr/local/maven
+$ ln -snf /usr/local/Maven/apache-maven-3.8.6/ /usr/local/maven
 ```
 
 5. 配置环境变量
