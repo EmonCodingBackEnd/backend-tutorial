@@ -303,8 +303,13 @@ $ mkdir -p $HOME/.kube
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# 如果是root用户，可以使用如下配置替换上面：（与上面二选一）
+# 【二选一】如果是root用户，可以使用如下配置替换上面：（与上面二选一）
 export KUBECONFIG=/etc/kubernetes/admin.conf
+
+# 【临时】无需执行，仅做记录参考
+# Then you can join any number of worker nodes by running the following on each as root:
+kubeadm join 192.168.200.116:6443 --token jqgqm7.ax7b938u5xheiu6d \
+    --discovery-token-ca-cert-hash sha256:882f6812169b4103fcae6065975c3cb231184cd4950301b7fcc5f769ddd265cb
 ```
 
 ### 3.2、安装网络插件-calico（仅master节点）
@@ -328,7 +333,8 @@ $ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
 
 ```bash
 # 下载calico.yaml文件
-$ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
+# $ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O 会加载最新版本，对K8S版本V1.20.15不再适合。
+$ curl https://docs.projectcalico.org/v3.20/manifests/calico.yaml -O
 ```
 
 修改IP自动发现
@@ -380,6 +386,18 @@ $ kubectl apply -f calico.yaml
 $ kubectl get nodes
 NAME    STATUS     ROLES                  AGE    VERSION
 emon    Ready      control-plane,master   7m2s   v1.20.15
+# 查看pod
+$ kubectl get po -n kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-577f77cb5c-g78c7   1/1     Running   0          13h
+calico-node-hxvx8                          1/1     Running   0          13h
+coredns-7f89b7bc75-8ks6f                   1/1     Running   0          14h
+coredns-7f89b7bc75-kfdbm                   1/1     Running   0          14h
+etcd-emon                                  1/1     Running   0          14h
+kube-apiserver-emon                        1/1     Running   0          14h
+kube-controller-manager-emon               1/1     Running   0          14h
+kube-proxy-f2r8l                           1/1     Running   0          14h
+kube-scheduler-emon                        1/1     Running   0          14h
 
 # ===== 等待加入一个worker节点进来之后，再查看下面信息，否则会看到pending，因为找不到合适的节点部署pod =====
 # 查看pod信息
@@ -450,21 +468,57 @@ kubeadm join 192.168.200.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
 
 ## 4、安装ingress-nginx（仅master节点）
 
-### 4.0、切换目录
+### 4.1、切换目录
 
 ```bash
 $ cd
 $ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
 ```
 
-### 4.1、安装ingress-nginx
+### 4.2、下载文件与配置调整【暂未启用】
+
+```bash
+# 下载
+curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml -O
+```
+
+修改kind模式 Deployment ==> DaemonSet
+
+```yaml
+#kind: Deployment 根据ingress-nginx-controller找到该处并修改
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.3.0
+  name: ingress-nginx-controller
+```
+
+第二处修改：增加
+
+```bash
+# 找到nginx-ingress-controller这个containers，增加nodeSelector属性
+	spec:
+      nodeSelector:
+        app: ingress
+      containers:
+      - args:
+        - /nginx-ingress-controller
+```
+
+
+
+### 4.3、安装ingress-nginx
 
 - 安装插件（master节点）
 
 ```bash
 # 由于mandatory.yaml添加了 nodeSelector，对node进行了label选择，这里必须添加标签，否则：
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
-$ kubectl label node emon3 app=ingress
+$ kubectl label node emon2 app=ingress
 
 # ===== 镜像下载一直是老大难问题，先下载吧 beg =====【仅worker节点下载镜像即可】
 # 查看所需镜像
@@ -483,9 +537,9 @@ $ kubectl apply -f ingress-nginx.yaml
 $ kubectl get all -n ingress-nginx -o wide
 ```
 
-### 4.2、测试服务
+### 4.4、测试服务
 
-#### 4.2.1、ingress-demo.yaml配置
+#### 4.4.1、ingress-demo.yaml配置
 
 ```bash
 $ vim ingress-demo.yaml
@@ -570,7 +624,7 @@ http://api.mooc.com # 看到 default backend - 404
 $ kubectl delete -f ingress-demo.yaml
 ```
 
-#### 4.2.3、ingress-nginx.yaml
+#### 4.4.2、ingress-nginx.yaml
 
 ```yaml
 apiVersion: v1
