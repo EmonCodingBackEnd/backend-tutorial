@@ -519,6 +519,7 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 [emon@emon ~]$ vim .bashrc
 alias docker="sudo /usr/bin/docker"
 alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
+alias dockerps="/usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
 ```
 
 使之生效：
@@ -1667,6 +1668,12 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]。
 [emon@emon ~]$ docker rm $(docker ps -aq --filter status=exited)
 # 或者
 [emon@emon ~]$ docker rm $(docker container ls -f "status=exited" -q)
+```
+
+4. 删除停止状态的容器，并删除其volume（备注：如果是启动时指定的-v，并不会被删除）
+
+```bash
+[emon@emon ~]$ docker rm -v <container_id|container_name>
 ```
 
 
@@ -4329,7 +4336,7 @@ docker system prune -a -f
 ```bash
 # 清理单个
 docker volume rm < VOLUME NAME >
-# 或者清理很多
+# 或者清理很多：如果volume不再被容器占用，才会被清理
 docker volume prune
 ```
 

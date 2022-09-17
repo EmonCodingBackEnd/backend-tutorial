@@ -1615,7 +1615,7 @@ $ docker run --name=mysql \
 -v /usr/local/dockerv/mysql/log:/var/log/mysql \
 -v /usr/local/dockerv/mysql/dada:/var/lib/mysql \
 -v /usr/local/dockerv/mysql/conf:/etc/mysql \
--p 3307:3306 -d mysql/mysql-server:5.7
+-p 3306:3306 -d mysql/mysql-server:5.7
 ```
 
 ### 1.2、主从
@@ -1926,9 +1926,13 @@ http://repo.emon.vip:9090
 
 ## 4、xxl-job-admin
 
+文档地址：https://www.xuxueli.com/xxl-job/
+
 - 创建依赖数据库
 
 脚本地址：https://github.com/xuxueli/xxl-job/blob/master/doc/db/tables_xxl_job.sql
+
+指定版本脚本地址：https://github.com/xuxueli/xxl-job/blob/2.3.0/doc/db/tables_xxl_job.sql
 
 - 启动
 
@@ -2012,5 +2016,125 @@ $ docker run --name es --net esnet -p 9200:9200 -p 9300:9300 -e "discovery.type=
 
 
 
+## 7、MongoDB
+
+### 7.1、普通启动
+
+```bash
+# /usr/local/dockerv/mongo 目录会自动创建
+$ docker run --name mongo \
+-e MONGO_INITDB_ROOT_USERNAME=root \
+-e MONGO_INITDB_ROOT_PASSWORD=root123 \
+-v /usr/local/dockerv/mongo/data/:/data/db \
+-p 27017:27017 \
+-d mongo:5.0.11
+```
+
+### 7.2、配置文件启动
+
+- 生成keyFile
+
+```bash
+$ mkdir -pv /usr/local/dockerv/mongo/conf
+$ openssl rand -base64 128 > /usr/local/dockerv/mongo/conf/keyFile
+# 复制集对keyFile的要求是：
+# 1-以base64编码集中的字符进行编写，即字符串只能包含a-z,A-Z,+,/，=
+# 2-长度不能够超过1000字节
+# 3-权限最多到600
+$ chmod 600 /usr/local/dockerv/mongo/conf/keyFile
+```
+
+- 创建配置文件
+
+```bash
+$ vim /usr/local/dockerv/mongo/conf/27017.conf
+```
+
+```bash
+# 端口，默认27017，MongoDB的默认服务TCP端口
+port=27017
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
+bind_ip=0.0.0.0
+# 日志文件
+logpath=/usr/local/dockerv/mongo/log/27017.log
+# 数据文件存放目录，默认： /data/db/
+dbpath=/usr/local/dockerv/mongo/data/27017/
+# 日志追加
+logappend=true
+# 启动的进程ID
+pidfilepath=/usr/local/dockerv/mongo/data/27017/27017.pid
+# 如果为true，以守护程序的方式启动，即在后台运行
+fork=false
+# oplog窗口大小
+oplogSize=5120
+# 复制集名称
+replSet=emon
+# 复制集认证文件
+keyFile=/usr/local/dockerv/mongo/conf/keyFile
+```
+
+- 启动
+
+```bash
+# /usr/local/dockerv/mongo 目录会自动创建
+$ docker run --name mongo \
+-e MONGO_INITDB_ROOT_USERNAME=root
+-e MONGO_INITDB_ROOT_PASSWORD=root123
+-v /usr/local/dockerv/mongo/conf/:/etc/mongo
+-d mongo:5.0.11
+--config /etc/mongo/27017.conf
+```
+
+## 8、JFrog Artifactory
+
+### 8.1、6版本
+
+- 创建volume
+
+```bash
+$ docker volume create artifactory
+```
+
+- 启动
+
+```bash
+$ docker run --name artifactory \
+-v artifactory:/var/opt/jfrog/artifactory \
+-p 8082:8081 \
+-d releases-docker.jfrog.io/jfrog/artifactory-oss:6.23.42
+```
+
+- 登录
+
+http://emon:8082/
+
+用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/admin123
 
 
+
+### 8.2、7版本
+
+- 创建目录并赋权
+
+```bash
+$ mkdir -pv /usr/local/dockerv/jfrog/artifactory/var/etc
+$ touch /usr/local/dockerv/jfrog/artifactory/var/etc/system.yaml
+$ chown -R 1030:1030 /usr/local/dockerv/jfrog/artifactory/var
+```
+
+- 启动
+
+```bash
+$ docker run --name artifactory \
+-v /usr/local/dockerv/jfrog/artifactory/var:/var/opt/jfrog/artifactory \
+-p 8081:8081 -p 8082:8082 \
+-d releases-docker.jfrog.io/jfrog/artifactory-oss:7.41.12
+```
+
+- 登录
+
+http://emon:8082/
+
+用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/Admin5%123
+
+Base URL：http://repo.emon.vip

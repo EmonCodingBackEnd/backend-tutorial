@@ -5125,6 +5125,8 @@ $ mkdir -pv /fastdfs/{tracker,storage,client,tmp}
 $ fdfs_trackerd /etc/fdfs/tracker.conf
 # 重启
 $ fdfs_trackerd /etc/fdfs/tracker.conf restart
+# 查看状态
+$ fdfs_trackerd /etc/fdfs/tracker.conf status
 ```
 
 - 配置并启动storage服务
@@ -5148,7 +5150,9 @@ $ tracker_server = 192.168.209.121:22122 = >tracker_server = 192.168.200.116:221
 # 启动
 $ fdfs_storaged /etc/fdfs/storage.conf
 # 重启
-$ fdfs_storaged /etc/fdfs/storage.conf
+$ fdfs_storaged /etc/fdfs/storage.conf restart
+# 查看状态
+$ fdfs_storaged /etc/fdfs/storage.conf status
 ```
 
 - 配置并测试client

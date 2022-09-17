@@ -19,7 +19,7 @@
 专项下载地址：https://help.sonatype.com/repomanager3/download
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.23.0-03-unix.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.41.1-01-unix.tar.gz
 ```
 
 3. 创建安装目录
@@ -27,20 +27,20 @@
 ```bash
 [emon@emon ~]$ mkdir /usr/local/Nexus
 # 每一个版本解压到一个目录
-[emon@emon ~]$ mkdir /usr/local/Nexus/nexus3.23.0-03-bundle/
+[emon@emon ~]$ mkdir /usr/local/Nexus/nexus3.41.1-01-bundle/
 ```
 
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.23.0-03-unix.tar.gz -C /usr/local/Nexus/nexus3.23.0-03-bundle
+[emon@emon ~]$ tar -zxvf /usr/local/src/nexus-3.41.1-01-unix.tar.gz -C /usr/local/Nexus/nexus3.41.1-01-bundle
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.23.0-03-bundle/nexus-3.23.0-03 /usr/local/nexus
-[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.23.0-03-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.41.1-01-bundle/nexus-3.41.1-01 /usr/local/nexus
+[emon@emon ~]$ ln -s /usr/local/Nexus/nexus3.41.1-01-bundle/sonatype-work/nexus3/ /usr/local/nexus-work
 ```
 
 6. 修改配置
@@ -171,15 +171,15 @@ WantedBy=multi-user.target
 
 11. 访问
 
-http://192.168.1.116:8081
+http://192.168.200.116:8081
 
 默认用户名密码： admin/admin123
 
 查看admin密码：
 
 ```bash
-[emon@emon ~]$ cat /usr/local/Nexus/nexus3.23.0-03-bundle/sonatype-work/nexus3/admin.password
-# 然后按照步骤修改为admin123，并允许匿名用户访问。
+[emon@emon ~]$ cat /usr/local/nexus-work/admin.password
+# 然后按照步骤修改为admin123，并允许匿名用户访问
 ```
 
 12. 添加阿里云代理资源库
