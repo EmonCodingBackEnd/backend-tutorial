@@ -419,34 +419,6 @@ dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
 [zk: localhost:2181(CONNECTED) 0] quit
 ```
 
-- 查看根节点下内容
-
-```bash
-[zk: localhost:2181(CONNECTED) 1] ls /
-```
-
-- 创建节点test并存储数据hello
-
-```bash
-[zk: localhost:2181(CONNECTED) 2] create /test hello
-```
-
-- 查看节点test内容
-
-```bash
-[zk: localhost:2181(CONNECTED) 6] get /test
-# 命令行输出结果
-hello
-```
-
-- 删除节点
-
-```bash
-# 递归删除
-[zk: localhost:2181(CONNECTED) 7] deleteall /test
-# 普通删除
-[zk: localhost:2181(CONNECTED) 7] delete /test
-```
 
 ### 1.4、Zookeeper集群（Apache版）
 

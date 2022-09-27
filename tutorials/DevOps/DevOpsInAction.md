@@ -14,7 +14,7 @@ CI/CD：持续集成/持续交付（或持续部署）
 
 
 
-## 1、互利网公司如何进行持续集成
+## 1、互联网公司如何进行持续集成
 
 ![image-20220318160527598](images/image-20220318160527598.png)
 
@@ -1873,7 +1873,7 @@ $ docker exec -it redis redis-cli
 - 启动
 
 ```bash
-$ docker run --name zoo --restart always -p 2181:2181 -d zookeeper:3.5.9
+$ docker run --name zoo --restart always -p 2181:2181 -d zookeeper:3.6.3
 ```
 
 - 连接
