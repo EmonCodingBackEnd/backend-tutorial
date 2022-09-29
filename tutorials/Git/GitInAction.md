@@ -1086,7 +1086,55 @@ git config --global core.longpaths true
 git cherry-pick <commit id>
 ```
 
+## 7.12、Git 解决 error bad signature 0x00000000 错误
 
+> 在 Git 运行时如果遇到强制中断的情形可能导致文件签名损坏，本文记录解决方案。 
+
+### 问题复现
+
+- 当运行 git 指令时，如遇到蓝屏、断电、热拔内存条等突发的内存数据清除情况时可能会导致 git 中记录签名部分的数据错误
+- 此时运行 `git  status` 指令会报错
+
+```shell
+error: bad signature 0x00000000
+fatal: index file corrupt
+```
+
+- 如果不幸这个仓库中还有子模块(submodule)，那么子模块可能也会跟着报错
+
+```shell
+Failed to recurse into submodule path '../modules/controllers'
+```
+
+### 解决方案
+
+- 因为断电导致的文件错误无法恢复，我们只能考虑 `拆掉重建` 的思路解决此类问题
+
+#### 针对带子模块的仓库
+
+-  如果错误信息中包含了子模块，此时子模块是可以进入的，并且一般情况下子模块的 git 可以正常运行（子模块损坏的情况我没有遇到过） 
+-  此时保存子模块工作状态，推到远程保护起来 
+-  返回大仓库目录，删除该子模块文件夹 
+-  如果删除后仍然有子模块报错，那么不断重复上述步骤
+
+#### 无子模块 / 子模块工作正常
+
+- 根仓库中 无子模块 或 子模块已经按照上述步骤操作过不再报错的情况下
+- 删除 `.git/index` 文件
+- 回到根仓库执行
+
+```shell
+git reset
+```
+
+- 此时 `git status` 应该可以正常运行，逐步恢复开发状态
+- 恢复子模块
+
+```shell
+git submodule update --init --recursive
+```
+
+[参考资料](https://superuser.com/questions/837668/fatal-index-file-corrupt-keeps-repeating-in-git)
 
 # 八、Git Flow——以发布为中心的开发模式
 
