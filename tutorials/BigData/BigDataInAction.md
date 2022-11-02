@@ -661,7 +661,15 @@ export PATH=$KAFKA_HOME/bin:$PATH
 log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
 # [修改]
 zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+# [新增]比如在listeners=PLAINTEXT://:9092下面一行添加
+advertised.host.name=192.168.200.116
 ```
+
+>备注：advertised.host.name很重要，如果不设置时，外网访问kafka会按照hostname去解析，设置zookeeper和kafka不在同一台机器也会出现注册问题。
+>
+>通过zookeeper上命令行查看 `get /brokers/ids/0` 可以看到zookeeper上面kafka的地址。
+>
+>设置了该值，在其他机器访问kafka时，才能指定ip地址访问。
 
 8. 编写启动停止脚本
 

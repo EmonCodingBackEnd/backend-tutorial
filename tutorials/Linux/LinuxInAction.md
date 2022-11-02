@@ -457,7 +457,7 @@ drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 官网下载页地址： http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u171-linux-x64.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u251-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u251-linux-x64.tar.gz
 ```
 
 3. 创建安装目录
@@ -469,13 +469,13 @@ drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/jdk-8u171-linux-x64.tar.gz -C /usr/local/Java/
+[emon@emon ~]$ tar -zxvf /usr/local/src/jdk-8u251-linux-x64.tar.gz -C /usr/local/Java/
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Java/jdk1.8.0_171/ /usr/local/java
+[emon@emon ~]$ ln -s /usr/local/Java/jdk1.8.0_251/ /usr/local/java
 ```
 
 6. 配置环境变量
@@ -499,9 +499,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ```bash
 [emon@emon ~]$ java -version
-java version "1.8.0_171"
-Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
-Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
+java version "1.8.0_251"
+Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
+Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 ```
 
 ## 2、安装Tomcat
@@ -556,7 +556,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 下载地址获取页面： https://maven.apache.org/download.cgi
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://mirrors.hust.edu.cn/apache/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
 ```
 
 2. 创建安装目录
@@ -568,13 +568,13 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-maven-3.5.3-bin.tar.gz -C /usr/local/Maven/
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-maven-3.8.6-bin.tar.gz -C /usr/local/Maven/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Maven/apache-maven-3.5.3/ /usr/local/maven
+[emon@emon ~]$ ln -s /usr/local/Maven/apache-maven-3.8.6/ /usr/local/maven
 ```
 
 5. 配置环境变量
@@ -651,6 +651,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
           <name>nexus maven</name>
           <url>http://maven.aliyun.com/nexus/content/groups/public</url>
           <!--<url>http://localhost:8081/repository/maven-public/</url>-->
+          <!--<url>http://www.ishanshan.com/nexus/content/groups/public/</url>-->
       </mirror>
     </mirrors>
   ```
@@ -1780,13 +1781,13 @@ conf  html  logs  sbin
 
 ```bash
 [emon@emon ~]$ nginx -V
-nginx version: nginx/1.18.0
-built by gcc 8.3.1 20190507 (Red Hat 8.3.1-4) (GCC) 
-built with OpenSSL 1.1.1c FIPS  28 May 2019
+nginx version: nginx/1.22.0
+built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) 
+built with OpenSSL 1.0.2k-fips  26 Jan 2017
 TLS SNI support enabled
-configure arguments: --prefix=/usr/local/Nginx/nginx1.18.0 --with-http_ssl_module
+configure arguments: --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_modul
 [emon@emon ~]$ nginx -v
-nginx version: nginx/1.18.0
+nginx version: nginx/1.22.0
 ```
 
 10. 配置`nginx.conf`
@@ -3518,21 +3519,21 @@ NVM管理不同版本的node与npm：
 1. 安装
 
 ```bash
-[emon@emon ~]$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100 12819  100 12819    0     0  13128      0 --:--:-- --:--:-- --:--:-- 13134
-=> Downloading nvm from git to '/home/emon/.nvm'
-=> 正克隆到 '/home/emon/.nvm'...
-remote: Counting objects: 267, done.
-remote: Compressing objects: 100% (242/242), done.
-remote: Total 267 (delta 31), reused 86 (delta 15), pack-reused 0
-接收对象中: 100% (267/267), 119.46 KiB | 229.00 KiB/s, 完成.
-处理 delta 中: 100% (31/31), 完成.
+[emon@emon ~]$ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+=> Downloading nvm from git to '/root/.nvm'
+=> Cloning into '/root/.nvm'...
+remote: Enumerating objects: 356, done.
+remote: Counting objects: 100% (356/356), done.
+remote: Compressing objects: 100% (303/303), done.
+remote: Total 356 (delta 39), reused 176 (delta 28), pack-reused 0
+Receiving objects: 100% (356/356), 225.33 KiB | 1.69 MiB/s, done.
+Resolving deltas: 100% (39/39), done.
+* (HEAD detached at FETCH_HEAD)
+  master
 => Compressing and cleaning up git repository
 
-=> Appending nvm source string to /home/emon/.bashrc
-=> Appending bash_completion source string to /home/emon/.bashrc
+=> Appending nvm source string to /root/.bashrc
+=> Appending bash_completion source string to /root/.bashrc
 => Close and reopen your terminal to start using nvm or run the following to use it now:
 
 export NVM_DIR="$HOME/.nvm"
@@ -3548,7 +3549,7 @@ export NVM_DIR="$HOME/.nvm"
 [emon@emon ~]$ command -v nvm
 nvm
 [emon@emon ~]$ nvm --version
-0.33.11
+0.39.2
 [emon@emon ~]$ nvm --help
 ```
 

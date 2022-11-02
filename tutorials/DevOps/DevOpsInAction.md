@@ -2138,3 +2138,23 @@ http://emon:8082/
 用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/Admin5%123
 
 Base URL：http://repo.emon.vip
+
+
+
+## 9、RabbitMQ
+
+- 启动
+
+```bash
+$ docker run --name rabbitmq \
+-e RABBITMQ_DEFAULT_USER=rabbit -e RABBITMQ_DEFAULT_PASS=rabbit123 \
+-p 5672:5672 -p 15672:15672 \
+-d rabbitmq:3.8.3-management
+```
+
+- docker命令访问
+
+```bash
+$ docker exec -it rabbitmq /bin/bash
+```
+
