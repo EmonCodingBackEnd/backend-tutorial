@@ -661,11 +661,27 @@ export PATH=$KAFKA_HOME/bin:$PATH
 log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
 # [修改]
 zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-# [新增]比如在listeners=PLAINTEXT://:9092下面一行添加
-advertised.host.name=192.168.200.116
+# [修改]
+advertised.listeners=PLAINTEXT://192.168.200.116:9092
 ```
 
->备注：advertised.host.name很重要，如果不设置时，外网访问kafka会按照hostname去解析，设置zookeeper和kafka不在同一台机器也会出现注册问题。
+>备注：外网访问kafka服务时，有两种开放ip的方式：
+>
+>其一：【推荐】
+>
+>```bash
+># [修改]
+>advertised.listeners=PLAINTEXT://192.168.200.116:9092
+>```
+>
+>其二：
+>
+>```bash
+># [新增]比如在listeners=PLAINTEXT://:9092下面一行添加
+>advertised.host.name=192.168.200.116
+>```
+>
+>advertised.host.name很重要，如果不设置时，外网访问kafka会按照hostname去解析，设置zookeeper和kafka不在同一台机器也会出现注册问题。
 >
 >通过zookeeper上命令行查看 `get /brokers/ids/0` 可以看到zookeeper上面kafka的地址。
 >

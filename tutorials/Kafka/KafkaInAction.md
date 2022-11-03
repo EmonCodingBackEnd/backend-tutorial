@@ -323,13 +323,14 @@ Kafka默认提供了基于控制台的生产者和消费者，方便测试使用
 再创建一个消费者消费Topic中的消息：
 
 ```bash
-[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic hello --from-beginning
+[emon@emon ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic hello --group g --from-beginning
 ```
 
 命令说明：
 
 - bootstrap-server：Kafka的服务地址[多个用英文逗号隔开]
 - topic：具体的Topic
+- --group：消费者组
 - from-beginning：表示从头消费，如果不指定，默认消费最新生产的数据
 
 ### 4.1.6、案例：QQ群聊天
@@ -431,7 +432,7 @@ Producer默认是随机将数据发送到topic的不同分区中，也可以根�
 
 不过如果宕机的是副本partition所在的节点，则数据是不会丢的。
 
-如果acks设置为0的话就表示是顺气自然了，只管发送，不管Kafka有没有收到，这种情况表示对数据丢失都无所谓了。
+如果acks设置为0的话就表示是顺其自然了，只管发送，不管Kafka有没有收到，这种情况表示对数据丢失都无所谓了。
 
 ### 4.2.3、Consumer扩展
 
