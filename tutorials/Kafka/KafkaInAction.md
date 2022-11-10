@@ -200,7 +200,9 @@ Consumer：消息和数据的消费者，从Kafka的topic中消费数据。
 
 ```bash
 # 指定2个分区，2个副本，副本数不能大于集群中的Broker的数量；对于zookeeper集群，也可以英文逗号分隔
-[emon@emon ~]$ kafka-topics.sh --create --zookeeper emon:2181 --partitions 2 --replication-factor 2 --topic hello
+# --bootstrap-server emon:9092 与 --zookeeper emon:2181 等价
+# --broker-list emon:9092 和  --bootstrap-server emon:9092 等价
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --create --partitions 2 --replication-factor 2 --topic hello
 # 命令行输出结果
 Created topic hello.
 ```
@@ -212,7 +214,7 @@ Created topic hello.
 - 查询Topic列表
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --list --zookeeper emon:2181
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --list
 # 命令行输出结果
 hello
 ```
@@ -220,7 +222,7 @@ hello
 - 查看指定topic的详细信息
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic hello
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --describe --topic hello
 Topic: hello	PartitionCount: 2	ReplicationFactor: 2	Configs: 
 	Topic: hello	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
 	Topic: hello	Partition: 1	Leader: 2	Replicas: 2,0	Isr: 2,0
@@ -267,7 +269,7 @@ Isr：当前partition处于同步状态的所有节点，这里显示的所有�
 因为数据是存储在partition中的，如果可以减少partition的话，那么partition中的数据就丢了。
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --alter --zookeeper emon:2181 --partitions 5 --topic hello
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --alter --partitions 5 --topic hello
 # 命令行输出结果
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
 Adding partitions succeeded!
@@ -284,33 +286,76 @@ Adding partitions succeeded!
 `delete.topic.enable`可以配置在`server.properties`文件中。
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --delete --zookeeper emon:2181 --topic hello
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --delete --topic hello
 # 命令行输出结果
 Topic hello is marked for deletion.
 Note: This will have no impact if delete.topic.enable is not set to true.
 ```
 
-### 4.1.5、Kafka中的生产者和消费者
+### 4.1.5、查看group
+
+- 查看group列表
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --list
+```
+
+- 查看指定group详情
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --describe --group con-1
+# 命令行输出结果
+Consumer group 'con-1' has no active members.
+
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+con-1           hello           4          0               0               0               -               -               -
+con-1           hello           2          0               0               0               -               -               -
+con-1           hello           3          2               2               0               -               -               -
+con-1           hello           0          0               0               0               -               -               -
+con-1           hello           1          2               2               0               -               -               -
+```
+
+GROUP：当前消费者组，通过group.id指定的值；
+
+TOPIC：当前消费的topic；
+
+PARTITION：消费的分区；
+
+CURRENT-OFFSET：消费者消费到这个分区的offset；
+
+LOG-END-OFFSET：当前分区中数据的最大offset；
+
+LAG：当前分区未消费数据量；
+
+CONSUMER-ID：消费者ID；
+
+HOST：主机；
+
+CLIENT-ID：客户端ID。
+
+
+
+### 4.1.6、Kafka中的生产者和消费者
 
 Kafka默认提供了基于控制台的生产者和消费者，方便测试使用。
 
 - 生产者：`kafka-console-producer.sh`
 - 消费者：`kafka-console-consumer.sh`
 
-#### 4.1.5.1、如何生产数据
+#### 4.1.6.1、如何生产数据
 
 直接使用Kafka提供的基于控制台的生产者。
 
 先创建一个Topic【5个分区，2个副本】：
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --create --zookeeper emon:2181 --partitions 5 --replication-factor 2 --topic hello
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --create --partitions 5 --replication-factor 2 --topic hello
 ```
 
 向这个Topic中生产数据：
 
 ```bash
-[emon@emon ~]$ kafka-console-producer.sh --broker-list emon:9092 --topic hello
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic hello
 # 进入kafka生产者命令行
 >
 ```
@@ -319,6 +364,8 @@ Kafka默认提供了基于控制台的生产者和消费者，方便测试使用
 
 - broker-list：Kafka的服务地址[多个用英文逗号隔开]
 - topic：Topic名称
+
+#### 4.1.6.2、如何消费数据
 
 再创建一个消费者消费Topic中的消息：
 
@@ -330,30 +377,30 @@ Kafka默认提供了基于控制台的生产者和消费者，方便测试使用
 
 - bootstrap-server：Kafka的服务地址[多个用英文逗号隔开]
 - topic：具体的Topic
-- --group：消费者组
+- group：消费者组
 - from-beginning：表示从头消费，如果不指定，默认消费最新生产的数据
 
-### 4.1.6、案例：QQ群聊天
+### 4.1.7、案例：QQ群聊天
 
 通过Kafka可以模拟QQ群聊天的功能，我们来看一下。
 
 首先在Kafka中创建一个新的topic，可以认为是我们在QQ里面创建了一个群，群号是88888888
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --create --zookeeper emon:2181 --partitions 5 --replication-factor 2 --topic 88888888
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --create --partitions 5 --replication-factor 2 --topic 88888888
 ```
 
 打开生产者：
 
 ```bash
-[emon@emon ~]$ kafka-console-producer.sh --broker-list emon:9092 --topic 88888888
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic 88888888
 ```
 
 打开2个新在终端，消费消息：
 
 ```bash
-[emon@emon2 ~]$ /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server emon:9092 --topic 88888888 --from-beginning
-[emon@emon3 ~]$ /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server emon:9092 --topic 88888888 --from-beginning
+[emon@emon2 ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic 88888888 --from-beginning
+[emon@emon3 ~]$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic 88888888 --from-beginning
 ```
 
 ## 4.2、Kafka核心扩展内容
@@ -1010,4 +1057,148 @@ http://kafka.apache.org/090/documentation.html#upgrade
 2：按照第一步的流程去依次操作剩余节点即可，就是先把0.9.0.0版本的Kafka停掉，再把0.9.0.1版本的Kafka启动即可。
 
 > 注意：每操作一个节点，需要稍等一下，确认这个节点可以正常接收和发送数据之后，再处理下一个节点。
+
+
+
+# 十、Kafka客户端API
+
+## 10.1、Producer
+
+### 10.1.1、Producer特性
+
+- Producer是线程安全的
+- 每次send并不会立即执行，而是批量执行的
+- 发送到某一个partition是由客户端决定的
+
+### 10.1.2、send的时序图
+
+![image-20221107125357317](images/image-20221107125357317.png)
+
+### 10.1.3、send业务流程图
+
+![image-20221107130006153](images/image-20221107130006153.png)
+
+
+
+# 九十九、Kafka配置全解析
+
+| 属性                                          | 默认值                                                       | 描述                                                         |
+| --------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| broker.id                                     |                                                              | 每个broker都可以用一个唯一的非负整数id进行标识；这个id可以作为broker的“名字”，并且它的存在使得broker无序混淆consumers就可以迁移到不用的host/port上。你可以选择任意你喜欢的数字作为id，只要id是唯一的即可。 |
+| log.dirs                                      | /tmp/kafka-logs                                              | Kafka存放数据的路径。这个路径并不是唯一的，可以是多个，路径之间只需要使用逗号分隔即可；每当创建新partition时，都会选择在包含最少partitions的路径下进行。 |
+| port                                          | 9092                                                         | server接受客户端连接的端口。                                 |
+| zookeeper.connect                             | localhost:2181                                               | ZooKeeper连接字符串的格式为：hostname:port，此处hostname和port分别是ZooKeeper集群中某个节点的host和port；为了当某个host当掉之后你能通过其他ZooKeeper节点进行连接，你可以按照以下方式制定多个hosts：<br />`hostname1:port1,hostname2:port2,hostname2:port3`<br />ZooKeeper允许你增加一个“chroot”路径，将集群中所有Kafka数据存放在特定的路径下。当多个Kafka集群或者其他应用使用相同ZooKeeper集群时，可以使用这个方式设置数据存放路径。这种方式的实现可以通过这样设置连接字符串格式，如下所示：<br />`hostname1:port1,hostname2:port2,hostname3:port3/chroot/path` 这样设置就将所有Kafka集群数据存放在`/chroot/path`路径下。注意，在你启动broker之前，你必须创建这个路径，并且consumers必须使用相同的连接格式。 |
+| message.max.bytes                             | 1000000                                                      | server可以接收的消息最大尺寸。重要的是，consumer和producer有关这个属性的设置必须同步，否则producer发布的消息对consumer来说太大。 |
+| num.network.threads                           | 3                                                            | server用来处理网络请求的网络线程数目；一般你不需要更改这个属性。 |
+| num.io.threads                                | 8                                                            | server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。 |
+| background.threads                            | 4                                                            | 用于后台处理的线程数目，例如文件删除；你不需要更改这个属性。 |
+| queued.max.requests                           | 500                                                          | 在网络线程停止读取新请求之前，可以排队等待I/O线程处理的最大请求个数。 |
+| host.name                                     | null                                                         | broker的hostname；如果hostname已经设置的话，borker将只会绑定到这个地址上；如果没有设置，它将绑定到所有接口，并发布一份到ZooKeeper。 |
+| advertised.host.name                          | null                                                         | 如果设置，则就作为broker的hostname发往producer、consumer以及其他brokers |
+| advertised.port                               | null                                                         | 此端口将给与producers、consumers以及其他brokers，它会在建立连接时用到；它仅在实际端口和server需要绑定的端口不一样时才需要设置。 |
+| socket.send.buffer.bytes                      | 100*1024（100KB）                                            | SO_SNDBUFF缓存大小，server进行socket连接时所用。             |
+| socket.receive.buffer.bytes                   | 100*1024（100KB）                                            | SO_RCVBUFF缓存大小啊，server进行socket连接时所用。           |
+| socket.request.max.bytes                      | 100\*1024\*1024（100M）                                      | server允许的最大请求尺寸；这将避免server溢出，它应该小于java heap size。 |
+| num.partitions                                | 1                                                            | 如果创建topic时没有给出划分partitions个数，这个数字将是topic下partitions数目的默认数值。 |
+| log.segment.bytes                             | 1024\*1024\*1024（1GB）                                      | topic partition的日志存放在某个目录下诸多文件中，这些文件将partition的日志切分成一段一段的；这个属性就是每个文件的最大尺寸；当尺寸达到这个数值时，就会创建新文件。此设置可以由每个topic基础设置时进行覆盖。【可覆盖】 |
+| log.roll.hours                                | 24*7（7天）                                                  | 即使文件没有达到`log.segment.bytes`，只要文件创建时间到达此属性，就会创建新文件。这个设置也可以有topic层面的设置进行覆盖。【可覆盖】 |
+| log.cleanup.policy                            | delete                                                       |                                                              |
+| log.retention.hours                           | 24*7（7天）                                                  | 每个日志文件删除之前保存的时间。默认数据保存时间对所有topic都一样。log.retention.minutes和log.retention.bytes都是用来设置删除日志文件的，无论哪个属性已经溢出。这个属性设置可以在topic基本设置时进行覆盖。【可覆盖】 |
+| log.retention.ms                              | null                                                         | 仅单位不同，作用同上。                                       |
+| log.retention.minutes                         | null                                                         | 仅单位不同，作用同上。                                       |
+| log.retention.bytes                           | -1                                                           | 注意，这是每个partitions的上限，因此这个数值乘以partitions的个数就是每个topic保存的数据总量。同时注意：如果`log.retention.hours`和`log.retention.bytes`都设置了，则超过了任何一个限制都会造成删除一个段文件。注意，这项设置可以由每个topic设置时进行覆盖。【可覆盖】 |
+| log.retention.check.interval.ms               | 300000（5分钟）                                              | 检查日志分段文件的间隔时间，以确定是否文件属性是否到达删除要求。 |
+| log.cleaner.enable                            | false                                                        | 当这个属性设置为false时，一旦日志的保存时间或者大小达到上限时，就会进行`log compaction`。 |
+| log.cleaner.threads                           | 1                                                            | 进行日志压缩的线程数。                                       |
+| log.cleaner.io.max.bytes.per.second           | None                                                         | 进行`log compaction`时，log cleaner可以拥有的最大I/O数目。这项设置限制了cleaner，以避免干扰活动的请求服务。 |
+| log.cleaner.io.buffer.size                    | 512\*1024（512K）                                            | log cleaner清除过程中针对日志进行索引化以及精简化所用到的缓存大小。最好设置大点，以提供充足的内存。 |
+| log.cleaner.io.buffer.load.factor             | 0.9                                                          | log cleaning中所使用的hash表的负载因子；你不需要更改这个选项。 |
+| log.cleaner.backoff.ms                        | 15000                                                        | 进行日志是否清理检查的时间间隔                               |
+| log.cleaner.min.cleanable.ratio               | 0.5                                                          | 这项配置控制log compactor试图清理日志的频率（假定log compaction是打开的）。默认避免清理压缩超过50%的日志。这个比率绑定了备份日志所消耗的最大空间（50%的日志备份时压缩率为50%）。更高的比率则意味着浪费消耗更少，也就可以更有效的清理更多的空间。这项设置在每个topic设置中可以覆盖。【可覆盖】 |
+| log.cleaner.delete.retention.ms               | 86400000（1day）                                             | 保存时间；保存压缩日志的最长时间；也是客户端消费消息的最长时间，与`log.retention.minutes`的区别在于一个控制未压缩数据，一个控制压缩后的数据；会被topic创建时的指定时间覆盖。【可覆盖】 |
+| log.index.size.max.bytes                      | 10\*1024\*1024（个数）                                       | 每个log segment中offset的最大索引值。注意，如果log的offset达到这个数值，即时尺寸没有超过`log.segment.bytes`限制，也需要产生新的log segment。 |
+| log.index.interval.bytes                      | 4096（4KB）                                                  | 当执行一次fetch后，需要一定的空间扫描最近的offset，设置的越大越好，一般使用默认值就可以。 |
+| log.flush.interval.messages                   | Long.MaxValue                                                | log文件`fsync`到磁盘之前积累的消息条数。因为磁盘IO操作是一个慢操作，但又是一个“数据可靠性”的必要手段，所以触发同步之前积累的消息条数，需要在“数据可靠性”与“性能”之间做必要的权衡，如果此值过大，将会导致每次`fsync`的时间过长（IO阻塞），如果此值过小，将会导致`fsync`的次数较多，这也就意味着整体的client请求有一定的延迟，物理server故障，将会导致没有`fsync`的消息丢失。 |
+| log.flush.scheduler.interval.ms               | Long.MaxValue                                                | 检查是否需要`fsync`的时间间隔。                              |
+| log.flush.interval.ms                         | Long.MaxValue（如果未设置默认使用`log.flush.scheduler.interval.ms`的值） | 仅仅通过interval来控制消息的磁盘写入时机，是不足的，这个数用来控制`fsync`的时间间隔，如果消息量始终没有达到固化到磁盘的消息数，但是离上次磁盘同步的时间间隔达到阈值，也将触发磁盘同步。 |
+| log.delete.delay.ms                           | 60000                                                        | 文件在索引中清除后的保留时间，一般不需要修改。               |
+| auto.create.topics.enable                     | true                                                         | 是否允许自动创建topic。如果是真的，则produce或者fetch不存在的topic时，会自动创建这个topic。否则需要使用命令行创建topic。 |
+| controller.socket.timeout.ms                  | 30000                                                        | partition管理控制器进行备份时，socket的超时时间。            |
+| controller.message.queue.size                 | Inte.MaxValue                                                | `controller-to-broker-channels` 的buffer尺寸                 |
+| default.replication.factor                    | 1                                                            | 默认备份份数，仅指自动创建的topics。                         |
+| replica.lag.time.max.ms                       | 10000                                                        | 如果一个follower在这个时间内没有发送fetch请求，leader将从ISR中移除这个follower，并认为这个follower已经挂了。 |
+| replica.lag.max.messages                      | 4000                                                         | 如果一个replica没有备份的条数超过这个数值，则leader将移除这个follower，并认为这个follower已经挂了。 |
+| replica.socket.timeout.ms                     | 30*1000                                                      | leader备份数据时的socket网络请求的超时时间                   |
+| replica.socket.receive.buffer.bytes           | 64*1024                                                      | 备份时向leader发送网络请求时的socket receive buffer          |
+| replica.fetch.max.bytes                       | 1024*1024（1MB）                                             | 备份时每次fetch的最大值                                      |
+| replica.fetch.min.bytes                       | 1                                                            | 备份时每次fetch的最小值                                      |
+| replica.fetch.wait.max.ms                     | 500（毫秒）                                                  | leader发出备份请求时，数据到达leader的最长等待时间           |
+| num.replica.fetchers                          | 1                                                            | 从leader备份数据的线程数                                     |
+| replica.high.watermark.checkpoint.interval.ms | 5000                                                         | 每个replica检查是否将最高水位进行固化的频率                  |
+| fetch.purgatory.purge.interval.requests       | 1000（请求数）                                               | fetch请求清除时的清除间隔                                    |
+| producer.purgatory.purge.interval.requests    | 1000（请求数）                                               | producer请求清除时的清除间隔                                 |
+| zookeeper.session.timeout.ms                  | 6000                                                         | ZooKeeper 会话超时时间                                       |
+| zookeeper.connection.timeout.ms               | 6000                                                         | 客户端等待和zookeeper建立连接的最大时间                      |
+| zookeeper.sync.time.ms                        | 2000                                                         | ZooKeeper follower落后于ZooKeeper Leader的最长时间           |
+| controlled.shutdown.enable                    | true                                                         | 是否能够控制broker的关闭。如果能够，broker将可以移动所有leaders到其他的broker上，在关闭之前。这减少了不可用性在关机过程中。 |
+| controlled.shutdown.max.retries               | 3                                                            | 在执行不彻底的关机之前，可以成功执行关机的命令数。           |
+| controlled.shutdown.retry.backoff.ms          | 5000                                                         | 在关机之间的backoff时间                                      |
+| auto.leader.rebalance.enable                  | true                                                         | 如果是true，控制者将会自动平衡brokers对于partitions的leadership。 |
+| leader.imbalance.per.broker.percentage        | 10                                                           | 每个broker所允许的leader最大不平衡比率                       |
+| leader.imbalance.check.interval.seconds       | 300                                                          | 检查leader不平衡的频率                                       |
+| offset.metadata.max.bytes                     | 4096                                                         | 允许客户端保存他们offsets的最大个数                          |
+| max.connections.per.ip                        | Int.MaxValue                                                 | 每个ip地址上每个broker可以被连接的最大数目                   |
+| max.connections.per.ip.overrides              | ""                                                           | 每个ip或者hostname默认的连接的最大覆盖，多个之间英文逗号分隔，比如：`hostname:100,127.0.0.1:200` |
+| connections.max.idle.ms                       | 600000                                                       | 空连接的超时限制                                             |
+| log.roll.jitter.hours                         | 0                                                            | 从logRollTimeMillis抽离的jitter最大数目                      |
+| log.roll.jitter.ms                            | null                                                         | 同上，如果未设置会采用`log.roll.jitter.hours`                |
+| num.recovery.threads.per.data.dir             | 1                                                            | 每个数据目录用来日志恢复的线程数目                           |
+| unclean.leader.election.enable                | false                                                        | 指示是否在万不得已的情况下启用不在ISR集中的副本作为领导者，即使这样做可能会导致数据丢失。 |
+| delete.topic.enable                           | true                                                         | 启用删除主题。如果关闭此配置，通过管理工具删除主题将无效     |
+| offsets.topic.num.partitions                  | 50                                                           | 存储主题消费偏移量的主题(`__consumer_offsets`)的分区数（部署后不应更改） |
+| offsets.topic.retention.minutes               | 1440（1天）                                                  | 存在时间超过这个时间限制的offsets都将被标记为待删除。        |
+| offsets.retention.check.interval.ms           | 600000                                                       | offset管理器检查陈旧offsets的频率                            |
+| offsets.topic.replication.factor              | 3                                                            | topic的offset的备份份数。建议设置更高的数字保证更高的可用性。 |
+| offsets.topic.segment.bytes                   | 104857600（100GB）                                           | 偏移主题段字节应保持相对较小，以便于更快的日志压缩和缓存加载 |
+| offsets.load.buffer.size                      | 5242880（5MB）                                               | 用于在读取offset信息到内存cache时，用于读取缓冲区的大小      |
+| offsets.commit.required.acks                  | -1                                                           | 可以接受提交之前所需的确认。通常，不应重写默认值（-1）       |
+|                                               |                                                              |                                                              |
+
+
+
+## 99.2、Topic级别的配置
+
+| 属性                                    | 默认值             | 服务器默认属性                          | 描述                                                         |
+| --------------------------------------- | ------------------ | --------------------------------------- | ------------------------------------------------------------ |
+| cleanup.policy                          | delete             | log.cleanup.policy                      | 要么是`delete`要么是`compact`；这个字符串指明了针对旧日志部分的利用方式；默认方式（`delete`）将会丢失旧的部分当他们的回收时间或者尺寸限制到达时。`compact`将会进行日志压缩。 |
+| compression.type                        | producer           | compression.type                        |                                                              |
+| delete.retention.ms                     | 86400000（24小时） | log.cleaner.delete.retention.ms         | 对于压缩日志保留的最长时间，也是客户端消费消息的最长时间，与`log.retention.minutes`（未压缩数据）的区别在于一个控制未压缩数据，一个控制压缩后的数据。此选项可以在topic创建覆盖。【可覆盖】 |
+| file.delete.delay.ms                    | 60000              | log.segment.delete.delay.ms             |                                                              |
+| flush.messages                          | Long.MaxValue      | log.flush.interval.messages             | 此项配置指定时间间隔：强制进行`fsync`日志。例如，如果这个选项设置为1，那么每条消息之后都需要进行`fsync`，如果设置为5，则每5条消息就需要进行一次`fsync`。一般来说，建议你不要设置这个值。此参数的设置，需要在“数据可靠性”与“性能”之间做好必要的权衡。如果此值过大，会导致每次`fsync`的时间较长（IO阻塞），如果此值过小，将会导致`fsync`的次数较多，这也意味着整体的client请求有一定的延迟。物理server故障，将会导致没有`fsync`的消息丢失。 |
+| flush.ms                                | Long.MaxValue      | log.flush.interval.ms                   | 此选项配置用来设置强制进行`fsync`日志到磁盘的时间间隔；例如，如果设置1000，那么每1000ms就需要进行一次`fsync`。一般不建议使用这个选项。 |
+| follower.replication.throttled.replicas | ""                 | follower.replication.throttled.replicas |                                                              |
+| index.interval.bytes                    | 4096               | log.index.interval.bytes                | 默认设置保证了我们每4096个字节就对消息添加一个索引，更多的索引使得阅读的消息更加靠近，但索引规模却会由此增大；一般不需要改变这个选项。 |
+| leader.replication.throttled.replicas   | ""                 | leader.replication.throttled.replicas   |                                                              |
+| max.compaction.lag.ms                   | Long.MaxValue      | log.cleaner.max.compaction.lag.ms       |                                                              |
+| max.message.bytes                       | 1000000            | message.max.bytes                       | Kafka追加消息的最大尺寸。注意如果你增大这个尺寸，你也必须增大你consumer的fetch尺寸，这样consumer才能fetch到这些最大尺寸的消息。 |
+| message.format.version                  | 2.5-IV0            | log.message.format.version              |                                                              |
+| message.timestamp.difference.max.ms     | Long.MaxValue      | log.message.timestamp.difference.max.ms |                                                              |
+| message.timestamp.type                  | CreateTime         | log.message.timestamp.type              |                                                              |
+| min.cleanable.dirty.ratio               | 0.5                | log.clean.min.cleanable.ratio           | 此项配置控制log压缩器试图进行清除日志的频率。默认情况下，将避免清除压缩率超过50%的日志。这个比率避免了最大的空间的浪费。 |
+| min.compaction.lag.ms                   | 0                  | log.cleaner.min.compaction.lag.ms       |                                                              |
+| min.insync.replicas                     | 1                  | min.insync.replicas                     | 当producer设置request.required.acks=-1时，min.insync.replicas指定replicas的最小数目（必须确认每一个replicas的写数据都是成功的），如果这个数目没有达到，producer会产生异常。 |
+| preallocate                             | false              | log.preallocate                         |                                                              |
+| retention.bytes                         | -1                 | log.retention.bytes                     | 如果使用`delete`的策略，这项配置就是指删除日志前日志所能达到的最大尺寸。默认情况下，没有尺寸限制而只有时间限制。 |
+| retention.ms                            | 604800000（7天）   | log.retention.ms                        | 如果使用`delete`的策略，这项配置就是指删除日志前日志保存的时间。 |
+| segment.bytes                           | 1073741824（1GB）  | log.segment.bytes                       | Kafka中log日志是分成一块块存储的，此配置是指log日志划分成块的大小。 |
+| segment.index.bytes                     | 10485760(10MB)     | log.index.size.max.bytes                | 决定了index文件大小达到多大之后进行切分，默认大小是10M。通常不需要更改此设置。 |
+| segment.jitter.ms                       | 0                  | log.roll.jitter.ms                      | 从计划的分段滚动时间中减去最大随机抖动，以避免分段滚动的集中爆发 |
+| segment.ms                              | 604800000（7天）   | log.roll.ms                             | 即时log的分块文件没有达到需要删除、压缩的大小，一旦log的时间达到这个上限，就会强制新建一个log分块文件 |
+| unclean.leader.election.enable          | false              | unclean.leader.election.enable          |                                                              |
+| message.downconversion.enable           | true               | log.message.downconversion.enable       |                                                              |
+|                                         |                    |                                         |                                                              |
+
+
+
+## 99.3、Producer配置
 

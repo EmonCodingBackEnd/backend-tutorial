@@ -631,6 +631,9 @@ server.3=emon3:2888:3888
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/kafka.sh
+```
+
+```bash
 export KAFKA_HOME=/usr/local/kafka
 export PATH=$KAFKA_HOME/bin:$PATH
 ```
@@ -658,11 +661,13 @@ export PATH=$KAFKA_HOME/bin:$PATH
 
 ```bash
 # [修改]
+listeners=PLAINTEXT://emon:9092
+# [修改]
+advertised.listeners=PLAINTEXT://emon:9092
+# [修改]
 log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
 # [修改]
 zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
-# [修改]
-advertised.listeners=PLAINTEXT://192.168.200.116:9092
 ```
 
 >备注：外网访问kafka服务时，有两种开放ip的方式：
@@ -744,7 +749,7 @@ advertised.listeners=PLAINTEXT://192.168.200.116:9092
 - 创建
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --create --bootstrap-server emon:9092 --replication-factor 1 --partitions 1 --topic test
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092  --create --partitions 1 --replication-factor 1 --topic test
 # 命令执行结果
 Created topic test.
 ```
@@ -752,7 +757,7 @@ Created topic test.
 - 查看topic列表
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --list --bootstrap-server emon:9092
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --list
 # 命令执行结果
 test
 ```
@@ -760,7 +765,7 @@ test
 - 查看单个topic详情
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --describe --bootstrap-server emon:9092 --topic test
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --describe --topic test
 # 命令执行结果
 Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
 	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
