@@ -484,6 +484,9 @@ drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/profile.d/jdk.sh
+```
+
+```bash
 export JAVA_HOME=/usr/local/java
 export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 export PATH=$JAVA_HOME/bin:$PATH

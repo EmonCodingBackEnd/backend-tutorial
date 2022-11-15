@@ -44,7 +44,7 @@
 
 ```bash
 # 打开生产者命令行模式
-[emon@emon ~]$ kafka-console-producer.sh --broker-list emon:9092 --topic test
+[emon@emon ~]$ kafka-console-producer.sh --bootstrap-server emon:9092 --topic test
 ```
 
 - 消费者
@@ -219,6 +219,32 @@ Created topic hello.
 hello
 ```
 
+- 查询topic的偏移量（最小值）
+
+```bash
+[emon@emon ~]$ kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list emon:9092 --topic test
+# 命令执行结果
+test:0:0
+test:1:0
+```
+
+- 查询topic的最小offset和最大offset
+
+```bash
+# 最小值
+$ kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list emon:9092 --topic test --time -2
+# 命令执行结果
+test:0:0
+test:1:0
+# 最大值
+$ kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list emon:9092 --topic test --time -1
+# 命令执行结果
+test:0:57
+test:1:83
+```
+
+
+
 - 查看指定topic的详细信息
 
 ```bash
@@ -321,9 +347,9 @@ TOPIC：当前消费的topic；
 
 PARTITION：消费的分区；
 
-CURRENT-OFFSET：消费者消费到这个分区的offset；
+CURRENT-OFFSET：该分区当前消费组内，已经消费到的offset。（比如：分区1的值为2，表示偏移量是0-1的消息被消费，下一条是偏移量为2的消息）
 
-LOG-END-OFFSET：当前分区中数据的最大offset；
+LOG-END-OFFSET：该分区中数据的最大offset。（比如：分区1的值为2，表示已有2条数据，或下一个最大offset的值）
 
 LAG：当前分区未消费数据量；
 
@@ -332,6 +358,19 @@ CONSUMER-ID：消费者ID；
 HOST：主机；
 
 CLIENT-ID：客户端ID。
+
+- 在topic上offset某个group
+
+```bash
+# 注意，to-offset 的参数，不能大于 LOG-END-OFFSET；to-offset可以替换为to-earliest或to-latest
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --group con-1 --topic hello --execute --reset-offsets --to-offset 0
+```
+
+- 删除某个group
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --delete --group con-1
+```
 
 
 
@@ -1078,9 +1117,139 @@ http://kafka.apache.org/090/documentation.html#upgrade
 
 ![image-20221107130006153](images/image-20221107130006153.png)
 
+## 10.2、Consumer
 
+- 单个分区的消息只能由ConsumerGroup中的某个Consumer消费。
+- Consumer从Partition中消费消息是顺序，默认从开头开始消费。
+- 单个ConsumerGroup会消费所有Partition中的消息。
 
 # 九十九、Kafka配置全解析
+
+Kafka中提供了`listeners`和`advertised.listeners`两个配置项，两个配置项的具体含义和作用是什么？有什么区别，以及应该如何进行配置呢？
+
+【概念理解】
+
+要搞清楚这些问题，首先得搞清楚两个逻辑概念：一个是Kafka的侦听ip，一个是Kafka的`broker ip`。
+
+所谓Kafka的侦听ip，顾名思义，就是tcp的侦听ip。可以在某个固定的ip上侦听，也可以是全网段进行侦听（0.0.0.0）。如果是在某个固定ip上侦听，例如`127.0.0.1`，那么只有与该ip正确连接的客户端能够成功连接到Kafka；而如果是全网段侦听，那么可以与Kafka所在机器的任意ip进行连接并访问Kafka。
+
+但是，与Kafka连接成功后，并不意味着就能成功进行生产和消费。
+
+成功连接Kafka的侦听ip，意味着tcp的三次握手已经成功了，在这之后会进行Kafka层面的协议交互，例如用户登录认证，元数据信息获取，向topic生产和消费等等。其中最重要的就是元数据信息的获取。
+
+Kafka的元数据信息包括topic名称，topic的分区（partition），每个分区的leader所在的broker的id，以及每个broker的ip地址等。
+
+由于向topic的分区进行生产消费，最终都需要与分区的leader进行交互。因此，获取到元数据信息后，客户端（生产者或者消费者）会和topic分区的leader所在的broker建立新的tcp连接以进行后续的生产消费。这就是Kafka的broker ip的作用，也即真正用于生产消费的ip地址。
+
+## 99.1、[Broker Configs](https://kafka.apache.org/25/documentation.html#brokerconfigs)
+
+必填项配置：
+
+- `broker.id`
+- `log.dirs`
+- `zookeeper.connect`
+
+主题级的配置和默认值如下：
+
+- | 属性                                                        | 默认值            | 描述                                                         |
+  | ----------------------------------------------------------- | ----------------- | ------------------------------------------------------------ |
+  | zookeeper.connect                                           |                   | ZooKeeper连接字符串的格式为：`hostname:port`，此处hostname和port分别是ZooKeeper集群中某个节点的host和port；为了当某个host当掉之后你能通过其他ZooKeeper节点进行连接，你可以按照以下方式指定多个主机：`hostname1:port1,hostname2:port2,hostname2:port3`。<br />ZooKeeper允许你增加一个“chroot”路径，将集群中所有Kafka数据存放在特定的路径下。当多个Kafka集群或者其他应用使用相同ZooKeeper集群时，可以使用这个方式设置数据存放路径。这种方式的实现可以通过这样设置连接字符串格式，如下所示：`hostname1:port1,hostname2:port2,hostname3:port3/chroot/path` 这样设置就将所有Kafka集群数据存放在`/chroot/path`路径下。注意，在你启动broker之前，你必须创建这个路径，并且consumers必须使用相同的连接格式。 |
+  | advertised.host.name                                        | null              | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的Hostname。在IaaS环境下，该值可能需要与broker绑定的接口不同。该值未设置情况下，如果`host.name`配置了，则使用`host.name`；否则，将使用`java.net.InetAddress.getCanonicalHostName()`返回的值。 |
+  | advertised.listeners                                        | null              | 给客户端用的发布至ZooKeeper的监听，broker会上送此地址到ZooKeeper，ZooKeeper会将此地址提供给消费者，消费者根据此地址获取消息。如果和`listeners`不同，则以此为准，在IaaS环境，此配置项可能和broker绑定的接口主机名不同，如果此配置项没有配置则以`listeners`为准。 |
+  | advertised.port                                             | null              | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的端口号。在IaaS环境下，该值可能需要与broker绑定的接口不同。如果该值未设置，则发布的端口与broker绑定的端口相同。 |
+  | auto.create.topics.enable                                   | true              | 启用服务端自动创建topic。                                    |
+  | auto.leader.rebalance.enable                                | true              | 是否允许定期进行leader选举。                                 |
+  | background.threads                                          | 10                | 用于各种后台处理任务的线程数。                               |
+  | broker.id                                                   | -1                | 服务端的broker id。如果未设置，一个唯一的broker id将生成。为了避免ZooKeeper生成的broker id和用户配置的broker id之间产生冲突，生成的broker id从`reserved.broker.max.id`+1开始。 |
+  | compression.type                                            | producer          | 对给定的topic指定压缩类型。可接受的值有('gzip','snappy','lz4','zstd')。另外，还可以接收`uncompressed`表示不压缩，以及`producer`表示保留生产者的原始压缩编解码器。 |
+  | control.plane.listener.name                                 | null              | 用于Controller和Broker之间通信的监听器名称，Broker将会使用该配置来定位监听列表中的EndPoint。如果未设置，则默认使用`inter.broker.listener.name`来通信，没有专门的链接。 |
+  | delete.topic.enable                                         | true              | 启用删除topic。如果关闭此配置项，通过管理工具删除主题将无效。 |
+  | host.name                                                   | ""                | 【已弃用】仅在listeners未设置时使用。使用listeners替代了。broker的hostname，如果设置了，将绑定到该地址上。如果未设置，绑定到所有网卡上。 |
+  | leader.imbalance.check.interval.seconds                     | 300               | 默认300s，也即5分钟扫描一次，控制器触发分区再平衡检查的频率。 |
+  | leader.imbalance.per.broker.percentage                      | 10                | 每个broker所能允许的leader失衡比率。如果超过该百分比，控制器将触发leader重新平衡。 |
+  | listeners                                                   | null              | 监听列表，broker对外提供服务时绑定的ip和端口。多个之间逗号分隔，如果监听器名称不是一个安全的协议，`listener.security.protocol.map`必须设置。主机名设置为0.0.0.0表示绑定所有接口，主机名为空这绑定默认的接口。例如：`PLAINTEXT://myhost:9092,SSL://:9091`<br />`CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093` |
+  | log.dir                                                     | /tmp/kafka-logs   | 日志数据的存储目录，对`log.dirs`的补充。                     |
+  | log.dirs                                                    | null              | 日志数据的存放目录，如果未设置，将使用`log.dir`。            |
+  | log.flush.interval.messages                                 | Long.MaxValue     | 消息刷新到磁盘之前，日志分区上积累的消息数量。               |
+  | log.flush.interval.ms                                       | null              | 消息刷新到磁盘之前，日志在内存中停留的最大毫秒数。如果未设置，将使用`log.flush.scheduler.interval.ms`。 |
+  | log.flush.offset.checkpoint.interval.ms                     | 60000             | 用于更新日志恢复点持久记录的频率。                           |
+  | log.flush.scheduler.interval.ms                             | Long.MaxValue     | 检测日志是否需要刷新到磁盘的频率，单位毫秒                   |
+  | log.flush.start.offset.checkpoint.interval.ms               | 60000             | 更新日志持久化日志记录的开始偏移量的频率                     |
+  | log.retention.bytes                                         | -1                | 日志被删除之前的最大尺寸，即日志保留的最大大小               |
+  | log.retention.hours                                         | 168               | 日志文件删除之前保留的时间，单位小时                         |
+  | log.retention.minutes                                       | null              | 日志文件删除之前保留的时间，单位分钟；未设置默认使用`log.retention.hours` |
+  | log.retention.ms                                            | null              | 日志文件删除之前保留的时间，单位毫秒；未设置默认使用`log.retention.minutes`，-1表示永久 |
+  | log.roll.hours                                              | 168               | 在新日志segment展开之前的最大时间，单位：小时                |
+  | log.roll.ms                                                 | null              | 新日志segment展开之前的最大时间，单位：毫秒；如果未设置，`log.roll.hours`将被使用。 |
+  | log.roll.jitter.hours                                       | 0                 | 指定日志切分段的小时数，避免日志切分时造成惊群               |
+  | log.roll.jitter.ms                                          | null              | 指定日志切分段的毫秒数，如果不设置，默认使用log.roll.jitter.hours |
+  | log.segment.bytes                                           | 1073741824（1G）  | 单个日志文件的最大尺寸                                       |
+  | log.segment.delete.delay.ms                                 | 60000             | 日志文件被真正删除之前保留的时间                             |
+  | message.max.bytes                                           | 1048588（约1M）   | 最大记录批大小                                               |
+  | min.insync.replicas                                         | 1                 | 当生产者acks为-1(all)时，该值指定了最小副本数量，这些副本必须确认写操作，才能认为写操作成功。如果不能满足这个最小值，那么生产者将抛出异常。 |
+  | num.io.threads                                              | 8                 | 服务器用于处理请求的线程数，其中可能包括磁盘I/O。            |
+  | num.network.threads                                         | 3                 |                                                              |
+  | num.recovery.threads.per.data.dir                           | 1                 |                                                              |
+  | num.replica.alter.log.dirs.threads                          | null              |                                                              |
+  | num.replica.fetchers                                        | 1                 |                                                              |
+  | offset.metadata.max.bytes                                   | 4096              |                                                              |
+  | offsets.commit.required.acks                                | -1                |                                                              |
+  | offsets.commit.timeout.ms                                   | 5000              |                                                              |
+  | offsets.load.buffer.size                                    | 5242880（5M）     |                                                              |
+  | offsets.retention.check.interval.ms                         | 600000            |                                                              |
+  | offsets.retention.minutes                                   | 10080             |                                                              |
+  | offsets.topic.compression.codec                             | 0                 |                                                              |
+  | offsets.topic.num.partitions                                | 50                |                                                              |
+  | offsets.topic.replication.factor                            | 3                 |                                                              |
+  | offsets.topic.segment.bytes                                 | 104857600（100M） |                                                              |
+  | port                                                        | 9092              |                                                              |
+  | queued.max.requests                                         | 500               |                                                              |
+  | quota.consumer.default                                      | Long.MaxValue     |                                                              |
+  | quota.producer.default                                      | Long.MaxValue     |                                                              |
+  | replica.fetch.min.bytes                                     | 1                 |                                                              |
+  |                                                             |                   |                                                              |
+  | password.encoder.key.length                                 | 128               |                                                              |
+  | password.encoder.keyfactory.algorithm                       | null              |                                                              |
+  | quota.window.num                                            | 11                |                                                              |
+  | quota.window.size.seconds                                   | 1                 |                                                              |
+  | replication.quota.window.num                                | 11                |                                                              |
+  | replication.quota.window.size.seconds                       | 1                 |                                                              |
+  | security.providers                                          | null              |                                                              |
+  | ssl.endpoint.identification.algorithm                       | https             |                                                              |
+  | ssl.principal.mapping.rules                                 | DEFAULT           |                                                              |
+  | ssl.secure.random.implementation                            | null              |                                                              |
+  | transaction.abort.timed.out.transaction.cleanup.interval.ms | 10000             |                                                              |
+  | transaction.remove.expired.transaction.cleanup.interval.ms  | 3600000           |                                                              |
+  | zookeeper.ssl.cipher.suites                                 | null              |                                                              |
+  | zookeeper.ssl.crl.enable                                    | false             |                                                              |
+  | zookeeper.ssl.enabled.protocols                             | null              |                                                              |
+  | zookeeper.ssl.endpoint.identification.algorithm             | HTTPS             |                                                              |
+  | zookeeper.ssl.ocsp.enable                                   | false             |                                                              |
+  | zookeeper.ssl.protocol                                      | TLSv1.2           |                                                              |
+  | zookeeper.sync.time.ms                                      | 2000              |                                                              |
+
+
+## 99.1.1、[Updating Broker Configs](https://kafka.apache.org/25/documentation.html#dynamicbrokerconfigs)
+
+## 99.2、[Topic Configs](https://kafka.apache.org/25/documentation.html#topicconfigs)
+
+## 99.3、[Producer Configs](https://kafka.apache.org/25/documentation.html#producerconfigs)
+
+## 99.4、[Consumer Configs](https://kafka.apache.org/25/documentation.html#consumerconfigs)
+
+| 属性                         | 默认值  | 描述                                                         |
+| ---------------------------- | ------- | ------------------------------------------------------------ |
+| session.timeout.ms           | 10000   | 使用Kafka的组管理工具时用于检测客户端故障的超时时间，默认10000毫秒。客户端定期向broker发送心跳来表示其活动。如果在此会话超时过期之前broker没有收到心跳，则broker将从组中删除此客户端并启动重新平衡。注意，该值必须在broker配置中配置的`group.min.session.timeout.ms`和`group.max.session.timeout.ms`允许范围内。 |
+| group.min.session.timeout.ms | 6000    | 注册消费者允许的`session.timeout.ms`的最小值。更短的超时时间会导致更快的故障检测，代价是更频繁的消费者心跳，这可能会压垮代理资源。 |
+| group.max.session.timeout.ms | 1800000 | 注册消费者允许的`session.timeout.ms`的最大值。更长的超时时间让消费者有更多的时间在心跳之间处理消息，但代价是检测失败的时间更长。 |
+
+
+
+## 99.5、[Kafka Connect Configs](https://kafka.apache.org/25/documentation.html#connectconfigs)
+
+## 99.6、[Kafka Streams Configs](https://kafka.apache.org/25/documentation.html#streamsconfigs)
+
+## 99.7、[AdminClient Configs](https://kafka.apache.org/25/documentation.html#adminclientconfigs)
 
 | 属性                                          | 默认值                                                       | 描述                                                         |
 | --------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -1200,5 +1369,12 @@ http://kafka.apache.org/090/documentation.html#upgrade
 
 
 
-## 99.3、Producer配置
+## 99.3、
+
+| 属性                  | 默认值 | 描述                                                         |
+| --------------------- | ------ | ------------------------------------------------------------ |
+| metadata.broker.list  |        | 服务于bootstrapping。producer仅用来获取metadata（topics，partitions，replicas）。发送实际数据的socket连接将基于返回的metadata数据信息而建立。格式是：<br />`host1:port1,host2:port2`<br />这个列表可以是brokers的子列表或者是一个指向brokers的VIP。 |
+| request.required.acks | 0      | 此配置是表明当一次produce请求被认为完成时的确认值。特别是，多少个其他brokers必须已经提交了数据到他们的log并且向他们的leader确认了这些信息。典型的值包括：<br />0：表示producer从来不等待来自broker的确认信息。这个选择提供了最小的时延但同时风险最大（因为server宕机时，数据将会丢失）。<br />1：表示获得leader replica已经接收了数据的确认信息。这个选择时延较小同时确保了server确认接收成功。<br />-1：producer会获得所有同步replicas都收到数据的确认。同时时延最大，然而，这种方式并没有完全消除丢失消息的风险，因为同步replicas的数量可能是1。如果你想确保某些replicas接收到数据，那么你应该在topic-level设置中选项min.insync.replicas设置一下。 |
+| request.timeout.ms    | 10000  | broker尽力实现request.required.acks需求时的等待时间，否则会发送错误到客户端。 |
+|                       |        |                                                              |
 

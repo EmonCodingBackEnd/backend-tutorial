@@ -749,7 +749,7 @@ zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 - 创建
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092  --create --partitions 1 --replication-factor 1 --topic test
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092  --create --partitions 2 --replication-factor 1 --topic test
 # 命令执行结果
 Created topic test.
 ```
@@ -767,8 +767,9 @@ test
 ```bash
 [emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --describe --topic test
 # 命令执行结果
-Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+Topic: test	PartitionCount: 2	ReplicationFactor: 1	Configs: segment.bytes=1073741824
 	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+	Topic: test	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
 ```
 
 11. 测试生产者消费者
@@ -792,7 +793,8 @@ Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=107374
 ```bash
 [emon@emon ~]$ kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list emon:9092 --topic test
 # 命令执行结果
-test:0:59134
+test:0:0
+test:1:0
 ```
 
 ### 2.2、Kafka集群
