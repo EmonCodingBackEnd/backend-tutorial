@@ -516,10 +516,11 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 	配置永久的alias：
 
 ```shell
+# 如果是root用户安装的，不需要带sudo命令
 [emon@emon ~]$ vim .bashrc
 alias docker="sudo /usr/bin/docker"
 alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
-alias dockerps="/usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
+alias dockerps="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
 ```
 
 使之生效：

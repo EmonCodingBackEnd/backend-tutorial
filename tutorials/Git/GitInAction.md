@@ -1136,6 +1136,10 @@ git submodule update --init --recursive
 
 [参考资料](https://superuser.com/questions/837668/fatal-index-file-corrupt-keeps-repeating-in-git)
 
+## 7.99、如何一个项目配置2个远程地址？
+
+https://blog.csdn.net/weixin_53138343/article/details/123042388
+
 # 八、Git Flow——以发布为中心的开发模式
 
 ## 8.1 git flow的工作流程

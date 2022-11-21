@@ -1105,7 +1105,7 @@ http://kafka.apache.org/090/documentation.html#upgrade
 
 ### 10.1.1、Producer特性
 
-- Producer是线程安全的
+- Producer是线程安全的【重点】
 - 每次send并不会立即执行，而是批量执行的
 - 发送到某一个partition是由客户端决定的
 
@@ -1122,6 +1122,137 @@ http://kafka.apache.org/090/documentation.html#upgrade
 - 单个分区的消息只能由ConsumerGroup中的某个Consumer消费。
 - Consumer从Partition中消费消息是顺序，默认从开头开始消费。
 - 单个ConsumerGroup会消费所有Partition中的消息。
+- 非线程安全的【重点】
+
+![image-20221115171937666](images/image-20221115171937666.png)
+
+![image-20221116122711318](images/image-20221116122711318.png)
+
+![image-20221116122811686](images/image-20221116122811686.png)
+
+## 10.3、Stream
+
+- Kafka Stream是处理分析存储在Kafka中的数据的客户端程序库
+- Kafka Stream通过state store可以实现高效状态操作
+- 支持原语Processor和高层抽象DSL
+
+### 10.3.1、Kafka Stream关键词
+
+- 流及流处理器
+- 流处理拓扑
+- 源处理器及Sink处理器
+
+![image-20221116124033666](images/image-20221116124033666.png)
+
+
+
+## 10.4、Connect
+
+[Kafka连接器](https://www.confluent.io/hub/)
+
+- Kafka Connect是Kafka流式计算的一部分
+- Kafka Connect主要用来与其他中间件建立流式通道
+- Kafka Connect支持流式和批量处理集成
+
+如何配置一个kafka-connector？
+
+第一步：下载连接器，https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc
+
+confluentinc-kafka-connect-jdbc-10.6.0.zip
+
+第二步：准备MySQL的驱动包（5.x和8.x）
+
+第三步：以上三者，上传到Kafka服务器，创建一个plugins目录`/usr/local/kafka/plugins`，用来存放
+
+第四步：解压连接器，并把驱动包移动到连接器的解压目录`lib`下，当前：`/usr/local/kafka/plugins//usr/local/kafka/plugins/confluentinc-kafka-connect-jdbc-10.6.0`
+
+第五步：修改Kafka配置`connect-distributed.properties`
+
+```bash
+# [修改]
+bootstrap.servers=localhost:9092 ==> bootstrap.servers=emon:9092
+# [新增]
+rest.port=8083
+# [新增]
+plugin.path=/usr/local/kafka/plugins
+```
+
+第六步：启动
+
+```bash
+## connect启动命令
+bin/connect-distributed.sh -daemon config/connect-distributed.properties
+bin/connect-distributed.sh config/connect-distributed.properties
+```
+
+启动成功后，可以访问：
+
+http://emon:8083/connector-plugins
+
+查看任务：
+
+http://emon:8083/connectors
+
+创建任务：从mysql到kafka
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -i 'http://emon:8083/connectors' \
+--data \
+'{"name":"emon-upload-mysql","config":{
+"connector.class":"io.confluent.connect.jdbc.JdbcSourceConnector",
+"connection.url":"jdbc:mysql://emon:3306/kafkadb?user=root&password=root123",
+"table.whitelist":"users",
+"incrementing.column.name": "id",
+"mode":"incrementing",
+"topic.prefix": "emon-mysql-"}}'
+```
+
+说明：
+
+- `table.whitelist` 表名白名单，哪些表需要被加载
+- `incrementing.column.name` 用于判断是否不断新增的列名字
+- `mode`: 迭代模式，不断迭代的模式
+- `topic.prefix` 主题前缀，生成kafka的topic时会用 topic.prefix + tableName 作为topicName；比如这里是`emon-mysql-users`
+
+消费topic：
+
+```bash
+$ kafka-console-consumer.sh --bootstrap-server emon:9092 --topic emon-mysql-users --from-beginning
+```
+
+
+
+创建任务：从kafka到mysql
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -i 'http://emon:8083/connectors' \
+--data \
+'{"name":"emon-download-mysql","config":{
+"connector.class":"io.confluent.connect.jdbc.JdbcSinkConnector",
+"connection.url":"jdbc:mysql://emon:3306/kafkadb?user=root&password=root123",
+"topics":"emon-mysql-users",
+"auto.create":"false",
+"insert.mode": "upsert",
+"pk.mode":"record_value",
+"pk.fields":"id",
+"table.name.format": "users_bak"}}'
+```
+
+说明：
+
+- `auto.crete` 自动创建表
+
+
+
+删除任务：
+
+```bash
+curl -X DELETE -i 'http://emon:8083/connectors/emon-download-mysql'
+```
+
+
+
+
 
 # 九十九、Kafka配置全解析
 
@@ -1227,21 +1358,104 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
   | zookeeper.ssl.ocsp.enable                                   | false             |                                                              |
   | zookeeper.ssl.protocol                                      | TLSv1.2           |                                                              |
   | zookeeper.sync.time.ms                                      | 2000              |                                                              |
+  | group.min.session.timeout.ms                                | 6000              | 注册消费者允许的`session.timeout.ms`的最小值。更短的超时时间会导致更快的故障检测，代价是更频繁的消费者心跳，这可能会压垮代理资源。 |
+  | group.max.session.timeout.ms                                | 1800000           | 注册消费者允许的`session.timeout.ms`的最大值。更长的超时时间让消费者有更多的时间在心跳之间处理消息，但代价是检测失败的时间更长。 |
 
 
 ## 99.1.1、[Updating Broker Configs](https://kafka.apache.org/25/documentation.html#dynamicbrokerconfigs)
 
 ## 99.2、[Topic Configs](https://kafka.apache.org/25/documentation.html#topicconfigs)
 
+| 属性                 | 默认值          | 描述                   |
+| -------------------- | --------------- | ---------------------- |
+| cleanup.policy       | delete          | 可选值[compact,delete] |
+| compression.type     | producer        |                        |
+| delete.retention.ms  | 86400000（1天） |                        |
+| file.delete.delay.ms | 60000           |                        |
+| flush.messages       | Long.MaxValue   |                        |
+|                      |                 |                        |
+
 ## 99.3、[Producer Configs](https://kafka.apache.org/25/documentation.html#producerconfigs)
+
+| 属性 | 默认值 | 描述 |
+| ---- | ------ | ---- |
+|      |        |      |
+|      |        |      |
+|      |        |      |
 
 ## 99.4、[Consumer Configs](https://kafka.apache.org/25/documentation.html#consumerconfigs)
 
-| 属性                         | 默认值  | 描述                                                         |
-| ---------------------------- | ------- | ------------------------------------------------------------ |
-| session.timeout.ms           | 10000   | 使用Kafka的组管理工具时用于检测客户端故障的超时时间，默认10000毫秒。客户端定期向broker发送心跳来表示其活动。如果在此会话超时过期之前broker没有收到心跳，则broker将从组中删除此客户端并启动重新平衡。注意，该值必须在broker配置中配置的`group.min.session.timeout.ms`和`group.max.session.timeout.ms`允许范围内。 |
-| group.min.session.timeout.ms | 6000    | 注册消费者允许的`session.timeout.ms`的最小值。更短的超时时间会导致更快的故障检测，代价是更频繁的消费者心跳，这可能会压垮代理资源。 |
-| group.max.session.timeout.ms | 1800000 | 注册消费者允许的`session.timeout.ms`的最大值。更长的超时时间让消费者有更多的时间在心跳之间处理消息，但代价是检测失败的时间更长。 |
+| 属性                                     | 默认值                                                | 描述                                                         |
+| ---------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| key.deserializer                         |                                                       | 实现了`org.apache.kafka.common.serialization.Deserializer`接口的反序列化类，用于key的反序列化。 |
+| value.deserializer                       |                                                       | 实现了`org.apache.kafka.common.serialization.Deserializer`接口的反序列化类，用于value的反序列化。 |
+| bootstrap.servers                        | ""                                                    | 用于建立到Kafka集群的初始连接的主机/端口对列表。客户机将使用所有服务器，此列表只影响用于发现完整服务器集的初始主机。该列表应该以host1:port1,host2:port2，由于这些服务器仅用于初始连接，以发现完整的集群成员关系(可能会动态更改)，因此此列表不需要包含完整的服务器集，为了避免连接的服务器宕机，因此需要指定多个服务器。 |
+| fetch.min.bytes                          | 1                                                     |                                                              |
+| group.id                                 | null                                                  |                                                              |
+| heartbeat.interval.ms                    | 3000                                                  |                                                              |
+| max.partition.fetch.bytes                | 1048576（1M）                                         |                                                              |
+| session.timeout.ms                       | 10000                                                 | 使用Kafka的组管理工具时用于检测客户端故障的超时时间，默认10000毫秒。客户端定期向broker发送心跳来表示其活动。如果在此会话超时过期之前broker没有收到心跳，则broker将从组中删除此客户端并启动重新平衡。注意，该值必须在broker配置中配置的`group.min.session.timeout.ms`和`group.max.session.timeout.ms`允许范围内。 |
+| ssl.key.password                         | null                                                  |                                                              |
+| ssl.keystore.location                    | null                                                  |                                                              |
+| ssl.keystore.password                    | null                                                  |                                                              |
+| ssl.truststore.location                  | null                                                  |                                                              |
+| ssl.truststore.password                  | null                                                  |                                                              |
+| allow.auto.create.topics                 | true                                                  |                                                              |
+| auto.offset.reset                        | latest                                                |                                                              |
+| client.dns.lookup                        | default                                               |                                                              |
+| connections.max.idle.ms                  | 540000                                                |                                                              |
+| default.api.timeout.ms                   | 60000                                                 |                                                              |
+| enable.auto.commit                       | true                                                  |                                                              |
+| exclude.internal.topics                  | true                                                  |                                                              |
+| fetch.max.bytes                          | 52428800（50M）                                       |                                                              |
+| group.instance.id                        | null                                                  |                                                              |
+| isolation.level                          | read_uncommitted                                      | 可选值[read_committed,read_uncommitted]                      |
+| max.poll.interval.ms                     | 300000                                                |                                                              |
+| max.poll.records                         | 500                                                   |                                                              |
+| partition.assignment.strategy            | class org.apache.kafka.clients.consumer.RangeAssignor |                                                              |
+| receive.buffer.bytes                     | 65536                                                 |                                                              |
+| request.timeout.ms                       | 30000                                                 |                                                              |
+| sasl.client.callback.handler.class       | null                                                  |                                                              |
+| sasl.jaas.config                         | null                                                  |                                                              |
+| sasl.kerberos.service.name               | null                                                  |                                                              |
+| sasl.login.callback.handler.class        | null                                                  |                                                              |
+| sasl.login.class                         | null                                                  |                                                              |
+| sasl.mechanism                           | GSSAPI                                                |                                                              |
+| security.protocol                        | PLAINTEXT                                             |                                                              |
+| send.buffer.bytes                        | 131072（128K）                                        |                                                              |
+| ssl.enabled.protocols                    | TLSv1.2                                               |                                                              |
+| ssl.keystore.type                        | JKS                                                   |                                                              |
+| ssl.protocol                             | TLSv1.2                                               |                                                              |
+| ssl.provider                             | null                                                  |                                                              |
+| ssl.truststore.type                      | JKS                                                   |                                                              |
+| auto.commit.interval.ms                  | 5000                                                  |                                                              |
+| check.crcs                               | true                                                  |                                                              |
+| client.id                                | ""                                                    |                                                              |
+| client.rack                              | ""                                                    |                                                              |
+| fetch.max.wait.ms                        | 500                                                   |                                                              |
+| interceptor.classes                      | ""                                                    |                                                              |
+| metadata.max.age.ms                      | 300000                                                |                                                              |
+| metric.reporters                         | ""                                                    |                                                              |
+| metrics.num.samples                      | 2                                                     |                                                              |
+| metrics.recording.level                  | INFO                                                  |                                                              |
+| metrics.sample.window.ms                 | 30000                                                 |                                                              |
+| reconnect.backoff.max.ms                 | 1000                                                  |                                                              |
+| reconnect.backoff.ms                     | 50                                                    |                                                              |
+| retry.backoff.ms                         | 100                                                   |                                                              |
+| sasl.kerberos.kinit.cmd                  | /usr/bin/kinit                                        |                                                              |
+| sasl.kerberos.min.time.before.relogin    | 60000                                                 |                                                              |
+| sasl.kerberos.ticket.renew.jitter        | 0.05                                                  |                                                              |
+| sasl.kerberos.ticket.renew.window.factor | 0.8                                                   |                                                              |
+| sasl.login.refresh.buffer.seconds        | 300                                                   |                                                              |
+| sasl.login.refresh.min.period.seconds    | 60                                                    |                                                              |
+| sasl.login.refresh.window.factor         | 0.8                                                   |                                                              |
+| sasl.login.refresh.window.jitter         | 0.05                                                  |                                                              |
+| security.providers                       | null                                                  |                                                              |
+| ssl.cipher.suites                        | null                                                  |                                                              |
+| ssl.endpoint.identification.algorithm    | https                                                 |                                                              |
+| ssl.keymanager.algorithm                 | SunX509                                               |                                                              |
+| ssl.secure.random.implementatiion        | null                                                  |                                                              |
+| ssl.trustmanager.algorithm               | PKIX                                                  |                                                              |
 
 
 
