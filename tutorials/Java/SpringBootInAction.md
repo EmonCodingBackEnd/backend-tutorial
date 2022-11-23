@@ -64,3 +64,9 @@ http://ip:port/{context-path}/actuator
 
 - 自定义端点
 
+
+
+## 2、feign打开日志
+
+https://blog.csdn.net/youbl/article/details/109047987
+

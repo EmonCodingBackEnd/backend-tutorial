@@ -54,7 +54,9 @@ java -jar -Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.en
 
 点击【OK】后选择并启动`huiba-room-remote`
 
+## 3、jce-policy问题
 
+https://blog.csdn.net/qq_42553504/article/details/120301640
 
 # 二、Java项目线上问题排查
 

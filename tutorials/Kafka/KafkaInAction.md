@@ -137,9 +137,11 @@ Kafka主要应用在实时计算领域，可以和Flume、Spark、Flink等框架
 
 先看中间的Kafka Cluster，这个Kafka集群内有两个节点，这些节点在这里我们称之为Broker。
 
+### 3.4.1、Broker
+
 Broker：消息的代理，Kaka集群中的一个节点称为一个broker。
 
-
+### 3.4.2、Topic
 
 在Kafka中有Topic的概念
 
@@ -147,7 +149,7 @@ Topic：称为主题，Kafka处理的消息的不同分类（是一个逻辑概�
 
 如果把Kafka认为是一个数据库的话，那么Kafka中的Topic就可以认为是一张表。不同的Topic中存储不同业务类型的数据，方便使用。
 
-
+### 3.4.3、Partition
 
 在Topic内部有partition的概念
 
@@ -157,9 +159,17 @@ Partition：是Topic物理上的分组，一个Topic会被分为1个或者多个
 
 在这里面副本因子其实就是2了，其中一个是Leader，另一个是真正的副本。
 
+- Leader
+
+Leader：用于处理消息的接收和消费等请求。
+
 Leader中的这个partition负责接收用户的读写请求，副本partition负责从Leader里面的partition中同步数据，这样的话，如果后期Leader对应的节点宕机了，副本可以切换为Leader顶上来。
 
+- Follower
 
+Follower：主要用于备份消息数据。
+
+### 3.4.4、Message
 
 在Partition内部还有一个message的概念
 
@@ -183,6 +193,14 @@ Consumer：消息和数据的消费者，从Kafka的topic中消费数据。
 
 
 最后还有一个Zookeeper服务，Kafka的运行是需要依赖于Zookeeper的，Zookeeper负责协调Kafka集群的正常运行。
+
+
+
+另一个参考图：
+
+![image-20221122131514419](images/image-20221122131514419.png)
+
+
 
 
 
@@ -834,6 +852,51 @@ Kafka可以实现以下三种语义，这三种语义是针对消费者而言的
 
 这样就可以保证数据仅被处理一次了。
 
+
+
+## 4.99、其他
+
+### 1、Kafka节点故障
+
+- Kafka与ZooKeeper心跳未保持视为节点故障。
+- follower消息落后leader太多也视为节点故障。
+- Kafka会对故障节点进行移除。
+
+### 2、Kafka节点故障处理
+
+- Kafka基本不会因为节点故障而丢失数据。
+- Kafka的语义担保（acks=all）也很大程度上避免数据丢失。
+- Kafka会对消息进行集群内平衡，减少消息在某些节点热度过高。
+
+### 3、Kafka集群之Leader选举
+
+- Kafka并没有采用多数投票来选举Leader（ZK、ES、Redis采用多数投票方式选举）
+
+  - 原因1：防止选举时，选举到了数据不全的broker；比如有三个节点，其中2个有10000条数据，另外1个只有9000条数据，如果采取多数投票选到了9000条的节点，就会导致丢失1000条数据。
+  - 原因2：当选举没有通过一轮就产生时（比如平票、弃票），需要额外的第二轮、第三轮甚至更多次，比较耗费时间；
+
+- Kafka会动态维护一组Leader数据的副本（ISR）
+
+- Kafka会在ISR中选择一个速度比较快的设置为Leader
+
+  - Watch
+
+  >由于Kafka集群依赖ZooKeeper集群，所以最简单的方案是所有follower都在ZooKeeper上设置一个watch。第一个启动的broker会在ZooKeeper中创建临时的Controller节点，其他Broker启动时会尝试创建Controller节点，如果已存在该节点，在Zookeeper中创建Watch对象，接收控制器变更的通知。如果broker中的leader节点挂掉，其他broker通过watch收到Controller变更的通知，尝试创建临时节点Controller，一旦创建成功，其他节点继续watch。
+  >
+  >Controller的作用：主要是管其他的Broker有没有损坏，如果损坏了，其上面有多少Leader和Follower，紧接着做重新分配。
+
+  - Kafka之Partition选举
+
+  所有Partition的Leader选举都由Controller决定。Controller会将Leader的改变直接通过RPC的方式通知需为此作为响应的Broker。Partition的选举过程主要为从Zookeeper中读取当前分区的所有ISR集合，调用配置的分区选择算法选择分区的Leader。
+
+- Leader选举配置建议
+  - ISR中副本全部宕机，会启用Unclean Leader选举。生产上应该禁用Unclean Leader。手动指定最小的ISR。
+
+### 4、Kafka监控
+
+- Kafka只能依靠Kafka-run-class.sh等命令来进行管理。
+- Kafka Manager是目前比较常见的监控工具。也即是：CMAK。
+
 # 五、Kafka技巧篇
 
 ## 5.1、Kafka集群参数调优
@@ -1010,7 +1073,7 @@ cmak.zkhosts="emon:2181"
 
 注意：如果是zk的集群，可以类似`cmak.zkhosts="emon:2181,emon2:2181,emon3:2181"`
 
-同时，该zookeeper只是被cmak使用的，是否是kafka所使用的zk集群，么的关系。
+同时，**该zookeeper只是被cmak使用的，是否是kafka所使用的zk集群，么的关系**。
 
 - 调整Kafka配合cmak
 
