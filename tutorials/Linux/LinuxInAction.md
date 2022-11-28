@@ -1736,10 +1736,12 @@ sftp>
 
 ```bash
 [emon@emon ~]$ cd /usr/local/Nginx/nginx-1.22.0/
-[emon@emon nginx-1.22.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_module
+[emon@emon nginx-1.22.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_module --with-stream --with-stream_ssl_module
 ```
 
 命令解释： `--with-http_ssl_module`指定编译时支持ssl，为Nginx代理时https准备。
+
+`--with-stream --with-stream_ssl_module`指定编译时支持stream代理tcp功能。
 
 - 编译
 

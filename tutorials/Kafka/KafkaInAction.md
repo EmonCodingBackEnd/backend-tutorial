@@ -892,11 +892,6 @@ Kafka可以实现以下三种语义，这三种语义是针对消费者而言的
 - Leader选举配置建议
   - ISR中副本全部宕机，会启用Unclean Leader选举。生产上应该禁用Unclean Leader。手动指定最小的ISR。
 
-### 4、Kafka监控
-
-- Kafka只能依靠Kafka-run-class.sh等命令来进行管理。
-- Kafka Manager是目前比较常见的监控工具。也即是：CMAK。
-
 # 五、Kafka技巧篇
 
 ## 5.1、Kafka集群参数调优
@@ -991,6 +986,9 @@ p10：表示这个Topic的分区数是10
 
 ## 5.3、Kafka集群监控管理工具
 
+- Kafka只能依靠Kafka-run-class.sh等命令来进行管理。
+- Kafka Manager是目前比较常见的监控工具。也即是：CMAK。
+
 现在我们操作Kafka都是在命令行界面中通过脚本操作的，后面需要传很多参数，用起来还是比较麻烦的，那么Kafka没有提供web界面的支持吗？
 
 很遗憾的告诉你，Apache官方并没有提供，不过好消息是有一个由雅虎开源的一个工具，目前用起来还不错。
@@ -1002,14 +1000,14 @@ CMAK是目前最受欢迎的Kafka集群管理工具，最早由雅虎开源，�
 下载地址：https://github.com/yahoo/CMAK/tags
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/yahoo/CMAK/releases/download/3.0.0.5/cmak-3.0.0.5.zip
+[emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/yahoo/CMAK/releases/download/3.0.0.6/cmak-3.0.0.6.zip
 ```
 
-> 注意：由于cmak-3.0.0.5.zip版本是在java11这个版本下编译的，所以在运行的时候也需要使用java11这个版本，我们目前服务器上使用的是java8这个版本。
+> 注意：由于cmak-3.0.0.6.zip版本是在java11这个版本下编译的，所以在运行的时候也需要使用java11这个版本，我们目前服务器上使用的是java8这个版本。
 
 我们为什么不使用java11版本呢？因为自2019年1月1日起，java8之后的更新版本在商业用途的时候就需要收费授权了。
 
-在针对cmak-3.0.0.5.zip这个版本，如果我们想要使用的话有两种解决办法：
+在针对cmak-3.0.0.6.zip这个版本，如果我们想要使用的话有两种解决办法：
 
 1：下载cmak的源码，使用jdk8编译
 
@@ -1046,13 +1044,13 @@ CMAK是目前最受欢迎的Kafka集群管理工具，最早由雅虎开源，�
 - 解压
 
 ```bash
-[emon@emon ~]$ unzip /usr/local/src/cmak-3.0.0.5.zip -d /usr/local/Cmak/
+[emon@emon ~]$ unzip /usr/local/src/cmak-3.0.0.6.zip -d /usr/local/Cmak/
 ```
 
 - 修改JDK版本
 
 ```bash
-[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.5/bin/cmak
+[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.6/bin/cmak
 ```
 
 ```bash
@@ -1063,7 +1061,7 @@ JAVA_HOME=/usr/local/Java/jdk-11.0.7/
 - 修改conf
 
 ```bash
-[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.5/conf/application.conf 
+[emon@emon ~]$ vim /usr/local/Cmak/cmak-3.0.0.6/conf/application.conf 
 ```
 
 ```bash
@@ -1073,7 +1071,7 @@ cmak.zkhosts="emon:2181"
 
 注意：如果是zk的集群，可以类似`cmak.zkhosts="emon:2181,emon2:2181,emon3:2181"`
 
-同时，**该zookeeper只是被cmak使用的，是否是kafka所使用的zk集群，么的关系**。
+同时，**该zookeeper只是被cmak使用的，是否是kafka所使用的zk集群，么得关系**。
 
 - 调整Kafka配合cmak
 
@@ -1101,7 +1099,7 @@ JMX_PORT=9988 /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafk
 
 ```bash
 # 默认9000端口，可以通过-Dhttp.port调整
-[emon@emon ~]$ /usr/local/Cmak/cmak-3.0.0.5/bin/cmak -Dconfig.file=/usr/local/Cmak/cmak-3.0.0.5/conf/application.conf -Dhttp.port=9000
+[emon@emon ~]$ /usr/local/Cmak/cmak-3.0.0.6/bin/cmak -Dconfig.file=/usr/local/Cmak/cmak-3.0.0.6/conf/application.conf -Dhttp.port=9000
 ```
 
 - 访问
@@ -1113,6 +1111,56 @@ http://emon:9000/
 ![image-20220227133713361](images/image-20220227133713361.png)
 
 点击`Save`后跳转的界面上，点击`Go to cluster view.`查看。
+
+
+
+## 5.4、Kafka安全
+
+- Kafka的安全措施
+  - Kafka提供了SSL或SASL机制（听说SSL降低Kafka20%的性能）
+  - Kafka提供了Broker到ZooKeeper链接的安全机制
+  - Kafka支持Client的读写验证
+
+### 5.4.1、SSL
+
+```bash
+# 创建密钥仓库，用于存储证书文件
+keytool -keystore server.keystore.jks -alias emonkafka -validity 100000 -genkey
+# 输出：
+server.keystore.jks
+
+# 创建CA
+openssl req -new -x509 -keyout ca-key -out ca-cert -days 100000
+# 输出：
+ca-cert  ca-key
+
+# 将生成的CA添加到客户信任库
+keytool -keystore client.truststore.jks -alias CARoot -import -file ca-cert
+# 输出：
+client.truststore.jks
+
+# 为broker提供信任库以及所有客户端签名了密钥的CA证书
+keytool -keystore server.truststore.jks -alias CARoot -import -file ca-cert
+# 输出：
+server.truststore.jks
+
+# 签名证书，用自己生成的CA来签名前面生成的证书
+# 1、从密钥仓库导出证书
+keytool -keystore server.keystore.jks -alias emonkafka -certreq -file cert-file
+# 输出：
+server.keystore.jks cert-file
+
+# 2、用CA签名：
+openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 100000 -CAcreateserial -passin pass:123456
+# 输出：
+ca-cert.srl cert-signed
+
+# 3、导入CA的证书和已签名的证书到密钥仓库
+keytool -keystore server.keystore.jks -alias CARoot -import -file ca-cert
+keytool -keystore server.keystore.jks -alias emonkafka -import -file cert-signed
+```
+
+
 
 # 六、实战：Kafka集群平滑升级
 
