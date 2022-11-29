@@ -1123,42 +1123,234 @@ http://emon:9000/
 
 ### 5.4.1、SSL
 
+- 切换到证书存储目录
+
 ```bash
-# 创建密钥仓库，用于存储证书文件
-keytool -keystore server.keystore.jks -alias emonkafka -validity 100000 -genkey
-# 输出：
-server.keystore.jks
-
-# 创建CA
-openssl req -new -x509 -keyout ca-key -out ca-cert -days 100000
-# 输出：
-ca-cert  ca-key
-
-# 将生成的CA添加到客户信任库
-keytool -keystore client.truststore.jks -alias CARoot -import -file ca-cert
-# 输出：
-client.truststore.jks
-
-# 为broker提供信任库以及所有客户端签名了密钥的CA证书
-keytool -keystore server.truststore.jks -alias CARoot -import -file ca-cert
-# 输出：
-server.truststore.jks
-
-# 签名证书，用自己生成的CA来签名前面生成的证书
-# 1、从密钥仓库导出证书
-keytool -keystore server.keystore.jks -alias emonkafka -certreq -file cert-file
-# 输出：
-server.keystore.jks cert-file
-
-# 2、用CA签名：
-openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 100000 -CAcreateserial -passin pass:123456
-# 输出：
-ca-cert.srl cert-signed
-
-# 3、导入CA的证书和已签名的证书到密钥仓库
-keytool -keystore server.keystore.jks -alias CARoot -import -file ca-cert
-keytool -keystore server.keystore.jks -alias emonkafka -import -file cert-signed
+$ mkdir /usr/local/kafka/ssl && cd /usr/local/kafka/ssl
 ```
+
+- 生成秘钥证书
+
+  - 创建服务端密钥仓库，用于存储证书文件
+
+  ```bash
+  $ keytool -keystore server.keystore.jks -alias emonkafka -validity 36500 -genkey
+  ```
+
+  > 【命令解释】
+  >
+  > emonkafka	秘钥别名
+  >
+  > | 命令      | 解释            |
+  > | --------- | --------------- |
+  > | emonkafka | 秘钥别名        |
+  > | validity  | 秘钥有效期100年 |
+  >
+  > 【命令执行概述】
+  >
+  > ```bash
+  > 输入密钥库口令: 123456
+  > 再次输入新口令: 123456
+  > 您的名字与姓氏是什么?
+  >   [Unknown]:  [忽略]
+  > 您的组织单位名称是什么?
+  >   [Unknown]:  [忽略]
+  > 您的组织名称是什么?
+  >   [Unknown]:  [忽略]
+  > 您所在的城市或区域名称是什么?
+  >   [Unknown]:  [忽略]
+  > 您所在的省/市/自治区名称是什么?
+  >   [Unknown]:  [忽略]
+  > 该单位的双字母国家/地区代码是什么?
+  >   [Unknown]:  [忽略]
+  > CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown是否正确?
+  >   [否]:  y
+  > 
+  > 输入 <emonkafka> 的密钥口令
+  > 	(如果和密钥库口令相同, 按回车): [回车]
+  > ```
+  >
+  > 【命令执行输出】
+  >
+  > -rw-r--r-- 1 root root 1988 11月 29 15:51 server.keystore.jks
+  >
+  > 【验证证书】
+  >
+  > ```bash
+  > $ keytool -list -v -keystore server.keystore.jks
+  > ```
+
+  - 创建CA并将生成的CA添加到客户信任库（truststore）
+
+    - 创建CA
+
+    ```bash
+    $ openssl req -new -x509 -keyout ca-key -out ca-cert -days 36500
+    ```
+
+    > 【命令执行概述】
+    >
+    > ```bash
+    > Generating a 2048 bit RSA private key
+    > ....+++
+    > .......+++
+    > writing new private key to 'ca-key'
+    > Enter PEM pass phrase: 123456
+    > Verifying - Enter PEM pass phrase: 123456
+    > -----
+    > You are about to be asked to enter information that will be incorporated
+    > into your certificate request.
+    > What you are about to enter is what is called a Distinguished Name or a DN.
+    > There are quite a few fields but you can leave some blank
+    > For some fields there will be a default value,
+    > If you enter '.', the field will be left blank.
+    > -----
+    > Country Name (2 letter code) [XX]: [忽略]
+    > State or Province Name (full name) []: [忽略]
+    > Locality Name (eg, city) [Default City]: [忽略]
+    > Organization Name (eg, company) [Default Company Ltd]: [忽略]
+    > Organizational Unit Name (eg, section) []: [忽略]
+    > Common Name (eg, your name or your server's hostname) []: [忽略]
+    > Email Address []: [忽略]
+    > ```
+    >
+    > 【命令执行输出】
+    >
+    > -rw-r--r-- 1 root root 1834 11月 29 16:05 ca-key
+    > -rw-r--r-- 1 root root 1220 11月 29 16:05 ca-cert
+
+    - 将生成的CA添加到客户信任库（truststore）
+
+    ```bash
+    $ keytool -keystore server.truststore.jks -alias CARoot -import -file ca-cert
+    # 命令行输出：为broker提供信任库以及所有客户端签名了密钥的CA证书
+    -rw-r--r-- 1 root root  924 11月 29 16:13 server.truststore.jks
+    
+    $ keytool -keystore client.truststore.jks -alias CARoot -import -file ca-cert
+    # 命令行输出：【重要】客户端通过SSL访问Kafka服务时，需要使用
+    -rw-r--r-- 1 root root  924 11月 29 16:14 client.truststore.jks
+    ```
+
+  - 从KeyStore导出证书，并用上述步骤生成的CA来签名生成的证书
+
+    - 从密钥仓库导出证书
+
+    ```bash
+    $ keytool -keystore server.keystore.jks -alias emonkafka -certreq -file cert-file
+    ```
+
+    > 【命令执行输出】
+    >
+    > -rw-r--r-- 1 root root 1575 11月 29 16:51 cert-file
+
+    - 用CA来签名生成的证书
+
+    ```bash
+    $ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 36500 -CAcreateserial -passin pass:123456
+    ```
+
+    > 【命令执行输出】
+    >
+    > -rw-r--r-- 1 root root   17 11月 29 16:54 ca-cert.srl
+    > -rw-r--r-- 1 root root 1899 11月 29 16:54 cert-signed
+
+  - 导入CA的证书和已签名的证书到密钥仓库
+
+  ```bash
+  $ keytool -keystore server.keystore.jks -alias CARoot -import -file ca-cert
+  $ keytool -keystore server.keystore.jks -alias emonkafka -import -file cert-signed
+  ```
+
+  > 【命令执行输出】执行上述命令，会变更如下的文件
+  >
+  > -rw-r--r-- 1 root root 3871 11月 29 16:58 server.keystore.jks
+
+  - 生成客户端秘钥
+
+  ```bash
+  $ keytool -keystore client.keystore.jks -alias emonkafka -validity 36500 -genkey -keyalg RSA
+  ```
+
+  > 【命令执行概述】
+  >
+  > ```bash
+  > 输入密钥库口令: 123456 
+  > 再次输入新口令: 123456
+  > 您的名字与姓氏是什么?
+  >   [Unknown]: [忽略] 
+  > 您的组织单位名称是什么?
+  >   [Unknown]: [忽略] 
+  > 您的组织名称是什么?
+  >   [Unknown]: [忽略] 
+  > 您所在的城市或区域名称是什么?
+  >   [Unknown]: [忽略] 
+  > 您所在的省/市/自治区名称是什么?
+  >   [Unknown]: [忽略] 
+  > 该单位的双字母国家/地区代码是什么?
+  >   [Unknown]: [忽略] 
+  > CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown是否正确?
+  >   [否]:  y
+  > 
+  > 输入 <emonkafka> 的密钥口令
+  > 	(如果和密钥库口令相同, 按回车): [回车]
+  > ```
+  >
+  > 【命令执行输出】
+  >
+  > -rw-r--r-- 1 root root 2248 11月 29 17:26 client.keystore.jks
+
+- Kafka服务端配置
+
+  - 配置
+
+  ```bash
+  $ vim /usr/local/kafka/config/server.properties 
+  ```
+
+  ```bash
+  # [修改]
+  listeners=PLAINTEXT://emon:9092,SSL://emon:8989
+  # [修改]
+  advertised.listeners=PLAINTEXT://emon:9092,SSL://emon:8989
+  # [新增]在advertised.listeners后面追加ssl配置
+  ssl.keystore.location=/root/ca/server.keystore.jks
+  ssl.keystore.password=123456
+  ssl.key.password=123456
+  ssl.truststore.location=/root/ca/server.truststore.jks
+  ssl.truststore.password=123456
+  # 设置空可以使得证书的主机名与kafka的主机名不用保持一致
+  ssl.endpoint.identification.algorithm=
+  # [修改]
+  log.dirs=/tmp/kafka-logs => log.dirs=/usr/local/kafka/logs
+  # [修改]
+  zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
+  ```
+
+  - 启动
+
+  - 测试
+
+  ```bash
+  # 测试SSL是否成功
+  $ openssl s_client -debug -connect emon:8989 -tls1
+  ```
+
+- 客户端配置
+
+  - 将上面生成的客户信任库client.truststore.jks复制到到java项目中，以便client可以信任这个CA
+
+  - 代码
+
+  ```java
+  // ......
+  properties.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+  properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "");
+  properties.setProperty(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, BASH_PATH+"client.truststore.jks");
+  properties.setProperty(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "123456");
+  // ......
+  ```
+
+  
 
 
 
