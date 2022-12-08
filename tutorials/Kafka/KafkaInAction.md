@@ -1139,24 +1139,24 @@ https://blog.csdn.net/weixin_42145354/article/details/125429575 【成功版】
 $ keytool -help
 ```
 
-| 命令            | 描述                           |
-| --------------- | ------------------------------ |
-| -certreq        | 生成证书请求                   |
-| -changealias    | 更改条目的别名                 |
-| -delete         | 删除条目                       |
-| -exportcert     | 导出证书                       |
-| -genkeypair     | 与 `-genkey` 等效，生成密钥对  |
-| -genseckey      | 生成密钥                       |
-| -gencert        | 根据证书请求生成证书           |
-| -importcert     | 导入证书或证书链               |
-| -importpass     | 导入口令                       |
-| -importkeystore | 从其他密钥库导入一个或所有条目 |
-| -keypasswd      | 更改条目的密钥口令             |
-| -list           | 列出密钥库中的条目             |
-| -printcert      | 打印证书内容                   |
-| -printcertreq   | 打印证书请求的内容             |
-| -printcrl       | 打印 CRL 文件的内容            |
-| -storepasswd    | 更改密钥库的存储口令           |
+| 命令            | 描述                              |
+| --------------- | --------------------------------- |
+| -certreq        | 生成证书请求                      |
+| -changealias    | 更改条目的别名                    |
+| -delete         | 删除条目                          |
+| -exportcert     | 导出证书                          |
+| -genkeypair     | 与 `-genkey` 等效，生成密钥对     |
+| -genseckey      | 生成密钥                          |
+| -gencert        | 根据证书请求生成证书              |
+| -importcert     | 与`-import`等效，导入证书或证书链 |
+| -importpass     | 导入口令                          |
+| -importkeystore | 从其他密钥库导入一个或所有条目    |
+| -keypasswd      | 更改条目的密钥口令                |
+| -list           | 列出密钥库中的条目                |
+| -printcert      | 打印证书内容                      |
+| -printcertreq   | 打印证书请求的内容                |
+| -printcrl       | 打印 CRL 文件的内容               |
+| -storepasswd    | 更改密钥库的存储口令              |
 
 - 命令示例
 
@@ -1666,7 +1666,7 @@ where options  are
 
 - 命令示例
 
-  - 生成自签名证书，证书名：`ca-cert`，密钥文件名称：`ca-key`【推荐】
+  - 生成CA自签名证书，证书名：`ca-cert`，密钥文件名称：`ca-key`【推荐】
 
   ```bash
   $ openssl req -new -x509 -keyout ca-key -out ca-cert -days 3650
@@ -1758,7 +1758,7 @@ usage: x509 args
  -signkey arg    - self sign cert with arg
  -x509toreq      - output a certification request object
  -req            - input is a certificate request, sign and output.
- 				
+ 				输入一个证书请求文件，然后签名并输出
  -CA arg         - set the CA certificate, must be PEM format.
  -CAkey arg      - set the CA key, must be PEM format
                    missing, it is assumed to be in the CA file.
@@ -1781,9 +1781,11 @@ usage: x509 args
 
 - 命令示例
 
-```bash
-$ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass:123456
-```
+  - 使用自签名证书签名
+
+  ```bash
+  $ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass:123456
+  ```
 
 ##### 2.6、`openssl genrsa`
 
@@ -1990,7 +1992,34 @@ where options are
 
   
 
+##### 2.99、常规应用
 
+- 生成私钥、公钥
+
+```bash
+# openssl_private_public.sh
+openssl genrsa -out rsa_private_key.pem 2048
+openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem
+openssl pkcs8 -topk8 -inform PEM -in rsa_private_key.pem -outform PEM -out pkcs8_rsa_private_key.pem -nocrypt
+```
+
+- 生成CA自签名证书
+
+```bash
+$ openssl req -new -x509 -keyout ca-key -out ca-cert -days 3650
+```
+
+- 签名
+
+```bash
+$ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass:123456
+```
+
+- 从密钥库中解析出公钥
+
+```bash
+$ keytool -list -rfc -keystore server.keystore.jks -storepass 123456 | openssl x509 -inform pem -pubkey
+```
 
 ### 5.4.1、SSL（简单版）
 
@@ -2002,10 +2031,10 @@ $ mkdir /usr/local/kafka/ssl && cd /usr/local/kafka/ssl
 
 #### 2、生成秘钥证书
 
-##### 2.1、生成服务端密钥库（含一对秘钥）
+##### 2.1、生成服务端密钥库文件
 
 ```bash
-$ keytool -genkey -keystore server.keystore.jks -alias emonkafka -validity 3650 -keyalg RSA
+$ keytool -genkey -keystore server.keystore.jks -alias server -validity 3650 -keyalg RSA
 ```
 
 > 【命令执行概述】
@@ -2042,9 +2071,9 @@ $ keytool -genkey -keystore server.keystore.jks -alias emonkafka -validity 3650 
 > $ keytool -list -v -keystore server.keystore.jks
 >```
 
-##### 2.2、创建CA并将CA添加到客户信任库
+##### 2.2、创建CA自签名证书并添加到信任库
 
-- 创建CA
+- 创建CA自签名证书
 
 ```bash
 $ openssl req -new -x509 -keyout ca-key -out ca-cert -days 3650
@@ -2081,34 +2110,34 @@ $ openssl req -new -x509 -keyout ca-key -out ca-cert -days 3650
 > -rw-r--r-- 1 root root 1834 12月  4 21:53 ca-key
 > -rw-r--r-- 1 root root 1220 12月  4 21:53 ca-cert
 
-- 将CA添加到客户信任库（truststore）
+- 将CA自签名证书添加到客户信任库（truststore）
 
 ```bash
-$ keytool -keystore server.truststore.jks -alias CARoot -import -file ca-cert
+$ keytool -import -keystore server.truststore.jks -alias CARoot -file ca-cert
 # 命令行输出：为broker提供信任库以及所有客户端签名了密钥的CA证书
 -rw-r--r-- 1 root root  922 12月  4 21:55 server.truststore.jks
 
-$ keytool -keystore client.truststore.jks -alias CARoot -import -file ca-cert
+$ keytool -import -keystore client.truststore.jks -alias CARoot -file ca-cert
 # 命令行输出：【重要】客户端通过SSL访问Kafka服务时，需要使用
 -rw-r--r-- 1 root root  922 12月  4 21:55 client.truststore.jks
 ```
 
-##### 2.3、从密钥仓库导出证书，并用CA来签名
+##### 2.3、生成服务端证书请求文件，并用CA签名
 
-- 从密钥仓库导出证书
+- 生成服务端证书请求文件
 
 ```bash
-$ keytool -keystore server.keystore.jks -alias emonkafka -certreq -file cert-file
+$ keytool -certreq -keystore server.keystore.jks -alias server -file server.csr
 ```
 
 > 【命令执行输出】
 >
-> -rw-r--r-- 1 root root 1579 12月  4 21:56 cert-file
+> -rw-r--r-- 1 root root 1579 12月  4 21:56 server.csr
 
-- 用CA来签名生成的证书
+- 用CA自签名证书来签名证书请求文件
 
 ```bash
-$ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -days 3650 -CAcreateserial -passin pass:123456
+$ openssl x509 -req -CA ca-cert -CAkey ca-key -in server.csr -out server.crt -days 3650 -CAcreateserial -passin pass:123456
 ```
 
 > 【命令执行概述】
@@ -2122,20 +2151,22 @@ $ openssl x509 -req -CA ca-cert -CAkey ca-key -in cert-file -out cert-signed -da
 > 【命令执行输出】
 >
 > -rw-r--r-- 1 root root   17 12月  4 21:56 ca-cert.srl
-> -rw-r--r-- 1 root root 1895 12月  4 21:56 cert-signed
+> -rw-r--r-- 1 root root 1895 12月  4 21:56 server.crt
 
-##### 2.4、导入CA证书和已签名的证书到密钥仓库
+##### 2.4、导入CA和已签名的证书到密钥仓库
 
 ```bash
-$ keytool -keystore server.keystore.jks -alias CARoot -import -file ca-cert
-$ keytool -keystore server.keystore.jks -alias emonkafka -import -file cert-signed
+$ keytool -import -keystore server.keystore.jks -alias CARoot -file ca-cert
+$ keytool -import -keystore server.keystore.jks -alias server -file server.crt
 ```
 
 > 【命令执行输出】执行上述命令，会变更如下的文件
 >
 > -rw-r--r-- 1 root root 3864 12月  4 21:57 server.keystore.jks
 
-#### 3、broker配置（内网使用9092端口明文，外网使用8989端口SSL）
+#### 3、broker配置
+
+**内网使用9092端口明文，外网使用8989端口SSL**
 
 - 配置
 
@@ -2193,9 +2224,9 @@ public void testAsyncSendWithSSL() throws Exception {
                            "org.apache.kafka.common.serialization.StringSerializer");
 
     properties.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-    properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "");
     properties.setProperty(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "client.truststore.jks");
     properties.setProperty(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "123456");
+    properties.setProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "");
 
     // Producer的主对象
     KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(properties);
@@ -2213,7 +2244,7 @@ public void testAsyncSendWithSSL() throws Exception {
 }
 ```
 
-### 5.4.2、SSL（独立客户端证书版）
+### 5.4.2、SSL（含客户端证书版）
 
 https://blog.csdn.net/justlpf/article/details/127280959
 
@@ -2227,7 +2258,7 @@ https://blog.csdn.net/justlpf/article/details/127280959
 CA_PWD=123456
 ```
 
-- 服务器证书密码
+- 服务端证书密码
 
 ```bash
 SERVER_PWD=567890
@@ -2251,84 +2282,39 @@ $ mkdir /usr/local/kafka/ssl && cd /usr/local/kafka/ssl
 
 #### 2、自签名CA证书
 
-##### 2.1、生成CA证书密钥库（含一对密钥）
+##### 2.1、生成CA证书密钥库文件
 
 ```bash
-$ keytool -genkeypair -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -keypass ${CA_PWD} -validity 365 -keyalg RSA -dname CN=ca,C=cn -ext bc:c
+$ keytool -genkeypair -keystore ca.keystore.jks -storepass ${CA_PWD} -alias ca -keypass ${CA_PWD} -validity 3650 -keyalg RSA -dname CN=ca,C=cn -ext bc:c
 ```
 
-> 生成密钥对，选项查看：`keytool -genkeypair -help`
->
-> 选项：
->
-> ```bash
->  -alias <alias>                  要处理的条目的别名
->  -keyalg <keyalg>                密钥算法名称
->  -keysize <keysize>              密钥位大小
->  -sigalg <sigalg>                签名算法名称
->  -destalias <destalias>          目标别名
->  -dname <dname>                  唯一判别名
->  -startdate <startdate>          证书有效期开始日期/时间
->  -ext <value>                    X.509 扩展
->  -validity <valDays>             有效天数（默认90天）
->  -keypass <arg>                  密钥口令
->  -keystore <keystore>            密钥库名称
->  -storepass <arg>                密钥库口令
->  -storetype <storetype>          密钥库类型
->  -providername <providername>    提供方名称
->  -providerclass <providerclass>  提供方类名
->  -providerarg <arg>              提供方参数
->  -providerpath <pathlist>        提供方类路径
->  -v                              详细输出
->  -protected                      通过受保护的机制的口令
-> ```
->
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1833 12月  3 13:24 mycastore.jks
+> -rw-r--r-- 1 root root 2091 12月  8 08:50 ca.keystore.jks
 
 ##### 2.2、导出条目为自签名证书
 
 ```bash
-$ keytool -exportcert -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -rfc -file myca.cer
+$ keytool -exportcert -keystore ca.keystore.jks -storepass ${CA_PWD} -alias ca -rfc -file ca.cer
 ```
 
-> 导出证书，选项查看：`keytool -exportcert -help`
->
-> 选项：
->
-> ```bash
->  -rfc                            以 RFC 样式输出
->  -alias <alias>                  要处理的条目的别名
->  -file <filename>                输出文件名
->  -keystore <keystore>            密钥库名称
->  -storepass <arg>                密钥库口令
->  -storetype <storetype>          密钥库类型
->  -providername <providername>    提供方名称
->  -providerclass <providerclass>  提供方类名
->  -providerarg <arg>              提供方参数
->  -providerpath <pathlist>        提供方类路径
->  -v                              详细输出
->  -protected                      通过受保护的机制的口令
-> ```
->
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1555 12月  3 13:31 myca.cer
+> -rw-r--r-- 1 root root 1077 12月  8 08:50 ca.cer
 
 ##### 2.3、查看自签名证书
 
 ```bash
 # 查看密钥库
-$ keytool -list -keystore mycastore.jks -storepass ${CA_PWD}
+$ keytool -list -keystore ca.keystore.jks -storepass ${CA_PWD}
  
 # 打印证书
-$ keytool -printcert -file myca.cer
+$ keytool -printcert -file ca.cer
 ```
 
 #### 3、服务器证书
 
-##### 3.1、生成服务端密钥库（含一对密钥）
+##### 3.1、生成服务端密钥库文件
 
 ```bash
 $ keytool -genkeypair -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias server -keypass ${SERVER_PWD} -validity 365 -keyalg RSA -dname CN=127.0.0.1,C=cn
@@ -2336,7 +2322,7 @@ $ keytool -genkeypair -keystore server.keystore.jks -storepass ${SERVER_PWD} -al
 
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1834 12月  3 17:20 server.keystore.jks
+> -rw-r--r-- 1 root root 2092 12月  8 08:53 server.keystore.jks
 
 ##### 3.2、生成服务端证书请求文件
 
@@ -2344,68 +2330,21 @@ $ keytool -genkeypair -keystore server.keystore.jks -storepass ${SERVER_PWD} -al
 $ keytool -certreq -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias server -keypass ${SERVER_PWD} -file server.csr
 ```
 
->生成证书请求，选项查看：`keytool -certreq -help`
->
->选项：
->
->```bash
-> -alias <alias>                  要处理的条目的别名
-> -sigalg <sigalg>                签名算法名称
-> -file <filename>                输出文件名
-> -keypass <arg>                  密钥口令
-> -keystore <keystore>            密钥库名称
-> -dname <dname>                  唯一判别名
-> -storepass <arg>                密钥库口令
-> -storetype <storetype>          密钥库类型
-> -providername <providername>    提供方名称
-> -providerclass <providerclass>  提供方类名
-> -providerarg <arg>              提供方参数
-> -providerpath <pathlist>        提供方类路径
-> -v                              详细输出
-> -protected                      通过受保护的机制的口令
->```
->
 >【输出】
 >
->-rw-r--r-- 1 root root 1473 12月  3 17:34 server.csr
+>-rw-r--r-- 1 root root  993 12月  8 08:53 server.csr
 
 
 
 ##### 3.3、CA签名服务端证书请求文件
 
 ```bash
-$ keytool -gencert -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -keypass ${CA_PWD} -validity 365 -infile server.csr -outfile server.cer
+$ keytool -gencert -keystore ca.keystore.jks -storepass ${CA_PWD} -alias ca -keypass ${CA_PWD} -validity 365 -infile server.csr -outfile server.crt
 ```
 
->根据证书请求生成证书，选项查看：`keytool -gencert -help`
->
->选项：
->
->```bash
-> -rfc                            以 RFC 样式输出
-> -infile <filename>              输入文件名
-> -outfile <filename>             输出文件名
-> -alias <alias>                  要处理的条目的别名
-> -sigalg <sigalg>                签名算法名称
-> -dname <dname>                  唯一判别名
-> -startdate <startdate>          证书有效期开始日期/时间
-> -ext <value>                    X.509 扩展
-> -validity <valDays>             有效天数
-> -keypass <arg>                  密钥口令
-> -keystore <keystore>            密钥库名称
-> -storepass <arg>                密钥库口令
-> -storetype <storetype>          密钥库类型
-> -providername <providername>    提供方名称
-> -providerclass <providerclass>  提供方类名
-> -providerarg <arg>              提供方参数
-> -providerpath <pathlist>        提供方类路径
-> -v                              详细输出
-> -protected                      通过受保护的机制的口令
->```
->
 >【输出】
 >
->-rw-r--r-- 1 root root 1117 12月  3 17:43 server.cer
+>-rw-r--r-- 1 root root  767 12月  8 08:59 server.crt
 
 
 
@@ -2415,7 +2354,7 @@ $ keytool -gencert -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -key
 # 查看证书请求文件
 $ keytool -printcertreq -v -file server.csr
 # 查看证书
-$ keytool -printcert -v -file server.cer
+$ keytool -printcert -v -file server.crt
 # 查看密钥库
 $ keytool -list -keystore server.keystore.jks -storepass ${SERVER_PWD}
 ```
@@ -2425,59 +2364,40 @@ $ keytool -list -keystore server.keystore.jks -storepass ${SERVER_PWD}
 ##### 3.5、导入CA证书，生成服务端truststore
 
 ```bash
-$ keytool -importcert -keystore server.truststore.jks -storepass ${SERVER_PWD} -alias myca -keypass ${CA_PWD} -file myca.cer
+$ keytool -importcert -keystore server.truststore.jks -storepass ${SERVER_PWD} -alias ca -keypass ${CA_PWD} -file ca.cer
 ```
 
-> 导入证书或证书链，选项查看：`keytool -importcert -help`
->
-> 选项：
->
-> ```bash
->  -noprompt                       不提示
->  -trustcacerts                   信任来自 cacerts 的证书
->  -protected                      通过受保护的机制的口令
->  -alias <alias>                  要处理的条目的别名
->  -file <filename>                输入文件名
->  -keypass <arg>                  密钥口令
->  -keystore <keystore>            密钥库名称
->  -storepass <arg>                密钥库口令
->  -storetype <storetype>          密钥库类型
->  -providername <providername>    提供方名称
->  -providerclass <providerclass>  提供方类名
->  -providerarg <arg>              提供方参数
->  -providerpath <pathlist>        提供方类路径
->  -v                              详细输出
-> ```
->
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1153 12月  3 17:52 server.truststore.jks
+> -rw-r--r-- 1 root root  803 12月  8 09:01 server.truststore.jks
 
 
 
 ##### 3.6、导入CA证书，添加到服务端密钥库
 
 ```bash
-$ keytool -importcert -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias myca -keypass ${CA_PWD} -file myca.cer
+$ keytool -importcert -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias ca -keypass ${CA_PWD} -file ca.cer
 ```
 
-> 【输出】
+> 【输出】更改了server.keystore.jks
 >
-> -rw-r--r-- 1 root root 2955 12月  3 18:01 server.keystore.jks
+> -rw-r--r-- 1 root root 2863 12月  8 09:02 server.keystore.jks
 
 
 
 ##### 3.7、导入服务端证书，添加到服务器密钥库
 
 ```bash
-$ keytool -importcert -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias server -keypass ${SERVER_PWD} -file server.cer
+$ keytool -importcert -keystore server.keystore.jks -storepass ${SERVER_PWD} -alias server -keypass ${SERVER_PWD} -file server.crt
 ```
 
-
+> 【输出】更改了server.keystore.jks
+>
+> -rw-r--r-- 1 root root 2863 12月  8 09:02 server.keystore.jks
 
 #### 4、客户端证书
 
-##### 4.1、生成客户端密钥库（含一对密钥）
+##### 4.1、生成客户端密钥库文件
 
 ```bash
 $ keytool -genkeypair -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias client1 -keypass ${CLIENT_PWD} -validity 365 -keyalg RSA -dname CN=client1,C=cn
@@ -2485,7 +2405,7 @@ $ keytool -genkeypair -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -a
 
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1830 12月  3 18:42 client1.keystore.jks
+> -rw-r--r-- 1 root root 2091 12月  8 09:04 client1.keystore.jks
 
 ##### 4.2、生成客户端证书请求文件
 
@@ -2493,15 +2413,15 @@ $ keytool -genkeypair -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -a
 $ keytool -certreq -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias client1 -keypass ${CLIENT_PWD} -file client1.csr
 ```
 
-> -rw-r--r-- 1 root root 1473 12月  3 18:45 client1.csr
+> -rw-r--r-- 1 root root  993 12月  8 09:04 client1.csr
 
 ##### 4.3、CA签名客户端证书请求文件
 
 ```bash
-$ keytool -gencert -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -keypass ${CA_PWD} -validity 365 -infile client1.csr -outfile client1.cer
+$ keytool -gencert -keystore ca.keystore.jks -storepass ${CA_PWD} -alias ca -keypass ${CA_PWD} -validity 365 -infile client1.csr -outfile client1.crt
 ```
 
-> -rw-r--r-- 1 root root 1473 12月  3 18:45 client1.csr
+> -rw-r--r-- 1 root root  765 12月  8 09:05 client1.crt
 
 ##### 4.4、查看客户端证书
 
@@ -2509,7 +2429,7 @@ $ keytool -gencert -keystore mycastore.jks -storepass ${CA_PWD} -alias myca -key
 # 查看证书请求文件
 $ keytool -printcertreq -v -file client1.csr
 # 查看证书
-$ keytool -printcert -v -file client1.cer
+$ keytool -printcert -v -file client1.crt
 # 查看密钥库
 $ keytool -list -keystore client1.keystore.jks -storepass ${CLIENT_PWD}
 ```
@@ -2517,55 +2437,49 @@ $ keytool -list -keystore client1.keystore.jks -storepass ${CLIENT_PWD}
 ##### 4.5、导入CA证书，生成客户端truststore
 
 ```bash
-$ keytool -importcert -keystore client1.truststore.jks -storepass ${CLIENT_PWD} -alias myca -keypass ${CA_PWD} -file myca.cer
+$ keytool -importcert -keystore client1.truststore.jks -storepass ${CLIENT_PWD} -alias ca -keypass ${CA_PWD} -file ca.cer
 ```
 
 > 【输出】
 >
-> -rw-r--r-- 1 root root 1153 12月  3 18:59 client1.truststore.jks
+> -rw-r--r-- 1 root root  803 12月  8 09:06 client1.truststore.jks
 
 ##### 4.6、导入CA证书，添加到客户端密钥库
 
 ```bash
-$ keytool -importcert -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias myca -keypass ${CA_PWD} -file myca.cer
+$ keytool -importcert -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias ca -keypass ${CA_PWD} -file ca.cer
 ```
 
-> 【输出】
+> 【输出】更改了client1.keystore.jks
 >
-> -rw-r--r-- 1 root root 2951 12月  3 19:03 client1.keystore.jks
+> -rw-r--r-- 1 root root 2862 12月  8 09:07 client1.keystore.jks
 
 ##### 4.7、导入客户端证书，到客户端密钥库
 
 ```bash
-$ keytool -importcert -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias client1 -keypass ${CLIENT_PWD} -file client1.cer
+$ keytool -importcert -keystore client1.keystore.jks -storepass ${CLIENT_PWD} -alias client1 -keypass ${CLIENT_PWD} -file client1.crt
 ```
 
-> 【输出】
+> 【输出】更改了client1.keystore.jks
 >
-> -rw-r--r-- 1 root root 4081 12月  3 19:07 client1.keystore.jks
+> -rw-r--r-- 1 root root 3645 12月  8 09:08 client1.keystore.jks
 
-#### 5、broker配置（内网使用9092端口明文，外网使用9093端口SSL）
+#### 5、broker配置
+
+**内网使用9092端口明文，外网使用8989端口SSL**
 
 ```bash
-ssl.keystore.location=server.keystore.jks
-ssl.keystore.password=xxx
-ssl.key.password=xxx
-ssl.truststore.location=server.truststore.jks
-ssl.truststore.password=xxx
-ssl.client.auth=required
-listeners=PLAINTEXT://0.0.0.0:9092,SSL://:9093
-advertised.listeners=PLAINTEXT://10.1.1.1:9092,SSL://x.x.x.x:9093
-
 # [修改]
-listeners=PLAINTEXT://emon:9092,SSL://emon:9093
+listeners=PLAINTEXT://emon:9092,SSL://emon:8989
 # [修改]
-advertised.listeners=PLAINTEXT://emon:9092,SSL://emon:9093
+advertised.listeners=PLAINTEXT://emon:9092,SSL://emon:8989
 # [新增]在advertised.listeners后面追加ssl配置
 ssl.keystore.location=/usr/local/kafka/ssl/server.keystore.jks
 ssl.keystore.password=${SERVER_PWD}
 ssl.key.password=${SERVER_PWD}
 ssl.truststore.location=/usr/local/kafka/ssl/server.truststore.jks
 ssl.truststore.password=${SERVER_PWD}
+# 如果配置了该项，客户端必须要有客户端证书[ssl.keystore.location,ssl.keystore.password,ssl.key.password]
 ssl.client.auth=required
 # 设置空可以使得证书的主机名与kafka的主机名不用保持一致
 ssl.endpoint.identification.algorithm=
@@ -2586,7 +2500,7 @@ zookeeper.connect=localhost:2181=>zookeeper.connect=emon:2181
 @Test
 public void testAsyncSendWithSSL() throws Exception {
     Properties properties = new Properties();
-    properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "emon:9093");
+    properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "emon:8989");
     properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
     properties.setProperty(ProducerConfig.RETRIES_CONFIG, "0");
     properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "16348");
