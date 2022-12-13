@@ -177,6 +177,10 @@ server {
 
 ## 1.3、stream配置代理tcp
 
+Nginx代理Kafka：https://zhuanlan.zhihu.com/p/358413575
+
+如果客户端无法直接访问Kafka，通过Nginx代理访问到Kafka。
+
 配置stream：
 
 ```bash

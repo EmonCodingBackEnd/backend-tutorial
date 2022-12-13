@@ -1127,10 +1127,6 @@ http://emon:9000/
   - Kafka提供了Broker到ZooKeeper链接的安全机制
   - Kafka支持Client的读写验证
 
-
-
-https://blog.csdn.net/weixin_42145354/article/details/125429575 【成功版】
-
 ### 5.4.0、keytool和openssl命令
 
 #### 0、前提
@@ -2252,8 +2248,6 @@ public void testAsyncSendWithSSL() throws Exception {
 
 ### 5.4.2、SSL（含客户端证书版）
 
-https://blog.csdn.net/justlpf/article/details/127280959
-
 #### 1、准备
 
 ##### 1.1、密码配置
@@ -2840,6 +2834,80 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
   | quota.consumer.default                                      | Long.MaxValue     |                                                              |
   | quota.producer.default                                      | Long.MaxValue     |                                                              |
   | replica.fetch.min.bytes                                     | 1                 |                                                              |
+  | replica.fetch.max.bytes                                     | 1048576           |                                                              |
+  | replica.high.watermark.checkpoint.interval.ms               | 5000              |                                                              |
+  | replica.lag.time.max.ms                                     | 30000             |                                                              |
+  | replica.socket.receive.buffer.bytes                         | 65536             |                                                              |
+  | replica.socket.timeout.ms                                   | 30000             |                                                              |
+  | rerquest.timeout.ms                                         | 30000             |                                                              |
+  | socket.receive.buffer.bytes                                 | 102400            |                                                              |
+  | socket.request.max.bytes                                    | 104857600         |                                                              |
+  | socket.send.buffer.bytes                                    | 102400            |                                                              |
+  | transaction.max.timeout.ms                                  | 900000            |                                                              |
+  | transaction.state.log.load.buffer.size                      | 5242880           |                                                              |
+  | transaction.state.log.min.isr                               | 2                 |                                                              |
+  | transaction.state.log.num.partitions                        | 50                |                                                              |
+  | transaction.state.log.replication.factor                    | 3                 |                                                              |
+  | transaction.state.log.segment.bytes                         | 104857600         |                                                              |
+  | transaction.id.expiration.ms                                | 604800000         |                                                              |
+  | unclean.leader.election.enable                              | false             |                                                              |
+  | zookeeper.connection.timeout.ms                             | null              |                                                              |
+  | zookeeper.max.in.flight.requests                            | 10                |                                                              |
+  | zookeeper.session.timeout.ms                                | 18000             |                                                              |
+  | zookeeper.set.acl                                           | false             |                                                              |
+  | broker.id.generation.enable                                 | true              |                                                              |
+  | broker.rack                                                 | null              |                                                              |
+  | connections.max.idle.ms                                     | 600000            |                                                              |
+  | connections.max.reauth.ms                                   | 0                 |                                                              |
+  | controlled.shutdown.enable                                  | true              |                                                              |
+  | controlled.shutdown.max.retries                             | 3                 |                                                              |
+  | controlled.shutdown.retry.backoff.ms                        | 5000              |                                                              |
+  | controller.socket.timeout.ms                                | 30000             |                                                              |
+  | default.replication.factor                                  | 1                 |                                                              |
+  | delegation.token.expiry.time.ms                             | 86400000          |                                                              |
+  | delegation.token.master.key                                 | null              |                                                              |
+  | delegation.token.max.lifetime.ms                            | 604800000         |                                                              |
+  | delete.records.purgatory.purge.interval.requests            | medium            |                                                              |
+  | fetch.max.bytes                                             | 57671680          |                                                              |
+  | fetch.purgatory.purge.interval.requests                     | 1000              |                                                              |
+  | group.initial.rebalance.delay.ms                            | 3000              |                                                              |
+  | group.max.session.timeout.ms                                | 1800000           |                                                              |
+  | group.max.size                                              | Long.MaxValue     |                                                              |
+  | group.min.session.timeout.ms                                | 6000              |                                                              |
+  | inter.broker.listener.name                                  | null              |                                                              |
+  | inter.broker.protocol.version                               | 2.5-IV0           |                                                              |
+  | log.cleaner.backoff.ms                                      | 15000             |                                                              |
+  | log.cleaner.dedupe.buffer.size                              | 134217728         |                                                              |
+  | log.cleaner.delete.retention.ms                             | 86400000          |                                                              |
+  | log.cleaner.enable                                          | true              |                                                              |
+  | log.cleaner.io.buffer.load.factor                           | 0.9               |                                                              |
+  | log.cleaner.io.buffer.size                                  | 524288            |                                                              |
+  | log.cleaner.io.max.bytes.per.second                         | Double.MaxValue   |                                                              |
+  | log.cleaner.max.compaction.lag.ms                           | Long.MaxValue     |                                                              |
+  | log.cleaner.min.cleanable.ratio                             | 0.5               |                                                              |
+  | log.cleaner.min.compaction.log.ms                           | 0                 |                                                              |
+  | log.cleaner.threads                                         | 1                 |                                                              |
+  | log.cleanup.policy                                          | delete            |                                                              |
+  | log.index.interval.bytes                                    | 4096              |                                                              |
+  | log.index.size.max.bytes                                    | 10485760          |                                                              |
+  | log.message.format.version                                  | 2.5-IV0           |                                                              |
+  | log.message.timestamp.difference.max.ms                     | Long.MaxValue     |                                                              |
+  | log.message.timestamp.type                                  | CreateTime        |                                                              |
+  | log.preallocate                                             | false             |                                                              |
+  | log.retention.check.interval.ms                             | 300000            |                                                              |
+  | max.connections                                             | Log.MaxValue      |                                                              |
+  | max.connections.per.ip                                      | Log.MaxValue      |                                                              |
+  | max.connections.per.ip.overrides                            | ""                |                                                              |
+  | max.incremental.fetch.session.cache.slots                   | 1000              |                                                              |
+  | num.partitions                                              | 1                 |                                                              |
+  | password.encoder.old.secret                                 | null              |                                                              |
+  | password.encoder.secret                                     | null              |                                                              |
+  | principal.builder.class                                     | null              |                                                              |
+  | producer.purgatory.purge.interval.requests                  | 1000              |                                                              |
+  | queued.max.request.bytes                                    | -1                |                                                              |
+  | replica.fetch.backoff.ms                                    | 1000              |                                                              |
+  | replica.fetch.max.bytes                                     | 1048576           |                                                              |
+  | replica.fetch.response.max.bytes                            | 10485760          |                                                              |
   |                                                             |                   |                                                              |
   | password.encoder.key.length                                 | 128               |                                                              |
   | password.encoder.keyfactory.algorithm                       | null              |                                                              |

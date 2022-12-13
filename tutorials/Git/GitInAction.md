@@ -1138,7 +1138,147 @@ git submodule update --init --recursive
 
 ## 7.99、如何一个项目配置2个远程地址？
 
-https://blog.csdn.net/weixin_53138343/article/details/123042388
+一个项目设置两个git地址，并最终实现一次性同时推送到两个git地址上。
+
+前提：
+
+1、假设你限制，在github上新创建了一个git地址A（里面已经有项目内容）
+
+```bash
+$ git@github.com:EmonCodingBackEnd/springcloud-config-repo.git
+```
+
+2、假设你在码云上面也创建了一个git地址B（可能是一个新建的空白项目地址）
+
+```bash
+$ git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git
+```
+
+现在想实现我在git地址A项目中，提交代码的同时，也提交到git地址B。
+
+- 方法1：（需要push两次，不符合目标，但有一个优点是可以pull两次）
+
+步骤1：在git地址A项目中添加另一个git地址B项目的远程地址
+
+```bash
+# origin2 可以自定义
+$ git remote add origin2 git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git
+```
+
+> 添加之前查看：
+>
+> ```bash
+> $ cat .git/config
+> [core]
+>         repositoryformatversion = 0
+>         filemode = false
+>         bare = false
+>         logallrefupdates = true
+>         symlinks = false
+>         ignorecase = true
+> [remote "origin"]
+>         url = git@github.com:EmonCodingBackEnd/springcloud-config-repo.git
+>         fetch = +refs/heads/*:refs/remotes/origin/*
+> [branch "master"]
+>         remote = origin
+>         merge = refs/heads/master
+> [branch "develop"]
+>         remote = origin
+>         merge = refs/heads/develop
+> ```
+>
+> 添加之后查看：
+>
+> ```bash
+> $ cat .git/config
+> [core]
+>         repositoryformatversion = 0
+>         filemode = false
+>         bare = false
+>         logallrefupdates = true
+>         symlinks = false
+>         ignorecase = true
+> [remote "origin"]
+>         url = git@github.com:EmonCodingBackEnd/springcloud-config-repo.git
+>         fetch = +refs/heads/*:refs/remotes/origin/*
+> [branch "master"]
+>         remote = origin
+>         merge = refs/heads/master
+> [branch "develop"]
+>         remote = origin
+>         merge = refs/heads/develop
+> [remote "origin2"]
+>         url = git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git
+>         fetch = +refs/heads/*:refs/remotes/origin2/*
+> ```
+
+步骤2：先拉取git地址B项目上的数据
+
+```bash
+# --allow-unrelated-histories是为了解决冲突
+$ git pull origin2 develop --allow-unrelated-histories
+```
+
+步骤3:在git地址A项目中把项目内容同步到git地址B项目中。
+
+```bash
+$ git push origin2 develop
+```
+
+此时，我们基本实现了可以把一个项目可以提交到两个git地址了，但是每次提交内容都需要进行如下两次提交，才能实现把一个项目同时提交到两个git地址。
+
+```bash
+$ git push origin develop
+$ git push origin2 develop
+```
+
+
+
+- 方法2：如何提交一次，同步两个项目？
+
+注意：删除上面添加的git地址B项目的远程地址。
+
+```bash
+# 查看
+$ git remote -v
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (fetch)
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (push)
+origin2 git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git (fetch)
+origin2 git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git (push)
+
+# 删除
+$ git remote rm origin2
+
+# 再次查看
+$ git remote -v
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (fetch)
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (push)
+```
+
+给origin增加一个可以push的地址：
+
+```bash
+$ git remote set-url --add origin git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git
+
+$ git remote -v
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (fetch)
+origin  git@github.com:EmonCodingBackEnd/springcloud-config-repo.git (push)
+origin  git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git (push)
+```
+
+OK！完成！
+
+```bash
+$ git push origin develop
+```
+
+问？如何删除路径？
+
+```bash
+$ git remote set-url --delete origin git@gitee.com:EmonCodingBackEnd/springcloud-config-repo.git
+```
+
+
 
 # 八、Git Flow——以发布为中心的开发模式
 
