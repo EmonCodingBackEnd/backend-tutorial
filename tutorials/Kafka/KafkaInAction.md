@@ -546,7 +546,7 @@ Producer默认是随机将数据发送到topic的不同分区中，也可以根�
 
 ### 4.2.3、Consumer扩展
 
-在消费者中海油一个消费者组的概念。
+在消费者中还有一个消费者组的概念。
 
 每个consumer属于一个消费者组，通过group.id指定消费者组。
 
@@ -620,6 +620,9 @@ Kafka中数据的存储方式是这样的：
 
 1. 每个partition由多个segment【片段】组成，每个segment中存储多条消息。
 2. 每个partition在内存中对应一个index，记录每个segment中的第一条消息偏移量。
+3. 每个partition会将消息添加到最后一个segment上
+4. 当segment达到一定阈值会flush到磁盘上
+5. segment文件分为两个部分：index和data（*.log文件）
 
 Kafka中数据的存储流程是这样的：
 生产者生产的消息会被发送到topic的多个partition上，topic收到消息后往对应partition的最后一个segment上添加该消息，segment达到一定的大小后会创建新的segment。
@@ -646,7 +649,7 @@ Kafka中数据的存储流程是这样的：
 [emon@emon ~]$ kill 82383
 ```
 
-我们可以先通过zookeeper来查看一下，因为当Kafka集群中的broker几点启动之后，会自动向zookeeper中进行注册，保存当前节点信息。
+我们可以先通过zookeeper来查看一下，因为当Kafka集群中的broker节点启动之后，会自动向zookeeper中进行注册，保存当前节点信息。
 
 ```bash
 [emon@emon ~]$ zkCli.sh 
@@ -657,7 +660,7 @@ Kafka中数据的存储流程是这样的：
 [1, 2]
 ```
 
-此时发现zookeeper的/brokers/ids下面只有2个节点信息。
+此时发现zookeeper的`/brokers/ids`下面只有2个节点信息。
 
 可以通过get命令查看节点信息，这里面会显示对应的主机名和端口号。
 
@@ -669,7 +672,7 @@ Kafka中数据的存储流程是这样的：
 然后再使用describe查询topic的详细信息，会发现此时的分区的leader全部变成了目前存活的另外两个节点。
 
 ```bash
-[emon@emon ~]$ kafka-topics.sh --describe --zookeeper emon:2181 --topic hello
+[emon@emon ~]$ kafka-topics.sh --bootstrap-server emon:9092 --describe --topic hello
 Topic: hello	PartitionCount: 5	ReplicationFactor: 2	Configs: 
 	Topic: hello	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
 	Topic: hello	Partition: 1	Leader: 2	Replicas: 2,0	Isr: 2
@@ -873,30 +876,6 @@ Kafka可以实现以下三种语义，这三种语义是针对消费者而言的
 - Kafka基本不会因为节点故障而丢失数据。
 - Kafka的语义担保（acks=all）也很大程度上避免数据丢失。
 - Kafka会对消息进行集群内平衡，减少消息在某些节点热度过高。
-
-### 3、Kafka集群之Leader选举
-
-- Kafka并没有采用多数投票来选举Leader（ZK、ES、Redis采用多数投票方式选举）
-
-  - 原因1：防止选举时，选举到了数据不全的broker；比如有三个节点，其中2个有10000条数据，另外1个只有9000条数据，如果采取多数投票选到了9000条的节点，就会导致丢失1000条数据。
-  - 原因2：当选举没有通过一轮就产生时（比如平票、弃票），需要额外的第二轮、第三轮甚至更多次，比较耗费时间；
-
-- Kafka会动态维护一组Leader数据的副本（ISR）
-
-- Kafka会在ISR中选择一个速度比较快的设置为Leader
-
-  - Watch
-
-  >由于Kafka集群依赖ZooKeeper集群，所以最简单的方案是所有follower都在ZooKeeper上设置一个watch。第一个启动的broker会在ZooKeeper中创建临时的Controller节点，其他Broker启动时会尝试创建Controller节点，如果已存在该节点，在Zookeeper中创建Watch对象，接收控制器变更的通知。如果broker中的leader节点挂掉，其他broker通过watch收到Controller变更的通知，尝试创建临时节点Controller，一旦创建成功，其他节点继续watch。
-  >
-  >Controller的作用：主要是管其他的Broker有没有损坏，如果损坏了，其上面有多少Leader和Follower，紧接着做重新分配。
-
-  - Kafka之Partition选举
-
-  所有Partition的Leader选举都由Controller决定。Controller会将Leader的改变直接通过RPC的方式通知需为此作为响应的Broker。Partition的选举过程主要为从Zookeeper中读取当前分区的所有ISR集合，调用配置的分区选择算法选择分区的Leader。
-
-- Leader选举配置建议
-  - ISR中副本全部宕机，会启用Unclean Leader选举。生产上应该禁用Unclean Leader。手动指定最小的ISR。
 
 # 五、Kafka技巧篇
 
@@ -2748,7 +2727,327 @@ curl -X DELETE -i 'http://emon:8083/connectors/emon-download-mysql'
 
 
 
+# 九十、Kafka Interview Guide
 
+## 90.1、Kafka常见应用场景
+
+类似问题：Kafka与其他消息中间件异同点
+
+- Kafka概念及优劣势分析
+
+  - Kafka概念：分布式流处理平台
+
+  - Kafka特性一：提供发布订阅及Topic支持
+
+  - Kafka特性二：吞吐量高但不保证消息有序（同一个partition有序，多个之间无序）
+
+- Kafka常见应用场景
+
+  - 日志收集或流式系统
+  - 消息系统（如果对消息顺序不作要求）
+  - 用户活动跟踪或运营指标监控
+
+## 90.2、Kafka吞吐量为什么大？
+
+类似问题：Kafka速度为什么快？
+
+- Kafka面试题分析
+  - 日志顺序读写和快速检索
+  - Partition机制
+  - 批量发送接收及数据压缩机制
+  - 通过sendfile实现零拷贝原则
+
+## 90.3、Kafka底层原理之日志
+
+- Kafka的日志是以Partition为单位进行保存
+- 日志目录格式为Topic名称+数字
+  - 比如：`test-0`,`test-1`，表示test有2个分区，对应2个目录
+
+- 日志文件格式是一个“日志条目”序列
+
+  ```bash
+  00000000000000000000.index
+  00000000000000000000.log
+  00000000000000000000.timeindex
+  leader-epoch-checkpoint
+  ```
+
+- 每条日志消息由4字节整形与N字节消息组成
+
+  ```bash
+  message length : 4 bytes (value: 1+4+n) // 消息长度
+  "magic" value  : 1 byte                 // 版本号
+  crc            : 4 bytes                // CRC校验码
+  payload        : n bytes	            // 具体的消息
+  ```
+
+- 日志分段
+  - 每个Partition的日志会分为N个大小相等的segment
+  - 每个segment中消息数量不一定相等
+  - 每个Partition只支持顺序读写（磁盘的顺序读写，比内存的随机读写，快！）
+
+## 90.4、Kafka零拷贝原理
+
+零拷贝：所谓零拷贝，就是把两次多余的拷贝（2和3）忽略掉，应用程序可以直接把磁盘中的数据，从内核中直接传输到socket，而不需要再次经过应用程序所在的用户空间。
+
+Linux系统中，零拷贝依赖于底层的sendfile()方法实现的。
+
+- 四次拷贝
+
+![image-20221218153931896](images/image-20221218153931896.png)
+
+- 两次拷贝
+
+![image-20221218154922710](images/image-20221218154922710.png)
+
+## 90.5、Kafka消费者组与消费者
+
+- Kafka消费者组是Kafka消费的单位
+- 单个Partition只能由消费者组中某个消费者消费
+- 消费者组中的单个消费者可以消费多个Partition
+
+## 90.6、Kafka生产者客户端
+
+[Kafka Producer介绍](https://www.cnblogs.com/huxi2b/p/6364613.html)
+
+- ProducerRecord
+
+一个ProducerRecord表示一条待发送的消息记录，主要由5个字段构成：
+
+| 字段      | 含义      |
+| --------- | --------- |
+| topic     | 所属topic |
+| partition | 所属分区  |
+| key       | 键值      |
+| value     | 消息体    |
+| timestamp | 时间戳    |
+
+ProducerRecord允许用户在创建消息对象的时候就直接指定要发送的分区，这样producer后续发送该消息时可以直接发送到指定分区，而不用再通过Partitioner计算目标分区了。
+
+另外，我们还可以直接指定消息的时间戳——但一定要慎重使用这个功能，因为它有可能会令时间戳索引机制失效。
+
+- RecordMetadata
+
+该类表示Kafka服务器端，返回给客户端的消息的元数据信息，包含以下内容：
+
+| 字段                | 描述                   |
+| ------------------- | ---------------------- |
+| offset              | 该条消息的位移         |
+| timestamp           | 消息时间戳             |
+| topic+partition     | 所属topic的分区        |
+| checksum            | 消息CRC32码            |
+| serializedKeySize   | 序列化后的消息键字节数 |
+| serializedValueSize | 序列化后的消息体字节数 |
+
+上面 元数据信息前3项比较重要，producer端可以使用这些信息做一些消息发送成功之后的处理，比如写入日志等。
+
+- 基本设计特点
+
+结合源代码，Producer从设计上来讲有以下几个特点（或者说是优势）：
+
+1. 总共创建两个线程：执行KafkaProducer.send逻辑的线程——我们称之为“用户主线程”；执行发送逻辑的IO线程——我们称之为“sender线程”。
+2. 不同于Scala老版本的producer，新版本producer完全异步发送消息，并提供了回调机制（callback）供用户判断消息是否发送成功。
+3. batching机制——“分批发送”机制。每个批次（batch）中包含了若干个PRODUCE请求，因此具有更高的吞吐量。
+4. 跟家合理的默认分区策略：对于无key消息而言，Scala版本分区策略是一段时间内（默认是10分钟）将消息发往固定的目标分区，这容易造成消息分布的不均匀，而新版本的Producer采用轮询的方式均匀地将消息分发到不同的Partition。
+5. 底层统一使用基于Selector的网络客户端实现，结合Java提供的Future实现完整地提供了更加健壮和优雅的生命周期管理。
+
+- Kafka Producer客户端时序图
+
+![image-20221218160757614](images/image-20221218160757614.png)
+
+- Kafka Producer客户端流程图
+
+![image-20221218160927496](images/image-20221218160927496.png)
+
+## 90.7、Kafka消息有序性处理
+
+- Kafka的特性只支持Partition有序
+
+- 使用Kafka Key + offset可以做到业务有序
+
+## 90.8、Kafka Topic删除背后的故事
+
+![image-20221218174232804](images/image-20221218174232804.png)
+
+Kafka的Topic删除存在的问题会比较多，
+
+建议设置`auto.create.topics.enable=false`
+
+建议设置delete.topic.enable=true
+
+建议先停掉流量，再执行删除！
+
+## 90.9、Kafka消息重复消费和漏消费原理分析
+
+本质上是offset控制出现了问题。
+
+- 重复消费常见场景
+
+  - 人为原因，尤其是在Consumer的使用上
+
+  - 程序处理原因，尤其是单次消费超时的情况
+
+  - Kafka机制：消费者重平衡时offset未控制好
+
+## 90.10、Kafka消费者线程安全性分析
+
+- Kafka的Consumer不是线程安全的
+- Kafka的Consumer并发消费的两种方式
+  - 多Consumer多线程【推荐】
+  - 单Consumer多线程
+
+## 90.11、Kafka Leader选举分析
+
+- Kafka并没有采用多数投票来选举Leader（ZK、ES、Redis采用多数投票方式选举）
+
+  - 原因1：防止选举时，选举到了数据不全的broker；比如有三个节点，其中2个有10000条数据，另外1个只有9000条数据，如果采取多数投票选到了9000条的节点，就会导致丢失1000条数据。**也即，新的Leader必须要尽量包含所有消息，即消息完整性**。
+  - 原因2：当选举没有通过一轮就产生时（比如平票、弃票），需要额外的第二轮、第三轮甚至更多次，比较耗费时间。**也即，不能产生过多的冗余导致过多的磁盘IO**。
+
+- Kafka为了保证数据一致性，使用了ISR机制
+
+  - 首先我们知道Kafka的数据是多副本的，某个topic的replication-factor为N，且N大于1时，每个Partition都会有N个副本（Replica）。Kafka的Replica包含leader与follower。每个topic下的每个分区下都有一个leader和（N-1）个follower。
+  - 每个follower的数据都是同步leader的，这里需要注意，**是follower主动拉取leader的数据**。
+  - Replical的个数小于等于Broker的个数，也就是说，对于每个Partition而言，每个Broker上最多只会有一个Replica，因此可以使用Broker id指定Partition的Replica。
+
+- Kafka会动态维护一组Leader数据的同步副本ISR(In-Sync Replicas)
+
+  - 条件1：根据副本和leader的交互时间差，如果大于某个时间差，就认定这个副本不行了，从ISR剔除。
+
+  > 时间差参数：
+  > replica.lag.time.max.ms=10000
+  > 也就是默认10s，isr中的follow没有向isr发送心跳包就会被移除
+
+  - 条件2：（已废弃）根据leader和副本的信息条数差值决定是否从ISR中剔除此副本，此信息条数差值根据配置参数
+
+  > replica.lag.max.messages=4000
+  >
+  > 也就是默认消息差值大于4000会被移除
+  >
+  > 【已废弃】避免极端情况下，producer一次性发来1万条消息，会大于4000，而导致同步副本被剔除
+
+- **Kafka会在ISR中选择一个速度比较快的设置为Leader**
+
+  - Watch
+
+  由于Kafka集群依赖ZooKeeper集群，所以最简单的方案是所有follower都在ZooKeeper上设置一个watch。第一个启动的broker会在ZooKeeper中创建临时的Controller节点，其他Broker启动时会尝试创建Controller节点，如果已存在该节点，在Zookeeper中创建Watch对象，接收控制器变更的通知。如果broker中的leader节点挂掉，其他broker通过watch收到Controller变更的通知，尝试创建临时节点Controller，一旦创建成功，其他节点继续watch。
+
+  Controller的作用：主要是管控其他的Broker有没有损坏，如果损坏了，其上面有多少Leader和Follower，紧接着做重新分配。
+
+  - Kafka之Partition选举
+
+  所有Partition的Leader选举都由Controller决定。Controller会将Leader的改变直接通过RPC的方式通知需为此作为响应的Broker。Partition的选举过程主要为从Zookeeper中读取当前分区的所有ISR集合，调用配置的分区选择算法选择分区的Leader。
+
+- Leader选举配置建议
+  - ISR中副本全部宕机，会启用Unclean Leader（也即在ISR之外找一个Follower作为Leader）选举。生产上应该禁用Unclean Leader。手动指定最小的ISR（`min.insync.replicas`默认值1）。
+  - `unclean.leader.election.enable`的默认值是false，指示是否在万不得已的情况下**也不启用**不在ISR集中的副本作为领导者，避免导致数据丢失。
+
+## 90.12、Kafka幂等性源码分析
+
+- 什么是幂等性
+
+如果服务器收到接口的重试，能被认为是同一个请求处理，就是幂等性。
+
+- Kafka为什么会产生幂等性问题
+
+Producer设置acks=-1会期望所有ISR（同步replicas）都收到数据的确认，如果有一个没有确认会导致重发。
+
+- Kafka有哪些幂等性问题
+  - 单体幂等性依赖pid（ProducerId)和sequenceNumber（批次）
+  - 单体幂等性相关配置：ProducerConfig级别的`enable.idempotence=true`，该属性默认值：false
+  - 全局性幂等性依赖事务保证
+
+## 90.13、Kafka事务支持实现及原理分析
+
+- 什么是事务
+
+事务提供的安全性保障是经典的 ACID，
+
+即**原子性（Atomicity）、一致性 (Consistency)**、**隔离性 (Isolation)** 和**持久性 (Durability)**。
+
+- Kafka隔离级别
+
+**已提交读（read committed）隔离级别**
+
+所谓的 read committed，指的是当读取数据库时，只能看到已提交的数据，即无脏读。
+
+同时，当写入数据库时，只能覆盖掉已提交的数据，即无脏写。
+
+**目前kafka是已提交读（read committed）隔离级别**,
+
+能保证多条消息原子性地写入到目标分区，同时也能保证 Consumer 只能看到事务成功提交的消息。
+
+- 事务型Producer
+
+事务型 Producer 能够保证将**消息原子性地写入到多个分区中**。这批消息要么**全部写入成功，要么全部失败**。另外，事务型 Producer 也不惧进程的重启。Producer 重启回来后，Kafka 依然保证它们发送消息的精确一次处理。
+
+- Kafka事务实现方式
+
+  - 添加`transactional_id`配置和`retries`配置
+
+    ```bash
+    # 要求retries必须大于0
+    retries=2
+    transactional.id=emon-trans-id
+    ```
+
+  - 完成事务的初始化和开启
+
+    ```bash
+    # 初始化事务
+    kafkaProducer.initTransactions();
+    # 事务开启
+    kafkaProducer.beginTransaction();
+    ```
+
+  - 事务完成记得Commit或者abort
+
+    ```bash
+    # 事务提交
+    kafkaProducer.commitTransaction();
+    # 事务回滚
+    kafkaProducer.abortTransaction()
+    ```
+
+  - 事务实现的核心是Coordinator
+
+示例代码：
+
+```java
+// 其他配置
+// ......
+// 1、事务支持配置
+properties.put(ProducerConfig.RETRIES_CONFIG, "2"); // 不为0即可
+properties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "emon-trans-id");
+
+// Producer的主对象
+KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(properties);
+
+// 2、初始化事务
+kafkaProducer.initTransactions();
+try {
+    // 3、事务开启
+    kafkaProducer.beginTransaction();
+    // 消息对象 - ProducerRecord
+    for (int i = 0; i < 10; i++) {
+        String key = "key-" + i;
+        String value = "value-" + i;
+        ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_NAME, key, value);
+        kafkaProducer.send(record);
+        if (i == 8) {
+            throw new Exception();
+        }
+    }
+    // 4-1、事务提交
+    kafkaProducer.commitTransaction();
+} catch (Exception e) {
+    e.printStackTrace();
+    // 4-2、事务回滚
+    kafkaProducer.abortTransaction();
+} finally {
+    // 所有的通道打开都需要关闭
+    kafkaProducer.close();
+}
+```
 
 # 九十九、Kafka配置全解析
 
@@ -2778,180 +3077,325 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
 
 主题级的配置和默认值如下：
 
-- | 属性                                                        | 默认值            | 描述                                                         |
-  | ----------------------------------------------------------- | ----------------- | ------------------------------------------------------------ |
-  | zookeeper.connect                                           |                   | ZooKeeper连接字符串的格式为：`hostname:port`，此处hostname和port分别是ZooKeeper集群中某个节点的host和port；为了当某个host当掉之后你能通过其他ZooKeeper节点进行连接，你可以按照以下方式指定多个主机：`hostname1:port1,hostname2:port2,hostname2:port3`。<br />ZooKeeper允许你增加一个“chroot”路径，将集群中所有Kafka数据存放在特定的路径下。当多个Kafka集群或者其他应用使用相同ZooKeeper集群时，可以使用这个方式设置数据存放路径。这种方式的实现可以通过这样设置连接字符串格式，如下所示：`hostname1:port1,hostname2:port2,hostname3:port3/chroot/path` 这样设置就将所有Kafka集群数据存放在`/chroot/path`路径下。注意，在你启动broker之前，你必须创建这个路径，并且consumers必须使用相同的连接格式。 |
-  | advertised.host.name                                        | null              | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的Hostname。在IaaS环境下，该值可能需要与broker绑定的接口不同。该值未设置情况下，如果`host.name`配置了，则使用`host.name`；否则，将使用`java.net.InetAddress.getCanonicalHostName()`返回的值。 |
-  | advertised.listeners                                        | null              | 给客户端用的发布至ZooKeeper的监听，broker会上送此地址到ZooKeeper，ZooKeeper会将此地址提供给消费者，消费者根据此地址获取消息。如果和`listeners`不同，则以此为准，在IaaS环境，此配置项可能和broker绑定的接口主机名不同，如果此配置项没有配置则以`listeners`为准。 |
-  | advertised.port                                             | null              | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的端口号。在IaaS环境下，该值可能需要与broker绑定的接口不同。如果该值未设置，则发布的端口与broker绑定的端口相同。 |
-  | auto.create.topics.enable                                   | true              | 启用服务端自动创建topic。                                    |
-  | auto.leader.rebalance.enable                                | true              | 是否允许定期进行leader选举。                                 |
-  | background.threads                                          | 10                | 用于各种后台处理任务的线程数。                               |
-  | broker.id                                                   | -1                | 服务端的broker id。如果未设置，一个唯一的broker id将生成。为了避免ZooKeeper生成的broker id和用户配置的broker id之间产生冲突，生成的broker id从`reserved.broker.max.id`+1开始。 |
-  | compression.type                                            | producer          | 对给定的topic指定压缩类型。可接受的值有('gzip','snappy','lz4','zstd')。另外，还可以接收`uncompressed`表示不压缩，以及`producer`表示保留生产者的原始压缩编解码器。 |
-  | control.plane.listener.name                                 | null              | 用于Controller和Broker之间通信的监听器名称，Broker将会使用该配置来定位监听列表中的EndPoint。如果未设置，则默认使用`inter.broker.listener.name`来通信，没有专门的链接。 |
-  | delete.topic.enable                                         | true              | 启用删除topic。如果关闭此配置项，通过管理工具删除主题将无效。 |
-  | host.name                                                   | ""                | 【已弃用】仅在listeners未设置时使用。使用listeners替代了。broker的hostname，如果设置了，将绑定到该地址上。如果未设置，绑定到所有网卡上。 |
-  | leader.imbalance.check.interval.seconds                     | 300               | 默认300s，也即5分钟扫描一次，控制器触发分区再平衡检查的频率。 |
-  | leader.imbalance.per.broker.percentage                      | 10                | 每个broker所能允许的leader失衡比率。如果超过该百分比，控制器将触发leader重新平衡。 |
-  | listeners                                                   | null              | 监听列表，broker对外提供服务时绑定的ip和端口。多个之间逗号分隔，如果监听器名称不是一个安全的协议，`listener.security.protocol.map`必须设置。主机名设置为0.0.0.0表示绑定所有接口，主机名为空这绑定默认的接口。例如：`PLAINTEXT://myhost:9092,SSL://:9091`<br />`CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093` |
-  | log.dir                                                     | /tmp/kafka-logs   | 日志数据的存储目录，对`log.dirs`的补充。                     |
-  | log.dirs                                                    | null              | 日志数据的存放目录，如果未设置，将使用`log.dir`。            |
-  | log.flush.interval.messages                                 | Long.MaxValue     | 消息刷新到磁盘之前，日志分区上积累的消息数量。               |
-  | log.flush.interval.ms                                       | null              | 消息刷新到磁盘之前，日志在内存中停留的最大毫秒数。如果未设置，将使用`log.flush.scheduler.interval.ms`。 |
-  | log.flush.offset.checkpoint.interval.ms                     | 60000             | 用于更新日志恢复点持久记录的频率。                           |
-  | log.flush.scheduler.interval.ms                             | Long.MaxValue     | 检测日志是否需要刷新到磁盘的频率，单位毫秒                   |
-  | log.flush.start.offset.checkpoint.interval.ms               | 60000             | 更新日志持久化日志记录的开始偏移量的频率                     |
-  | log.retention.bytes                                         | -1                | 日志被删除之前的最大尺寸，即日志保留的最大大小               |
-  | log.retention.hours                                         | 168               | 日志文件删除之前保留的时间，单位小时                         |
-  | log.retention.minutes                                       | null              | 日志文件删除之前保留的时间，单位分钟；未设置默认使用`log.retention.hours` |
-  | log.retention.ms                                            | null              | 日志文件删除之前保留的时间，单位毫秒；未设置默认使用`log.retention.minutes`，-1表示永久 |
-  | log.roll.hours                                              | 168               | 在新日志segment展开之前的最大时间，单位：小时                |
-  | log.roll.ms                                                 | null              | 新日志segment展开之前的最大时间，单位：毫秒；如果未设置，`log.roll.hours`将被使用。 |
-  | log.roll.jitter.hours                                       | 0                 | 指定日志切分段的小时数，避免日志切分时造成惊群               |
-  | log.roll.jitter.ms                                          | null              | 指定日志切分段的毫秒数，如果不设置，默认使用log.roll.jitter.hours |
-  | log.segment.bytes                                           | 1073741824（1G）  | 单个日志文件的最大尺寸                                       |
-  | log.segment.delete.delay.ms                                 | 60000             | 日志文件被真正删除之前保留的时间                             |
-  | message.max.bytes                                           | 1048588（约1M）   | 最大记录批大小                                               |
-  | min.insync.replicas                                         | 1                 | 当生产者acks为-1(all)时，该值指定了最小副本数量，这些副本必须确认写操作，才能认为写操作成功。如果不能满足这个最小值，那么生产者将抛出异常。 |
-  | num.io.threads                                              | 8                 | 服务器用于处理请求的线程数，其中可能包括磁盘I/O。            |
-  | num.network.threads                                         | 3                 |                                                              |
-  | num.recovery.threads.per.data.dir                           | 1                 |                                                              |
-  | num.replica.alter.log.dirs.threads                          | null              |                                                              |
-  | num.replica.fetchers                                        | 1                 |                                                              |
-  | offset.metadata.max.bytes                                   | 4096              |                                                              |
-  | offsets.commit.required.acks                                | -1                |                                                              |
-  | offsets.commit.timeout.ms                                   | 5000              |                                                              |
-  | offsets.load.buffer.size                                    | 5242880（5M）     |                                                              |
-  | offsets.retention.check.interval.ms                         | 600000            |                                                              |
-  | offsets.retention.minutes                                   | 10080             |                                                              |
-  | offsets.topic.compression.codec                             | 0                 |                                                              |
-  | offsets.topic.num.partitions                                | 50                |                                                              |
-  | offsets.topic.replication.factor                            | 3                 |                                                              |
-  | offsets.topic.segment.bytes                                 | 104857600（100M） |                                                              |
-  | port                                                        | 9092              |                                                              |
-  | queued.max.requests                                         | 500               |                                                              |
-  | quota.consumer.default                                      | Long.MaxValue     |                                                              |
-  | quota.producer.default                                      | Long.MaxValue     |                                                              |
-  | replica.fetch.min.bytes                                     | 1                 |                                                              |
-  | replica.fetch.max.bytes                                     | 1048576           |                                                              |
-  | replica.high.watermark.checkpoint.interval.ms               | 5000              |                                                              |
-  | replica.lag.time.max.ms                                     | 30000             |                                                              |
-  | replica.socket.receive.buffer.bytes                         | 65536             |                                                              |
-  | replica.socket.timeout.ms                                   | 30000             |                                                              |
-  | rerquest.timeout.ms                                         | 30000             |                                                              |
-  | socket.receive.buffer.bytes                                 | 102400            |                                                              |
-  | socket.request.max.bytes                                    | 104857600         |                                                              |
-  | socket.send.buffer.bytes                                    | 102400            |                                                              |
-  | transaction.max.timeout.ms                                  | 900000            |                                                              |
-  | transaction.state.log.load.buffer.size                      | 5242880           |                                                              |
-  | transaction.state.log.min.isr                               | 2                 |                                                              |
-  | transaction.state.log.num.partitions                        | 50                |                                                              |
-  | transaction.state.log.replication.factor                    | 3                 |                                                              |
-  | transaction.state.log.segment.bytes                         | 104857600         |                                                              |
-  | transaction.id.expiration.ms                                | 604800000         |                                                              |
-  | unclean.leader.election.enable                              | false             |                                                              |
-  | zookeeper.connection.timeout.ms                             | null              |                                                              |
-  | zookeeper.max.in.flight.requests                            | 10                |                                                              |
-  | zookeeper.session.timeout.ms                                | 18000             |                                                              |
-  | zookeeper.set.acl                                           | false             |                                                              |
-  | broker.id.generation.enable                                 | true              |                                                              |
-  | broker.rack                                                 | null              |                                                              |
-  | connections.max.idle.ms                                     | 600000            |                                                              |
-  | connections.max.reauth.ms                                   | 0                 |                                                              |
-  | controlled.shutdown.enable                                  | true              |                                                              |
-  | controlled.shutdown.max.retries                             | 3                 |                                                              |
-  | controlled.shutdown.retry.backoff.ms                        | 5000              |                                                              |
-  | controller.socket.timeout.ms                                | 30000             |                                                              |
-  | default.replication.factor                                  | 1                 |                                                              |
-  | delegation.token.expiry.time.ms                             | 86400000          |                                                              |
-  | delegation.token.master.key                                 | null              |                                                              |
-  | delegation.token.max.lifetime.ms                            | 604800000         |                                                              |
-  | delete.records.purgatory.purge.interval.requests            | medium            |                                                              |
-  | fetch.max.bytes                                             | 57671680          |                                                              |
-  | fetch.purgatory.purge.interval.requests                     | 1000              |                                                              |
-  | group.initial.rebalance.delay.ms                            | 3000              |                                                              |
-  | group.max.session.timeout.ms                                | 1800000           |                                                              |
-  | group.max.size                                              | Long.MaxValue     |                                                              |
-  | group.min.session.timeout.ms                                | 6000              |                                                              |
-  | inter.broker.listener.name                                  | null              |                                                              |
-  | inter.broker.protocol.version                               | 2.5-IV0           |                                                              |
-  | log.cleaner.backoff.ms                                      | 15000             |                                                              |
-  | log.cleaner.dedupe.buffer.size                              | 134217728         |                                                              |
-  | log.cleaner.delete.retention.ms                             | 86400000          |                                                              |
-  | log.cleaner.enable                                          | true              |                                                              |
-  | log.cleaner.io.buffer.load.factor                           | 0.9               |                                                              |
-  | log.cleaner.io.buffer.size                                  | 524288            |                                                              |
-  | log.cleaner.io.max.bytes.per.second                         | Double.MaxValue   |                                                              |
-  | log.cleaner.max.compaction.lag.ms                           | Long.MaxValue     |                                                              |
-  | log.cleaner.min.cleanable.ratio                             | 0.5               |                                                              |
-  | log.cleaner.min.compaction.log.ms                           | 0                 |                                                              |
-  | log.cleaner.threads                                         | 1                 |                                                              |
-  | log.cleanup.policy                                          | delete            |                                                              |
-  | log.index.interval.bytes                                    | 4096              |                                                              |
-  | log.index.size.max.bytes                                    | 10485760          |                                                              |
-  | log.message.format.version                                  | 2.5-IV0           |                                                              |
-  | log.message.timestamp.difference.max.ms                     | Long.MaxValue     |                                                              |
-  | log.message.timestamp.type                                  | CreateTime        |                                                              |
-  | log.preallocate                                             | false             |                                                              |
-  | log.retention.check.interval.ms                             | 300000            |                                                              |
-  | max.connections                                             | Log.MaxValue      |                                                              |
-  | max.connections.per.ip                                      | Log.MaxValue      |                                                              |
-  | max.connections.per.ip.overrides                            | ""                |                                                              |
-  | max.incremental.fetch.session.cache.slots                   | 1000              |                                                              |
-  | num.partitions                                              | 1                 |                                                              |
-  | password.encoder.old.secret                                 | null              |                                                              |
-  | password.encoder.secret                                     | null              |                                                              |
-  | principal.builder.class                                     | null              |                                                              |
-  | producer.purgatory.purge.interval.requests                  | 1000              |                                                              |
-  | queued.max.request.bytes                                    | -1                |                                                              |
-  | replica.fetch.backoff.ms                                    | 1000              |                                                              |
-  | replica.fetch.max.bytes                                     | 1048576           |                                                              |
-  | replica.fetch.response.max.bytes                            | 10485760          |                                                              |
-  |                                                             |                   |                                                              |
-  | password.encoder.key.length                                 | 128               |                                                              |
-  | password.encoder.keyfactory.algorithm                       | null              |                                                              |
-  | quota.window.num                                            | 11                |                                                              |
-  | quota.window.size.seconds                                   | 1                 |                                                              |
-  | replication.quota.window.num                                | 11                |                                                              |
-  | replication.quota.window.size.seconds                       | 1                 |                                                              |
-  | security.providers                                          | null              |                                                              |
-  | ssl.endpoint.identification.algorithm                       | https             |                                                              |
-  | ssl.principal.mapping.rules                                 | DEFAULT           |                                                              |
-  | ssl.secure.random.implementation                            | null              |                                                              |
-  | transaction.abort.timed.out.transaction.cleanup.interval.ms | 10000             |                                                              |
-  | transaction.remove.expired.transaction.cleanup.interval.ms  | 3600000           |                                                              |
-  | zookeeper.ssl.cipher.suites                                 | null              |                                                              |
-  | zookeeper.ssl.crl.enable                                    | false             |                                                              |
-  | zookeeper.ssl.enabled.protocols                             | null              |                                                              |
-  | zookeeper.ssl.endpoint.identification.algorithm             | HTTPS             |                                                              |
-  | zookeeper.ssl.ocsp.enable                                   | false             |                                                              |
-  | zookeeper.ssl.protocol                                      | TLSv1.2           |                                                              |
-  | zookeeper.sync.time.ms                                      | 2000              |                                                              |
-  | group.min.session.timeout.ms                                | 6000              | 注册消费者允许的`session.timeout.ms`的最小值。更短的超时时间会导致更快的故障检测，代价是更频繁的消费者心跳，这可能会压垮代理资源。 |
-  | group.max.session.timeout.ms                                | 1800000           | 注册消费者允许的`session.timeout.ms`的最大值。更长的超时时间让消费者有更多的时间在心跳之间处理消息，但代价是检测失败的时间更长。 |
+| 属性                                                        | 默认值                        | 描述                                                         |
+| ----------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
+| zookeeper.connect                                           |                               | ZooKeeper连接字符串的格式为：`hostname:port`，此处hostname和port分别是ZooKeeper集群中某个节点的host和port；为了当某个host当掉之后你能通过其他ZooKeeper节点进行连接，你可以按照以下方式指定多个主机：`hostname1:port1,hostname2:port2,hostname2:port3`。<br />ZooKeeper允许你增加一个“chroot”路径，将集群中所有Kafka数据存放在特定的路径下。当多个Kafka集群或者其他应用使用相同ZooKeeper集群时，可以使用这个方式设置数据存放路径。这种方式的实现可以通过这样设置连接字符串格式，如下所示：`hostname1:port1,hostname2:port2,hostname3:port3/chroot/path` 这样设置就将所有Kafka集群数据存放在`/chroot/path`路径下。注意，在你启动broker之前，你必须创建这个路径，并且consumers必须使用相同的连接格式。 |
+| advertised.host.name                                        | null                          | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的Hostname。在IaaS环境下，该值可能需要与broker绑定的接口不同。该值未设置情况下，如果`host.name`配置了，则使用`host.name`；否则，将使用`java.net.InetAddress.getCanonicalHostName()`返回的值。 |
+| advertised.listeners                                        | null                          | 给客户端用的发布至ZooKeeper的监听，broker会上送此地址到ZooKeeper，ZooKeeper会将此地址提供给消费者，消费者根据此地址获取消息。如果和`listeners`不同，则以此为准，在IaaS环境，此配置项可能和broker绑定的接口主机名不同，如果此配置项没有配置则以`listeners`为准。 |
+| advertised.port                                             | null                          | 【已废弃】，仅当`advertised.listeners`或`listeners`未设置时启用；目前已使用`advertised.listeners`替代。发布到ZooKeeper以供客户端使用的端口号。在IaaS环境下，该值可能需要与broker绑定的接口不同。如果该值未设置，则发布的端口与broker绑定的端口相同。 |
+| auto.create.topics.enable                                   | true                          | 启用服务端自动创建topic。                                    |
+| auto.leader.rebalance.enable                                | true                          | 是否允许定期进行leader选举。                                 |
+| background.threads                                          | 10                            | 用于各种后台处理任务的线程数。                               |
+| broker.id                                                   | -1                            | 服务端的broker id。如果未设置，一个唯一的broker id将生成。为了避免ZooKeeper生成的broker id和用户配置的broker id之间产生冲突，生成的broker id从`reserved.broker.max.id`+1开始。 |
+| compression.type                                            | producer                      | 对给定的topic指定压缩类型。可接受的值有('gzip','snappy','lz4','zstd')。另外，还可以接收`uncompressed`表示不压缩，以及`producer`表示保留生产者的原始压缩编解码器。 |
+| control.plane.listener.name                                 | null                          | 用于Controller和Broker之间通信的监听器名称，Broker将会使用该配置来定位监听列表中的EndPoint。如果未设置，则默认使用`inter.broker.listener.name`来通信，没有专门的链接。 |
+| delete.topic.enable                                         | true                          | 启用删除topic。如果关闭此配置项，通过管理工具删除主题将无效。 |
+| host.name                                                   | ""                            | 【已弃用】仅在listeners未设置时使用。使用listeners替代了。broker的hostname，如果设置了，将绑定到该地址上。如果未设置，绑定到所有网卡上。 |
+| leader.imbalance.check.interval.seconds                     | 300                           | 默认300s，也即5分钟扫描一次，控制器触发分区再平衡检查的频率。 |
+| leader.imbalance.per.broker.percentage                      | 10                            | 每个broker所能允许的leader失衡比率。如果超过该百分比，控制器将触发leader重新平衡。 |
+| listeners                                                   | null                          | 监听列表，broker对外提供服务时绑定的ip和端口。多个之间逗号分隔，如果监听器名称不是一个安全的协议，`listener.security.protocol.map`必须设置。主机名设置为0.0.0.0表示绑定所有接口，主机名为空这绑定默认的接口。例如：`PLAINTEXT://myhost:9092,SSL://:9091`<br />`CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093` |
+| log.dir                                                     | /tmp/kafka-logs               | 日志数据的存储目录，对`log.dirs`的补充。                     |
+| log.dirs                                                    | null                          | 日志数据的存放目录，如果未设置，将使用`log.dir`。            |
+| log.flush.interval.messages                                 | Long.MaxValue                 | 消息刷新到磁盘之前，日志分区上积累的消息数量。               |
+| log.flush.interval.ms                                       | null                          | 消息刷新到磁盘之前，日志在内存中停留的最大毫秒数。如果未设置，将使用`log.flush.scheduler.interval.ms`。 |
+| log.flush.offset.checkpoint.interval.ms                     | 60000                         | 用于更新日志恢复点持久记录的频率。                           |
+| log.flush.scheduler.interval.ms                             | Long.MaxValue                 | 检测日志是否需要刷新到磁盘的频率，单位毫秒                   |
+| log.flush.start.offset.checkpoint.interval.ms               | 60000                         | 更新日志持久化日志记录的开始偏移量的频率                     |
+| log.retention.bytes                                         | -1                            | 日志被删除之前的最大尺寸，即日志保留的最大大小               |
+| log.retention.hours                                         | 168                           | 日志文件删除之前保留的时间，单位小时                         |
+| log.retention.minutes                                       | null                          | 日志文件删除之前保留的时间，单位分钟；未设置默认使用`log.retention.hours` |
+| log.retention.ms                                            | null                          | 日志文件删除之前保留的时间，单位毫秒；未设置默认使用`log.retention.minutes`，-1表示永久 |
+| log.roll.hours                                              | 168                           | 在新日志segment展开之前的最大时间，单位：小时                |
+| log.roll.ms                                                 | null                          | 新日志segment展开之前的最大时间，单位：毫秒；如果未设置，`log.roll.hours`将被使用。 |
+| log.roll.jitter.hours                                       | 0                             | 指定日志切分段的小时数，避免日志切分时造成惊群               |
+| log.roll.jitter.ms                                          | null                          | 指定日志切分段的毫秒数，如果不设置，默认使用log.roll.jitter.hours |
+| log.segment.bytes                                           | 1073741824（1G）              | 单个日志文件的最大尺寸                                       |
+| log.segment.delete.delay.ms                                 | 60000                         | 日志文件被真正删除之前保留的时间                             |
+| message.max.bytes                                           | 1048588（约1M）               | 最大记录批大小                                               |
+| min.insync.replicas                                         | 1                             | 当生产者acks为-1(all)时，该值指定了最小副本数量，这些副本必须确认写操作，才能认为写操作成功。如果不能满足这个最小值，那么生产者将抛出异常。 |
+| num.io.threads                                              | 8                             | 服务器用于处理请求的线程数，其中可能包括磁盘I/O。            |
+| num.network.threads                                         | 3                             |                                                              |
+| num.recovery.threads.per.data.dir                           | 1                             |                                                              |
+| num.replica.alter.log.dirs.threads                          | null                          |                                                              |
+| num.replica.fetchers                                        | 1                             |                                                              |
+| offset.metadata.max.bytes                                   | 4096                          |                                                              |
+| offsets.commit.required.acks                                | -1                            |                                                              |
+| offsets.commit.timeout.ms                                   | 5000                          |                                                              |
+| offsets.load.buffer.size                                    | 5242880（5M）                 |                                                              |
+| offsets.retention.check.interval.ms                         | 600000                        |                                                              |
+| offsets.retention.minutes                                   | 10080                         |                                                              |
+| offsets.topic.compression.codec                             | 0                             |                                                              |
+| offsets.topic.num.partitions                                | 50                            |                                                              |
+| offsets.topic.replication.factor                            | 3                             |                                                              |
+| offsets.topic.segment.bytes                                 | 104857600（100M）             |                                                              |
+| port                                                        | 9092                          |                                                              |
+| queued.max.requests                                         | 500                           |                                                              |
+| quota.consumer.default                                      | Long.MaxValue                 |                                                              |
+| quota.producer.default                                      | Long.MaxValue                 |                                                              |
+| replica.fetch.min.bytes                                     | 1                             |                                                              |
+| replica.fetch.max.bytes                                     | 1048576                       |                                                              |
+| replica.high.watermark.checkpoint.interval.ms               | 5000                          |                                                              |
+| replica.lag.time.max.ms                                     | 30000                         |                                                              |
+| replica.socket.receive.buffer.bytes                         | 65536                         |                                                              |
+| replica.socket.timeout.ms                                   | 30000                         |                                                              |
+| rerquest.timeout.ms                                         | 30000                         |                                                              |
+| socket.receive.buffer.bytes                                 | 102400                        |                                                              |
+| socket.request.max.bytes                                    | 104857600                     |                                                              |
+| socket.send.buffer.bytes                                    | 102400                        |                                                              |
+| transaction.max.timeout.ms                                  | 900000                        |                                                              |
+| transaction.state.log.load.buffer.size                      | 5242880                       |                                                              |
+| transaction.state.log.min.isr                               | 2                             |                                                              |
+| transaction.state.log.num.partitions                        | 50                            |                                                              |
+| transaction.state.log.replication.factor                    | 3                             |                                                              |
+| transaction.state.log.segment.bytes                         | 104857600                     |                                                              |
+| transaction.id.expiration.ms                                | 604800000                     |                                                              |
+| unclean.leader.election.enable                              | false                         | 指示是否在万不得已的情况下启用不在ISR集中的副本作为领导者，即使这样做可能会导致数据丢失。 |
+| zookeeper.connection.timeout.ms                             | null                          |                                                              |
+| zookeeper.max.in.flight.requests                            | 10                            |                                                              |
+| zookeeper.session.timeout.ms                                | 18000                         |                                                              |
+| zookeeper.set.acl                                           | false                         |                                                              |
+| broker.id.generation.enable                                 | true                          |                                                              |
+| broker.rack                                                 | null                          |                                                              |
+| connections.max.idle.ms                                     | 600000                        |                                                              |
+| connections.max.reauth.ms                                   | 0                             |                                                              |
+| controlled.shutdown.enable                                  | true                          |                                                              |
+| controlled.shutdown.max.retries                             | 3                             |                                                              |
+| controlled.shutdown.retry.backoff.ms                        | 5000                          |                                                              |
+| controller.socket.timeout.ms                                | 30000                         |                                                              |
+| default.replication.factor                                  | 1                             |                                                              |
+| delegation.token.expiry.time.ms                             | 86400000                      |                                                              |
+| delegation.token.master.key                                 | null                          |                                                              |
+| delegation.token.max.lifetime.ms                            | 604800000                     |                                                              |
+| delete.records.purgatory.purge.interval.requests            | medium                        |                                                              |
+| fetch.max.bytes                                             | 57671680                      |                                                              |
+| fetch.purgatory.purge.interval.requests                     | 1000                          |                                                              |
+| group.initial.rebalance.delay.ms                            | 3000                          |                                                              |
+| group.max.session.timeout.ms                                | 1800000                       | 注册消费者允许的`session.timeout.ms`的最大值。更长的超时时间让消费者有更多的时间在心跳之间处理消息，但代价是检测失败的时间更长。 |
+| group.max.size                                              | Long.MaxValue                 |                                                              |
+| group.min.session.timeout.ms                                | 6000                          | 注册消费者允许的`session.timeout.ms`的最小值。更短的超时时间会导致更快的故障检测，代价是更频繁的消费者心跳，这可能会压垮代理资源。 |
+| inter.broker.listener.name                                  | null                          |                                                              |
+| inter.broker.protocol.version                               | 2.5-IV0                       |                                                              |
+| log.cleaner.backoff.ms                                      | 15000                         |                                                              |
+| log.cleaner.dedupe.buffer.size                              | 134217728                     |                                                              |
+| log.cleaner.delete.retention.ms                             | 86400000                      |                                                              |
+| log.cleaner.enable                                          | true                          |                                                              |
+| log.cleaner.io.buffer.load.factor                           | 0.9                           |                                                              |
+| log.cleaner.io.buffer.size                                  | 524288                        |                                                              |
+| log.cleaner.io.max.bytes.per.second                         | Double.MaxValue               |                                                              |
+| log.cleaner.max.compaction.lag.ms                           | Long.MaxValue                 |                                                              |
+| log.cleaner.min.cleanable.ratio                             | 0.5                           |                                                              |
+| log.cleaner.min.compaction.log.ms                           | 0                             |                                                              |
+| log.cleaner.threads                                         | 1                             |                                                              |
+| log.cleanup.policy                                          | delete                        |                                                              |
+| log.index.interval.bytes                                    | 4096                          |                                                              |
+| log.index.size.max.bytes                                    | 10485760                      |                                                              |
+| log.message.format.version                                  | 2.5-IV0                       |                                                              |
+| log.message.timestamp.difference.max.ms                     | Long.MaxValue                 |                                                              |
+| log.message.timestamp.type                                  | CreateTime                    |                                                              |
+| log.preallocate                                             | false                         |                                                              |
+| log.retention.check.interval.ms                             | 300000                        |                                                              |
+| max.connections                                             | Log.MaxValue                  |                                                              |
+| max.connections.per.ip                                      | Log.MaxValue                  |                                                              |
+| max.connections.per.ip.overrides                            | ""                            |                                                              |
+| max.incremental.fetch.session.cache.slots                   | 1000                          |                                                              |
+| num.partitions                                              | 1                             |                                                              |
+| password.encoder.old.secret                                 | null                          |                                                              |
+| password.encoder.secret                                     | null                          |                                                              |
+| principal.builder.class                                     | null                          |                                                              |
+| producer.purgatory.purge.interval.requests                  | 1000                          |                                                              |
+| queued.max.request.bytes                                    | -1                            |                                                              |
+| replica.fetch.backoff.ms                                    | 1000                          |                                                              |
+| replica.fetch.max.bytes                                     | 1048576                       |                                                              |
+| replica.fetch.response.max.bytes                            | 10485760                      |                                                              |
+| replica.selector.class                                      | null                          |                                                              |
+| reserved.broker.max.id                                      | 1000                          |                                                              |
+| sasl.client.callback.handler.class                          | null                          |                                                              |
+| sasl.enabled.mechanisms                                     | GSSAPI                        |                                                              |
+| sasl.jaas.config                                            | null                          |                                                              |
+| sasl.kerberos.kinit.cmd                                     | /usr/bin/kinit                |                                                              |
+| sasl.kerberos.min.time.before.relogin                       | 60000                         |                                                              |
+| sasl.kerberos.principal.to.local.rules                      | DEFAULT                       |                                                              |
+| sasl.kerberos.service.name                                  | null                          |                                                              |
+| sasl.kerberos.ticket.renew.jitter                           | 0.05                          |                                                              |
+| sasl.kerberos.ticket.renew.window.factor                    | 0.8                           |                                                              |
+| sasl.login.callback.handler.class                           | null                          |                                                              |
+| sasl.login.class                                            | null                          |                                                              |
+| sasl.login.refresh.buffer.seconds                           | 300                           |                                                              |
+| sasl.login.refresh.min.period.seconds                       | 60                            |                                                              |
+| sasl.login.refresh.window.factor                            | 0.8                           |                                                              |
+| sasl.login.refresh.window.jitter                            | 0.05                          |                                                              |
+| sasl.mechanism.inter.broker.protocol                        | GSSAPI                        |                                                              |
+| sasl.server.callback.handler.class                          | null                          |                                                              |
+| security.inter.broker.protocol                              | PLAINTEXT                     |                                                              |
+| ssl.cipher.suites                                           | ""                            |                                                              |
+| ssl.client.auth                                             | none                          |                                                              |
+| ssl.enabled.protocols                                       | TLSv1.2                       |                                                              |
+| ssl.key.password                                            | null                          |                                                              |
+| ssl.keymanager.algorithm                                    | SunX509                       |                                                              |
+| ssl.keystore.location                                       | null                          |                                                              |
+| ssl.keystore.password                                       | null                          |                                                              |
+| ssl.keystore.type                                           | JKS                           |                                                              |
+| ssl.protocol                                                | TLSv1.2                       |                                                              |
+| ssl.provider                                                | null                          |                                                              |
+| ssl.trustmanager.algorithm                                  | PKIX                          |                                                              |
+| ssl.truststore.location                                     | null                          |                                                              |
+| ssl.truststore.password                                     | null                          |                                                              |
+| ssl.truststore.type                                         | JKS                           |                                                              |
+| zookeeper.clientCnxnSocket                                  | null                          |                                                              |
+| zookeeper.ssl.client.enable                                 | false                         |                                                              |
+| zookeeper.ssl.keystore.location                             | null                          |                                                              |
+| zookeeper.ssl.keystore.password                             | null                          |                                                              |
+| zookeeper.ssl.keystore.type                                 | null                          |                                                              |
+| zookeeper.ssl.truststore.location                           | null                          |                                                              |
+| zookeeper.ssl.truststore.password                           | null                          |                                                              |
+| zookeeper.ssl.truststore.type                               | null                          |                                                              |
+| alter.config.policy.class.name                              | null                          |                                                              |
+| alter.log.dirs.replication.quota.window.num                 | 11                            |                                                              |
+| alter.log.dirs.replication.quota.window.size.seconds        | 1                             |                                                              |
+| authorizer.class.name                                       | ""                            |                                                              |
+| client.quota.callback.class                                 | null                          |                                                              |
+| connection.failed.authentication.delay.ms                   | 100                           |                                                              |
+| create.topic.policy.class.name                              | null                          |                                                              |
+| delegation.token.expiry.check.interval.ms                   | 3600000                       |                                                              |
+| kafka.metrics.polling.interval.secs                         | 10                            |                                                              |
+| kafka.metrics.reporters                                     | ""                            |                                                              |
+| listener.security.protocol.map                              | SSL:SSL,SASL_SSL:SASL_SSL,... |                                                              |
+| log.message.downconversion.enable                           | true                          |                                                              |
+| metric.reporters                                            | ""                            |                                                              |
+| metrics.num.samples                                         | 2                             |                                                              |
+| metrics.recording.level                                     | INFO                          |                                                              |
+| metrics.sample.window.ms                                    | 30000                         |                                                              |
+| password.encoder.cipher.algorithm                           | AES/CBC/PKCS5Padding          |                                                              |
+| password.encoder.iterations                                 | 4096                          |                                                              |
+| password.encoder.key.length                                 | 128                           |                                                              |
+| password.encoder.keyfactory.algorithm                       | null                          |                                                              |
+| quota.window.num                                            | 11                            |                                                              |
+| quota.window.size.seconds                                   | 1                             |                                                              |
+| replication.quota.window.num                                | 11                            |                                                              |
+| replication.quota.window.size.seconds                       | 1                             |                                                              |
+| security.providers                                          | null                          |                                                              |
+| ssl.endpoint.identification.algorithm                       | https                         |                                                              |
+| ssl.principal.mapping.rules                                 | DEFAULT                       |                                                              |
+| ssl.secure.random.implementation                            | null                          |                                                              |
+| transaction.abort.timed.out.transaction.cleanup.interval.ms | 10000                         |                                                              |
+| transaction.remove.expired.transaction.cleanup.interval.ms  | 3600000                       |                                                              |
+| zookeeper.ssl.cipher.suites                                 | null                          |                                                              |
+| zookeeper.ssl.crl.enable                                    | false                         |                                                              |
+| zookeeper.ssl.enabled.protocols                             | null                          |                                                              |
+| zookeeper.ssl.endpoint.identification.algorithm             | HTTPS                         |                                                              |
+| zookeeper.ssl.ocsp.enable                                   | false                         |                                                              |
+| zookeeper.ssl.protocol                                      | TLSv1.2                       |                                                              |
+| zookeeper.sync.time.ms                                      | 2000                          |                                                              |
 
-
-## 99.1.1、[Updating Broker Configs](https://kafka.apache.org/25/documentation.html#dynamicbrokerconfigs)
+### 99.1.1、[Updating Broker Configs](https://kafka.apache.org/25/documentation.html#dynamicbrokerconfigs)
 
 ## 99.2、[Topic Configs](https://kafka.apache.org/25/documentation.html#topicconfigs)
 
-| 属性                 | 默认值          | 描述                   |
-| -------------------- | --------------- | ---------------------- |
-| cleanup.policy       | delete          | 可选值[compact,delete] |
-| compression.type     | producer        |                        |
-| delete.retention.ms  | 86400000（1天） |                        |
-| file.delete.delay.ms | 60000           |                        |
-| flush.messages       | Long.MaxValue   |                        |
-|                      |                 |                        |
+| 属性                                    | 默认值          | 描述                                                         |
+| --------------------------------------- | --------------- | ------------------------------------------------------------ |
+| cleanup.policy                          | delete          | 可选值[compact,delete]                                       |
+| compression.type                        | producer        |                                                              |
+| delete.retention.ms                     | 86400000（1天） |                                                              |
+| file.delete.delay.ms                    | 60000           |                                                              |
+| flush.messages                          | Long.MaxValue   |                                                              |
+| flush.ms                                | Long.MaxValue   |                                                              |
+| follower.replication.throttled.replicas | ""              |                                                              |
+| index.interval.bytes                    | 4096            |                                                              |
+| leader.replication.throttled.replicas   | ""              |                                                              |
+| max.compaction.lag.ms                   | Long.MaxValue   |                                                              |
+| max.message.bytes                       | 1048588         |                                                              |
+| message.format.version                  | 2.5-IV0         |                                                              |
+| message.timestamp.difference.max.ms     | Long.MaxValue   |                                                              |
+| message.timestamp.type                  | CreateTime      |                                                              |
+| min.cleanable.dirty.ratio               | 0.5             |                                                              |
+| min.compaction.lag.ms                   | 0               |                                                              |
+| min.insync.replicas                     | 1               | 当生产者acks为-1(all)时，该值指定了最小副本数量，这些副本必须确认写操作，才能认为写操作成功。如果不能满足这个最小值，那么生产者将抛出异常。 |
+| preallocate                             | false           |                                                              |
+| retention.bytes                         | -1              |                                                              |
+| retention.ms                            | 604800000       |                                                              |
+| segment.bytes                           | 1073741824      |                                                              |
+| segment.index.bytes                     | 10485760        |                                                              |
+| segment.jitter.ms                       | 0               |                                                              |
+| segment.ms                              | 604800000       |                                                              |
+| unclean.leader.election.enable          | false           | 指示是否将不在ISR集合中的副本选为领导者作为最后的手段，即使这样做可能会导致数据丢失。 |
+| message.downconversion.enable           | true            |                                                              |
 
 ## 99.3、[Producer Configs](https://kafka.apache.org/25/documentation.html#producerconfigs)
 
-| 属性 | 默认值 | 描述 |
-| ---- | ------ | ---- |
-|      |        |      |
-|      |        |      |
-|      |        |      |
+- 关键参数
+
+  - batch.size
+  - acks
+  - linger.ms
+  - compression.type
+  - max.in.flight.requests.per.connection
+  - retries
+
+  
+
+- 全量参数
+
+| 属性                                  | 默认值                                                       | 描述                |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------- |
+| key.serializer                        |                                                              |                     |
+| value.serializer                      |                                                              |                     |
+| acks                                  | 默认值1；可选值[all,-1,0,1]                                  |                     |
+| bootstrap.servers                     | ""                                                           |                     |
+| buffer.memory                         | 33554432                                                     |                     |
+| compression.type                      | none                                                         |                     |
+| retries                               | Integer.MaxValue                                             |                     |
+| ssl.key.password                      | null                                                         |                     |
+| ssl.keystore.location                 | null                                                         |                     |
+| ssl.keystore.password                 | null                                                         |                     |
+| ssl.truststore.location               | null                                                         |                     |
+| ssl.truststore.password               | null                                                         |                     |
+| batch.size                            | 16384（16K）                                                 | 控制一个batch的大小 |
+| client.dns.lookup                     | default                                                      |                     |
+| client.id                             | ""                                                           |                     |
+| connections.max.idle.ms               | 540000                                                       |                     |
+| delivery.timeout.ms                   | 120000                                                       |                     |
+| linger.ms                             | 0                                                            |                     |
+| max.block.ms                          | 60000                                                        |                     |
+| max.request.size                      | 1048576                                                      |                     |
+| partitioner.class                     | org.apache.kafka.clients.producer.internals.DefaultPartitione |                     |
+| receive.buffer.bytes                  | 32768                                                        |                     |
+| request.timeout.ms                    | 30000                                                        |                     |
+| sasl.client.callback.handler.class    | null                                                         |                     |
+| sasl.jaas.config                      | null                                                         |                     |
+| sasl.kerberos.service.name            | null                                                         |                     |
+| sasl.login.callback.handler.class     | null                                                         |                     |
+| sasl.login.class                      | null                                                         |                     |
+| sasl.mechanism                        | GSSAPI                                                       |                     |
+| security.protocol                     | PLAINTEXT                                                    |                     |
+| send.buffer.bytes                     | 131072                                                       |                     |
+| ssl.enabled.protocols                 | TLSv1.2                                                      |                     |
+| ssl.keystore.type                     | JKS                                                          |                     |
+| ssl.protocol                          | TLSv1.2                                                      |                     |
+| ssl.provider                          | null                                                         |                     |
+| ssl.truststore.type                   | JKS                                                          |                     |
+| worker.sync.timeout.ms                | 3000                                                         |                     |
+| worker.unsync.backoff.ms              | 300000                                                       |                     |
+| access.control.allow.methods          | ""                                                           |                     |
+| access.control.allow.origin           | ""                                                           |                     |
+| admin.listeners                       | null                                                         |                     |
+| client.id                             | ""                                                           |                     |
+| config.providers                      | ""                                                           |                     |
+| config.storage.replication.factor     | 3                                                            |                     |
+| connect.protocol                      | sessioned                                                    |                     |
+| header.converter                      | org.apache.kafka.connect.storage.SimpleHeaderConverter       |                     |
+| inter.worker.key.generation.algorithm | HmacSHA256                                                   |                     |
+| inter.worker.key.size                 | null                                                         |                     |
+| inter.worker.key.ttl.ms               | 3600000                                                      |                     |
+| inter.worker.signature.algorithm      | HmacSHA256                                                   |                     |
+| inter.worker.verification.algorithms  | HmacSHA256                                                   |                     |
+| internal.key.converter                | org.apache.kafka.connect.json.JsonConverter                  |                     |
+| internal.value.converter              | org.apache.kafka.connect.json.JsonConverter                  |                     |
+| listeners                             | null                                                         |                     |
+| metadata.max.age.ms                   | 300000                                                       |                     |
+| metric.reporters                      | ""                                                           |                     |
+|                                       |                                                              |                     |
+| enable.idempotence                    | false                                                        |                     |
+|                                       |                                                              |                     |
 
 ## 99.4、[Consumer Configs](https://kafka.apache.org/25/documentation.html#consumerconfigs)
 
@@ -3106,7 +3550,6 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
 | log.roll.jitter.hours                         | 0                                                            | 从logRollTimeMillis抽离的jitter最大数目                      |
 | log.roll.jitter.ms                            | null                                                         | 同上，如果未设置会采用`log.roll.jitter.hours`                |
 | num.recovery.threads.per.data.dir             | 1                                                            | 每个数据目录用来日志恢复的线程数目                           |
-| unclean.leader.election.enable                | false                                                        | 指示是否在万不得已的情况下启用不在ISR集中的副本作为领导者，即使这样做可能会导致数据丢失。 |
 | delete.topic.enable                           | true                                                         | 启用删除主题。如果关闭此配置，通过管理工具删除主题将无效     |
 | offsets.topic.num.partitions                  | 50                                                           | 存储主题消费偏移量的主题(`__consumer_offsets`)的分区数（部署后不应更改） |
 | offsets.topic.retention.minutes               | 1440（1天）                                                  | 存在时间超过这个时间限制的offsets都将被标记为待删除。        |
@@ -3139,7 +3582,6 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
 | message.timestamp.type                  | CreateTime         | log.message.timestamp.type              |                                                              |
 | min.cleanable.dirty.ratio               | 0.5                | log.clean.min.cleanable.ratio           | 此项配置控制log压缩器试图进行清除日志的频率。默认情况下，将避免清除压缩率超过50%的日志。这个比率避免了最大的空间的浪费。 |
 | min.compaction.lag.ms                   | 0                  | log.cleaner.min.compaction.lag.ms       |                                                              |
-| min.insync.replicas                     | 1                  | min.insync.replicas                     | 当producer设置request.required.acks=-1时，min.insync.replicas指定replicas的最小数目（必须确认每一个replicas的写数据都是成功的），如果这个数目没有达到，producer会产生异常。 |
 | preallocate                             | false              | log.preallocate                         |                                                              |
 | retention.bytes                         | -1                 | log.retention.bytes                     | 如果使用`delete`的策略，这项配置就是指删除日志前日志所能达到的最大尺寸。默认情况下，没有尺寸限制而只有时间限制。 |
 | retention.ms                            | 604800000（7天）   | log.retention.ms                        | 如果使用`delete`的策略，这项配置就是指删除日志前日志保存的时间。 |
@@ -3147,7 +3589,6 @@ Kafka的元数据信息包括topic名称，topic的分区（partition），每�
 | segment.index.bytes                     | 10485760(10MB)     | log.index.size.max.bytes                | 决定了index文件大小达到多大之后进行切分，默认大小是10M。通常不需要更改此设置。 |
 | segment.jitter.ms                       | 0                  | log.roll.jitter.ms                      | 从计划的分段滚动时间中减去最大随机抖动，以避免分段滚动的集中爆发 |
 | segment.ms                              | 604800000（7天）   | log.roll.ms                             | 即时log的分块文件没有达到需要删除、压缩的大小，一旦log的时间达到这个上限，就会强制新建一个log分块文件 |
-| unclean.leader.election.enable          | false              | unclean.leader.election.enable          |                                                              |
 | message.downconversion.enable           | true               | log.message.downconversion.enable       |                                                              |
 |                                         |                    |                                         |                                                              |
 

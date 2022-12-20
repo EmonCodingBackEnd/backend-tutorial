@@ -187,6 +187,8 @@ git remote add origin http://yourname:password@git.oschina.net/name/project.git
 
    ```bash
    [emon@emon emonnote]$ git remote add origin git@github.com:Rushing0711/emonnote.git
+   # 实际使用中，本地创建了仓库，远程也创建了仓库，可能内容不一致，先pull下来，再push上去
+   [emon@emon emonnote]$ git pull origin master --allow-unrelated-histories
    [emon@emon emonnote]$ git push -u origin master
    ```
 
