@@ -1265,3 +1265,95 @@ BTRACE_HOME=C:\Job\JobSoftware\btrace-bin-1.3.11.3
 
 Path 追加 %BTRACE_HOME%\bin
 
+
+
+# 三、@SuppressWarnings注解用法详解
+
+今天来谈谈@SuppressWarnings注解的作用。
+
+J2SE提供的最后一个批注是@SuppressWarnings。该批注的作用是给编译器一条指令，告诉它对被批注的代码元素内部的某些警告保持静默。
+
+@SuppressWarnings批注允许你选择性地取消特定代码段（即，类或方法）中的警告。其中的想法是当你看到警告时，你将调查它，如果你确定它不是问题，你就可以添加一个@SuppressWarnings批注，以使你不会再看到警告。虽然它听起来似乎会屏蔽潜在的错误，但实际上它将提高代码安全性，因为它将**防止你对警告无动于衷——你看到的每一个警告都将值得注意**。
+
+我经常遇到的问题是不晓得什么时候用@SuppressWarnings的什么批注比较好，为了避免简单的`@SuppressWarnings("all")`这种用法，所以做了如下整理使用：
+
+- @SuppressWarnings("")
+- @SuppressWarnings({})
+- @SuppressWarnings(value={})
+
+## 3.1、抑制单类型警告
+
+```java
+@Test
+@SuppressWarnings("unused")
+public void testRmdir(){
+    try {
+        boolean ok = ftpHelper.ftpClient.removeDirectory("src1");
+        String s = "";
+    } catch(IOException e){
+        e.printStackTrace();
+    }
+}
+```
+
+## 3.2、抑制多类型警告
+
+抑制多类型的警告
+
+```java
+@SuppressWarnings(value={"unchecked", "rawtypes"})
+public void addItems(String item) {
+    List items = new ArrayList();
+    items.add(item);
+}
+```
+
+## 3.3、抑制所有类型警告
+
+```java
+@SuppressWarnings("all")
+public void addItems(String item) {
+    List items = new ArrayList();
+    items.add(item);
+}
+```
+
+## 3.4、@SuppressWarnings可用于何处？
+
+通过@SuppressWarnings的源码可知，其注解目标为类、字段、函数、函数入参、构造函数和函数的局部变量。
+
+```java
+@Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+@Retention(RetentionPolicy.SOURCE)
+public @interface SuppressWarnings {
+    String[] value();
+}
+```
+
+这里建议大家，**注解应声明在最接近警告发生的位置**。
+
+## 3.5、@SuppressWarnings的value值有哪些？
+
+| 关键字                   | 用途                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| all                      | to supress all warnings（抑制所有警告）                      |
+| boxing                   | to suppress warnings relative to boxing/unboxing operations（抑制装箱、拆箱操作时候的警告） |
+| cast                     | to suppress warnings relative to cast operations（抑制映射相关的警告） |
+| dep-ann                  | to suppress warnings relative to deprecated annotation（抑制启用注释的警告 |
+| deprecation              | to suppress warnings relative to deprecation（抑制过期方法警告） |
+| fallthrough              | to suppress warnings relative to missing breaks in switch statements（抑制switch缺失break警告） |
+| finally                  | to suppress warnings relative to finally block that don't return（抑制finally模块没有返回的警告） |
+| hiding                   | to suppress warnings relative to locals that hide variable（抑制与隐藏变量的局部变量相关的警告） |
+| incomplete-switch        | to suppress warnings relative to missing entries in a switch statement(enum case)（忽略没有完整的switch语句） |
+| nls                      | to suppress warnings relative to non-nls string literals（忽略非nls格式的字符） |
+| null                     | to suppress warnings relative to null analysis（忽略对null的操作） |
+| rawtypes                 | to suppress warnings relative to un-specific types when using generics on class params（使用generics时忽略没有指定相应的类型） |
+| restriction              | to suppress warnings relative to usage of discouraged or forbidden references（抑制与不鼓励或禁止引用的使用相关的警告） |
+| serial                   | to suppress warnings relative to missing serialVersionUID field for a serializable class（忽略在serializable类中没有声明serialVersionUID变量） |
+| static-access            | to suppress warnings relative to incorrect static access（抑制不正确的静态访问方式警告） |
+| synthetic-access         | to suppress warnings relative to unoptimized access from inner classes（抑制子类没有按最优方法访问内部类的警告） |
+| unchecked                | to suppress warnings relative to unchecked operations（抑制没有进行类型检查操作的警告） |
+| unqualified-field-access | to suppress warnings relative to field access unqualified（抑制没有权限访问的域的警告） |
+| unused                   | to suppress warnings relative to unused code（抑制没被使用过的代码的警告） |
+| resource                 | 对于J2EE，可以使用@Resource来完成依赖注入或者叫资源注入，但是当你在一个类中使用已经使用注解的类，却没有为其注入依赖时，该关键字会抑制其没有注入依赖的警告。 |
+

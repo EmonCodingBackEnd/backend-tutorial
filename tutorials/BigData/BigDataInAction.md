@@ -310,6 +310,8 @@ server.3=emon3:2888:3888
 
 官网地址： https://zookeeper.apache.org/index.html
 
+下载地址：https://archive.apache.org/dist/zookeeper/
+
 下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
 
 ```bash
