@@ -549,6 +549,35 @@ $ echo wchc|nc emon 2181
 
 
 
+# 十、ZooKeeper客户端API
+
+## 10.1、常用的ZooKeeper Java客户端
+
+- ZooKeeper原生API
+
+  - 配置
+
+  ```xml
+  <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+  </dependency>
+  ```
+
+  - 不足
+    - 超时重连，不支持自动，需要手动才可以。
+    - Watcher注册一次后会失效
+    - 不支持递归创建节点
+
+- zkclient
+- Apache curator
+  - Apache的开源项目
+  - 解决Watcher的注册一次就失效问题
+  - API更加简单易用
+  - 提供更多解决方案并且实现简单，比如：分布式锁
+  - 提供常用的ZooKeeper工具类
+  - 编程风格更爽
+
 # 九十、ZooKeeper Interview Guide
 
 ### 90.1、ZooKeeper奇偶数节点问题的简单理解
