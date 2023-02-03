@@ -235,13 +235,13 @@ Authentication is not valid : /test/abc/xyz
 - 设置auth权限
 
 ```bash
-# 添加一个认证用户
-addauth digest emon:emon
+# 添加/登录一个认证用户
+addauth digest emon0:123456
 # 设置权限
-setAcl /test/abc auth:emon:emon:cdrwa
+setAcl /test/abc auth:emon0:123456:cdrwa
 # 查看权限
 getAcl /test/abc
-'digest,'emon:5EmPTubek0DdErNpeZhhlayIIYA=
+'digest,'emon0:VfLYllQszSu5jTPKo9hR8++hZvo=
 : cdrwa
 ```
 
@@ -249,7 +249,7 @@ getAcl /test/abc
 
 ```bash
 # 设置权限，密码是<base64encoded(SHA1(password))>
-setAcl /test/abc digest:emon:5EmPTubek0DdErNpeZhhlayIIYA=:cdrwwa
+setAcl /test/abc digest:emon0:VfLYllQszSu5jTPKo9hR8++hZvo=:cdrwa
 ```
 
 - 设置ip权限
@@ -264,11 +264,11 @@ setAcl /test/abc ip:192.168.200.1:cdrwa
 第一步：修改zkServer.sh，增加super管理员
 
 ```bash
-# 找到nohup，增加-Dzookeeper.DigestAuthenticationProvider.superDigest属性
+# 找到nohup，增加-Dzookeeper.DigestAuthenticationProvider.superDigest属性，emon:emon123
 nohup "$JAVA" $ZOO_DATADIR_AUTOCREATE "-Dzookeeper.log.dir=${ZOO_LOG_DIR}" \
 "-Dzookeeper.log.file=${ZOO_LOG_FILE}" "-Dzookeeper.root.logger=${ZOO_LOG4J_PROP}" \
 -XX:+HeapDumpOnOutOfMemoryError -XX:OnOutOfMemoryError='kill -9 %p' \
-"-Dzookeeper.DigestAuthenticationProvider.superDigest=emon:5EmPTubek0DdErNpeZhhlayIIYA=" \
+"-Dzookeeper.DigestAuthenticationProvider.superDigest=emon:6/mDgySlNwggKl0eNhUYm7rPFYs=" \
 -cp "$CLASSPATH" $JVMFLAGS $ZOOMAIN "$ZOOCFG" > "$_ZOO_DAEMON_OUT" 2>&1 < /dev/null &
 ```
 
