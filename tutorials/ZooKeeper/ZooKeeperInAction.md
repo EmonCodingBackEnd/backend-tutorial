@@ -575,7 +575,7 @@ $ echo wchc|nc emon 2181
 
 - ZkClient
 
-  - 由Datameer的工程师开发，对Zookeeper的原生API进行了包装，实现了超时重连、Watcher反复注册等功能。像dubbo等框架对其也进行了集成使用。
+  - 由Datameer的工程师开发，对Zookeeper的原生API进行了包装，实现了超时重连、Watcher反复注册等功能。像dubbo（2.6之前）等框架对其也进行了集成使用。dubbo2.6开始使用Curator。
   - 不足：
     - 几乎没有参考文档；
     - 异常处理简化（抛出RuntimeException）；
@@ -583,6 +583,16 @@ $ echo wchc|nc emon 2181
     - 没有提供各种使用场景的实现；
 
 - Apache Curator
+
+  - Apache Curator与ZooKeeper版本对应关系
+
+  | ZooKe |      |
+  | ----- | ---- |
+  |       |      |
+  |       |      |
+  |       |      |
+  
+  
 
   - Curator组件与ZooKeeper版本对应关系
 
@@ -593,9 +603,9 @@ $ echo wchc|nc emon 2181
   | Recipes   | ZooKeeper所有的典型应用场景的实现（除了两阶段提交外），该主机依赖Client和Framework。包括监听、各种分布式锁（可重入锁、排他锁、共享锁、信号锁等）、缓存、队列、选举、分布式atomic（分布式计数器）、分布式Barrier等等。 |
   | Utilities | 为ZooKeeper提供的各种工具类。                                |
   | Errors    | Curator异常处理、连接、恢复等。                              |
-
+  
   - Maven依赖
-
+  
   | GroupID/Org        | ArtifactID/Name           | 描述                                                         |
   | ------------------ | ------------------------- | ------------------------------------------------------------ |
   | org.apache.curator | curator-recipes           | 所有典型应用场景。需要依赖client和framework，需设置自动获取依赖。 |
@@ -606,15 +616,16 @@ $ echo wchc|nc emon 2181
   | org.apache.curator | curator-x-discovery       | 在framework上构建的服务发现实现。                            |
   | org.apache.curator | curator-x-discoveryserver | 可以和Curator Discovery一起使用的RESTful服务器。             |
   | org.apache.curator | curator-x-rpc             | Curator Framework和Recipes非Java环境的桥接。                 |
-
   
-
+  
+  
   - Apache的开源项目
   - 解决Watcher的注册一次就失效问题
   - API更加简单易用
   - 提供更多解决方案并且实现简单，比如：分布式锁
   - 提供常用的ZooKeeper工具类
   - 编程风格更爽
+  
 
 # 九十、ZooKeeper Interview Guide
 

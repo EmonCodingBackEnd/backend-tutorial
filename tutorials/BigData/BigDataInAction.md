@@ -315,7 +315,7 @@ server.3=emon3:2888:3888
 下载地址： https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.9/apache-zookeeper-3.5.9-bin.tar.gz --no-check-certificate
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.6.4/apache-zookeeper-3.6.4-bin.tar.gz --no-check-certificate
 ```
 
 2. 创建安装目录
@@ -327,13 +327,13 @@ server.3=emon3:2888:3888
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.5.9-bin.tar.gz -C /usr/local/ZooKeeper/
+[emon@emon ~]$ tar -zxvf /usr/local/src/apache-zookeeper-3.6.4-bin.tar.gz -C /usr/local/ZooKeeper/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -snf /usr/local/ZooKeeper/apache-zookeeper-3.5.9-bin/ /usr/local/zoo
+[emon@emon ~]$ ln -snf /usr/local/ZooKeeper/apache-zookeeper-3.6.4-bin/ /usr/local/zoo
 ```
 
 5. 配置环境变量
