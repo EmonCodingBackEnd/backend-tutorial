@@ -14,9 +14,19 @@ Oracle各个版本的文档：https://docs.oracle.com/en/database/oracle/oracle-
 
 Oracle版本的介绍：https://www.cndba.cn/dave/article/107944
 
-Oracle各个版本的文档：
+
+
+安装文档：
+
+https://blog.csdn.net/xwk19870212/article/details/125659057
 
 
 
+https://zhuanlan.zhihu.com/p/589748282
 
+
+
+https://pan.baidu.com/s/18kfSC7KRjTsOKRG6UokOFA#list/path=%2Foracle-database-preinstall-19c-1.0-1.el7.x86_64.rpm
+
+yyds
 

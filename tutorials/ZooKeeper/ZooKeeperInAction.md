@@ -575,7 +575,7 @@ $ echo wchc|nc emon 2181
 
 - ZkClient
 
-  - 由Datameer的工程师开发，对Zookeeper的原生API进行了包装，实现了超时重连、Watcher反复注册等功能。像dubbo（2.6之前）等框架对其也进行了集成使用。dubbo2.6开始使用Curator。
+  - 由Datameer的工程师开发，对Zookeeper的原生API进行了包装，实现了超时重连、Watcher反复注册等功能。像dubbo（2.3.0之前）等框架对其也进行了集成使用。从 2.3.0 版本开始支持可选 curator 实现。在2.7.x的版本中已经移除了zkclient的实现。
   - 不足：
     - 几乎没有参考文档；
     - 异常处理简化（抛出RuntimeException）；
@@ -586,16 +586,21 @@ $ echo wchc|nc emon 2181
 
   - Apache Curator与ZooKeeper版本对应关系
 
-  | ZooKe |      |
-  | ----- | ---- |
-  |       |      |
-  |       |      |
-  |       |      |
+  | Apache Curator                                               | ZooKeeper            |
+  | ------------------------------------------------------------ | -------------------- |
+  | Curator2.X、Curator4.2.X（需要排除ZooKeeper）                | ZooKeeper3.4.X       |
+  | Curator3.0.0、Curator3.1.0、Curator3.2.0、Curator3.2.1、Curator3.3.0 | ZooKeeper3.5.1-alpha |
+  | Curator4.0.0、Curator4.0.1                                   | ZooKeeper3.5.3-beta  |
+  | Curator4.1.0、Curator4.2.0                                   | ZooKeeper3.5.4-beta  |
+  | Curator4.3.0                                                 | ZooKeeper3.5.7       |
+  | Curator5.0.0、Curator5.1.0                                   | ZooKeeper3.6.0       |
+  | Curator5.2.0、Curator5.2.1、Curator5.3.0                     | ZooKeeper3.6.3       |
+  | Curator5.4.0                                                 | ZooKeeper3.7.0       |
   
   
-
+  
   - Curator组件与ZooKeeper版本对应关系
-
+  
   | 组件名称  | 用途                                                         |
   | --------- | ------------------------------------------------------------ |
   | Client    | ZooKeeper客户端的封装，用于取代原生的ZooKeeper客户端，提供了一些底层处理和相关的工具方法。 |
