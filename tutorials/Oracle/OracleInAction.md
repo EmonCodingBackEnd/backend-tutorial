@@ -30,3 +30,9 @@ https://pan.baidu.com/s/18kfSC7KRjTsOKRG6UokOFA#list/path=%2Foracle-database-pre
 
 yyds
 
+
+
+PL/SQL下载：
+
+https://blog.csdn.net/Pasto/article/details/108673818
+

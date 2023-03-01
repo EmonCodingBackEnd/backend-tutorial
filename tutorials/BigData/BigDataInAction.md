@@ -606,7 +606,7 @@ server.3=emon3:2888:3888
 下载地址：http://kafka.apache.org/downloads
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.5.1/kafka_2.12-2.5.1.tgz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://archive.apache.org/dist/kafka/2.8.2/kafka_2.12-2.8.2.tgz
 ```
 
 2. 创建安装目录
@@ -618,13 +618,13 @@ server.3=emon3:2888:3888
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.5.1.tgz -C /usr/local/Kafka/
+[emon@emon ~]$ tar -zxvf /usr/local/src/kafka_2.12-2.8.2.tgz -C /usr/local/Kafka/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.5.1/ /usr/local/kafka
+[emon@emon ~]$ ln -snf /usr/local/Kafka/kafka_2.12-2.8.2/ /usr/local/kafka
 ```
 
 5. 配置环境变量

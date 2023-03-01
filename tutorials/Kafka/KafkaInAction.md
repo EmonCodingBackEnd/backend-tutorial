@@ -16,6 +16,20 @@
 
 
 
+## 2.1、Kafka与ZooKeeper版本对应关系
+
+| Kafka                                             | ZooKeeper                     |
+| ------------------------------------------------- | ----------------------------- |
+| Kafka_2.12-2.5.1                                  | ZooKeeper3.5.8                |
+| Kafka_2.12-2.6.3                                  | ZooKeeper3.5.9                |
+| Kafka_2.12-2.7.2                                  | ZooKeeper3.5.9                |
+| Kafka_2.12-2.8.2，开始尝试从服务架构去掉ZooKeeper | ZooKeeper3.5.9                |
+| Kafka_2.12-3.1.2                                  | ZooKeeper3.6.3                |
+| Kafka_2.12-3.0.2，基本完成从服务架构去掉ZooKeeper | ZooKeeper3.6.3                |
+| Kafka_2.12-3.2.3                                  | ZooKeeper3.6.3                |
+| Kafka_2.12-3.3.2                                  | ZooKeeper3.6.3/ZooKeeper3.7.1 |
+| Kafka_2.12-3.4.0                                  | ZooKeeper3.6.3/ZooKeeper3.7.1 |
+
 # 二、常用命令
 
 - 创建
