@@ -1357,3 +1357,11 @@ public @interface SuppressWarnings {
 | unused                   | to suppress warnings relative to unused code（抑制没被使用过的代码的警告） |
 | resource                 | 对于J2EE，可以使用@Resource来完成依赖注入或者叫资源注入，但是当你在一个类中使用已经使用注解的类，却没有为其注入依赖时，该关键字会抑制其没有注入依赖的警告。 |
 
+
+
+# 四、安全
+
+- 通讯安全，加解密、加验签
+- 密码管理->配置文件中的明文密码
+- 密码管理->硬编码加密秘钥
+- XSS攻击
