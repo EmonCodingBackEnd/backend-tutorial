@@ -656,6 +656,11 @@ select * from loginfo;
 ```
 
 
+
+# 二、Elasticsearch学习
+
+https://www.bilibili.com/video/BV1hh411D7sb/?p=4&spm_id_from=pageDriver&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
+
 # 三、概念
 
 ## 1、常用术语
