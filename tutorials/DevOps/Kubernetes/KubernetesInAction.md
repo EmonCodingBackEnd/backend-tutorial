@@ -8473,6 +8473,11 @@ kubectl delete rs rs_name --cascade=fale(默认删除控制器会同时删除其管控的所有Pod
 
 # 查看ingress配置
 $ kubectl get ing -n lishi-recruitment
+
+# kubctl如何把文件拷贝出来？
+#语法： kubectl cp <some-namespace>/<some-pod>:/path /local/path
+# 假如命名空间是 nbms，容器名称是 nbms-admin
+$ kubectl cp nbms/nbms-admin-xxxxx:/home/app/logs -c nbms-admin .
 ```
 
 - iptables
