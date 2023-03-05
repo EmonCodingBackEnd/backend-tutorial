@@ -1,77 +1,77 @@
-# DevOpsʵ��
+# DevOps实践
 
-[�����б�](https://github.com/EmonCodingBackEnd/backend-tutorial)
+[返回列表](https://github.com/EmonCodingBackEnd/backend-tutorial)
 
 [TOC]
 
-# ��һ��DevOps
+# 序一、DevOps
 
-DevOps��Development��Operations����ϴ�
+DevOps：Development和Operations的组合词
 
-CI/CD����������/�������������������
+CI/CD：持续集成/持续交付（或持续部署）
 
 ![image-20220318161154990](images/image-20220318161154990.png)
 
 
 
-## 1����������˾��ν��г�������
+## 1、互联网公司如何进行持续集成
 
 ![image-20220318160527598](images/image-20220318160527598.png)
 
-## 2����������˾��ν��г�������
+## 2、互联网公司如何进行持续部署
 
-### 2.1�������Զ������𷽷�
+### 2.1、常见自动化部署方法
 
 ![image-20220318162034127](images/image-20220318162034127.png)
 
-### 2.2����β��Բ����Ч��
+### 2.2、如何测试部署的效果
 
-- ���̷���
+- 蓝绿发布
 
 ![image-20220318162528421](images/image-20220318162528421.png)
 
-- ��˿ȸ����
+- 金丝雀发布
 
 ![image-20220318162429520](images/image-20220318162429520.png)
 
-- ���ܿ���
+- 功能开关
 
 
 
-## 3��������Ŀ�����ܹ�
+## 3、敏捷项目管理架构
 
-����Jira��https://www.atlassian.com/software/jira
+工具Jira：https://www.atlassian.com/software/jira
 
-- Release����������λΪ��
-  - Sprint����̣���λΪ��
-    - Issue������
-      - Epic��ʷʫ�����磬������˫ʮһҪ��һ���������
-      - Story���û����£���Ʒ����
-      - Task�����񣺿���
-      - Bug�����ϣ�����
-
-
-
-ÿ��վ�᣺
-
-- Scrum Master����
-- ����ÿ�����Ͼ���
-- ÿ�˻ش�3������
-  - ��������ʲô
-  - ����Ҫ��ʲô
-  - ��ʲô���⣬��Ҫʲô����
-
-## 4���ڿ��������Ｏ��Jira���
-
-- IDEA�����Jira Integration
+- Release：发布，单位为月
+  - Sprint：冲刺，单位为周
+    - Issue：问题
+      - Epic：史诗：比如，我们在双十一要上一个促销活动！
+      - Story：用户故事：产品经理
+      - Task：任务：开发
+      - Bug：故障：测试
 
 
 
-## 5��Gitflow VS ���ɿ�����֧ģ��
+每日站会：
 
-### 5.1��ʲô��Gitflow�Լ�����
+- Scrum Master主持
+- 建议每日早上举行
+- 每人回答3个问题
+  - 昨天做了什么
+  - 今天要做什么
+  - 有什么问题，需要什么帮助
 
-Gitflow��һ�ַ�֧����ģ�ͣ���Դ��Vincent Driessen�����£���A successful Git branching model"
+## 4、在开发工具里集成Jira插件
+
+- IDEA插件：Jira Integration
+
+
+
+## 5、Gitflow VS 主干开发分支模型
+
+### 5.1、什么是Gitflow以及特性
+
+Gitflow是一种分支开发模型，来源于Vincent Driessen的文章：“A successful Git branching model"
 
 - Master
 - Develop
@@ -79,15 +79,15 @@ Gitflow��һ�ַ�֧����ģ�ͣ���Դ��Vincent Driessen�����£���A successful Git bran
 - Feature
 - Hotfix
 
-Gitflow���ó���
+Gitflow适用场景
 
-- �����������ȶ���Ҫ���
-- �Ŷ����������з������������м��з�
-- ��Դ��Ŀ
+- 软件本身对稳定性要求高
+- 团队少量资深研发，多数初，中级研发
+- 开源项目
 
-### 5.2��ʲô�����ɿ���ģʽ�Լ�����
+### 5.2、什么是主干开发模式以及特性
 
-���ܿ������������ɿ�����
+功能开关适用于主干开发：
 
 ```java
 if (FeatureManager.isFeatureEnabled("NewLoginForm")) {
@@ -97,29 +97,29 @@ if (FeatureManager.isFeatureEnabled("NewLoginForm")) {
 }
 ```
 
-���ɿ�����֧ģ�����ó�����
+主干开发分支模型适用场景：
 
-- �������������Ͽ�
-- �Ŷ��м��������з��϶࣬�����з�����
-- ��������Ʒ
+- 软件本身迭代较快
+- 团队中级，资深研发较多，初级研发较少
+- 互联网产品
 
 
 
-# һ������һ��Spring BootӦ��
+# 一、开发一个Spring Boot应用
 
 ![image-20220318172126929](images/image-20220318172126929.png)
 
-## 1����Ŀ����ܹ�ͼ
+## 1、项目整体架构图
 
 ![image-20220318172329781](images/image-20220318172329781.png)
 
 
 
-## 2��������·׷��
+## 2、服务链路追踪
 
 ![image-20220319083449424](images/image-20220319083449424.png)
 
-- Docker��ʽ����Zipkin����
+- Docker方式启动Zipkin服务
 
 ```bash
 [emon@emon ~]$ docker run --name zipkin -d -p 9411:9411 openzipkin/zipkin
@@ -129,26 +129,26 @@ http://emon:9411/
 
 
 
-# �������
+# 二、打包
 
-## 1���Maven˽��
+## 1、搭建Maven私服
 
 ![image-20220319153242376](images/image-20220319153242376.png)
 
-### 1.1��Maven˽������
+### 1.1、Maven私服介绍
 
-- ����
-  - ����Maven����ֿ⣬����Maven��������
-  - ��Ϊ���ػ���������й�˾������
-- ������Դ����
-  - JFrog Artifactory��Դ��
+- 作用
+  - 代理Maven中央仓库，加速Maven依赖下载
+  - 作为本地缓存服务所有公司开发者
+- 主流开源工具
+  - JFrog Artifactory开源版
   - Nexus
 
 
 
-### 1.2���JFrog Artifactory OSS��Դ��
+### 1.2、搭建JFrog Artifactory OSS开源版
 
-- ʹ��Docker
+- 使用Docker
 
 ```docker
 [emon@emon ~]$ docker run --name artifactory-oss-6.18.1 -d -p 8083:8081 docker.bintray.io/jfrog/artifactory-oss:6.18.1
@@ -156,9 +156,9 @@ http://emon:9411/
 
 http://emon:8083/
 
-�û������룺admin/password ==> ��¼��ǿ���޸ģ��޸Ľ����admin/admin123
+用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/admin123
 
-- ʹ�ð�װ��
+- 使用安装包
 
 https://jfrog.com/open-source/
 
@@ -166,131 +166,131 @@ https://jfrog.com/open-source/
 
 ![image-20220319160615339](images/image-20220319160615339.png)
 
-- ���ʹ��JFrog��
+- 如何使用JFrog？
 
-��һ�������� http://emon:8083
+第一步：访问 http://emon:8083
 
-�ڶ�����������Artifacts==>�Ҳ�ҳ����Set Me Up==>����ҳ���Generate Maven Settings==>Generate Settings
+第二步：点击左侧Artifacts==>右侧页面点击Set Me Up==>弹出页点击Generate Maven Settings==>Generate Settings
 
-��������Download Snippet
+第三步：Download Snippet
 
 ```bash
-# �����ɵ�Settings������ȥ
+# 把生成的Settings保存上去
 [emon@emon ~]$ vim .m2/settings.xml
 ```
 
-### 1.3����˽������jar
+### 1.3、从私服下载jar
 
 ```bash
-# admin�������API Key��ȡ��ʽ����¼JFrog==>���Ͻ�Welcome,admin����==>Edit Profile==>���������Unlock==>�����������ͼ�갴ť���ɣ��������ɹ�ֱ�Ӹ��ƣ�
+# admin后面的是API Key获取方式：登录JFrog==>右上角Welcome,admin下拉==>Edit Profile==>输入密码后Unlock==>下拉点击设置图标按钮生成；或者生成过直接复制！
 [emon@emon ~]$ curl -u admin:AKCp8krAbJnpHRmCxRwQyh2t58cC6Hn6zURWKFwMaHGKvG7LP7FHRzLVuMBsEYdGaGBFLpYVW http://emon:8083/artifactory/libs-release-local/com/coding/devops/notebook-service/1.0/notebook-service-1.0.jar --output notebook-service-1.0.jar
 ```
 
 
 
-# ������������
+# 三、持续集成
 
 ![image-20220319175723995](images/image-20220319175723995.png)
 
-## 1���Jenkins
+## 1、搭建Jenkins
 
-### 1.1��Jenkins����
+### 1.1、Jenkins介绍
 
 - Jenkins
 
-  - Project��Ŀ
-  - Build����
-  - Workspace�����ռ�
-    - ���������ʵ�ʹ���Ŀ¼
-      - �洢����
-      - �м���ʱ�ļ�
+  - Project项目
+  - Build构建
+  - Workspace工作空间
+    - 构建任务的实际工作目录
+      - 存储代码
+      - 中间临时文件
 
-  - Credentialsƾ��
-    - ���ڹ����û���������Ϣ
-      - �û���������
+  - Credentials凭据
+    - 用于管理用户的敏感信息
+      - 用户名、密码
       - SSH Key
-      - ֤��
+      - 证书
 
 
 
-### 1.2���Jenkins
+### 1.2、搭建Jenkins
 
-- ʹ��Docker
+- 使用Docker
 
-ע�⣬��hub.docker.com������jenkinsʱ������ٷ��汾�󿴵���ʾ��
+注意，在hub.docker.com上搜索jenkins时，点击官方版本后看到提示：
 
 DEPRECATED; use "jenkins/jenkins:lts" instead
 
 ```bash
-# �������������ص�
+# 创建宿主机挂载点
 [emon@emon ~]$ mkdir /usr/local/dockerv/jenkins_home
-# -v /usr/local/dockerv/jenkins_home:/var/jenkins_home ָ��������Ŀ¼ΪJenkins����Ŀ¼
-# -v /etc/localtime:/etc/localtime ������ʹ�úͷ�����ͬ����ʱ������
-# -v /usr/local/maven:/usr/local/maven ӳ����������maven
-# -v /usr/local/java:/usr/local/java ӳ����������java
-# Ҳ����ʹ�� jenkins/jenkins:lts-centos7-jdk8 ����
+# -v /usr/local/dockerv/jenkins_home:/var/jenkins_home 指定宿主机目录为Jenkins工作目录
+# -v /etc/localtime:/etc/localtime 让容器使用和服务器同样的时间设置
+# -v /usr/local/maven:/usr/local/maven 映射宿主机的maven
+# -v /usr/local/java:/usr/local/java 映射宿主机的java
+# 也可以使用 jenkins/jenkins:lts-centos7-jdk8 镜像
 [emon@emon ~]$ docker run --name jenkins -d -p 8080:8080 -p 50000:50000 -v /usr/local/dockerv/jenkins_home:/var/jenkins_home -v /etc/localtime:/etc/localtime -v /usr/local/maven:/usr/local/maven -v /usr/local/java:/usr/local/java jenkins/jenkins:lts
 ```
 
-- �鿴����
+- 查看密码
 
 ```bash
 [emon@emon ~]$ docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-# ������������
+# 命令行输出结果
 a3ada16670124943be3412fa7400c7f2
 ```
 
-���ʣ�http://emon:8080
+访问：http://emon:8080
 
-��װ�Ƽ��Ĳ��==>�����û���jenkins/jenkins123
+安装推荐的插件==>创建用户：jenkins/jenkins123
 
-- ����Jenkins
+- 重启Jenkins
 
 http://emon:8080/restart
 
 
 
-### 1.3�����ò����װ�뻷������
+### 1.3、常用插件安装与环境配置
 
-#### 1.3.1�����ò����װ
+#### 1.3.1、常用插件安装
 
 - Git
 
-- Artifactory������ⰲװ
+- Artifactory：需额外安装
 - Pipeline
-- Jira������ⰲװ
-- Ansible������ⰲװ
-- Kubernetes������ⰲװ
+- Jira：需额外安装
+- Ansible：需额外安装
+- Kubernetes：需额外安装
 
 - [ SonarQube Scanner](https://plugins.jenkins.io/sonar)
 
-��װ��ɺ󣬵������װ��ɺ�����Jenkins������������������
+安装完成后，点击【安装完成后重启Jenkins】，触发重启操作。
 
-#### 1.3.2����������
+#### 1.3.2、环境配置
 
-##### Global Tool Configuration��ȫ�ֹ������ã�
+##### Global Tool Configuration（全局工具配置）
 
-- ����JDK
+- 配置JDK
 
-����·����Manage Jenkins==>Global Tool Configuration==>JDK==>�����Զ���װ==>
+配置路径：Manage Jenkins==>Global Tool Configuration==>JDK==>勾掉自动安装==>
 
-JDK����=java
+JDK别名=java
 
 JAVA_HOME=/usr/local/java
 
-- ����Maven
+- 配置Maven
 
-����·����Manage Jenkins==>Global Tool Configuration==>Maven==>�����Զ���װ==>
+配置路径：Manage Jenkins==>Global Tool Configuration==>Maven==>勾掉自动安装==>
 
-JDK����=maven
+JDK别名=maven
 
 MAVEN_HOME=/usr/local/maven
 
-##### Configure System��ϵͳ���ã�
+##### Configure System（系统配置）
 
-- ȫ������==>��������
+- 全局属性==>环境变量
 
-����·����Manage Jenkins==>Configure System==>��ѡ��������==>���Ӽ�ֵ���б�==>
+配置路径：Manage Jenkins==>Configure System==>勾选环境变量==>添加键值对列表==>
 
 JAVA_HOME=/usr/local/java
 
@@ -298,15 +298,15 @@ MAVEN_HOME=/usr/local/maven
 
 PATH+EXTRA=$MAVEN_HOME/bin:$JAVA_HOME/bin
 
-- ����JFrog
+- 配置JFrog
 
-����·����Manage Jenkins==>Configure System==>JFrog==>Add JFrog Platform Instance==>
+配置路径：Manage Jenkins==>Configure System==>JFrog==>Add JFrog Platform Instance==>
 
 Instance Id=artifactory-oss
 
 JFrog Platform URL=http://172.17.0.1:8083/artifactory
 
-Default Deployer Credentials���ã�
+Default Deployer Credentials配置：
 
 Username=admin
 
@@ -314,50 +314,50 @@ Password=admin123
 
 
 
-### 1.4��Jenkins����������ˮ�߽���
+### 1.4、Jenkins持续集成流水线介绍
 
-#### 1.4.1��Jenkins��Ŀ����
+#### 1.4.1、Jenkins项目类型
 
-- Jenkins��Ŀ����
-  - Freestyle��Ŀ
-  - Maven��Ŀ
-  - Pipeline��Ŀ����ˮ�ߣ�
-  - �ⲿ�������
-
-
-
-#### 1.4.2��Jenkins����������ˮ���ŵ�
-
-- Pipeline as Code����ˮ�߼����룬����ɴ洢��git�ֿ⣩
-- ����������ˮ����������л���������Jenkins Slave�ڵ㣩
-- �͵��������ɸ������ף��ӿڵ��ã�
+- Jenkins项目类型
+  - Freestyle项目
+  - Maven项目
+  - Pipeline项目（流水线）
+  - 外部任务调用
 
 
 
-#### 1.4.3��Jenkins����������ˮ���﷨
+#### 1.4.2、Jenkins持续集成流水线优点
 
-- Scripted�ű�ʽ
-  - ��ʹ������Groovy�ű�ʵ�ֹ��ܣ��ǳ����
-  - ѧϰ�ɱ��ͣ������ƹ�
-- Declarative����ʽ
-  - ͨ��Ԥ�Ƶı�ǩ���нṹ���ı�д
-  - �������ޣ������ӱ�׼��
+- Pipeline as Code（流水线即代码，代码可存储于git仓库）
+- 不依赖于流水线任务的运行环境（不绑定Jenkins Slave节点）
+- 和第三方集成更加容易（接口调用）
 
 
 
-### 1.5���ű�ʽ��ˮ��
+#### 1.4.3、Jenkins持续集成流水线语法
+
+- Scripted脚本式
+  - 可使用任意Groovy脚本实现功能，非常灵活
+  - 学习成本低，易于推广
+- Declarative声明式
+  - 通过预制的标签进行结构化的编写
+  - 功能受限，但更加标准化
+
+
+
+### 1.5、脚本式流水线
 
 ```groovy
-node { // �����ڵ�
+node { // 工作节点
     def mvnHome
-    stage('Pull source code') {// ���岽��
+    stage('Pull source code') {// 定义步骤
         git 'https://github.com/EmonCodingBackEnd/backend-devops-learning.git'
         mvnHome = tool 'maven'
     }
-    dir('notebook-service') { // �л�����Ŀ¼
+    dir('notebook-service') { // 切换工作目录
         stage('Maven build') {
             sh '''
-            mvn deploy // ִ��Maven����
+            mvn deploy // 执行Maven命令
             '''
         }
     }
@@ -366,15 +366,15 @@ node { // �����ڵ�
 
 
 
-### 1.6������ʽ��ˮ��
+### 1.6、声明式流水线
 
 ```groovy
-pipeline { // ���
-    agent { docker 'maven:3-alpine'} // ָ��Agent
+pipeline { // 起点
+    agent { docker 'maven:3-alpine'} // 指定Agent
     stages {
-        stage('Example Build') { // ִ�н׶�
+        stage('Example Build') { // 执行阶段
             steps {
-                sh 'mvn -B clean verify' // ִ��Maven����
+                sh 'mvn -B clean verify' // 执行Maven命令
             }
         }
     }
@@ -383,34 +383,34 @@ pipeline { // ���
 
 
 
-## 2��Jenkins����Artifactory
+## 2、Jenkins集成Artifactory
 
 ![image-20220320105817043](images/image-20220320105817043.png)
 
-### 2.1��JFrog Artifactory����
+### 2.1、JFrog Artifactory介绍
 
-- Artifactory��֪������Ʒ��������ߣ�����ͳһ���������԰�����������Ʒ���ṩMaven˽������Ʒ��Ĺ��ܡ�
-- ����Nexus��Ҫ����������������ȱ������Ʒ�Ĺ���������Ȩ�ޣ�MD5��飬������Ϣ�ȵȣ��������������ҵ��ʹ��Artifactory���Nexus������ͳһ��������������Ʒ�������
+- Artifactory是知名的制品库管理工具，用于统一管理多语言包的依赖和制品，提供Maven私服和制品库的功能。
+- 由于Nexus主要用于依赖管理，而缺乏对制品的管理，包括权限，MD5检查，构建信息等等，互利网或大型企业逐渐使用Artifactory替代Nexus，进行统一依赖管理，和制品库管理。
 
-### 2.2��Jenkins���ɲ���
+### 2.2、Jenkins集成步骤
 
-- ��װJenkins Artifactory���
-- ����Artifactory���
-- ����Artifactory credentials
-- ����ˮ����ʹ��Artifactory�����������أ���Ʒ�ϴ�
+- 安装Jenkins Artifactory插件
+- 配置Artifactory插件
+- 配置Artifactory credentials
+- 在流水线中使用Artifactory进行依赖下载，制品上传
 
-### 2.3������ƾ��
+### 2.3、配置凭据
 
-����·����Manage Jenkins==>ManageCredentials==>���Ͻ�ƾ������ѡ��System��ϵͳ��==>����ѡ��ȫ��ƾ�ݣ�unrestricted��==>����ƾ��==>
+配置路径：Manage Jenkins==>ManageCredentials==>左上角凭据下拉选择System（系统）==>下拉选择全局凭据（unrestricted）==>添加凭据==>
 
 ![image-20220320103558461](images/image-20220320103558461.png)
 
 
 
-### 2.4��Pipeline��ˮ��������Artifactory��Stage
+### 2.4、Pipeline流水线中引入Artifactory的Stage
 
 ```groovy
-        //Maven ��������Ʒ�ϴ��� Artifactory
+        //Maven 构建，制品上传到 Artifactory
         stage('Maven build'){
             def server = Artifactory.newServer url: "http://172.17.0.1:8083/artifactory", credentialsId: 'artifactory-oss-apikey'
             def rtMaven = Artifactory.newMavenBuild()
@@ -418,7 +418,7 @@ pipeline { // ���
             rtMaven.tool = 'maven' // Tool name from Jenkins configuration
             rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
 
-            //�ռ�������Ϣ
+            //收集构建信息
             def buildInfo = Artifactory.newBuildInfo()
             // server.publishBuildInfo buildInfo
             rtMaven.run pom: 'pom.xml', goals: 'deploy -Dmaven.test.skip=true', buildInfo: buildInfo
@@ -429,255 +429,255 @@ pipeline { // ���
 
 
 
-## 3��Jenkins����Jira���Թ���
+## 3、Jenkins集成Jira【略过】
 
 ![image-20220320105739321](images/image-20220320105739321.png)
 
-### 3.1��Jira����
+### 3.1、Jira介绍
 
-- Jira��ҵ��֪���������������
-- Jira�������ڹ���������Ŀ������׷�٣������������Ŀ���ȣ������ȹ��ܣ��ʺ����ݿ����Ŷӽ���ʹ�á�
+- Jira是业界知名的需求管理工具
+- Jira可以用于管理敏捷项目的需求追踪，任务管理，项目进度，报表等功能，适合敏捷开发团队进行使用。
 
-### 3.2��Jenkins���ɲ���
+### 3.2、Jenkins集成步骤
 
-- ��װJenkins Jira���
-- ����Jira credentials
-- ����Jira���
-- �ύ����ʱ������Jira����ID
-- �ڹ�������в鿴����ID
+- 安装Jenkins Jira插件
+- 配置Jira credentials
+- 配置Jira插件
+- 提交代码时，管理Jira任务ID
+- 在构建结果中查看任务ID
 
-## 4��Jenkins����Sonarqube
+## 4、Jenkins集成Sonarqube
 
 ![image-20220320112656769](images/image-20220320112656769.png)
 
 
 
-### 4.1��Sonarqube����
+### 4.1、Sonarqube介绍
 
-- Sonarqube��֪���Ŀ�ԴԴ����ɨ�蹤�ߡ�
+- Sonarqube是知名的开源源代码扫描工具。
 
-- ����������Ŀ��Դ����ɨ�裬ʶ������������©�����ظ��ʵ����⣬���������������
-- ԭ����
-  - ͨ���������ص�ɨ�������Դ�������ɨ�裬������й����򴴽�һ��issue�����������߽����޸���
+- 用于软件项目的源代码扫描，识别代码的质量，漏洞，重复率等问题，提升代码的质量。
+- 原理：
+  - 通过建立本地的扫描规则库对源代码进行扫描，如果命中规则则创建一个issue，提升开发者进行修复。
 
-### 4.2���Sonarqube
+### 4.2、搭建Sonarqube
 
-- ʹ��Docker
+- 使用Docker
 
 ```bash
 [emon@emon ~]$ docker run --name sonarqube -d -p 9000:9000 library/sonarqube:lts
 ```
 
-���ʣ�http://emon:9000
+访问：http://emon:9000
 
-�û������룺admin/admin ==> ��¼����ʾ�޸����룺admin/admin123
+用户名密码：admin/admin ==> 登录后被提示修改密码：admin/admin123
 
 
 
-## 5��Jenkins����YAPI
+## 5、Jenkins集成YAPI
 
-### 5.1��YAPI����
+### 5.1、YAPI介绍
 
-- YAPI��ȥ�Ķ���Դ�Ľӿ��Զ������Թ��ߣ� https://github.com/YMFE/yapi
-- YAPI�Ǹ�Ч�����á�����ǿ���API����ƽ̨��ּ��Ϊ��������Ʒ��������Ա�ṩ�����ŵĽӿڹ������񡣿�Դ�������������ɴ�����������ά��API��
+- YAPI是去哪儿开源的接口自动化测试工具： https://github.com/YMFE/yapi
+- YAPI是高效、易用、功能强大的API管理平台，旨在为开发、产品、测试人员提供更优雅的接口管理服务。开源帮助开发者轻松创建、发布、维护API。
 
-## 6��Jenkins����Selenium
+## 6、Jenkins基础Selenium
 
 ![image-20220320120728443](images/image-20220320120728443.png)
 
 
 
-### 6.1��Selenium����
+### 6.1、Selenium介绍
 
-- Selenium�ǳ����UI�Զ����Թ�����Ŀ�� https://www.selenium.dev
-- Selenium��Ŀ
-  - WebDriver - �������������ģ�����
-  - IDE - ͨ��ҳ�������в��Խű���¼��
-  - Grid - ֧�ֿ�ƽ̨�������������в���
+- Selenium是成熟的UI自动测试工具项目： https://www.selenium.dev
+- Selenium项目
+  - WebDriver - 驱动浏览器进行模拟测试
+  - IDE - 通过页面点击进行测试脚本的录制
+  - Grid - 支持跨平台，多个浏览器并行测试
 
 
 
-# �ġ���������
+# 四、持续测试
 
 ![image-20220320120916693](images/image-20220320120916693.png)
 
 
 
-## 1��Ansible���
+## 1、Ansible简介
 
-### 1.1��Ansible����
+### 1.1、Ansible介绍
 
-Ansible���³��ֵ��Զ�����ά���ߣ�����Python�������������ڶ���ά���ߣ�puppet��chef��func��fabric�����ŵ㣬ʵ����ƥ��ϵͳ���á�����������������������ȹ��ܡ�
+Ansible是新出现的自动化运维工具，基于Python开发，集合了众多运维工具（puppet、chef、func、fabric）的优点，实现了匹配系统配置、批量程序部署、批量运行命令等功能。
 
-Ansible�ǻ���paramiko�����ģ����һ���ģ�黯����������û������������������������������������Ansible�����е�ģ�飬Ansibleֻ���ṩһ�ֿ�ܡ�Ansible����Ҫ��Զ�������ϰ�װClient/Agents����Ϊ�����ǻ���ssh����Զ������ͨѶ�ġ�
+Ansible是基于paramiko开发的，并且基于模块化工作，本身没有批量部署的能力。真正具有批量部署的是Ansible所运行的模块，Ansible只是提供一种框架。Ansible不需要在远程主机上安装Client/Agents，因为它们是基于ssh来和远程主机通讯的。
 
-AnsibleĿǰ�Ѿ�����ñ�ٷ��չ������Զ�����ά�����д���Ͽɶ���ߵģ������������ף�ѧϰ�򵥡���ÿλ��ά����ʦ�������յļ���֮һ��
+Ansible目前已经被红帽官方收购，是自动化运维工具中大家认可度最高的，并且上手容易，学习简单。是每位运维工程师必须掌握的技能之一。
 
-### 1.2��Ansible���ŵ�
+### 1.2、Ansible的优点
 
-- ����򵥣�ֻ��Ҫ�����ض˲���Ansible���������ض��������κβ�����
-- Ĭ��ʹ��SSHЭ����豸���й�����
-- �д���������ά����ģ�飬����ʵ���ճ����󲿷ֲ�����
-- ���ü򵥡�����ǿ����չ��ǿ��
-- ֧��API���Զ���ģ�飬��ͨ��Python������չ��
-- ͨ��Playbooks���籾��������ǿ������á�״̬������
-- �������������ڿͻ��˰�װAgent������ʱ��ֻ��Ҫ�ڲ������Ͻ���һ�θ��¼��ɣ�
-- �ṩһ������ǿ�󡢲�����ǿ��Web���������REST API�ӿڡ���AWXƽ̨��
+- 部署简单，只需要在主控端部署Ansible环境，被控端无需做任何操作；
+- 默认使用SSH协议对设备进行管理；
+- 有大量常规运维操作模块，可以实现日常绝大部分操作；
+- 配置简单、功能强大、扩展性强；
+- 支持API及自定义模块，可通过Python轻松扩展；
+- 通过Playbooks（剧本）来定制强大的配置、状态管理；
+- 轻量级、无需在客户端安装Agent，更新时，只需要在操作机上进行一次更新即可；
+- 提供一个功能强大、操作型强的Web管理界面和REST API接口——AWX平台。
 
-- ͨ��Ansible Galaxy�ɻ�ȡ��Դ����������Playbook�������ظ��쳵�֡�
+- 通过Ansible Galaxy可获取开源社区共享的Playbook，避免重复造车轮。
 
-### 1.3��Ansible�ܹ�ͼ
+### 1.3、Ansible架构图
 
 ![img](images/1204916-20171205163000628-69838828.png)
 
-��ͼ�����ǿ�������Ҫģ�����£�
+上图中我们看到的主要模块如下：
 
-- Ansible��Ansible���ĳ���
-- HostInventory����¼��Ansible������������Ϣ�������˿ڡ����롢IP�ȡ�
-- Playbooks�����籾��YAML��ʽ�ļ��������������һ���ļ��У�����������Ҫ������Щģ������ɵĹ��ܡ�
-- CoreModules������ģ�飬��Ҫ������ͨ�����ú���ģ������ɹ�������
-- CustomModules���Զ���ģ�飬��ɺ���ģ���޷���ɵĹ��ܣ�֧�ֶ������ԡ�
-- ConnectionPlugins�����Ӳ����Ansible��Hostͨ��ʹ�á�
-
-
-
-### 1.4��Ansible�ĺ��ĸ���
-
-- Control node�����ƽڵ�
-  - Ansible��װ�Ļ�������������������playbook��
-  - �κΰ�װ��Python�Ļ������ܰ�װAnsible��-laptops��shared desktops��and servers��
-  - ��������Windows machine��Ϊ���ƽڵ㡣
-- Managed nodes���ܹܿؽڵ�
-  - ʹ��Ansible�ܿص��豸������
-  - �ܹܿؽڵ�Ҳ����֮Ϊ`hosts`
-  - Ansible����װ���ܹܿؽڵ�
-- Inventory������
-  - �ܹܿؽڵ���б���
-  - �����ļ�Ҳ����`hostfile`����Ŀ���ļ�����ָ���ܹܿػ�����IP��
-  - ����Ҳ���Թ����ڵ㣬�������飬������������
-- Modules��ģ��
-  - Ansibleͨ��ģ����ִ���ض����
-  - ÿ��ģ�����ض����ô���
-  - �������һ�������е���ĳ��ģ�飬Ҳ������playbook�е��ö��ģ�顣
-- Tasks������
-  - Ansible�е�����Ԫ��������������ִ��һ��ad-hoc���
-- Playbooks���籾
-  - ����ı��Žű������ڶ��ڵ���������һϵ�е�����Playbooks���԰���������һ���ı������ݡ�
-  - ��YAML��д�����ڱ�д��������
+- Ansible：Ansible核心程序。
+- HostInventory：记录由Ansible管理的主机信息，包括端口、密码、IP等。
+- Playbooks：“剧本“YAML格式文件，多个任务定义在一个文件中，定义主机需要调用哪些模块来完成的功能。
+- CoreModules：核心模块，主要操作是通过调用核心模块来完成管理任务。
+- CustomModules：自定义模块，完成核心模块无法完成的功能，支持多种语言。
+- ConnectionPlugins：连接插件，Ansible和Host通信使用。
 
 
 
-## 2��Ansible����ִ��
+### 1.4、Ansible的核心概念
 
-### 2.1��Ansible����ִ��ģʽ
+- Control node：控制节点
+  - Ansible安装的机器，你可以运行命令和playbook。
+  - 任何安装了Python的机器都能安装Ansible，-laptops，shared desktops，and servers。
+  - 但不能用Windows machine作为控制节点。
+- Managed nodes：受管控节点
+  - 使用Ansible管控的设备，机器
+  - 受管控节点也被称之为`hosts`
+  - Ansible不安装在受管控节点
+- Inventory：库存表
+  - 受管控节点的列表。
+  - 库存表文件也叫做`hostfile`。你的库存文件可以指定受管控机器的IP。
+  - 库存表也可以管理节点，创建分组，编译多机操作。
+- Modules：模块
+  - Ansible通过模块来执行特定命令。
+  - 每个模块有特定的用处。
+  - 你可以在一个任务中调用某个模块，也可以在playbook中调用多个模块。
+- Tasks：任务
+  - Ansible中的任务单元，可以在任务中执行一个ad-hoc命令。
+- Playbooks：剧本
+  - 任务的编排脚本，用于定期的批量部署一系列的任务。Playbooks可以包含和任务一样的变量内容。
+  - 用YAML编写，易于编写，共享。
 
-Ansibleϵͳ�ɿ��������Ա��ܽڵ�Ĳ�����ʽ�ɷ�Ϊ���ࣺ`adhoc`��`playbook`��
 
-- ad-hocģʽ����Ե�ģʽ��
 
-ʹ�õ���ģ�飬֧������ִ�е������ad-hoc������һ�ֿ��Կ��������������Ҳ���Ҫ����������������൱��bash�е�һ�仰shell��
+## 2、Ansible任务执行
 
-- playbookģʽ���籾ģʽ��
+### 2.1、Ansible任务执行模式
 
-��ģʽ��Ansible��Ҫ������ʽ��Ҳ��Ansible����ǿ��Ĺؼ����ڡ�playbookͨ�����task�������һ�๦�ܣ���Web����İ�װ�������ݿ���������������ݵȡ����Լ򵥵ذ�palybook����Ϊͨ����϶���ad-hoc�����������ļ���
+Ansible系统由控制主机对被管节点的操作方式可分为两类：`adhoc`和`playbook`：
 
-### 2.2��Ansibleִ������
+- ad-hoc模式（点对点模式）
+
+使用单个模块，支持批量执行单条命令。ad-hoc命令是一种可以快速输入的命令，而且不需要保存起来的命令。就相当于bash中的一句话shell。
+
+- playbook模式（剧本模式）
+
+该模式是Ansible主要管理方式，也是Ansible功能强大的关键所在。playbook通过多个task集合完成一类功能，如Web服务的安装部署、数据库服务器的批量备份等。可以简单地把palybook理解为通过组合多条ad-hoc操作的配置文件。
+
+### 2.2、Ansible执行流程
 
 ![img](images/1204916-20171205162615738-1292598736.png)
 
-���������Ansible������ʱ�����ȶ�ȡ`ansible.cfg`�е����ã����ݹ����ȡ`Inventory`�еĹ��������б������е�����Щ������ִ�����õ��������ȴ�ִ�з��صĽ����
+简单理解就是Ansible在运行时，首先读取`ansible.cfg`中的配置，根据规则获取`Inventory`中的管理主机列表，并行的在这些主机中执行配置的任务，最后等待执行返回的结果。
 
 
 
-### 2.3��Ansible����ִ�й���
+### 2.3、Ansible命令执行过程
 
-1. �����Լ��������ļ���Ĭ��`/etc/ansible/ansible.cfg`��
-2. ���Ҷ�Ӧ�����������ļ����ҵ�Ҫִ�е����������飻
-3. �����Լ���Ӧ��ģ���ļ�����command��
-4. ͨ��ansible��ģ����������ɶ�Ӧ����ʱpy�ļ���python�ű������������ļ�������Զ�̷�������
-5. ��Ӧִ���û��ļ�Ŀ¼��`.ansible/tmp/XXX/XXX.PY`�ļ���
-6. ���ļ�+xִ��Ȩ�ޣ�
-7. ִ�в����ؽ����
-8. ɾ����ʱpy�ļ���`sleep 0`�˳���
+1. 加载自己的配置文件，默认`/etc/ansible/ansible.cfg`；
+2. 查找对应的主机配置文件，找到要执行的主机或者组；
+3. 加载自己对应的模块文件，如command；
+4. 通过ansible将模块或命令生成对应的临时py文件（python脚本），并将该文件传输至远程服务器；
+5. 对应执行用户的家目录的`.ansible/tmp/XXX/XXX.PY`文件；
+6. 给文件+x执行权限；
+7. 执行并返回结果；
+8. 删除临时py文件，`sleep 0`退出；
 
-## 3��Ansible�������
+## 3、Ansible配置详解
 
-### 3.1��Ansible��װ��ʽ
+### 3.1、Ansible安装方式
 
-Ansible��װ�������ַ�ʽ��`yum��װ`��`pip����װ`��
+Ansible安装常用两种方式，`yum安装`和`pip程序安装`。
 
-#### 3.1.1��ʹ��pip��python�İ�����ģ�飩��װ
+#### 3.1.1、使用pip（python的包管理模块）安装
 
-���ȣ�������Ҫ��װһ��Python3.8���ϰ汾�İ�����װ����Ժ���ֱ��ʹ��`pip`���װansible���ɣ�
+首先，我们需要安装一个Python3.8以上版本的包，安装完成以后，则直接使用`pip`命令安装ansible即可：
 
 ```bash
 [emon@emon ~]$ pip3 install ansible
 ```
 
-#### 3.1.2��ʹ��yum��װ���Ƽ���
+#### 3.1.2、使用yum安装【推荐】
 
-yum��װ�����Ǻ���Ϥ�İ�װ��ʽ�ˡ�������Ҫ�Ȱ�װһ��epel-release�����ٰ�װ���ǵ�ansible���ɡ�
+yum安装是我们很熟悉的安装方式了。我们需要先安装一个epel-release包，再安装我们的ansible即可。
 
 ```bash
 [emon@emon ~]$ sudo yum install -y epel-release
 [emon@emon ~]$ sudo yum install -y ansible
 ```
 
-### 3.2��Ansible����ṹ
+### 3.2、Ansible程序结构
 
-��װĿ¼���£�yum��װ����
+安装目录如下（yum安装）：
 
-| Ŀ¼                                      | ˵��          |
+| 目录                                      | 说明          |
 | ----------------------------------------- | ------------- |
-| /etc/ansible/                             | �����ļ�Ŀ¼  |
-| /usr/bin/                                 | ִ���ļ�Ŀ¼  |
-| /usr/lib/pythonX.X/site-packages/ansible/ | Lib������Ŀ¼ |
-| /usr/share/doc/ansible-X.X.X/             | Help�ĵ�Ŀ¼  |
-| /usr/share/man/man1/                      | Man�ĵ�Ŀ¼   |
+| /etc/ansible/                             | 配置文件目录  |
+| /usr/bin/                                 | 执行文件目录  |
+| /usr/lib/pythonX.X/site-packages/ansible/ | Lib库依赖目录 |
+| /usr/share/doc/ansible-X.X.X/             | Help文档目录  |
+| /usr/share/man/man1/                      | Man文档目录   |
 
-### 3.3��Ansible�����ļ�����˳��
+### 3.3、Ansible配置文件查找顺序
 
-Ansible�����������ķ�������һ�����кܴ�ͬ������������ļ������ǴӶ���ط��ҵģ�˳�����£�
+Ansible与我们其他的服务在这一点上有很大不同，这里的配置文件查找是从多个地方找的，顺序如下：
 
-1. ��黷�ڱ���`ANSIBLE_CONFIG`ָ���·���ļ���export ANSIBLE_CONFIG=/etc/ansible/ansible.cfg����
-2. `~/.ansible.cfg`����鵱ǰĿ¼�µ�ansible.cfg�����ļ���
-3. `/etc/ansible/ansible.cfg`���etcĿ¼�������ļ�
+1. 检查环节变量`ANSIBLE_CONFIG`指向的路径文件（export ANSIBLE_CONFIG=/etc/ansible/ansible.cfg）；
+2. `~/.ansible.cfg`，检查当前目录下的ansible.cfg配置文件；
+3. `/etc/ansible/ansible.cfg`检查etc目录的配置文件
 
-### 3.4��Ansible�����ļ�
+### 3.4、Ansible配置文件
 
-Ansible�������ļ�Ϊ`/etc/ansible/ansible.cfg`��ansible��������������������г�һЩ�����Ĳ�����
+Ansible的配置文件为`/etc/ansible/ansible.cfg`，ansible有许多参数，下面我们列出一些常见的参数：
 
 ```ini
-inventory = /etc/ansible/hosts	#���������ʾ��Դ�嵥inventory�ļ���λ��
-library = /usr/share/ansible	#ָ����Ansibleģ���Ŀ¼��֧�ֶ��Ŀ¼��ʽ��ֻҪ��ð�ţ����������Ϳ���
-forks = 5						#������������Ĭ��Ϊ5
-sudo_user = root				#����Ĭ��ִ��������û�
-remote_port = 22				#ָ�����ӱ��ܽڵ�Ĺ����˿ڣ�Ĭ��Ϊ22�˿ڣ������޸ģ��ܹ����Ӱ�ȫ
-host_key_checking = False		#�����Ƿ���SSH��������Կ��ֵΪTrue/False���رպ��һ�����Ӳ�����ʾ����ʵ��
-timeout = 60					#����SSH���ӵĳ�ʱʱ�䣬��λΪ��
-log_path = /var/log/ansible.log	#ָ��һ���洢ansible��־���ļ���Ĭ�ϲ���¼��־��
+inventory = /etc/ansible/hosts	#这个参数表示资源清单inventory文件的位置
+library = /usr/share/ansible	#指向存放Ansible模块的目录，支持多个目录方式，只要用冒号（：）隔开就可以
+forks = 5						#并发连接数，默认为5
+sudo_user = root				#设置默认执行命令的用户
+remote_port = 22				#指定连接被管节点的管理端口，默认为22端口，建议修改，能够更加安全
+host_key_checking = False		#设置是否检查SSH主机的密钥，值为True/False。关闭后第一次连接不会提示配置实例
+timeout = 60					#设置SSH连接的超时时间，单位为秒
+log_path = /var/log/ansible.log	#指定一个存储ansible日志的文件（默认不记录日志）
 ```
 
-### 3.5��Ansible�����嵥
+### 3.5、Ansible主机清单
 
-�������ļ��У������ᵽ����Դ�嵥������嵥�������ǵ������嵥�����汣�����һЩansible��Ҫ���ӹ����������б������ǿ������������Ķ��巽ʽ��
+在配置文件中，我们提到了资源清单，这个清单就是我们的主机清单，里面保存的是一些ansible需要连接管理的主机列表。我们可以来看看他的定义方式：
 
 ```bash
-1�� ֱ��ָ��������ַ����������
+1、 直接指明主机地址或主机名：
 	## green.example.com#
 	# blue.example.com#
 	# 192.168.100.1
 	# 192.168.100.10
-2�� ����һ��������[����]�ѵ�ַ���������ӽ�ȥ
+2、 定义一个主机组[组名]把地址或主机名加进去
 	[mysql_test]
 	192.168.253.159
 	192.168.253.160
 	192.168.253.153
 ```
 
-��Ҫע����ǣ���������Ա����ʹ��ͨ�����ƥ�䣬��������һЩ��׼���Ĺ�����˵�ͺ����ɷ����ˡ�
+需要注意的是，这里的组成员可以使用通配符来匹配，这样对于一些标准化的管理来说就很轻松方便了。
 
-���ǿ��Ը���ʵ��������������ǵ������б�������������£�
+我们可以根据实际情况来配置我们的主机列表，具体操作如下：
 
 ```bash
 [emon@emon ~]$ sudo mkdir /etc/ansible
@@ -690,119 +690,119 @@ emon2
 emon3
 ```
 
-������Hosts�����о����õ��ı������֣�
+以下是Hosts部分中经常用到的变量部分：
 
-| ����                         | ����                                                         |
+| 变量                         | 含义                                                         |
 | ---------------------------- | ------------------------------------------------------------ |
-| ansible_ssh_host             | ����ָ������������������ʵIP                                 |
-| ansible_ssh_port             | ����ָ�����ӵ�������������ssh�˿ںţ�Ĭ����22                |
-| ansible_ssh_user             | ssh����ʱĬ��ʹ�õ��û���                                    |
-| ansible_ssh_pass             | ssh����ʱ������                                              |
-| ansible_sudo_pass            | ʹ��sudo�����û�ʱ������                                     |
-| ansible_sudo_exec            | ���sudo�����Ĭ��·������Ҫָ��sudo����·��               |
-| ansible_ssh_private_key_file | ��Կ�ļ�·������Կ�ļ��������ʹ��ssh-agent����ʱ����ʹ�ô�ѡ�� |
-| ansible_shell_type           | Ŀ��ϵͳ��shell�����ͣ�Ĭ��sh                                |
-| ansible_connection           | SSH ���ӵ����ͣ�local , ssh , paramiko����ansible1.2֮ǰĬ����paramiko ����������ѡ������ʹ�û���ControlPersist ��ssh |
-| ansible_python_interpreter   | ����ָ��python��������·����Ĭ��Ϊ/usr/bin/python ͬ������ָ��ruby ��perl��·�� |
-| `ansible_*_interpreter`      | ����������·�����÷���ansible_python_interpreter���ƣ�����"*"������ruby��perl���������� |
+| ansible_ssh_host             | 用于指定被管理的主机的真实IP                                 |
+| ansible_ssh_port             | 用于指定连接到被管理主机的ssh端口号，默认是22                |
+| ansible_ssh_user             | ssh连接时默认使用的用户名                                    |
+| ansible_ssh_pass             | ssh连接时的密码                                              |
+| ansible_sudo_pass            | 使用sudo连接用户时的密码                                     |
+| ansible_sudo_exec            | 如果sudo命令不在默认路径，需要指定sudo命令路径               |
+| ansible_ssh_private_key_file | 秘钥文件路径，秘钥文件如果不想使用ssh-agent管理时可以使用此选项 |
+| ansible_shell_type           | 目标系统的shell的类型，默认sh                                |
+| ansible_connection           | SSH 连接的类型：local , ssh , paramiko，在ansible1.2之前默认是paramiko ，后来智能选择，优先使用基于ControlPersist 的ssh |
+| ansible_python_interpreter   | 用来指定python解释器的路径，默认为/usr/bin/python 同样可以指定ruby 、perl的路径 |
+| `ansible_*_interpreter`      | 其他解释器路径，用法与ansible_python_interpreter类似，这里"*"可以是ruby或perl等其它语言 |
 
-## 4��Ansible��������
+## 4、Ansible常用命令
 
-### 4.1��ansible���
+### 4.1、ansible命令集
 
 ```bash
-# -1����-l
+# -1不是-l
 [emon@emon ~]$ ls -1 /usr/local/python3/bin/ansible*
-# ������������������ AD-hoc����ʾ��ʱ����ģʽ
-/usr/local/python3/bin/ansible # Ansible AD-Hoc��ʱ����ִ�й��ߣ���������ʱ�����ִ��
+# 命令行输出结果，其中 AD-hoc：表示临时命令模式
+/usr/local/python3/bin/ansible # Ansible AD-Hoc临时命令执行工具，常用于临时命令的执行
 /usr/local/python3/bin/ansible-config 
 /usr/local/python3/bin/ansible-connection
-/usr/local/python3/bin/ansible-console # Ansible����Linux Console��������û�����������ִ�й���
-/usr/local/python3/bin/ansible-doc # Ansibleģ�鹦�ܲ鿴����
-/usr/local/python3/bin/ansible-galaxy # ����/�ϴ���������Rolesģ��Ĺ���ƽ̨�����������
+/usr/local/python3/bin/ansible-console # Ansible基于Linux Console界面可与用户交互的命令执行工具
+/usr/local/python3/bin/ansible-doc # Ansible模块功能查看工具
+/usr/local/python3/bin/ansible-galaxy # 下载/上传优秀代码或Roles模块的官网平台，基于网络的
 /usr/local/python3/bin/ansible-inventory
-/usr/local/python3/bin/ansible-playbook # Ansible�����Զ��������񼯱��Ź���
-/usr/local/python3/bin/ansible-pull # AnsibleԶ��ִ������Ĺ��ߣ���ȡ���ö����������ã�ʹ�ý��٣���������ʱʹ�ã�����ά�ļܹ�����Ҫ��ϸߣ�
+/usr/local/python3/bin/ansible-playbook # Ansible定制自动化的任务集编排工具
+/usr/local/python3/bin/ansible-pull # Ansible远程执行命令的工具，拉取配置而非推送配置（使用较少，海量机器时使用，对运维的架构能力要求较高）
 /usr/local/python3/bin/ansible-test
-/usr/local/python3/bin/ansible-vault # Ansible�ļ����ܹ���
+/usr/local/python3/bin/ansible-vault # Ansible文件加密工具
 ```
 
-���У����ǱȽϳ��õ���`ansible`��`ansible-playbook`���
+其中，我们比较常用的是`ansible`和`ansible-playbook`命令。
 
-### 4.2��ansible-doc����
+### 4.2、ansible-doc命令
 
-ansible-doc������ڻ�ȡģ����Ϣ����ʹ�ð�����һ���÷����£�
+ansible-doc命令常用于获取模块信息及其使用帮助，一般用法如下：
 
 ```bash
-ansible-doc -l # ��ȡȫ��ģ�����Ϣ
-ansible-doc -s MOD_NAME # ��ȡָ��ģ���ʹ�ð���
-ansible-doc -h # ��ȡansible-doc�����ȫ���÷�
+ansible-doc -l # 获取全部模块的信息
+ansible-doc -s MOD_NAME # 获取指定模块的使用帮助
+ansible-doc -h # 获取ansible-doc命令的全部用法
 ```
 
-- ���磬��mysql_userģ��Ϊ��
+- 比如，以mysql_user模块为例
 
 ```bash
 [emon@emon ~]$ ansible-doc -s mysql_user
 ```
 
-### 4.3��ansible�������
+### 4.3、ansible命令详解
 
-- ����ľ����ʽ���£�
+- 命令的具体格式如下：
 
 ```bash
 ansible <host-pattern> [-f forks] [-m module_name] [-a args]
 ```
 
-Ҳ����ͨ��`ansible -h`���鿴�����������г�һЩ����ѡ����ͺ��壺
+也可以通过`ansible -h`来查看帮助，下面列出一些常用选项并解释含义：
 
 ```bash
--a MODULE_ARGS # ģ��Ĳ��������ִ��Ĭ��COMMAND��ģ�飬��������������磺date��pwd�ȵ�
--k, --ask-pass # ask for SSH password����¼���룬��ʾ����SSH��������Ǽ��������Կ����֤��Сд��k
--b, --become # ��Ȩ������ִ��������-K��������ʱ���������
--K, --ask-become-pass # ����Ȩ������ʱ�������룬��д��K
+-a MODULE_ARGS # 模块的参数，如果执行默认COMMAND的模块，即是命令参数，如：date、pwd等等
+-k, --ask-pass # ask for SSH password。登录密码，提示输入SSH密码而不是假设基于秘钥的验证，小写的k
+-b, --become # 以权限提升执行命令，配合-K输入提升时所需的密码
+-K, --ask-become-pass # 请求权限提升时输入密码，大写的K
 
--f FORKS # ������������Ĭ��Ϊ5
--i INVENTORY # ָ�������嵥��·����Ĭ��Ϊ `/etc/ansible/hosts`
---list-hosts # �鿴����Щ������
+-f FORKS # 并行任务数，默认为5
+-i INVENTORY # 指定主机清单的路径，默认为 `/etc/ansible/hosts`
+--list-hosts # 查看有哪些主机组
 
--m MODULE_NAME # ִ��ģ������֣�Ĭ��ʹ��commandģ�飬���������ִֻ�е�һ������Բ���-m����
--o # ѹ����������Խ����н����һ�������һ������ռ�����ʹ��
--v # �鿴��ϸ��Ϣ��ͬʱ֧��-vvv��-vvvv�ɲ鿴����ϸ��Ϣ
+-m MODULE_NAME # 执行模块的名字，默认使用command模块，所以如果是只执行单一命令可以不用-m参数
+-o # 压缩输出，尝试将所有结果在一行输出，一般针对收集工具使用
+-v # 查看详细信息，同时支持-vvv和-vvvv可查看更详细信息
 
--T TIMEOUT # ����ʱָ��sshĬ�ϳ�ʱʱ�䣬Ĭ��Ϊ10s��Ҳ�����������ļ����޸�
--u REMOTE_USER # ����ʱ���õ�Զ���û���Ĭ��Ϊ��ǰ�û�
+-T TIMEOUT # 连接时指定ssh默认超时时间，默认为10s，也可以在配置文件中修改
+-u REMOTE_USER # 连接时所用的远程用户，默认为当前用户
 ```
 
-### 4.4��Ansible���ù�˽Կ
+### 4.4、Ansible配置公私钥
 
-���������Ѿ��ᵽ��Ansible�ǻ���SSHЭ��ʵ�ֵģ����������ù�˽Կ�ķ�ʽ��SSHЭ��ķ�ʽ��ͬ����������������£�
+上面我们已经提到过Ansible是基于SSH协议实现的，所以其配置公私钥的方式与SSH协议的方式相同，具体操作步骤如下：
 
-1. ����˽Կ
+1. 生成私钥
 
 ```bash
 [emon@emon ~]# ssh-keygen
 ```
 
-2. �������ַ���Կ
+2. 向主机分发公钥
 
 ```bash
 [emon@emon ~]# ssh-copy-id -i root@emon2
 [emon@emon ~]# ssh-copy-id -i root@emon3
 ```
 
-�����Ļ����Ϳ���ʵ���������¼��
+这样的话，就可以实现无密码登录。
 
-�����ʾû��ssh-copy-id������԰�װ��
+如果提示没有ssh-copy-id命令，可以安装：
 
 ```bash
 yum -y install openssh-clientsansible
 ```
 
-## 5��Ansible����ģ��
+## 5、Ansible常用模块
 
-### 5.1��������ͨ�Բ���
+### 5.1、主机连通性测试
 
-ʹ��`ansible web -m ping`����������������ͨ�Բ��ԣ�Ч�����£�
+使用`ansible web -m ping`命令来进行主机连通性测试，效果如下：
 
 ```bash
 [emon@emon ~]#  ansible web -m ping
@@ -822,14 +822,14 @@ emon2 | SUCCESS => {
 }
 ```
 
-### 5.2��commandģ��
+### 5.2、command模块
 
-���ģ�����ֱ����Զ��������ִ���������������ر�������
+这个模块可以直接在远程主机上执行命令，并将结果返回本主机。
 
-- �������£�
+- 举例如下：
 
 ```bash
-# -b -K ��ʾ����Ȩ��ִ�У�K�Ǵ�д��ĸ
+# -b -K 表示提升权限执行，K是大写字母
 [emon@emon ~]$ ansible web -m command -a 'ss -ntl' -b -K
 emon3 | CHANGED | rc=0 >>
 State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              
@@ -845,35 +845,35 @@ LISTEN     0      100      [::1]:25                    [::]:*
 LISTEN     0      128       [::]:22                    [::]:* 
 ```
 
-����ģ������������ƣ������ǿո�ָ����б����������������������ѡ���Ľڵ���ִ�С�������ͨ��shell���д���������$HOME�Ͳ�����"<",">","|",";","&"��������Ҫʹ�ã�shell��ģ��ʵ����Щ���ܣ���ע�⣬�����֧��`|`�ܵ����
+命令模块接受命令名称，后面是空格分隔的列表参数。给定的命令将在所有选定的节点上执行。它不会通过shell进行处理，比如$HOME和操作如"<",">","|",";","&"工作（需要使用（shell）模块实现这些功能）。注意，该命令不支持`|`管道命令。
 
-��������һ����ģ���³��õļ������
+下面来看一看该模块下常用的几个命令：
 
-> chdir # ��ִ������֮ǰ�����л�����Ŀ¼
+> chdir # 在执行命令之前，先切换到该目录
 >
-> executable # �л�shell��ִ�������Ҫʹ������ľ���·��
+> executable # 切换shell来执行命令，需要使用命令的绝对路径
 >
-> free_form # Ҫִ�е�Linuxָ�һ��ʹ��Ansible��-a��������
+> free_form # 要执行的Linux指令，一般使用Ansible的-a参数代替
 >
-> creates # һ���ļ�����������ļ����ڣ���������һ�£������������ж�
+> creates # 一个文件名，当这个文件存在，则该命令不找一下，可以用来做判断
 >
-> removes # һ���ļ���������ļ������ڣ�������ִ��
+> removes # 一个文件名，这个文件不存在，则该命令不执行
 
-����������������Щ�����ִ��Ч����
+下面我们来看看这些命令的执行效果：
 
 ```bash
-# ��emon2�ϴ���Ŀ¼
+# 在emon2上创建目录
 [root@emon2 ~]# mkdir /data/abc
 
-# ���л���/data/Ŀ¼����ִ�С�ls������
+# 先切换到/data/目录，再执行“ls”命令
 [emon@emon ~]$ ansible web -m command -a 'chdir=/data/ ls'
-# ���ָ��Ŀ¼���ڣ���ִ������
+# 如果指定目录存在，则不执行命令
 [emon@emon ~]$ ansible web -m command -a 'creates=/data/ ls'
 emon2 | SUCCESS | rc=0 >>
 skipped, since /data/ existsDid not run command since '/data/' exists
 emon3 | CHANGED | rc=0 >>
 bin
-# ���ָ��Ŀ¼�����ڣ���ִ������
+# 如果指定目录不存在，则不执行命令
 [emon@emon ~]$ ansible web -m command -a 'removes=/data/ ls'
 emon2 | CHANGED | rc=0 >>
 bin
@@ -881,9 +881,9 @@ emon3 | SUCCESS | rc=0 >>
 skipped, since /data/ does not existDid not run command since '/data/' does not exist
 ```
 
-### 5.3��shellģ��
+### 5.3、shell模块
 
-shellģ�������Զ�������ϵ���shell�������������֧��shell�ĸ��ֹ��ܣ�����ܵ��ȡ�
+shell模块可以在远程主机上调用shell解释器运行命令，支持shell的各种功能，例如管道等。
 
 ```bash
 [emon@emon ~]$ ansible web -m shell -a 'cat /etc/passwd|grep "emon"'
@@ -897,167 +897,167 @@ emon:x:1000:1000:Web Site User:/home/emon:/bin/bash
 [emon@emon ~]$ ansible web -m shell -a 'ss -ntl' -b -K
 ```
 
-ֻҪ�����ǵ�shell���������ͨ�����ģ����Զ�����������С�
+只要是我们的shell命令，都可以通过这个模块在远程主机上运行。
 
-### 5.4��copyģ��
+### 5.4、copy模块
 
-���ģ�����ڽ��ļ����Ƶ�Զ��������ͬʱ֧�ָ������������ļ����޸�Ȩ�޵ȡ�
+这个模块用于将文件复制到远程主机，同时支持给定内容生成文件和修改权限等。
 
-�����ѡ�����£�
+其相关选项如下：
 
-> src #�����Ƶ�Զ�������ı����ļ��������Ǿ���·����Ҳ���������·�������·����һ��Ŀ¼�����ݹ鸴�ƣ��÷�������"rsync"
+> src #被复制到远程主机的本地文件。可以是绝对路径，也可以是相对路径。如果路径是一个目录，则会递归复制，用法类似于"rsync"
 >
-> content #�����滻"src"������ֱ��ָ���ļ���ֵ
+> content #用于替换"src"，可以直接指定文件的值
 >
-> dest # ��ѡ���Դ�ļ����Ƶ�Զ�������ľ���·��
+> dest # 必选项，将源文件复制到远程主机的绝对路径
 >
-> backup # ���ļ����ݷ����ı���ڸ���֮ǰ��Դ�ļ����ݣ������ļ�����ʱ����Ϣ
+> backup # 当文件内容发生改变后，在覆盖之前把源文件备份，备份文件包含时间信息
 >
-> directory_mode # �ݹ��趨Ŀ¼��Ȩ�ޣ�Ĭ��ΪϵͳĬ��Ȩ��
+> directory_mode # 递归设定目录的权限，默认为系统默认权限
 >
-> force # ��Ŀ�������������ļ��������ݲ�ͬʱ������Ϊ"yes"����ʾǿ�Ƹ��ǣ�����Ϊ"no"����ʾĿ��������Ŀ��λ�ò����ڸ��ļ��Ÿ��ơ�Ĭ��Ϊ"yes"
+> force # 当目标主机包含该文件，但内容不同时，设置为"yes"，表示强制覆盖；设置为"no"，表示目标主机的目标位置不存在该文件才复制。默认为"yes"
 >
-> others # ���е�fileģ���е�ѡ�����������ʹ��
+> others # 所有的file模块中的选项都可以在这里使用
 
-�÷��������£�
+用法举例如下：
 
-- �����ļ�
+- 复制文件
 
 ```bash
 [emon@emon ~]$ ansible web -m copy -a 'src=~/notebook-service-1.0.jar dest=~/'
 ```
 
-- �������������ļ�����ָ��Ȩ��
+- 给定内容生成文件，并指定权限
 
 ```bash
 [emon@emon ~]$ ansible web -m copy -a 'content="hello world!\n" dest=~/test.txt mode=666'
 ```
 
-- ���ڸ���
+- 关于覆盖
 
-���ǰ��ļ��������޸�һ�£�Ȼ��ѡ�񸲸Ǳ��ݣ�
+我们把文件的内容修改一下，然后选择覆盖备份：
 
 ```bash
 [emon@emon ~]$ ansible web -m copy -a 'content="hello world!\ngood!" backup=yes dest=~/test.txt mode=666'
-# �鿴һ��
+# 查看一下
 [emon@emon ~]$ ansible web -m shell -a 'ls -l ~/|grep test'
 emon3 | CHANGED | rc=0 >>
--rw-rw-rw-. 1 emon emon       18 3��  20 23:49 test.txt
--rw-rw-rw-. 1 emon emon       13 3��  20 23:45 test.txt.71549.2022-03-20@23:49:21~
+-rw-rw-rw-. 1 emon emon       18 3月  20 23:49 test.txt
+-rw-rw-rw-. 1 emon emon       13 3月  20 23:45 test.txt.71549.2022-03-20@23:49:21~
 emon2 | CHANGED | rc=0 >>
--rw-rw-rw-. 1 emon emon       18 3��  20 23:49 test.txt
--rw-rw-rw-. 1 emon emon       13 3��  20 23:45 test.txt.121900.2022-03-20@23:49:35~
+-rw-rw-rw-. 1 emon emon       18 3月  20 23:49 test.txt
+-rw-rw-rw-. 1 emon emon       13 3月  20 23:45 test.txt.121900.2022-03-20@23:49:35~
 ```
 
-### 5.5��fileģ��
+### 5.5、file模块
 
-��ģ����Ҫ���������ļ������ԣ����紴���ļ������������ļ���ɾ���ļ��ȡ�
+该模块主要用于设置文件的属性，比如创建文件、创建链接文件、删除文件等。
 
-������һЩ�������
+下面是一些常见命令：
 
-> force # ��Ҫ�����������ǿ�ƴ��������ӣ�һ����Դ�ļ������ڣ���֮��Ὠ��������£���һ����Ŀ���������Ѵ��ڣ���Ҫ��ȡ��֮ǰ�������ӣ�Ȼ�󴴽��µ������ӣ�������ѡ�yes|no
+> force # 需要在两种情况下强制创建软连接，一种是源文件不存在，但之后会建立的情况下；另一种是目标软链接已存在，需要先取消之前的软链接，然后创建新的软链接，有两个选项：yes|no
 >
-> group # �����ļ�/Ŀ¼�����顣������Լ���`mode`�������ļ�/Ŀ¼��Ȩ��
+> group # 定义文件/目录的属组。后面可以加上`mode`：定义文件/目录的权限
 >
-> owner # �����ļ�/Ŀ¼������������������`path`�������ļ�/Ŀ¼��·��
+> owner # 定义文件/目录的属主。后面必须跟上`path`：定义文件/目录的路径
 >
-> recurse # �ݹ������ļ������ԣ�ֻ��Ŀ¼��Ч���������`src`�������ӵ�Դ�ļ�·����ֻӦ����`state=link`�����
+> recurse # 递归设置文件的属性，只对目录有效，后面跟上`src`：被链接的源文件路径，只应用于`state=link`的情况
 >
-> dest # �����ӵ���·����ֻӦ����`state=link`�����
+> dest # 被链接到的路径，只应用于`state=link`的情况
 >
-> state # ״̬��������ѡ�
+> state # 状态，有以下选项：
 >
-> > directory�����Ŀ¼�����ڣ��ʹ���Ŀ¼
+> > directory：如果目录不存在，就创建目录
 > >
-> > file����ʹ�ļ������ڣ�Ҳ���ᱻ����
+> > file：即使文件不存在，也不会被创建
 > >
-> > link������������
+> > link：创建软链接
 > >
-> > hard������Ӳ����
+> > hard：创建硬链接
 > >
-> > touch������ļ������ڣ���ᴴ��һ���µ��ļ�������ļ���Ŀ¼�Ѵ��ڣ������������޸�ʱ��
+> > touch：如果文件不存在，则会创建一个新的文件，如果文件或目录已存在，则更新其最后修改时间
 > >
-> > absent��ɾ��Ŀ¼���ļ�����ȡ�������ļ�
+> > absent：删除目录、文件或者取消链接文件
 
-- ����Ŀ¼
+- 创建目录
 
 ```bash
 [emon@emon ~]$ ansible web -m file -a 'path=~/data/app state=directory'
 ```
 
-- ���������ļ�
+- 创建链接文件
 
 ```bash
-# Ч����bbb.jpg -> aaa.jpg 
+# 效果：bbb.jpg -> aaa.jpg 
 [emon@emon ~]$ ansible web -m file -a 'path=~/data/bbb.jpg force=yes src=aaa.jpg state=link'
 ```
 
-- ɾ���ļ�
+- 删除文件
 
 ```bash
 [emon@emon ~]$ ansible web -m file -a 'path=~/data/a state=absent'
 ```
 
-### 5.6��fetchģ��
+### 5.6、fetch模块
 
-��ģ�����ڴ�Զ��ĳ������ȡ�����ƣ��ļ������ء�
+该模块用于从远程某主机获取（复制）文件到本地。
 
-������ѡ�
+有两个选项：
 
-> dest����������ļ���Ŀ¼
+> dest：用来存放文件的目录
 >
-> src����Զ����ȡ���ļ������ұ�����һ��file��������Ŀ¼
+> src：在远程拉取的文件，并且必须是一个file，不能是目录
 
-- ����Զ���ļ�������
+- 复制远端文件到本地
 
 ```bash
 [emon@emon ~]$ ansible web -m fetch -a 'src=~/test.txt dest=~/data'
-# �鿴���
+# 查看结果
 [emon@emon ~]$ tree data
 data
-������ emon2
-��?? ������ home
-��??     ������ emon
-��??         ������ test.txt
-������ emon3
-    ������ home
-        ������ emon
-            ������ test.txt
+├── emon2
+│?? └── home
+│??     └── emon
+│??         └── test.txt
+└── emon3
+    └── home
+        └── emon
+            └── test.txt
 ```
 
-### 5.7��cronģ��
+### 5.7、cron模块
 
-��ģ�������ڹ���`cron`�ƻ�����ġ�
+该模块适用于管理`cron`计划任务的。
 
-��ʹ�õ��﷨�����ǵ�`crontab`�ļ��е��﷨һ�£�ͬʱ������ָ������ѡ�
+其使用的语法跟我们的`crontab`文件中的语法一致，同时，可以指定以下选项：
 
-> day�� ��Ӧ�����еĹ�����`1-31,*,*/2`��
+> day： 日应该运行的工作（`1-31,*,*/2`）
 >
-> hour��Сʱ��`0-23,*,*/2`��
+> hour：小时（`0-23,*,*/2`）
 >
-> minute����֧��`0-59,*,*/2`��
+> minute：分支（`0-59,*,*/2`）
 >
-> mouth���£�`1-12,*,*/2`��
+> mouth：月（`1-12,*,*/2`）
 >
-> weekday���ܣ�`0-6 for Sunday-Saturday`��
+> weekday：周（`0-6 for Sunday-Saturday`）
 >
-> job��ָ�����е�������ʲô
+> job：指明运行的命令是什么
 >
-> name����ʱ��������
+> name：定时任务描述
 >
-> reboot������������ʱ���У�������ʹ�ã�����ʹ��special_time
+> reboot：任务在重启时运行，不建议使用，建议使用special_time
 >
-> special_time�������ʱ�䷶Χ��������reboot������ʱ����annually��ÿ�꣩��monthly��ÿ�£���weekly��ÿ�ܣ���daily��ÿ�죩��hourly��ÿСʱ��
+> special_time：特殊的时间范围，参数：reboot（重启时），annually（每年），monthly（每月），weekly（每周），daily（每天），hourly（每小时）
 >
-> state��ָ��״̬��present��ʾ���Ӷ�ʱ����Ҳ��Ĭ�����ã�absent��ʾɾ����ʱ����
+> state：指定状态，present表示添加定时任务，也是默认设置，absent表示删除定时任务
 >
-> user�����ĸ��û�������ִ��
+> user：以哪个用户的身份执行
 
-- ���Ӽƻ�����
+- 添加计划任务
 
 ```bash
 [emon@emon ~]$ ansible web -m cron -a 'name="ntp update every 5 min" minute=*/5 job="/usr/sbin/ntpdate 172.17.0.1 &> /dev/null"'
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'crontab -l'
 emon2 | CHANGED | rc=0 >>
 #Ansible: ntp update every 5 min
@@ -1067,129 +1067,129 @@ emon3 | CHANGED | rc=0 >>
 */5 * * * * /usr/sbin/ntpdate 172.17.0.1 &> /dev/null
 ```
 
-- ɾ���ƻ�����
+- 删除计划任务
 
-������ǵļƻ��������Ӵ�����Ҫɾ���Ļ�����ִ�����²�����
+如果我们的计划任务添加错误，想要删除的话，则执行以下操作：
 
 ```bash
-# ע�⣬��ͬ�������state=absent����ɾ����ʱ������
+# 注意，相同命令，带上state=absent就是删除定时任务了
 [emon@emon ~]$ ansible web -m cron -a 'name="ntp update every 5 min" minute=*/5 job="/usr/sbin/ntpdate 172.17.0.1 &> /dev/null" state=absent'
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'crontab -l'
 emon2 | CHANGED | rc=0 >>
 
 emon3 | CHANGED | rc=0 >>
 ```
 
-### 5.8��yumģ��
+### 5.8、yum模块
 
-����˼�壬��ģ����Ҫ���������İ�װ��
+顾名思义，该模块主要用于软件的安装。
 
-��ѡ�����£�
+其选项如下：
 
-> name������װ�İ�������
+> name：所安装的包的名称
 >
-> state��present-��װ��latest-��װ���µģ�absent-ж��������
+> state：present-安装，latest-安装最新的，absent-卸载软件。
 >
-> update_cache��ǿ�Ƹ���yum�Ļ���
+> update_cache：强制更新yum的缓存
 >
-> conf_file��ָ��Զ��yum��װʱ�������������ļ�����װ�������еİ�����
+> conf_file：指定远程yum安装时所依赖的配置文件（安装本地已有的包）。
 >
-> disable_pgp_check���Ƿ��ֹGPG checking��ֻ����present or latest
+> disable_pgp_check：是否禁止GPG checking，只用于present or latest
 >
-> disablerepo����ʱ��ֹʹ�õ�yum�⡣ֻ���ڰ�װ�����ʱ��
+> disablerepo：临时禁止使用的yum库。只用于安装或更新时。
 >
-> enablerepo����ʱʹ�õ�yum�⡣ֻ���ڰ�װ�����ʱ��
+> enablerepo：临时使用的yum库。只用于安装或更新时。
 
-- ��װһ��������
+- 安装一个包测试
 
 ```bash
-# �鿴Ŀ������Ƿ��иð�
+# 查看目标机器是否有该包
 [emon@emon ~]$ ansible web -m shell -a 'yum list epel-release'
-# ��װ
+# 安装
 [emon@emon ~]$ ansible web -m yum -a 'name=epel-release state=present' -b -K
 ```
 
-- ��װhtop����ж��
+- 安装htop后，再卸载
 
 ```bash
-# ��װ
+# 安装
 [emon@emon ~]$ ansible web -m yum -a 'name=htop state=present' -b -K
-# ж��
+# 卸载
 [emon@emon ~]$ ansible web -m yum -a 'name=htop state=absent' -b -K
 ```
 
-### 5.9��serviceģ��
+### 5.9、service模块
 
-��ģ�����ڷ������Ĺ�����
+该模块用于服务程序的管理。
 
-����Ҫѡ�����£�
+其主要选项如下：
 
-> arguments���������ṩ����Ĳ���
+> arguments：命令行提供额外的参数
 >
-> enabled�����ÿ�������
+> enabled：设置开机启动
 >
-> name����������
+> name：服务名称
 >
-> runlevel�����������ļ���һ�㲻��ָ����
+> runlevel：开机启动的级别，一般不用指定。
 >
-> sleep������������Ĺ����У��Ƿ�ȴ������ڷ���ر��Ժ��ٵȴ�2�����������������ھ籾�С���
+> sleep：在重启服务的过程中，是否等待。如在服务关闭以后再等待2秒再启动。（定义在剧本中。）
 >
-> state��������״̬���ֱ�Ϊ��started-��������stopped-ֹͣ����restarted-��������reloaded-��������
+> state：有四种状态，分别为：started-启动服务，stopped-停止服务，restarted-重启服务，reloaded-重载配置
 
-- ������������������
+- 开启服务并设置自启动
 
 ```bash
 [emon@emon ~]$ ansible web -m service -a 'name=docker state=started enabled=true' -b -K
 ```
 
-- �رշ���ȡ��������
+- 关闭服务并取消自启动
 
 ```bash
 [emon@emon ~]$ ansible web -m service -a 'name=docker state=stopped enabled=false' -b -K
 ```
 
-### 5.10��userģ��
+### 5.10、user模块
 
-��ģ����Ҫ�����������û��˺š�
+该模块主要是用来管理用户账号。
 
-����Ҫѡ�����£�
+其主要选项如下：
 
-> comment���û���������Ϣ
+> comment：用户的描述信息
 >
-> createhome���Ƿ񴴽���Ŀ¼
+> createhome：是否创建家目录
 >
-> force����ʹ��state=absentʱ����Ϊ��userdel -forceһ��
+> force：在使用state=absent时，行为与userdel -force一致
 >
-> group��ָ��������
+> group：指定基本组
 >
-> groups��ָ�������飬���ָ��Ϊ��groups=����ʾɾ��������
+> groups：指定附加组，如果指定为（groups=）表示删除所有组
 >
-> home��ָ���û���Ŀ¼
+> home：指定用户家目录
 >
-> move_home���������Ϊhome=ʱ����ͼ���û���Ŀ¼�ƶ���ָ����Ŀ¼
+> move_home：如果设置为home=时，试图将用户主目录移动到指定的目录
 >
-> name��ָ���û���
+> name：指定用户名
 >
-> non_unique����ѡ�������ı��Ψһ���û�IDֵ
+> non_unique：该选项允许改变非唯一的用户ID值
 >
-> password��ָ���û�����
+> password：指定用户密码
 >
-> remove����ʹ��state=absentʱ����Ϊ����userdel -removeһ��
+> remove：在使用state=absent时，行为是与userdel -remove一致
 >
-> shell��ָ��Ĭ��shell
+> shell：指定默认shell
 >
-> state�������˺�״̬����ָ��Ϊ������ָ��ֵΪabsent��ʾɾ����
+> state：设置账号状态，不指定为创建，指定值为absent表示删除。
 >
-> system��������һ���û�����������û���ϵͳ�û���������ò��ܸ��������û�
+> system：当创建一个用户，设置这个用户是系统用户。这个设置不能更改现有用户
 >
-> uid��ָ���û���uid
+> uid：指定用户的uid
 
-- ����һ���û���ָ����uid
+- 添加一个用户并指定其uid
 
 ```bash
 [emon@emon ~]$ ansible web -m user -a 'name=keer uid=11111' -b -K
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'cat /etc/passwd|grep keer'
 emon2 | CHANGED | rc=0 >>
 keer:x:11111:11111::/home/keer:/bin/bash
@@ -1197,11 +1197,11 @@ emon3 | CHANGED | rc=0 >>
 keer:x:11111:11111::/home/keer:/bin/bash
 ```
 
-- ɾ���û�
+- 删除用户
 
 ```bash
 [emon@emon ~]$ ansible web -m user -a 'name=keer state=absent' -b -K
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'cat /etc/passwd|grep keer'
 emon2 | FAILED | rc=1 >>
 non-zero return code
@@ -1209,25 +1209,25 @@ emon3 | FAILED | rc=1 >>
 non-zero return code
 ```
 
-### 5.11��groupģ��
+### 5.11、group模块
 
-��ģ����Ҫ�������ӻ�ɾ���顣
+该模块主要用于添加或删除组。
 
-���õ�ѡ�����£�
+常用的选项如下：
 
-> gid���������GID��
+> gid：设置组的GID号
 >
-> name��ָ���������
+> name：指定组的名称
 >
-> state��ָ�����״̬��Ĭ��Ϊ����������ΪabsentΪɾ��
+> state：指定组的状态，默认为创建，设置为absent为删除
 >
-> system������ֵΪyes����ʾ����Ϊϵͳ�顣
+> system：设置值为yes，表示创建为系统组。
 
-- ������
+- 创建组
 
 ```bash
 [emon@emon ~]$ ansible web -m group -a 'name=songuo gid=12222' -b -K
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'cat /etc/group|grep 12222'
 emon2 | CHANGED | rc=0 >>
 songuo:x:12222:
@@ -1235,11 +1235,11 @@ emon3 | CHANGED | rc=0 >>
 songuo:x:12222:
 ```
 
-- ɾ����
+- 删除组
 
 ```bash
 [emon@emon ~]$ ansible web -m group -a 'name=songuo state=absent' -b -K
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'cat /etc/group|grep 12222'
 emon3 | FAILED | rc=1 >>
 non-zero return code
@@ -1247,13 +1247,13 @@ emon2 | FAILED | rc=1 >>
 non-zero return code
 ```
 
-### 5.12��scriptģ��
+### 5.12、script模块
 
-��ģ�����ڽ������Ľű��ڱ������˵Ļ��������С�
+该模块用于将本机的脚本在贝管理端的机器上运行。
 
-��ģ��ֱ��ָ���ű���·�����ɣ�����ͨ����������һ���������ʹ�õģ�
+该模块直接指定脚本的路径即可，我们通过例子来看一看到底如何使用的：
 
-���ȣ�����дһ���ű������������ִ��Ȩ�ޣ�
+首先，我们写一个脚本，并给其加上执行权限：
 
 ```bash
 [emon@emon ~]$ vim /tmp/df.sh
@@ -1270,15 +1270,15 @@ df -lh >> /tmp/disk_total.log
 [emon@emon ~]$ chmod +x /tmp/df.sh
 ```
 
-Ȼ������ֱ������������ʵ���ڱ�������ִ�иýű���
+然后，我们直接运行命令来实现在被管理端执行该脚本：
 
 ```bash
 [emon@emon ~]$ ansible web -m script -a '/tmp/df.sh'
-# �鿴���
+# 查看结果
 [emon@emon ~]$ ansible web -m shell -a 'cat /tmp/disk_total.log'
 emon3 | CHANGED | rc=0 >>
-2022�� 03�� 21�� ����һ 13:19:04 CST
-�ļ�ϵͳ                 ����  ����  ���� ����% ���ص�
+2022年 03月 21日 星期一 13:19:04 CST
+文件系统                 容量  已用  可用 已用% 挂载点
 devtmpfs                 898M     0  898M    0% /dev
 tmpfs                    910M     0  910M    0% /dev/shm
 tmpfs                    910M   26M  885M    3% /run
@@ -1293,8 +1293,8 @@ tmpfs                    910M     0  910M    0% /sys/fs/cgroup
 tmpfs                    182M     0  182M    0% /run/user/0
 tmpfs                    182M     0  182M    0% /run/user/1000
 emon2 | CHANGED | rc=0 >>
-2022�� 03�� 21�� ����һ 13:19:04 CST
-�ļ�ϵͳ                 ����  ����  ���� ����% ���ص�
+2022年 03月 21日 星期一 13:19:04 CST
+文件系统                 容量  已用  可用 已用% 挂载点
 devtmpfs                 898M     0  898M    0% /dev
 tmpfs                    910M     0  910M    0% /dev/shm
 tmpfs                    910M   18M  893M    2% /run
@@ -1310,22 +1310,22 @@ tmpfs                    182M     0  182M    0% /run/user/0
 tmpfs                    182M     0  182M    0% /run/user/1000
 ```
 
-���Կ��֣��Ѿ�ִ�гɹ���
+可以卡粗，已经执行成功！
 
-### 5.13��setupģ��
+### 5.13、setup模块
 
-��ģ����Ҫ�����ռ���Ϣ����ͨ������facts�����ʵ�ֵġ�
+该模块主要用于收集信息，是通过调用facts组件来实现的。
 
-facts�����Ansible���ڲɼ����ܻ����豸��Ϣ��һ�����ܣ����ǿ���ʹ��setupģ��鿴����������facts��Ϣ������ʹ��filter���鿴ָ����Ϣ������facts��Ϣ����װ��һ��JSON��ʽ�����ݽṹ�У�ansible_facts�����ϲ��ֵ��
+facts组件是Ansible用于采集被管机器设备信息的一个功能，我们可以使用setup模块查看机器的所有facts信息，可以使用filter来查看指定信息。整个facts信息被包装在一个JSON格式的数据结构中，ansible_facts是最上层的值。
 
-facts���Ǳ������ڽ�������ÿ�������ĸ�����Ϣ��cpu�������ڴ��С�ȡ������facts�е�ĳ�������С����ú󷵻غܶ��Ӧ��������Ϣ���ں���Ĳ����п��Ը��ݲ�ͬ����Ϣ������ͬ�Ĳ�������redhatϵ����yum��װ����debianϵ����apt��װ������
+facts就是变量，内建变量。每个主机的各种信息，cpu颗数、内存大小等。会存在facts中的某个变量中。调用后返回很多对应主机的信息，在后面的操作中可以根据不同的信息来做不同的操作。如redhat系列用yum安装，而debian系列用apt安装软件。
 
-- �鿴��Ϣ
+- 查看信息
 
-���ǿ���ֱ���������ȡ��������ֵ�������������������ӣ�
+我们可以直接用命令获取到变量的值，具体我们来看看例子：
 
 ```bash
-# �鿴�ڴ�
+# 查看内存
 [emon@emon ~]$ ansible web -m setup -a 'filter="*mem*"'
 emon2 | SUCCESS => {
     "ansible_facts": {
@@ -1377,7 +1377,7 @@ emon3 | SUCCESS => {
     },
     "changed": false
 }
-# ʹ��free -m��ʽ��ѯ�Ա���
+# 使用free -m方式查询对比下
 [emon@emon ~]$ ansible web -m shell -a 'free -m'
 emon2 | CHANGED | rc=0 >>
               total        used        free      shared  buff/cache   available
@@ -1389,9 +1389,9 @@ Mem:           1819         268         384          23        1166        1344
 Swap:          5119           2        5117
 ```
 
-- ������Ϣ
+- 保存信息
 
-���ǵ�setupģ�黹��һ���ܺ��õĹ��ܾ��ǿ��Ա���������ɸѡ����Ϣ�����ǵ������ϣ�ͬʱ���ļ���Ϊ���Ǳ����Ƶ�������IP��������������֪������̨�����������⡣
+我们的setup模块还有一个很好用的功能就是可以保存我们所筛选的信息至我们的主机上，同时，文件名为我们被管制的主机的IP，这样方便我们知道是哪台机器出的问题。
 
 ```bash
 [emon@emon ~]$ ansible web -m setup -a 'filter="*mem*"' --tree /tmp/facts
@@ -1426,97 +1426,97 @@ emon3
 }
 ```
 
-## 6��Ansible Playbook
+## 6、Ansible Playbook
 
-### 6.1��Ansible Playbook����
+### 6.1、Ansible Playbook介绍
 
-Playbooks��adhoc��ȣ���һ����ȫ��ͬ������ansible�ķ�ʽ��������saltstack��state״̬�ļ���ad-hoc�޷��־�ʹ�ã�playbook���Գ־�ʹ�á�
+Playbooks与adhoc相比，是一种完全不同的运用ansible的方式，类似于saltstack的state状态文件。ad-hoc无法持久使用，playbook可以持久使用。
 
-Playbook����һ������play��ɵ��б���play����Ҫ�������ڽ����ȹ鲢Ϊһ�������װ�������ͨ��ansible�е�task����õĽ�ɫ���Ӹ�������������ν��task�޷��ǵ���ansible��һ��module�������play��֯��һ��playbook�У��������������������������ȱ��ŵĻ������ĳһ������
+Playbook是由一个或多个play组成的列表，play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓的task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们联合起来按事先编排的机制完成某一个任务。
 
-### 6.2��Playbook����Ԫ��
+### 6.2、Playbook核心元素
 
-- Hosts��ִ�е�Զ�������б�
-- Tasks������
-- Variables�����ñ������Զ��������playbook�е���
-- Templates��ģ�壬��ʹ��ģ���﷨���ļ������������ļ���
-- Handlers��notity���ʹ�ã����ض����������Ĳ�����������������ִ�У�����ִ��
-- Taggs����ǩ��ָ��ĳ������ִ�У�����ѡ������playbook�еĲ��ִ���
-
-
-
-### 6.3��Playbook�﷨
-
-playbookʹ��yaml�﷨��ʽ����׺������yaml��Ҳ������yml��
-
-- �ڵ�һһ��playbook�ļ��У����������������Ӻţ�`---`�����ֶ��play������ѡ���Ե�����������ţ�`...`��������ʾplay�Ľ�β��Ҳ����ʡ�ԡ�
-
-- ���п�ʼ����дplaybook�����ݣ�һ�㶼��д��������playbook�Ĺ��ܡ�
-
-- ʹ��#��ע�ʹ��롣
-- ��������ͳһ�����ܿո��tab���á�
-- �����ļ���Ҳ������һ�µģ�ͬ������������ͬ���ļ��𣬳����б����õļ�����ͨ��������ϻ���ʵ�ֵġ�
-- YAML�ļ����ݺ�Linuxϵͳ��Сд�жϷ�ʽ����һ�£������ִ�Сд�ģ�`k/v`��ֵ�����Сд���С�
-- `k/v`��ֵ��ͬ��дҲ���Ի���д��ͬ��ʹ��`:`�ָ���
-- `v`������һ���ַ�����Ҳ������һ���б�
-- һ�������Ĵ���鹦����Ҫ����Ԫ�ذ�����`name:task`
+- Hosts：执行的远程主机列表
+- Tasks：任务集
+- Variables：内置变量或自定义变量在playbook中调用
+- Templates：模板，即使用模板语法的文件，比如配置文件等
+- Handlers和notity结合使用，由特定条件出发的操作，满足条件方才执行，否则不执行
+- Taggs：标签，指定某条任务执行，用于选择运行playbook中的部分代码
 
 
 
-### 6.4��һ���򵥵�ʾ��
+### 6.3、Playbook语法
+
+playbook使用yaml语法格式，后缀可以是yaml，也可以是yml。
+
+- 在单一一个playbook文件中，可以连续三个连子号（`---`）区分多个play。还有选择性的连续三个点号（`...`）用来表示play的结尾，也可以省略。
+
+- 次行开始正常写playbook的内容，一般都会写上描述该playbook的功能。
+
+- 使用#号注释代码。
+- 缩进必须统一，不能空格和tab混用。
+- 缩进的级别也必须是一致的，同样的缩进代表同样的级别，程序判别配置的级别是通过缩进结合换行实现的。
+- YAML文件内容和Linux系统大小写判断方式保持一致，是区分大小写的，`k/v`的值均需大小写敏感。
+- `k/v`的值可同行写也可以换行写。同行使用`:`分隔。
+- `v`可以是一个字符串，也可以是一个列表
+- 一个完整的代码块功能需要最少元素包括：`name:task`
+
+
+
+### 6.4、一个简单的示例
 
 ```yaml
----								# �̶���ʽ
-- hosts: 192.168.1.31			# ������Ҫִ�е�����
-  remote_user: root				# Զ���û�
-  vars:							# �������
-    http_port: 8088				# ����
+---								# 固定格式
+- hosts: 192.168.1.31			# 定义需要执行的主机
+  remote_user: root				# 远程用户
+  vars:							# 定义变量
+    http_port: 8088				# 变量
 
-  tasks:						# ����һ������Ŀ�ʼ
-    - name: create new file		# �������������
-      file: name=/tmp/playtest.txt state=touch	# ����ģ�飬����Ҫ��������
+  tasks:						# 定义一个任务的开始
+    - name: create new file		# 定义任务的名称
+      file: name=/tmp/playtest.txt state=touch	# 调用模块，具体要做的事情
     - name: create new user
       user: name=test02 system=yes shell=/sbin/nologin
     - name: install package
       yum: name=httpd
     - name: config httpd
       template: src=./httpd.conf dest=/etc/httpd/conf/httpd.conf
-      notify:								# ����ִ��һ��������action����handlers������ִ�У���handlers���ʹ��
-        - restart apache					# notifyҪִ�еĶ��������������handlers�е�name��������һ��
+      notify:								# 定义执行一个动作（action）让handlers来引用执行，与handlers配合使用
+        - restart apache					# notify要执行的动作，这里必须与handlers中的name定义内容一致
     - name: copy index.html
       copy: src=/var/www/html/index.html dest/var/www/html/index.html
     - name: start https
       service: name=httpd state=started
-  handlers:									# ����������Ӧtasks��notify�����action����ִ����Ӧ�Ĵ�������
-    - name: restart apache					# Ҫ��notify�����������ͬ
-      service: name=httpd state=restarted	# ����Ҫִ�еĶ���
+  handlers:									# 处理器：对应tasks中notify定义的action触发执行相应的处理动作
+    - name: restart apache					# 要与notify定义的内容相同
+      service: name=httpd state=restarted	# 触发要执行的动作
 ```
 
-### 6.5��Playbook�����з�ʽ
+### 6.5、Playbook的运行方式
 
-ͨ��`ansible-playbook`��������
+通过`ansible-playbook`命令运行
 
-��ʽ��`ansible-playbook <filename.yml> ... [options]`
+格式：`ansible-playbook <filename.yml> ... [options]`
 
-> -C, --check # ֻ�����ܻᷢ���ĸı䣬��������ִ�иò���
+> -C, --check # 只检测可能会发生的改变，但不真正执行该操作
 >
->  --list-hosts # �г��������������
+>  --list-hosts # 列出运行任务的主机
 >
->  --list-tags  # �г�playbook�ļ��ж�������е�tags
+>  --list-tags  # 列出playbook文件中定义的所有的tags
 >
->  --list-tasks # �г�playbook�ļ��ж�������е�tasks
+>  --list-tasks # 列出playbook文件中定义的所有的tasks
 >
->  --skip-tags SKIP_TAGS # ����ָ����tags
+>  --skip-tags SKIP_TAGS # 跳过指定的tags
 >
-> -f # ָ����������Ĭ��Ϊ5��
+> -f # 指定并发数，默认为5个
 >
-> -t # ָ��playbook�ж����tags���У�����ĳ�����߶��tags��
+> -t # 指定playbook中定义的tags运行，运行某个或者多个tags。
 >
-> -v # ��ʾ���� -vv����-vvv����ϸ
+> -v # 显示过程 -vv或者-vvv更详细
 
-### 6.6����������
+### 6.6、几个例子
 
-#### 6.6.1��ping����
+#### 6.6.1、ping命令
 
 ```bash
 [emon@emon ~]$ vim ansibledata/ping-playbook.yml
@@ -1535,7 +1535,7 @@ playbookʹ��yaml�﷨��ʽ����׺������yaml��Ҳ������yml��
 
 ```bash
 [emon@emon ~]$ ansible-playbook ansibledata/ping-playbook.yml
-# ������������
+# 命令行输出结果
 PLAY [web] ****************************************************************************************************
 
 TASK [Gathering Facts] ****************************************************************************************
@@ -1551,9 +1551,9 @@ emon2                      : ok=2    changed=0    unreachable=0    failed=0    s
 emon3                      : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-#### 6.6.2��playbook������
+#### 6.6.2、playbook的引用
 
-- ��дplaybook
+- 编写playbook
 
 ```bash
 [emon@emon ~]$ vim ansibledata/loop-playbook.yml
@@ -1584,32 +1584,32 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
       loop: "{{ groups['all'] }}"
 ```
 
-- ִ��
+- 执行
 
 ```bash
 [emon@emon ~]$ ansible-playbook ansibledata/import-playbook.yml 
 ```
 
-#### 6.6.3�����ʹ�ñ���
+#### 6.6.3、如何使用变量
 
 
 
-# �塢��
+# 五、无
 
 
 
-# ����������
+# 六、容器化
 
 ![image-20220321225749039](images/image-20220321225749039.png)
 
-# ��ʮ����������������������
+# 九十、各种软件的容器化部署
 
-## 1��MySQL
+## 1、MySQL
 
-### 1.1������
+### 1.1、单机
 
 ```bash
-# /usr/local/dockerv/mysql_home Ŀ¼���Զ�����
+# /usr/local/dockerv/mysql_home 目录会自动创建
 $ docker run --name=mysql \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql/log:/var/log/mysql \
@@ -1618,14 +1618,14 @@ $ docker run --name=mysql \
 -p 3306:3306 -d mysql/mysql-server:5.7
 ```
 
-### 1.2������
+### 1.2、主从
 
-#### 1.2.1����
+#### 1.2.1、主
 
-1������
+1：启动
 
 ```bash
-# /usr/local/dockerv/mysql_home Ŀ¼���Զ�����
+# /usr/local/dockerv/mysql_home 目录会自动创建
 $ docker run --name=mysql-master \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql-master/log:/var/log/mysql \
@@ -1634,7 +1634,7 @@ $ docker run --name=mysql-master \
 -p 3307:3306 -d mysql/mysql-server:5.7
 ```
 
-2������
+2：配置
 
 ```bash
 $ vim /usr/local/dockerv/mysql-master/conf/my.cnf
@@ -1642,47 +1642,47 @@ $ vim /usr/local/dockerv/mysql-master/conf/my.cnf
 
 ```bash
 [mysqld]
-#========���Ӹ�������========
-#������������־����
+#========主从复制设置========
+#开启二进制日志功能
 log-bin=mysql-bin
-#����ʹ�õĶ�������־��ʽ��mixed,statement,row��
+#设置使用的二进制日志格式（mixed,statement,row）
 binlog_format=row
-# ����binlog_format = ROWģʽʱ�����ټ�¼��־�����ݣ�ֻ��¼��Ӱ�����
+# 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
 binlog_row_image = minimal
-#����server_id��ͬһ����������ҪΨһ
+#设置server_id，同一局域网中需要唯一
 server_id=1
 
-#��������־��������ʱ�䡣Ĭ��ֵΪ0����ʾ���Զ�������
+#二进制日志过期清理时间。默认值为0，表示不自动清理。
 expire_logs_days=7
-# ÿ����־�ļ���С
+# 每个日志文件大小
 max_binlog_size = 100m
-# binlog�����С
+# binlog缓存大小
 binlog_cache_size = 4m
-# ���binlog�����С
+# 最大binlog缓存大小
 max_binlog_cache_size = 512m
 
-# ����������������д�����ݣ�������ͨ�û���Ч��������root��ʹ��super_read_only
+# 在主服务器上允许写入数据，仅对普通用户生效，若限制root请使用super_read_only
 read_only=0
-#ָ������Ҫͬ�������ݿ�����
+#指定不需要同步的数据库名称
 binlog_ignore_db = information_schema
 binlog_ignore_db = mysql
 binlog_ignore_db = performance_schema
 binlog_ignore_db = sys
 ```
 
-33������
+33：重启
 
 ```bash
 $ docker restart mysql-master
 ```
 
-4������mysql-master����
+4：进入mysql-master容器
 
 ```bash
 $ docker exec -it mysql-master /bin/bash
 ```
 
-��mysql-master�����ڴ�������ͬ���û���
+在mysql-master容器内创建数据同步用户。
 
 ```bash
 bash-4.2# mysql -uroot -proot123
@@ -1697,12 +1697,12 @@ show master status;
 1 row in set (0.00 sec)
 ```
 
-#### 1.2.2����
+#### 1.2.2、从
 
-1������
+1：启动
 
 ```bash
-# /usr/local/dockerv/mysql_home Ŀ¼���Զ�����
+# /usr/local/dockerv/mysql_home 目录会自动创建
 $ docker run --name=mysql-slave \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql-slave/log:/var/log/mysql \
@@ -1711,7 +1711,7 @@ $ docker run --name=mysql-slave \
 -p 3308:3306 -d mysql/mysql-server:5.7
 ```
 
-2������
+2：配置
 
 ```bash
 $ vim /usr/local/dockerv/mysql-slave/conf/my.cnf
@@ -1719,58 +1719,58 @@ $ vim /usr/local/dockerv/mysql-slave/conf/my.cnf
 
 ```bash
 [mysqld]
-#========���Ӹ�������========
-#������������־����
+#========主从复制设置========
+#开启二进制日志功能
 log-bin=mysql-bin
-#����ʹ�õĶ�������־��ʽ��mixed,statement,row��
+#设置使用的二进制日志格式（mixed,statement,row）
 binlog_format=row
-# ����binlog_format = ROWģʽʱ�����ټ�¼��־�����ݣ�ֻ��¼��Ӱ�����
+# 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
 binlog_row_image = minimal
-#����server_id��ͬһ����������ҪΨһ
+#设置server_id，同一局域网中需要唯一
 server_id=2
 
-#��������־��������ʱ�䡣Ĭ��ֵΪ0����ʾ���Զ�������
+#二进制日志过期清理时间。默认值为0，表示不自动清理。
 expire_logs_days=7
-# ÿ����־�ļ���С
+# 每个日志文件大小
 max_binlog_size = 100m
-# binlog�����С
+# binlog缓存大小
 binlog_cache_size = 4m
-# ���binlog�����С
+# 最大binlog缓存大小
 max_binlog_cache_size = 512m
 
-# �ڴӷ������Ͻ�ֹ�κ��û�д���κ����ݣ�������ͨ�û���Ч��������root��ʹ��super_read_only
+# 在从服务器上禁止任何用户写入任何数据，仅对普通用户生效，若限制root请使用super_read_only
 read_only = 1
 
-#ָ������Ҫͬ�������ݿ�����
+#指定不需要同步的数据库名称
 replicate_ignore_db = information_schema
 replicate_ignore_db = mysql
 replicate_ignore_db = performance_schema
 replicate_ignore_db = sys
 relay_log = mysql-relay-bin
-# ��Ϊ�ӿ�ʱ��Ч������м������ƣ�����Ҫ�˲���
+# 作为从库时生效，想进行级联复制，则需要此参数
 log_slave_updates = on
-#�����������Ὣmaster.info��relay.info�����ڱ��У�Ĭ����Myisam����
+#这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
 master_info_repository = TABLE
 relay_log_info_repository = TABLE
 ```
 
-3������
+3：重启
 
 ```bash
 $ docker restart mysql-slave
 ```
 
-4������mysql-slave����
+4：进入mysql-slave容器
 
 ```bash
 $ docker exec -it mysql-slave /bin/bash
 bash-4.2# mysql -uroot -proot123
 ```
 
-5����mysql-slave���������Ӹ���
+5：在mysql-slave中配置主从复制
 
 ```bash
-# ע�⣺MASTER_LOG_FILE��MASTER_LOG_POS��������ͨ�� show master status �õ���
+# 注意：MASTER_LOG_FILE和MASTER_LOG_POS是在主库通过 show master status 得到的
 mysql> change master to \
 master_host='192.168.200.116', \
 master_port=3307, \
@@ -1782,9 +1782,9 @@ mysql> start slave;
 mysql> show slave status \G
 ```
 
-#### 1.2.3����֤
+#### 1.2.3、验证
 
-- ��¼������
+- 登录主容器
 
 ```bash
 $ docker exec -it mysql-master /bin/bash
@@ -1802,7 +1802,7 @@ mysql> select * from user;
 1 row in set (0.00 sec)
 ```
 
-- ��¼�ӿ�
+- 登录从库
 
 ```bash
 $ docker exec -it mysql-slave /bin/bash
@@ -1818,41 +1818,41 @@ mysql> select * from db0.user;
 
 
 
-## 2��Redis
+## 2、Redis
 
-- redis�����ļ����ص�ַ��https://redis.io/docs/manual/config/
+- redis配置文件下载地址：https://redis.io/docs/manual/config/
 
 ```bash
-# ����redis.conf
+# 下载redis.conf
 $ wget -cP /usr/local/dockerv/redis_home/ https://raw.githubusercontent.com/redis/redis/5.0/redis.conf
-# ����redis.conf
+# 备份redis.conf
 $ cp /usr/local/dockerv/redis_home/redis.conf /usr/local/dockerv/redis_home/redis.conf.bak
 ```
 
-- ���������ļ�
+- 调整配置文件
 
 ```bash
 $ vim /usr/local/dockerv/redis_home/redis.conf
 ```
 
 ```bash
-# [�޸�]
+# [修改]
 bind 127.0.0.1
 ==>
 bind 0.0.0.0
-# [�޸�] Ĭ��yes����������ģʽ������Ϊ���ط���
+# [修改] 默认yes，开启保护模式，限制为本地访问
 protected-mode yes
 ==>
 protected-mode no
-# [�޸�] Ĭ��Ū����Ϊyes��Ϊ����aof�־û�
+# [修改] 默认弄，改为yes意为开启aof持久化
 appendonly no
 ==>
 appendonly yes
-# [����] ������������
+# [增加] 开启访问密码
 requirepass redis123
 ```
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name=redis \
@@ -1862,40 +1862,40 @@ $ docker run --name=redis \
 redis-server /etc/redis/redis.conf
 ```
 
-- docker�����з���
+- docker命令行访问
 
 ```bash
 $ docker exec -it redis redis-cli
 ```
 
-## 3��Zookeeper
+## 3、Zookeeper
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name zoo --restart always -p 2181:2181 -d zookeeper:3.6.3
 ```
 
-- ����
+- 连接
 
 ```bash
 $ docker exec -it zoo zkCli.sh
-# �˳�
+# 退出
 [zk: localhost:2181(CONNECTED) 1] quit
 ```
 
 ## zkui
 
-- ������������
+- 制作镜像并启动
 
 ```bash
-# ����zkui����
+# 制作zkui镜像
 $ mkdir /usr/local/zkui
 $ cd /usr/local/zkui/
 $ git clone https://github.com/DeemOpen/zkui.git
 $ cd zkui
-# ȷ�����ص�¼��docker hub
-# �޸� vim Makefile �� publish һ��
+# 确保本地登录了docker hub
+# 修改 vim Makefile 中 publish 一段
 # ==================================
 publish:
     docker tag $(NAME):$(VERSION) $(NAME):$(VERSION)
@@ -1914,75 +1914,75 @@ $ make build
 $ make publish
 
 
-# admin/manager ��д�˺ţ�appconfig/appconfig ��ͨ�û�
+# admin/manager 读写账号；appconfig/appconfig 普通用户
 $ docker run -d --name zkui -p 9090:9090 -e ZK_SERVER=192.168.200.116:2181 rushing/zkui
-# �ɲ鿴ʵ������
+# 可查看实际配置
 $ docker exec -it zkui /bin/bash
 ```
 
-- ��¼����
+- 登录访问
 
 http://repo.emon.vip:9090
 
-## 4��xxl-job-admin
+## 4、xxl-job-admin
 
-�ĵ���ַ��https://www.xuxueli.com/xxl-job/
+文档地址：https://www.xuxueli.com/xxl-job/
 
-- �����������ݿ�
+- 创建依赖数据库
 
-�ű���ַ��https://github.com/xuxueli/xxl-job/blob/master/doc/db/tables_xxl_job.sql
+脚本地址：https://github.com/xuxueli/xxl-job/blob/master/doc/db/tables_xxl_job.sql
 
-ָ���汾�ű���ַ��https://github.com/xuxueli/xxl-job/blob/2.3.0/doc/db/tables_xxl_job.sql
+指定版本脚本地址：https://github.com/xuxueli/xxl-job/blob/2.3.0/doc/db/tables_xxl_job.sql
 
-- ����
+- 启动
 
 ```bash
-# ��ȷ����ִ�����ݿ�ű���������xxl_job��ͱ�
-# �����Զ��� mysql �����ã���ͨ�� "-e PARAMS" ָ����������ʽ PARAMS="--key=value  --key2=value2" ��
-# ������ο��ļ���https://github.com/xuxueli/xxl-job/blob/master/xxl-job-admin/src/main/resources/application.properties
-# �����Զ��� JVM�ڴ���� �����ã���ͨ�� "-e JAVA_OPTS" ָ����������ʽ JAVA_OPTS="-Xmx512m" ��
+# 请确保先执行数据库脚本，创建了xxl_job库和表
+# 如需自定义 mysql 等配置，可通过 "-e PARAMS" 指定，参数格式 PARAMS="--key=value  --key2=value2" ；
+# 配置项参考文件：https://github.com/xuxueli/xxl-job/blob/master/xxl-job-admin/src/main/resources/application.properties
+# 如需自定义 JVM内存参数 等配置，可通过 "-e JAVA_OPTS" 指定，参数格式 JAVA_OPTS="-Xmx512m" ；
 $ docker run --name xxl-job-admin \
 -e PARAMS="--spring.datasource.url=jdbc:mysql://192.168.200.116:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=root123" \
 -v /usr/local/dockerv/xxl-job-admin:/data/applogs \
 -p 8790:8080 -d xuxueli/xxl-job-admin:2.3.0
 ```
 
-- ��¼����
+- 登录访问
 
 http://repo.emon.vip:8790/xxl-job-admin
 
-�˺����룺
+账号密码：
 
 admin/123456
 
-## 5��sentinel-dashboard
+## 5、sentinel-dashboard
 
-- ����
+- 下载
 
 ```bash
 $ mkdir /usr/local/sentinel-dashboard && cd /usr/local/sentinel-dashboard/
 $ wget https://github.com/alibaba/Sentinel/releases/download/1.8.4/sentinel-dashboard-1.8.4.jar
-# ��ע������ʹ�õĲ��ǹٷ��棬��Ϊ�ٷ�Ĭ�ϲ�֧����������־û�������
+# 备注：如下使用的不是官方版，因为官方默认不支持限流规则持久化！！！
 $ vim Dockerfile
 ```
 
 ```dockerfile
 FROM openjdk:8-jre
-MAINTAINER ���� liming2011071@163.com
+MAINTAINER 问秋 liming2011071@163.com
 
 COPY sentinel-dashboard-1.8.0-zookeeper.jar sentinel-dashboard.jar
 
 ENTRYPOINT ["java", "-jar", "/sentinel-dashboard.jar"]
 ```
 
-- ��������
+- 制作镜像
 
 ```bash
 $ docker build -t rushing/sentinel-dashboard:ds-1.8.0 .
 $ docker push rushing/sentinel-dashboard:ds-1.8.0
 ```
 
-- ����
+- 运行
 
 ```bash
 $ docker run --name sentinel \
@@ -1990,25 +1990,25 @@ $ docker run --name sentinel \
 -p 8791:8791 -d rushing/sentinel-dashboard:ds-1.8.0
 ```
 
-- ��¼����
+- 登录访问
 
 http://repo.emon.vip:8791
 
-�˺����룺
+账号密码：
 
 sentinel/sentinel
 
 
 
-## 6��Elasticsearch
+## 6、Elasticsearch
 
-- �������磨ͬһ�����services�������ӣ�
+- 创建网络（同一网络的services互相连接）
 
 ```bash
 $ docker network create esnet
 ```
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name es --net esnet -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d elasticsearch:7.17.5
@@ -2016,12 +2016,12 @@ $ docker run --name es --net esnet -p 9200:9200 -p 9300:9300 -e "discovery.type=
 
 
 
-## 7��MongoDB
+## 7、MongoDB
 
-### 7.1����ͨ����
+### 7.1、普通启动
 
 ```bash
-# /usr/local/dockerv/mongo Ŀ¼���Զ�����
+# /usr/local/dockerv/mongo 目录会自动创建
 $ docker run --name mongo \
 -e MONGO_INITDB_ROOT_USERNAME=root \
 -e MONGO_INITDB_ROOT_PASSWORD=root123 \
@@ -2030,53 +2030,53 @@ $ docker run --name mongo \
 -d mongo:5.0.11
 ```
 
-### 7.2�������ļ�����
+### 7.2、配置文件启动
 
-- ����keyFile
+- 生成keyFile
 
 ```bash
 $ mkdir -pv /usr/local/dockerv/mongo/conf
 $ openssl rand -base64 128 > /usr/local/dockerv/mongo/conf/keyFile
-# ���Ƽ���keyFile��Ҫ���ǣ�
-# 1-��base64���뼯�е��ַ����б�д�����ַ���ֻ�ܰ���a-z,A-Z,+,/��=
-# 2-���Ȳ��ܹ�����1000�ֽ�
-# 3-Ȩ����ൽ600
+# 复制集对keyFile的要求是：
+# 1-以base64编码集中的字符进行编写，即字符串只能包含a-z,A-Z,+,/，=
+# 2-长度不能够超过1000字节
+# 3-权限最多到600
 $ chmod 600 /usr/local/dockerv/mongo/conf/keyFile
 ```
 
-- ���������ļ�
+- 创建配置文件
 
 ```bash
 $ vim /usr/local/dockerv/mongo/conf/27017.conf
 ```
 
 ```bash
-# �˿ڣ�Ĭ��27017��MongoDB��Ĭ�Ϸ���TCP�˿�
+# 端口，默认27017，MongoDB的默认服务TCP端口
 port=27017
-# Զ������Ҫָ��ip����Ȼ�޷����ӣ�0.0.0.0��ʾ������ip���ʣ���������Ӧ�˿�
+# 远程连接要指定ip，不然无法连接；0.0.0.0表示不限制ip访问，并开启对应端口
 bind_ip=0.0.0.0
-# ��־�ļ�
+# 日志文件
 logpath=/usr/local/dockerv/mongo/log/27017.log
-# �����ļ����Ŀ¼��Ĭ�ϣ� /data/db/
+# 数据文件存放目录，默认： /data/db/
 dbpath=/usr/local/dockerv/mongo/data/27017/
-# ��־׷��
+# 日志追加
 logappend=true
-# �����Ľ���ID
+# 启动的进程ID
 pidfilepath=/usr/local/dockerv/mongo/data/27017/27017.pid
-# ���Ϊtrue�����ػ�����ķ�ʽ���������ں�̨����
+# 如果为true，以守护程序的方式启动，即在后台运行
 fork=false
-# oplog���ڴ�С
+# oplog窗口大小
 oplogSize=5120
-# ���Ƽ�����
+# 复制集名称
 replSet=emon
-# ���Ƽ���֤�ļ�
+# 复制集认证文件
 keyFile=/usr/local/dockerv/mongo/conf/keyFile
 ```
 
-- ����
+- 启动
 
 ```bash
-# /usr/local/dockerv/mongo Ŀ¼���Զ�����
+# /usr/local/dockerv/mongo 目录会自动创建
 $ docker run --name mongo \
 -e MONGO_INITDB_ROOT_USERNAME=root
 -e MONGO_INITDB_ROOT_PASSWORD=root123
@@ -2085,17 +2085,17 @@ $ docker run --name mongo \
 --config /etc/mongo/27017.conf
 ```
 
-## 8��JFrog Artifactory
+## 8、JFrog Artifactory
 
-### 8.1��6�汾
+### 8.1、6版本
 
-- ����volume
+- 创建volume
 
 ```bash
 $ docker volume create artifactory
 ```
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name artifactory \
@@ -2104,17 +2104,17 @@ $ docker run --name artifactory \
 -d releases-docker.jfrog.io/jfrog/artifactory-oss:6.23.42
 ```
 
-- ��¼
+- 登录
 
 http://emon:8082/
 
-�û������룺admin/password ==> ��¼��ǿ���޸ģ��޸Ľ����admin/admin123
+用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/admin123
 
 
 
-### 8.2��7�汾
+### 8.2、7版本
 
-- ����Ŀ¼����Ȩ
+- 创建目录并赋权
 
 ```bash
 $ mkdir -pv /usr/local/dockerv/jfrog/artifactory/var/etc
@@ -2122,7 +2122,7 @@ $ touch /usr/local/dockerv/jfrog/artifactory/var/etc/system.yaml
 $ chown -R 1030:1030 /usr/local/dockerv/jfrog/artifactory/var
 ```
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name artifactory \
@@ -2131,19 +2131,19 @@ $ docker run --name artifactory \
 -d releases-docker.jfrog.io/jfrog/artifactory-oss:7.41.12
 ```
 
-- ��¼
+- 登录
 
 http://emon:8082/
 
-�û������룺admin/password ==> ��¼��ǿ���޸ģ��޸Ľ����admin/Admin5%123
+用户名密码：admin/password ==> 登录后被强制修改，修改结果：admin/Admin5%123
 
-Base URL��http://repo.emon.vip
+Base URL：http://repo.emon.vip
 
 
 
-## 9��RabbitMQ
+## 9、RabbitMQ
 
-- ����
+- 启动
 
 ```bash
 $ docker run --name rabbitmq \
@@ -2152,7 +2152,7 @@ $ docker run --name rabbitmq \
 -d rabbitmq:3.8.3-management
 ```
 
-- docker�������
+- docker命令访问
 
 ```bash
 $ docker exec -it rabbitmq /bin/bash
