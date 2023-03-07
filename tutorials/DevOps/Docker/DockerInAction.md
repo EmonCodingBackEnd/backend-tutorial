@@ -451,7 +451,7 @@ net.bridge.bridge-nf-call-iptables = 1
   ```bash
   [emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
   docker version >= 1.12
-  {"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
+  {"registry-mirrors": ["https://mirror.baidubce.com","http://f1361db2.m.daocloud.io"]}
   Success.
   You need to restart docker to take effect: sudo systemctl restart docker
   ```
