@@ -1138,6 +1138,12 @@ git submodule update --init --recursive
 
 [参考资料](https://superuser.com/questions/837668/fatal-index-file-corrupt-keeps-repeating-in-git)
 
+## 7.13、如何查看某个分支从哪个分支checkout -b出来的
+
+```bash
+git reflog --date=local | grep <branchName>
+```
+
 ## 7.99、如何一个项目配置2个远程地址？
 
 一个项目设置两个git地址，并最终实现一次性同时推送到两个git地址上。
