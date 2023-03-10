@@ -344,6 +344,19 @@ server {
         proxy_pass http://tomcats;
     }
 }
+
+# 若需要增加路径，比如customPath
+server {
+    listen 80;
+    server_name www.tomcats.com;
+
+    location / {
+        if ($request_uri ~/(.+)) {
+        	set $P $1;
+        }
+        proxy_pass http://tomcats/customPath/$P;
+    }
+}
 ```
 
 - 加载Nginx配置
