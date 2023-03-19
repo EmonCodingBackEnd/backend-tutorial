@@ -1618,6 +1618,12 @@ $ docker run --name=mysql \
 -p 3306:3306 -d mysql/mysql-server:5.7
 ```
 
+- docker命令行访问
+
+```bash
+$ docker exec -it mysql mysql -uroot -proot123
+```
+
 ### 1.2、主从
 
 #### 1.2.1、主
