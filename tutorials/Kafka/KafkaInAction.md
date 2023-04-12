@@ -366,6 +366,12 @@ Note: This will have no impact if delete.topic.enable is not set to true.
 $ kafka-consumer-groups.sh --bootstrap-server emon:9092 --list
 ```
 
+- 查看所有group详情
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --describe --all-groups
+```
+
 - 查看指定group详情
 
 ```bash
@@ -399,10 +405,22 @@ HOST：主机；
 
 CLIENT-ID：客户端ID。
 
+- 查看消费组成员信息
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --describe --group con-1 --members
+```
+
+- 查看消费组状态信息
+
+```bash
+$ kafka-consumer-groups.sh --bootstrap-server emon:9092 --describe --group con-1 --state
+```
+
 - 在topic上offset某个group
 
 ```bash
-# 注意，to-offset 的参数，不能大于 LOG-END-OFFSET；to-offset可以替换为to-earliest或to-latest
+# 注意，to-offset 的参数，不能大于 LOG-END-OFFSET；to-offset可以替换为to-earliest或to-latest或to-current或to-datetime
 $ kafka-consumer-groups.sh --bootstrap-server emon:9092 --group con-1 --topic hello --execute --reset-offsets --to-offset 0
 ```
 
