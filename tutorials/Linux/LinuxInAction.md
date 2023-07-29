@@ -1022,7 +1022,7 @@ success
 
 ## 5、安装ftps服务器
 
-**ftps=ftps+ssl**
+**ftps=ftp+ssl**
 
 - 为ftp添加ssl功能的方式
   - 使用自签名证书

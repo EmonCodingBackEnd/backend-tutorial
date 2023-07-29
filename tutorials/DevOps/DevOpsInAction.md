@@ -2084,10 +2084,10 @@ keyFile=/usr/local/dockerv/mongo/conf/keyFile
 ```bash
 # /usr/local/dockerv/mongo 目录会自动创建
 $ docker run --name mongo \
--e MONGO_INITDB_ROOT_USERNAME=root
--e MONGO_INITDB_ROOT_PASSWORD=root123
--v /usr/local/dockerv/mongo/conf/:/etc/mongo
--d mongo:5.0.11
+-e MONGO_INITDB_ROOT_USERNAME=root \
+-e MONGO_INITDB_ROOT_PASSWORD=root123 \
+-v /usr/local/dockerv/mongo/conf/:/etc/mongo \
+-d mongo:5.0.11 \
 --config /etc/mongo/27017.conf
 ```
 
