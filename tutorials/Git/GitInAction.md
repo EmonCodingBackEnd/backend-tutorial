@@ -727,6 +727,18 @@ $ git --version
 $ git -v
 ```
 
+- 增加配置项
+
+```shell
+$ git config core.hooksPath .mygithooks
+```
+
+- 删除配置项
+
+```shell
+$ git config --unset core.hooksPath
+```
+
 
 
 ## 7.1 Git命令帮助文档的使用
