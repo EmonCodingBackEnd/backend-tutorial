@@ -251,8 +251,6 @@ $ cat /etc/docker/daemon.json
 
 ```bash
 $ systemctl enable docker && systemctl restart docker
-# 删掉旧的存储位置
-$ rm -rf /var/lib/docker/
 ```
 
 ### 2.2、安装kubeadm/kubelet/kubectl
