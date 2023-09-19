@@ -189,7 +189,7 @@ emon
 
 ```bash
 [root@emon ~]# mkdir /media/cdrom
-[root@emon ~]# mount -t iso9660 -o loop /usr/local/src/CentOS-7-x86_64-DVD-1804.iso /media/cdrom/
+[root@emon ~]# mount -t iso9660 -o loop /usr/local/src/CentOS-7-x86_64-DVD-2009.iso /media/cdrom/
 ```
 
 2. 设置开机自动挂载系统镜像文件
@@ -199,16 +199,16 @@ emon
 ```bash
 [root@emon ~]# vi /etc/fstab
 # 个人配置
-/usr/local/src/CentOS-7-x86_64-DVD-1804.iso /media/cdrom        iso9660         defaults,ro,loop 0 0
+/usr/local/src/CentOS-7-x86_64-DVD-2009.iso /media/cdrom        iso9660         defaults,ro,loop 0 0
 ```
 
 3. 配置本地yum
 
 ```bash
-[root@emon ~]# vi /etc/yum.repos.d/CentOS-7.5.repo
+[root@emon ~]# vi /etc/yum.repos.d/CentOS-7.9.repo
 # 如下内容为编辑的文件内容
-[CentOS7.5]
-name=CentOS7.5
+[CentOS7.9]
+name=CentOS7.9
 baseurl=file:///media/cdrom
 enabled=1
 gpgcheck=1
