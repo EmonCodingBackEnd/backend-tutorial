@@ -1613,7 +1613,7 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 $ docker run --name=mysql \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql/log:/var/log/mysql \
--v /usr/local/dockerv/mysql/dada:/var/lib/mysql \
+-v /usr/local/dockerv/mysql/data:/var/lib/mysql \
 -v /usr/local/dockerv/mysql/conf:/etc/mysql \
 -p 3306:3306 -d mysql/mysql-server:5.7
 ```
