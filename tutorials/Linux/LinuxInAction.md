@@ -167,6 +167,15 @@ emon
 [root@emon ~]# nmcli conn mod net8 connection.autoconnect yes 
 ```
 
+> 执行： `nmcli conn up net8` 报错如下：
+>
+> Error: Connection activation failed: No suitable device found for this connection (device lo not available because device is strictly unmanaged).
+>
+> 解决：
+>
+> - `nmcli n` 看是不是 disabled
+> - 如果是，那么执行 `nmcli n on`
+
 5. 编辑网卡会话
 
 ```bash
