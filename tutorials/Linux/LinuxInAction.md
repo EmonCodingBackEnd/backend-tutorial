@@ -160,9 +160,9 @@ emon
 此时，可配置如下：
 
 ```bash
-[root@emon ~]# nmcli connection add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.200.2
-# net8无需添加dns，如果无法访问外网，重启以下虚拟机
-# [root@emon ~]# nmcli con modify net8 +ipv4.dns <具体DNS>
+[root@emon ~]# nmcli conn add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.200.2
+# 指定了DNS后，还需要重新激活（nmtui图形界面操作）一下 net8，网络才通
+[root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.200.2
 # 配置开机自动启动该会话
 [root@emon ~]# nmcli conn mod net8 connection.autoconnect yes 
 ```
