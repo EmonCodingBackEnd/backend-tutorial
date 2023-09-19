@@ -472,7 +472,7 @@ net.bridge.bridge-nf-call-iptables = 1
   sudo tee /etc/docker/daemon.json <<-'EOF'
   {
     "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
-    "graph": "/usr/local/lib/docker",
+    "graph": "/var/lib/docker",
     "exec-opts": ["native.cgroupdriver=cgroupfs"],
     "insecure-registries": ["emon:5080"]
   }

@@ -234,9 +234,9 @@ $ docker run hello-world
 tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
-  "graph": "/usr/local/lib/docker",
+  "graph": "/var/lib/docker",
   "exec-opts": ["native.cgroupdriver=cgroupfs"],
-  "insecure-registries": ["192.168.200.116:5080"]
+  "insecure-registries": ["192.168.32.116:5080"]
 }
 EOF
 ```
