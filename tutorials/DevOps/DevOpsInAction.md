@@ -1778,7 +1778,7 @@ bash-4.2# mysql -uroot -proot123
 ```bash
 # 注意：MASTER_LOG_FILE和MASTER_LOG_POS是在主库通过 show master status 得到的
 mysql> change master to \
-master_host='192.168.200.116', \
+master_host='192.168.32.116', \
 master_port=3307, \
 master_user='repl', \
 master_password='repl123', \
@@ -1947,7 +1947,7 @@ http://repo.emon.vip:9090
 # 配置项参考文件：https://github.com/xuxueli/xxl-job/blob/master/xxl-job-admin/src/main/resources/application.properties
 # 如需自定义 JVM内存参数 等配置，可通过 "-e JAVA_OPTS" 指定，参数格式 JAVA_OPTS="-Xmx512m" ；
 $ docker run --name xxl-job-admin \
--e PARAMS="--spring.datasource.url=jdbc:mysql://192.168.200.116:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=root123" \
+-e PARAMS="--spring.datasource.url=jdbc:mysql://192.168.32.116:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=root123" \
 -v /usr/local/dockerv/xxl-job-admin:/data/applogs \
 -p 8790:8080 -d xuxueli/xxl-job-admin:2.3.0
 ```
@@ -1991,7 +1991,7 @@ $ docker push rushing/sentinel-dashboard:ds-1.8.0
 
 ```bash
 $ docker run --name sentinel \
--e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Ddatasource.provider=zookeeper -Ddatasource.provider.zookeeper.server-addr=192.168.200.116:2181" \
+-e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Ddatasource.provider=zookeeper -Ddatasource.provider.zookeeper.server-addr=192.168.32.116:2181" \
 -p 8791:8791 -d rushing/sentinel-dashboard:ds-1.8.0
 ```
 

@@ -20,11 +20,11 @@ KubeadmÊÇÒ»¸öK8s²¿Êð¹¤¾ß£¬Ìá¹©kubeadm initºÍkubeadm join£¬ÓÃÓÚ¿ìËÙ²¿ÊðKubernetes
 
 ### 1.1¡¢·þÎñÆ÷¹æ»®
 
-| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·          | ÄÚ´æ | ²¿ÊðÄÚÈÝ |
-| ------ | --------- | --------------- | ---- | -------- |
-| emon   | CentOS7.7 | 192.168.200.116 | >=2G | master   |
-| emon2  | CentOS7.7 | 192.168.200.117 | >=2G | worker   |
-| emon3  | CentOS7.7 | 192.168.200.118 | >=2G | worker   |
+| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊðÄÚÈÝ |
+| ------ | --------- | -------------- | ---- | -------- |
+| emon   | CentOS7.7 | 192.168.32.116 | >=2G | master   |
+| emon2  | CentOS7.7 | 192.168.32.117 | >=2G | worker   |
+| emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker   |
 
 ### 1.2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓÐ½Úµã£©
 
@@ -48,9 +48,9 @@ $ vim /etc/hosts
 ```
 
 ```bash
-192.168.200.116 emon
-192.168.200.117 emon2
-192.168.200.118 emon3
+192.168.32.116 emon
+192.168.32.117 emon2
+192.168.32.118 emon3
 ```
 
 #### 1.2.3¡¢°²×°ÒÀÀµ°ü
@@ -290,7 +290,7 @@ $ systemctl enable kubelet
 # ÔÚMasterÉÏÖ´ÐÐ£¬ÓÉÓÚÄ¬ÈÏÀ­È¡¾µÏñµØÖ· k8s.gcr.io ¹úÄÚÎÞ·¨·ÃÎÊ£¬ÕâÀïÖ¸¶¨°¢ÀïÔÆ¾µÏñ²Ö¿âµØÖ·¡£
 # Ö´ÐÐ¸Ã²½ÖèÖ®Ç°£¬Ò²¿ÉÒÔÖ´ÐÐ kubeadm config images pull Ô¤ÏÂÔØ¾µÏñ
 $ kubeadm init \
---apiserver-advertise-address=192.168.200.116 \
+--apiserver-advertise-address=192.168.32.116 \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.20.0 \
 --service-cidr=10.233.0.0/16 \
@@ -306,7 +306,7 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # ¡¾ÁÙÊ±¡¿ÎÞÐèÖ´ÐÐ£¬½ö×ö¼ÇÂ¼²Î¿¼
 # Then you can join any number of worker nodes by running the following on each as root:
-kubeadm join 192.168.200.116:6443 --token jqgqm7.ax7b938u5xheiu6d \
+kubeadm join 192.168.32.116:6443 --token jqgqm7.ax7b938u5xheiu6d \
     --discovery-token-ca-cert-hash sha256:882f6812169b4103fcae6065975c3cb231184cd4950301b7fcc5f769ddd265cb
 ```
 
@@ -458,7 +458,7 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 
 Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 192.168.200.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
+kubeadm join 192.168.32.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
     --discovery-token-ca-cert-hash sha256:2ab2809af3d7ea7b684e1dcdea1859b226ec8b9185a82a56344aade4d3000f99
 ```
 
@@ -611,8 +611,8 @@ $ kubectl get pod -o wide
 
 # ÅäÖÃ±¾µØDNS£º·ÃÎÊemon3µÄDNS
 $ vim /etc/hosts
-192.168.200.118 tomcat.mooc.com
-192.168.200.118 api.mooc.com
+192.168.32.118 tomcat.mooc.com
+192.168.32.118 api.mooc.com
 
 # ·ÃÎÊ
 http://tomcat.mooc.com # ¿´µ½Õý³£tomcat½çÃæ
@@ -1213,7 +1213,7 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```yaml
 # ÐÞ¸Ä
 # hostname: reg.mydomain.com
-hostname: 192.168.200.116
+hostname: 192.168.32.116
 # ÐÞ¸Ä
   # port: 80
   port: 5080
@@ -1260,7 +1260,7 @@ trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 
 8. µÇÂ¼
 
-·ÃÎÊ£ºhttp://192.168.200.116:5080 £¨»á±»Ìø×ªµ½http://192.168.200.116:5443£©
+·ÃÎÊ£ºhttp://192.168.32.116:5080 £¨»á±»Ìø×ªµ½http://192.168.32.116:5443£©
 
 ÓÃ»§ÃûÃÜÂë£º admin/Harbor12345
 
@@ -1293,7 +1293,7 @@ $ vim /etc/docker/daemon.json
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
   "graph": "/usr/local/lib/docker",
   "exec-opts": ["native.cgroupdriver=cgroupfs"],
-  "insecure-registries": ["192.168.200.116:5080"]
+  "insecure-registries": ["192.168.32.116:5080"]
 }
 ```
 
@@ -1323,13 +1323,13 @@ $ systemctl restart docker
 # ÏÂÔØ
 $ docker pull openjdk:8-jre
 # ´ò±êÇ©
-$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker tag openjdk:8-jre 192.168.32.116:5080/devops-learning/openjdk:8-jre
 # µÇÂ¼
-$ docker login -u emon -p Emon@123 192.168.200.116:5080
+$ docker login -u emon -p Emon@123 192.168.32.116:5080
 # ÉÏ´«¾µÏñ
-$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker push 192.168.32.116:5080/devops-learning/openjdk:8-jre
 # ÍË³öµÇÂ¼
-$ docker logout 192.168.200.116:5080
+$ docker logout 192.168.32.116:5080
 
 »úÆ÷ÈËÕË»§£º
 token£º  
@@ -1340,11 +1340,11 @@ XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 
 ## 1¡¢·þÎñÆ÷¹æ»®
 
-| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·          | ÄÚ´æ | ²¿ÊðÄÚÈÝ |
-| ------ | --------- | --------------- | ---- | -------- |
-| emon   | CentOS7.7 | 192.168.200.116 | >=2G | master   |
-| emon2  | CentOS7.7 | 192.168.200.117 | >=2G | worker   |
-| emon3  | CentOS7.7 | 192.168.200.118 | >=2G | worker   |
+| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊðÄÚÈÝ |
+| ------ | --------- | -------------- | ---- | -------- |
+| emon   | CentOS7.7 | 192.168.32.116 | >=2G | master   |
+| emon2  | CentOS7.7 | 192.168.32.117 | >=2G | worker   |
+| emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker   |
 
 ## 2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓÐ½Úµã£©
 
@@ -1370,9 +1370,9 @@ vim /etc/hosts
 ```
 
 ```bash
-192.168.200.116 emon
-192.168.200.117 emon2
-192.168.200.118 emon3
+192.168.32.116 emon
+192.168.32.117 emon2
+192.168.32.118 emon3
 ```
 
 ### 2.3¡¢°²×°ÒÀÀµ°ü
@@ -1513,7 +1513,7 @@ export USE_REAL_HOSTNAME=true
 # Ö¸¶¨ÅäÖÃÎÄ¼þÎ»ÖÃ
 export CONFIG_FILE=inventory/mycluster/hosts.yaml
 # ¶¨ÒåipÁÐ±í£¨ÄãµÄ·þÎñÆ÷ÄÚÍøipµØÖ·ÁÐ±í£¬3Ì¨¼°ÒÔÉÏ£¬Ç°Á½Ì¨Ä¬ÈÏÎªmaster½Úµã£©
-declare -a IPS=(192.168.200.116 192.168.200.117 192.168.200.118)
+declare -a IPS=(192.168.32.116 192.168.32.117 192.168.32.118)
 # Éú³ÉÅäÖÃÎÄ¼þ
 python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 ```
@@ -1542,9 +1542,9 @@ vim inventory/mycluster/group_vars/k8s-cluster/addons.yml
 
 ```bash
 # [ÐÂÔö]
-http_proxy: "http://192.168.200.116:8118"
+http_proxy: "http://192.168.32.116:8118"
 # [ÐÂÔö]
-https_proxy: "http://192.168.200.116:8118"
+https_proxy: "http://192.168.32.116:8118"
 ```
 
 - `vim inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
@@ -1621,11 +1621,11 @@ $ grep 8118 -r /etc/yum*
 
 ### 1.1¡¢·þÎñÆ÷¹æ»®
 
-| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·          | ÄÚ´æ | ²¿ÊðÄÚÈÝ       |
-| ------ | --------- | --------------- | ---- | -------------- |
-| emon   | CentOS7.7 | 192.168.200.116 | >=2G | master         |
-| emon2  | CentOS7.7 | 192.168.200.117 | >=2G | master¡¢worker |
-| emon3  | CentOS7.7 | 192.168.200.118 | >=2G | worker         |
+| »úÆ÷Ãû | ÏµÍ³ÀàÐÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊðÄÚÈÝ       |
+| ------ | --------- | -------------- | ---- | -------------- |
+| emon   | CentOS7.7 | 192.168.32.116 | >=2G | master         |
+| emon2  | CentOS7.7 | 192.168.32.117 | >=2G | master¡¢worker |
+| emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker         |
 
 ### 1.2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓÐ½Úµã£©
 
@@ -1649,9 +1649,9 @@ $ vim /etc/hosts
 ```
 
 ```bash
-192.168.200.116 emon
-192.168.200.117 emon2
-192.168.200.118 emon3
+192.168.32.116 emon
+192.168.32.117 emon2
+192.168.32.118 emon3
 ```
 
 #### 1.2.3¡¢°²×°ÒÀÀµ°ü
@@ -1959,7 +1959,7 @@ KubernetesÊ¹ÓÃÒ»ÖÖ³ÆÎªNode AuthorizerµÄ×¨ÓÃÊÚÈ¨Ä£Ê½À´ÊÚÈ¨Kubelets·¢³öµÄAPIÇëÇó¡£
 ```bash
 # ÉèÖÃÄãµÄworker½ÚµãÁÐ±í
 $ WORKERS=(emon2 emon3)
-$ WORKER_IPS=(192.168.200.117 192.168.200.118)
+$ WORKER_IPS=(192.168.32.117 192.168.32.118)
 # Éú³ÉËùÓÐworker½ÚµãµÄÖ¤ÊéÅäÖÃ
 $ for ((i=0;i<${#WORKERS[@]};i++)); do
 cat > ${WORKERS[$i]}-csr.json <<EOF
@@ -2157,7 +2157,7 @@ EOF
 # apiserverµÄservice ipµØÖ·£¨Ò»°ãÊÇsvcÍø¶ÎµÄµÚÒ»¸öip£©
 $ KUBERNETES_SVC_IP=10.233.0.1
 # ËùÓÐµÄmasterÄÚÍøip£¬¶ººÅ·Ö¸ô£¨ÔÆ»·¾³¿ÉÒÔ¼ÓÉÏmaster¹«ÍøipÒÔ±ãÖ§³Ö¹«Íøip·ÃÎÊ£©£ºËäÈ»118²»ÊÇmaster£¬µ«Î´À´¿ÉÄÜÊÇ
-$ MASTER_IPS=192.168.200.116,192.168.200.117,192.168.200.118
+$ MASTER_IPS=192.168.32.116,192.168.32.117,192.168.32.118
 # Éú³ÉÖ¤Êé
 $ cfssl gencert \
   -ca=ca.pem \
@@ -2274,7 +2274,7 @@ done
 > ×¢Òâ£ºÓÉÓÚÏÂÃæ·Ö·¢µÄÖ¤Êé¼´°üº¬ÁËetcdµÄÖ¤ÊéÒ²°üº¬ÁËk8sÖ÷½ÚµãµÄÖ¤Êé¡£ ËùÒÔ MASTER_IPS ÖÐ±ØÐë°üº¬ËùÓÐ `master` ½ÚµãÒÔ¼° `etcd` ½Úµã¡£Èç¹ûÃ»ÓÐ°üº¬ËùÓÐetcd½ÚµãµÄÖ¤Êé£¬ÐèÒªÖØÐÂ¶¨Òå£¬¶ººÅ·Ö¸ô
 
 ```bash
-$ MASTER_IPS=192.168.200.116,192.168.200.117,192.168.200.118
+$ MASTER_IPS=192.168.32.116,192.168.32.117,192.168.32.118
 OIFS=$IFS
 IFS=','
 for instance in ${MASTER_IPS}; do
@@ -2482,10 +2482,10 @@ $ cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
 
 ```bash
 $ ETCD_NAME=$(hostname -s)
-$ ETCD_IP=192.168.200.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
+$ ETCD_IP=192.168.32.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
 # etcdËùÓÐ½ÚµãµÄipµØÖ·
 $ ETCD_NAMES=(emon emon2 emon3)
-$ ETCD_IPS=(192.168.200.116 192.168.200.117 192.168.200.118)
+$ ETCD_IPS=(192.168.32.116 192.168.32.117 192.168.32.118)
 $ cat <<EOF > /etc/systemd/system/etcd.service
 [Unit]
 Description=etcd
@@ -2537,9 +2537,9 @@ $ ETCDCTL_API=3 etcdctl member list \
   --cert=/etc/etcd/kubernetes.pem \
   --key=/etc/etcd/kubernetes-key.pem
 # ÃüÁîÐÐÊä³ö½á¹û
-3bae6ef756268744, started, emon2, https://192.168.200.117:2380, https://192.168.200.117:2379, false
-48fd167b46c04497, started, emon3, https://192.168.200.118:2380, https://192.168.200.118:2379, false
-7d04ddf76c096e96, started, emon, https://192.168.200.116:2380, https://192.168.200.116:2379, false
+3bae6ef756268744, started, emon2, https://192.168.32.117:2380, https://192.168.32.117:2379, false
+48fd167b46c04497, started, emon3, https://192.168.32.118:2380, https://192.168.32.118:2379, false
+7d04ddf76c096e96, started, emon, https://192.168.32.116:2380, https://192.168.32.116:2379, false
 ```
 
 
@@ -2571,11 +2571,11 @@ $ cp ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem \
 
 # ÅäÖÃkube-apiserver.service
 # ±¾»úÄÚÍøip
-$ IP=192.168.200.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
+$ IP=192.168.32.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
 # apiserverÊµÀýÊý
 $ APISERVER_COUNT=2
 # etcd½Úµã
-$ ETCD_ENDPOINTS=(192.168.200.116 192.168.200.117 192.168.200.118)
+$ ETCD_ENDPOINTS=(192.168.32.116 192.168.32.117 192.168.32.118)
 # ´´½¨ apiserver service
 $ cat <<EOF > /etc/systemd/system/kube-apiserver.service
 [Unit]
@@ -2711,9 +2711,9 @@ $ netstat -tnlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
 tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      17094/master        
-tcp        0      0 192.168.200.116:2379    0.0.0.0:*               LISTEN      61298/etcd          
+tcp        0      0 192.168.32.116:2379    0.0.0.0:*               LISTEN      61298/etcd          
 tcp        0      0 127.0.0.1:2379          0.0.0.0:*               LISTEN      61298/etcd          
-tcp        0      0 192.168.200.116:2380    0.0.0.0:*               LISTEN      61298/etcd          
+tcp        0      0 192.168.32.116:2380    0.0.0.0:*               LISTEN      61298/etcd          
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      9808/sshd           
 tcp6       0      0 ::1:25                  :::*                    LISTEN      17094/master        
 tcp6       0      0 :::6443                 :::*                    LISTEN      61426/kube-apiserve 
@@ -2841,12 +2841,12 @@ $ vim /etc/containerd/config.toml
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
           #endpoint = ["https://registry-1.docker.io"]
           endpoint = ["https://pyk8pf3k.mirror.aliyuncs.com"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.200.116:5080"]
-          endpoint = ["https://192.168.200.116:5443"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.32.116:5080"]
+          endpoint = ["https://192.168.32.116:5443"]
       [plugins."io.containerd.grpc.v1.cri".registry.configs]
-        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.200.116:5443".tls]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.32.116:5443".tls]
           insecure_skip_verify = true
-        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.200.116:5443".auth]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.32.116:5443".auth]
           username = "admin"
           password = "Harbor12345"
 ```
@@ -2867,7 +2867,7 @@ systemctl restart containerd
 $ mkdir -p /etc/kubernetes/ssl/
 $ cp ${HOSTNAME}-key.pem ${HOSTNAME}.pem ca.pem ca-key.pem /etc/kubernetes/ssl/
 $ cp ${HOSTNAME}.kubeconfig /etc/kubernetes/kubeconfig
-$ IP=192.168.200.117 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
+$ IP=192.168.32.117 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
 # Ð´ÈëkubeletÅäÖÃÎÄ¼þ
 $ cat <<EOF > /etc/kubernetes/kubelet-config.yaml
 kind: KubeletConfiguration
@@ -2943,7 +2943,7 @@ nginx-proxyÊÇÒ»¸öÓÃÓÚworker½Úµã·ÃÎÊapiserverµÄÒ»¸ö´úÀí£¬ÊÇapiserverÒ»¸öÓÅÑÅµÄ¸ß¿
 ```bash
 $ mkdir -p /etc/nginx
 # master ipÁÐ±í
-$ MASTER_IPS=(192.168.200.116 192.168.200.117)
+$ MASTER_IPS=(192.168.32.116 192.168.32.117)
 # Ö´ÐÐÇ°ÇëÏÈcopyÒ»·Ý£¬²¢ÐÞ¸ÄºÃupstreamµÄ 'server' ²¿·ÖÅäÖÃ
 $ cat <<EOF > /etc/nginx/nginx.conf
 error_log stderr notice;
@@ -3137,14 +3137,14 @@ $ journalctl -f -u kube-proxy
 > 4ÔÂ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.859842   60611 kubelet.go:2243] node "emon3" not found
 > 4ÔÂ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.959939   60611 kubelet.go:2243] node "emon3" not found
 > 4ÔÂ 01 17:27:57 emon3 kubelet[60611]: E0401 17:27:57.060894   60611 kubelet.go:2243] node "emon3" not found
-> 4ÔÂ 01 17:27:59 emon3 kubelet[60611]: I0401 17:27:59.174140   60611 setters.go:86] Using node IP: "192.168.200.118"
+> 4ÔÂ 01 17:27:59 emon3 kubelet[60611]: I0401 17:27:59.174140   60611 setters.go:86] Using node IP: "192.168.32.118"
 > 4ÔÂ 01 17:28:00 emon3 kubelet[60611]: E0401 17:28:00.488025   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
 > 4ÔÂ 01 17:28:05 emon3 kubelet[60611]: I0401 17:28:05.318879   60611 kubelet_getters.go:176] "Pod status updated" pod="kube-system/nginx-proxy-emon3" status=Running
 > 4ÔÂ 01 17:28:05 emon3 kubelet[60611]: E0401 17:28:05.489211   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:09 emon3 kubelet[60611]: I0401 17:28:09.178972   60611 setters.go:86] Using node IP: "192.168.200.118"
+> 4ÔÂ 01 17:28:09 emon3 kubelet[60611]: I0401 17:28:09.178972   60611 setters.go:86] Using node IP: "192.168.32.118"
 > 4ÔÂ 01 17:28:10 emon3 kubelet[60611]: E0401 17:28:10.490192   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
 > 4ÔÂ 01 17:28:15 emon3 kubelet[60611]: E0401 17:28:15.491678   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:19 emon3 kubelet[60611]: I0401 17:28:19.182519   60611 setters.go:86] Using node IP: "192.168.200.118"
+> 4ÔÂ 01 17:28:19 emon3 kubelet[60611]: I0401 17:28:19.182519   60611 setters.go:86] Using node IP: "192.168.32.118"
 > 4ÔÂ 01 17:28:20 emon3 kubelet[60611]: E0401 17:28:20.493213   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
 > ```
 >
@@ -3356,13 +3356,13 @@ acb35f522c6d6       f0b8a9a541369       17 minutes ago      Running             
 $ kubectl get po -n kube-system -o wide
 NAME                                       READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
 calico-kube-controllers-858c9597c8-vdc7n   1/1     Running   0          16m   10.200.161.1      emon3   <none>           <none>
-calico-node-4qz8m                          1/1     Running   0          16m   192.168.200.117   emon2   <none>           <none>
-calico-node-q5x6w                          1/1     Running   0          16m   192.168.200.118   emon3   <none>           <none>
+calico-node-4qz8m                          1/1     Running   0          16m   192.168.32.117   emon2   <none>           <none>
+calico-node-q5x6w                          1/1     Running   0          16m   192.168.32.118   emon3   <none>           <none>
 coredns-84646c885d-ghjsk                   1/1     Running   0          11m   10.200.161.2      emon3   <none>           <none>
 coredns-84646c885d-plqbz                   1/1     Running   0          11m   10.200.108.65     emon2   <none>           <none>
-nginx-proxy-emon3                          1/1     Running   0          21m   192.168.200.118   emon3   <none>           <none>
-nodelocaldns-72nns                         1/1     Running   0          10m   192.168.200.117   emon2   <none>           <none>
-nodelocaldns-n6fqj                         1/1     Running   0          10m   192.168.200.118   emon3   <none>           <none>
+nginx-proxy-emon3                          1/1     Running   0          21m   192.168.32.118   emon3   <none>           <none>
+nodelocaldns-72nns                         1/1     Running   0          10m   192.168.32.117   emon2   <none>           <none>
+nodelocaldns-n6fqj                         1/1     Running   0          10m   192.168.32.118   emon3   <none>           <none>
 ```
 
 
@@ -4054,7 +4054,7 @@ $ sysctl -p
     "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
     "graph": "/usr/local/lib/docker",
     "exec-opts": ["native.cgroupdriver=cgroupfs"],
-    "insecure-registries": ["192.168.200.116:5080"]
+    "insecure-registries": ["192.168.32.116:5080"]
   }
   EOF
   ```
@@ -4183,7 +4183,7 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```yaml
 # ÐÞ¸Ä
 # hostname: reg.mydomain.com
-hostname: 192.168.200.116
+hostname: 192.168.32.116
 # ÐÞ¸Ä
   # port: 80
   port: 5080
@@ -4230,7 +4230,7 @@ trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 
 8. µÇÂ¼
 
-·ÃÎÊ£ºhttp://192.168.200.116:5080 £¨»á±»Ìø×ªµ½http://192.168.200.116:5443£©
+·ÃÎÊ£ºhttp://192.168.32.116:5080 £¨»á±»Ìø×ªµ½http://192.168.32.116:5443£©
 
 ÓÃ»§ÃûÃÜÂë£º admin/Harbor12345
 
@@ -4291,13 +4291,13 @@ $ sudo systemctl restart docker
 # ÏÂÔØ
 $ docker pull openjdk:8-jre
 # ´ò±êÇ©
-$ docker tag openjdk:8-jre 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker tag openjdk:8-jre 192.168.32.116:5080/devops-learning/openjdk:8-jre
 # µÇÂ¼
-$ docker login -u emon -p Emon@123 192.168.200.116:5080
+$ docker login -u emon -p Emon@123 192.168.32.116:5080
 # ÉÏ´«¾µÏñ
-$ docker push 192.168.200.116:5080/devops-learning/openjdk:8-jre
+$ docker push 192.168.32.116:5080/devops-learning/openjdk:8-jre
 # ÍË³öµÇÂ¼
-$ docker logout 192.168.200.116:5080
+$ docker logout 192.168.32.116:5080
 
 »úÆ÷ÈËÕË»§£º
 token£º  
@@ -4421,8 +4421,8 @@ $ kubectl get pod -o wide
 
 # ÅäÖÃ±¾µØDNS£º·ÃÎÊemon3µÄDNS
 $ vim /etc/hosts
-192.168.200.118 tomcat.mooc.com
-192.168.200.118 api.mooc.com
+192.168.32.118 tomcat.mooc.com
+192.168.32.118 api.mooc.com
 
 # ·ÃÎÊ
 http://tomcat.mooc.com # ¿´µ½Õý³£tomcat½çÃæ
@@ -4833,7 +4833,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/springboot-web-demo:latest
         ports:
         - containerPort: 8080
 ---
@@ -5027,7 +5027,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         resources:
@@ -5185,7 +5185,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
 ```
@@ -5229,7 +5229,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         # LimitRange³¬¹ýÏÞ¶¨
@@ -5346,7 +5346,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
         resources:
@@ -5452,7 +5452,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+        image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
       # Ñ¡ÔñÖ¸¶¨ node ²¿Êð¸Ã pod
@@ -5543,7 +5543,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # ´æ»î×´Ì¬¼ì²é
@@ -5594,7 +5594,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # ´æ»î×´Ì¬¼ì²é
@@ -5661,7 +5661,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # ´æ»î×´Ì¬¼ì²é
@@ -5717,7 +5717,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-node
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       # Ç×ºÍÐÔ
@@ -5786,7 +5786,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-pod
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       # Ç×ºÍÐÔ
@@ -5854,7 +5854,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo-taint
-          image: 192.168.200.116:5080/devops-learning/k8s-springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
       tolerations:
@@ -5922,7 +5922,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-rollingupdate
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:latest
           ports:
             - containerPort: 8080
           resources:
@@ -6034,7 +6034,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-recreate
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:latest
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:latest
           ports:
             - containerPort: 8080
           # ´æ»î×´Ì¬¼ì²é
@@ -6147,7 +6147,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-bluegreen
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
           ports:
             - containerPort: 8080
           resources:
@@ -6250,9 +6250,9 @@ name: sbt-web-bluegreen-v2.0
 # µÚ¶þ´Î£ºPod±êÇ©
 version: v2.0
 # µÚÈý´Î£º¾µÏñ°æ±¾
-image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
 ==>
-image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v2.0
 ```
 
 - µ÷ÕûserviceÎÄ¼þ
@@ -6315,11 +6315,11 @@ metadata:
 spec:
   containers:
     - name: sbt-v1
-      image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+      image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
       ports:
         - containerPort: 8080
     - name: sbt-v2
-      image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+      image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v2.0
       args: [ "--server.port=8081" ]
       ports:
         - containerPort: 8081
@@ -7404,7 +7404,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+        image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
         ports:
         - containerPort: 8080
 ---
@@ -7426,7 +7426,7 @@ spec:
     spec:
       containers:
       - name: sbt-web-demo
-        image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+        image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v2.0
         ports:
         - containerPort: 8080
 ---
@@ -7584,7 +7584,7 @@ spec:
     spec:
       containers:
         - name: web-canary-a
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v1.0
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
           ports:
             - containerPort: 8080
           livenessProbe:
@@ -7658,7 +7658,7 @@ spec:
     spec:
       containers:
         - name: web-canary-b
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:v2.0
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v2.0
           ports:
             - containerPort: 8080
           livenessProbe:
@@ -8030,7 +8030,7 @@ spec:
       - name: log-pilot
         # °æ±¾Çë²Î¿¼https://github.com/AliyunContainerService/log-pilot/releases
         # image: registry.cn-hangzhou.aliyuncs.com/acs/log-pilot:0.9.7-filebeat
-        # image: 192.168.200.116:5080/devops-learning/log-pilot:0.9.7-filebeat-7.6.1
+        # image: 192.168.32.116:5080/devops-learning/log-pilot:0.9.7-filebeat-7.6.1
         # image: heleicool/log-pilot:7.x-filebeat
         image: rushing/log-pilot:7.x-filebeat
         resources:
@@ -8138,7 +8138,7 @@ spec:
     spec:
       containers:
         - name: sbt-web-demo
-          image: 192.168.200.116:5080/devops-learning/springboot-web-demo:vlog
+          image: 192.168.32.116:5080/devops-learning/springboot-web-demo:vlog
           ports:
             - containerPort: 8080
           env:
@@ -8636,8 +8636,8 @@ $ privoxy --user privoxy /usr/local/etc/privoxy/config
 ¾­¹ýÉÏÃæµÄ×ª»»£¬ÎÒÃÇ¾ÍÔÚ×Ô¼ºµÄ·þÎñÆ÷ÉÏÓÐÁËÒ»¸ö¿ÉÒÔÌá¹©http/https´úÀíµÄ·þÎñ£¬ÆäËû·þÎñÆ÷ÏëÒª·ÃÎÊÍâÍø¾Í·Ç³£¼òµ¥ÁË£¬Ö±½ÓÉèÖÃÁ½¸ö»·¾³±äÁ¿¾ÍºÃ£º
 
 ```bash
-$ export http_proxy=http://192.168.200.1:8118
-$ export https_proxy=http://192.168.200.1:8118
+$ export http_proxy=http://192.168.32.1:8118
+$ export https_proxy=http://192.168.32.1:8118
 # ²âÊÔ
 $ curl www.google.com
 ```
@@ -9247,7 +9247,7 @@ b273ae2aadaf491e834d1fce52b90e65
 >
 > Ë³±ãÖ´ÐÐÏÂharborµÇÂ¼£¬±ÜÃâ½Å±¾ÖÐµÇÂ¼£º
 >
-> root@eab33185950a:/# docker login -u emon -p Emon@123 192.168.200.116:5080
+> root@eab33185950a:/# docker login -u emon -p Emon@123 192.168.32.116:5080
 
 
 
@@ -9636,11 +9636,11 @@ cd ${DOCKER_DIR}
 
 # ¿ªÊ¼ÖÆ×÷²¢ÉÏ´«¾µÏñÎÄ¼þ
 VERSION=`date +%Y%m%d%H%M%S`
-#IMAGE_NAME=192.168.200.116:5080/devops-learning/${JOB_NAME}:${VERSION}
+#IMAGE_NAME=192.168.32.116:5080/devops-learning/${JOB_NAME}:${VERSION}
 IMAGE_NAME=${IMAGE_REPO}/${JOB_NAME}:${VERSION}
 
 echo "building image: ${IMAGE_NAME}"
-#docker login -u emon -p Emon@123 192.168.200.116:5080
+#docker login -u emon -p Emon@123 192.168.32.116:5080
 docker build -t ${IMAGE_NAME} .
 
 docker push ${IMAGE_NAME}
@@ -10051,7 +10051,7 @@ $ vim /root/jenkins/k8s/gaia-web/Dockerfile
 ```
 
 ```dockerfile
-# FROM 192.168.200.116:5080/devops-learning/nginx:1.21
+# FROM 192.168.32.116:5080/devops-learning/nginx:1.21
 FROM nginx:1.21
 MAINTAINER ÎÊÇï liming2011071@163.com
 

@@ -151,18 +151,18 @@ emon
 
 网络：vmnet8
 
-子网IP：192.168.200.0
+子网IP：192.168.32.0
 
 子网掩码：255.255.255.0
 
-网关IP（G）：192.168.200.2
+网关IP（G）：192.168.32.2
 
 此时，可配置如下：
 
 ```bash
-[root@emon ~]# nmcli conn add con-name net8 ifname ens33 type ethernet ip4 192.168.200.116/24 gw4 192.168.200.2
+[root@emon ~]# nmcli conn add con-name net8 ifname ens33 type ethernet ip4 192.168.32.116/24 gw4 192.168.32.2
 # 指定了DNS后，还需要重新激活（nmtui图形界面操作）一下 net8，网络才通
-[root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.200.2
+[root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.32.2
 # 配置开机自动启动该会话
 [root@emon ~]# nmcli conn mod net8 connection.autoconnect yes 
 ```
@@ -5159,7 +5159,7 @@ base_path = /home/yuqing/fastdfs => base_path = /fastdfs/storage
 # 修改
 store_path0 = /home/yuqing/fastdfs => store_path0 = /fastdfs/storage
 # 修改
-$ tracker_server = 192.168.209.121:22122 = >tracker_server = 192.168.200.116:22122
+$ tracker_server = 192.168.209.121:22122 = >tracker_server = 192.168.32.116:22122
 ```
 
 ```bash
@@ -5181,14 +5181,14 @@ vim /etc/fdfs/client.conf
 # 修改
 base_path = /home/yuqing/fastdfs => base_path = /fastdfs/client
 # 修改
-tracker_server = 192.168.209.121:22122 = >tracker_server = 192.168.200.116:22122
+tracker_server = 192.168.209.121:22122 = >tracker_server = 192.168.32.116:22122
 ```
 
 ```bash
 # 上传测试
 $ fdfs_test /etc/fdfs/client.conf upload zhuxiantoushibeijingtu.jpg
 # 结果
-# http://192.168.200.116/emon/M00/00/00/wKjIdGMA8k2AbLKjANyAzWMPc9A151.jpg
+# http://192.168.32.116/emon/M00/00/00/wKjIdGMA8k2AbLKjANyAzWMPc9A151.jpg
 ```
 
 #### 14.2.4、安装fastdfs-nginx-module
@@ -5230,7 +5230,7 @@ $ vim /etc/fdfs/mod_fastdfs.conf
 # 修改
 base_path=/tmp => base_path = /fastdfs/tmp
 # 修改
-tracker_server=tracker:22122 = >tracker_server = 192.168.200.116:22122
+tracker_server=tracker:22122 = >tracker_server = 192.168.32.116:22122
 # 修改
 group_name = group1 => group_name = emon
 # 修改 在url上拼接组名
@@ -5248,7 +5248,7 @@ vim /usr/local/nginx/conf/vhost/fastdfs.conf
 ```nginx
 server {
     listen 88;
-    server_name 192.168.200.116;
+    server_name 192.168.32.116;
     # 如果自己修改组名了，这块配自己修改的组名
     location /emon/M00 {
         ngx_fastdfs_module;
@@ -5261,7 +5261,7 @@ server {
 $ nginx -t -c /usr/local/nginx/conf/nginx.conf
 $ nginx
 # 访问
-# http://192.168.200.116:88/emon/M00/00/00/wKjIdGMA8k2AbLKjANyAzWMPc9A151.jpg
+# http://192.168.32.116:88/emon/M00/00/00/wKjIdGMA8k2AbLKjANyAzWMPc9A151.jpg
 ```
 
 4. Java客户端使用
