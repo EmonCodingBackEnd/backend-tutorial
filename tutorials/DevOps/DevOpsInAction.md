@@ -1604,6 +1604,15 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 
 # 九十、各种软件的容器化部署
 
+## 0、请注意，先关闭防火墙，并重启Docker
+
+```shell
+$ systemctl stop firewalld
+$ systemctl restart docker
+```
+
+注意：避免容器之间依赖使用时报错，比如zkui依赖zoo，xxl-job-admin依赖mysql等。
+
 ## 1、MySQL
 
 ### 1.1、单机

@@ -517,7 +517,7 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 
 ```shell
 # 如果是root用户安装的，不需要带sudo命令
-[emon@emon ~]$ vim .bashrc
+[emon@emon ~]$ vim ~/.bashrc
 alias docker="sudo /usr/bin/docker"
 alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
 alias dockerps="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
@@ -526,7 +526,7 @@ alias dockerps="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{
 使之生效：
 
 ```shell
-[emon@emon ~]$ source .bashrc
+[emon@emon ~]$ source ~/.bashrc
 ```
 
 使用示例：
