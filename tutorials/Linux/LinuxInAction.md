@@ -2723,7 +2723,7 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 下载地址：  https://www.kernel.org/pub/software/scm/git/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz
+[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.gz
 ```
 
 3. 依赖检查与安装

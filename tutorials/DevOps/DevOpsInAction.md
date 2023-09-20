@@ -1830,15 +1830,15 @@ mysql> select * from db0.user;
 
 ```bash
 # 下载redis.conf
-$ wget -cP /usr/local/dockerv/redis_home/ https://raw.githubusercontent.com/redis/redis/5.0/redis.conf
+$ wget -cP /usr/local/dockerv/redis/ https://raw.githubusercontent.com/redis/redis/5.0/redis.conf
 # 备份redis.conf
-$ cp /usr/local/dockerv/redis_home/redis.conf /usr/local/dockerv/redis_home/redis.conf.bak
+$ cp /usr/local/dockerv/redis/redis.conf /usr/local/dockerv/redis/redis.conf.bak
 ```
 
 - 调整配置文件
 
 ```bash
-$ vim /usr/local/dockerv/redis_home/redis.conf
+$ vim /usr/local/dockerv/redis/redis.conf
 ```
 
 ```bash
@@ -1862,8 +1862,8 @@ requirepass redis123
 
 ```bash
 $ docker run --name=redis \
--v /usr/local/dockerv/redis_home/data:/data \
--v /usr/local/dockerv/redis_home/redis.conf:/etc/redis/redis.conf \
+-v /usr/local/dockerv/redis/data:/data \
+-v /usr/local/dockerv/redis/redis.conf:/etc/redis/redis.conf \
 -p 6379:6379 -d redis:5.0 \
 redis-server /etc/redis/redis.conf
 ```
