@@ -2742,7 +2742,7 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 5. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.26.2.tar.gz -C /usr/local/Git/
+[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.42.0.tar.gz -C /usr/local/Git/
 ```
 
 6. 执行配置脚本，并编译安装
@@ -2750,29 +2750,29 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 - 切换目录并执行脚本
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Git/git-2.26.2/
-[emon@emon git-2.26.2]$ ./configure --prefix=/usr/local/Git/git2.26.2
+[emon@emon ~]$ cd /usr/local/Git/git-2.42.0/
+[emon@emon git-2.42.0]$ ./configure --prefix=/usr/local/Git/git2.42.0
 ```
 
 - 编译
 
 ```bash
-[emon@emon git-2.26.2]$ make
+[emon@emon git-2.42.0]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon git-2.26.2]$ make install
-[emon@emon git-2.26.2]$ cd
-[emon@emon ~]$ ls /usr/local/Git/git2.26.2/
+[emon@emon git-2.42.0]$ make install
+[emon@emon git-2.42.0]$ cd
+[emon@emon ~]$ ls /usr/local/Git/git2.42.0/
 bin  libexec  share
 ```
 
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Git/git2.26.2/ /usr/local/git
+[emon@emon ~]$ ln -s /usr/local/Git/git2.42.0/ /usr/local/git
 ```
 
 8. 配置环境变量
@@ -2912,7 +2912,7 @@ Hi Rushing0711! You've successfully authenticated, but GitHub does not provide s
 
 ```bash
 [emon@emon ~]$ git --version
-git version 2.26.2
+git version 2.42.0
 ```
 
 ## 10、安装Python

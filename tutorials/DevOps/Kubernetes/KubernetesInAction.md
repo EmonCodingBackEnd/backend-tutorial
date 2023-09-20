@@ -8698,7 +8698,7 @@ $ mkdir /usr/local/Git
 5. 解压
 
 ```bash
-$ tar -zxvf /usr/local/src/git-2.26.2.tar.gz -C /usr/local/Git/
+$ tar -zxvf /usr/local/src/git-2.42.0.tar.gz -C /usr/local/Git/
 ```
 
 6. 执行配置脚本，并编译安装
@@ -8706,8 +8706,8 @@ $ tar -zxvf /usr/local/src/git-2.26.2.tar.gz -C /usr/local/Git/
 - 切换目录并执行脚本
 
 ```bash
-$ cd /usr/local/Git/git-2.26.2/
-$ ./configure --prefix=/usr/local/Git/git2.26.2
+$ cd /usr/local/Git/git-2.42.0/
+$ ./configure --prefix=/usr/local/Git/git2.42.0
 ```
 
 - 编译
@@ -8721,14 +8721,14 @@ $ make
 ```bash
 $ make install
 $ cd
-$ ls /usr/local/Git/git2.26.2/
+$ ls /usr/local/Git/git2.42.0/
 bin  libexec  share
 ```
 
 7. 创建软连接
 
 ```bash
-$ ln -snf /usr/local/Git/git2.26.2/ /usr/local/git
+$ ln -snf /usr/local/Git/git2.42.0/ /usr/local/git
 ```
 
 8. 配置环境变量
@@ -8824,7 +8824,7 @@ $ ls -a ~/.ssh/
 
 ```bash
 $ git --version
-git version 2.26.2
+git version 2.42.0
 ```
 
 ## 2、安装JDK
