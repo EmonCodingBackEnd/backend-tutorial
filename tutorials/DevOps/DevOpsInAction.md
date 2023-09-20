@@ -1906,7 +1906,6 @@ $ cd zkui
 publish:
     docker tag $(NAME):$(VERSION) $(NAME):$(VERSION)
     docker tag $(NAME):$(VERSION) $(NAME):latest
-    docker tag $(NAME):$(VERSION) $(NAME):latest
     docker push $(NAME)
 ==>
 HUB_NAME = rushing/zkui
@@ -1921,7 +1920,7 @@ $ make publish
 
 
 # admin/manager 读写账号；appconfig/appconfig 普通用户
-$ docker run -d --name zkui -p 9090:9090 -e ZK_SERVER=192.168.200.116:2181 rushing/zkui
+$ docker run -d --name zkui -p 9090:9090 -e ZK_SERVER=192.168.32.116:2181 rushing/zkui
 # 可查看实际配置
 $ docker exec -it zkui /bin/bash
 ```
