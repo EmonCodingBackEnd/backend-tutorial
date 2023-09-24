@@ -1168,6 +1168,16 @@ git submodule update --init --recursive
 git reflog --date=local | grep <branchName>
 ```
 
+## 7.14、git显示中文文件名乱码
+
+在默认设置下，中文文件名在工作区状态输出，中文名不能正确显示，而是显示未八进制的字符编码。
+
+解决如下：
+
+```shell
+$ git config --global core.quotepath false
+```
+
 ## 7.99、如何一个项目配置2个远程地址？
 
 一个项目设置两个git地址，并最终实现一次性同时推送到两个git地址上。
