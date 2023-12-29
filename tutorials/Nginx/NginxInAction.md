@@ -351,7 +351,24 @@ add_header 'Access-Control-Allow-Credentials' 'true';
 add_header 'Access-Control-Allow-Methods' *;
 #允许请求的header
 add_header 'Access-Control-Allow-Headers' *;
+#允许发送按段获取资源的请求
+add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
+# 一定要有！！！否则Post请求无法进行跨域！
+#在发送POST跨域请求之前，会以OPTIONS方式发送预检请求，服务器接受时才会正式请求！！！
+if ($request_method='OPTIONS'){
+	return 204;
+}
 ```
+
+### 2.3.1、chrome证书问题
+
+NET::ERR_CERT_AUTHORITY_INVALID
+
+测试时启动Chrome添加参数：`--ignore-certificate-errors`
+
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --ignore-certificate-errors
+
+在使用自动化测试Selenium、jvppeteer时也可以在启动Chrome浏览器时添加上这个参数。
 
 ## 2.4、Nginx防盗链配置支持
 
