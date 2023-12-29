@@ -224,7 +224,7 @@ server {
 
 ## 2.1、root与alias
 
-加入服务器路径为：`/home/emon/files/img/face.png`
+假如服务器路径为：`/home/emon/files/img/face.png`
 
 - root路径完全匹配访问
 
@@ -293,6 +293,52 @@ location ^~ /emon/img {
 	root /home;
 }
 ```
+
+### 2.2.1、关于proxy_pass代理转发
+
+在nginx中配置proxy_pass代理转发时，如果在proxy_pass后面的url追加一个/，表示绝对根路径；如果没有/，表示相对根路径，把匹配的路径部分也给代理走。
+
+假设下面四种情况分别用 http://192.168.1.1/proxy/test.html 进行访问。
+
+- 第一种：
+
+```nginx
+location /proxy/ {
+    proxy_pass http://127.0.0.1/;
+}
+```
+
+代理到URL：http://127.0.0.1/test.html
+
+- 第二种：
+
+```nginx
+location /proxy/ {
+    proxy_pass http://127.0.0.1;
+}
+```
+
+代理到URL：http://127.0.0.1/proxy/test.html
+
+- 第三种：
+
+```nginx
+location /proxy/ {
+    proxy_pass http://127.0.0.1/aaa/;
+}
+```
+
+代理到URL：http://127.0.0.1/aaa/test.html
+
+- 第四种：
+
+```nginx
+location /proxy/ {
+    proxy_pass http://127.0.0.1/aaa;
+}
+```
+
+代理到URL：http://127.0.0.1/aaatest.html
 
 ## 2.3、Nginx跨域配置支持
 
