@@ -370,6 +370,20 @@ NET::ERR_CERT_AUTHORITY_INVALID
 
 在使用自动化测试Selenium、jvppeteer时也可以在启动Chrome浏览器时添加上这个参数。
 
+
+
+### 2.3.2、Access-Control-Allow-Origin multiple values 问题
+
+Access to XMLHttpRequest at 'https://183.129.238.236:6443/hdm/zjzhfw/personal/flowVerify/applyDataVerify' from origin 'https://khslfw-jht-qt.hz.bankofbeijing.com.cn' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header contains multiple values '*, *', but only one is allowed.
+
+这个是由于“https://183.129.238.236:6443/hdm/zjzhfw/personal/flowVerify/applyDataVerify”接口访问时，得到不止一个跨域的配置，最终导致：
+
+> 'Access-Control-Allow-Origin' header contains multiple values '*, *'
+
+去掉接口链路中多余的跨域配置即可！！！
+
+
+
 ## 2.4、Nginx防盗链配置支持
 
 ```bash
