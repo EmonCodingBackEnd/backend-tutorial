@@ -1178,6 +1178,55 @@ git reflog --date=local | grep <branchName>
 $ git config --global core.quotepath false
 ```
 
+## 7.98、git submodule
+
+场景：
+
+我在学习Vue3时，有一个git项目是：（这里称作A项目）
+
+git@github.com:EmonCodingFrontEnd/frontend-vue-learning.git
+
+然后我在该项目根目录下创建了新的子项目，并配置了单独的git提交了。（这里称作B项目）
+${根目录}/vue3-03-inaction/vue3-admin-template
+
+git@github.com:EmonCodingFrontEnd/vue3-admin-template.git
+
+当我回到A项目并执行`git add`时得到提示：
+
+>hint:   git submodule add <url> vue3-03-inaction/vue3-admin-template
+>hint:
+>hint: If you added this path by mistake, you can remove it from the
+>hint: index with:
+>hint:
+>hint:   git rm --cached vue3-03-inaction/vue3-admin-template
+>hint:
+>hint: See "git help submodule" for more information.
+
+根据提示，我需要添加A项目的gitmodule子模块，操作如下：
+
+- 第一步，删除A项目对B项目的索引（若存在）
+
+```bash
+$ git rm -r -rf --cached vue3-03-inaction/vue3-admin-template
+```
+
+- 第二步，添加子模块 `git submodule add <url> <submodulepath>`
+
+```bash
+$ git submodule add git@github.com:EmonCodingFrontEnd/vue3-admin-template.git vue3-03-inaction/vue3-admin-template
+```
+
+> fatal: 'vue3-03-inaction/vue3-admin-template' already exists in the index
+> 若出现错误，请转到第一步，先删除A项目对B项目的索引！！！
+
+执行成功后，可以在A项目看到一个`.gitsubmodules`的文件，打开查看内容如下：
+
+```bash
+[submodule "vue3-03-inaction/vue3-admin-template"]
+        path = vue3-03-inaction/vue3-admin-template
+        url = git@github.com:EmonCodingFrontEnd/vue3-admin-template.git
+```
+
 ## 7.99、如何一个项目配置2个远程地址？
 
 一个项目设置两个git地址，并最终实现一次性同时推送到两个git地址上。
