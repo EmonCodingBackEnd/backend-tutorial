@@ -844,12 +844,13 @@ Compiled Failed Invalid   Time   FailedType FailedMethod
   - `E`年轻代中Eden（伊甸园）已使用的占当前容量百分比
   - `O`old代已使用的占当前容量百分比
   - `M`perm代已使用的占当前容量百分比
+  - `CCS`压缩类空间大小百分比
   - `YGC`新生代中gc次数
   - `YGCT`新生代中gc所用时间（秒）
   - `FGC`堆全gc次数（秒）
   - `FGCT`堆全GC花费总时间（秒）
   - `GCT`系统gc用的总时间(秒)
-
+  
   
 
 ### 5.12、显示垃圾回收的相关信息(-gcutil)
