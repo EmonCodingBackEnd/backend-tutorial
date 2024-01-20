@@ -1193,6 +1193,8 @@ $ git config --global core.quotepath false
 
 22端口可能被防火墙屏蔽了，可以尝试连接GitHub的443端口。
 
+这个解决方案的思路是：给`~/.ssh/config`文件里添加如下内容，这样ssh连接GitHub的时候就会使用443端口。
+
 - $ vim `~/.ssh/config`
 
 ```bash
