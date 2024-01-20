@@ -1178,6 +1178,39 @@ git reflog --date=local | grep <branchName>
 $ git config --global core.quotepath false
 ```
 
+## 7.97、ssh: connect to host github.com port 22: Connection timed out
+
+问题：
+
+>$ git push
+>ssh: connect to host github.com port 22: Connection timed out
+>fatal: Could not read from remote repository.
+>
+>Please make sure you have the correct access rights
+>and the repository exists.
+
+解决：
+
+22端口可能被防火墙屏蔽了，可以尝试连接GitHub的443端口。
+
+- $ vim `~/.ssh/config`
+
+```bash
+Host github.com
+  Hostname ssh.github.com
+  Port 443
+```
+
+- 测试：
+
+> $ ssh -T git@github.com
+> The authenticity of host '[ssh.github.com]:443 ([20.205.243.160]:443)' can't be established.
+> ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+> This key is not known by any other names.
+> Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+> Warning: Permanently added '[ssh.github.com]:443' (ED25519) to the list of known hosts.
+> Hi Rushing0711! You've successfully authenticated, but GitHub does not provide shell access.
+
 ## 7.98、git submodule
 
 场景：
