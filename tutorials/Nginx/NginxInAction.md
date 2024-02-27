@@ -355,7 +355,7 @@ add_header 'Access-Control-Allow-Headers' *;
 add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
 # 一定要有！！！否则Post请求无法进行跨域！
 #在发送POST跨域请求之前，会以OPTIONS方式发送预检请求，服务器接受时才会正式请求！！！
-if ($request_method='OPTIONS'){
+if ($request_method = 'OPTIONS'){
 	return 204;
 }
 ```
