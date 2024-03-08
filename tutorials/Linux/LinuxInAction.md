@@ -5276,6 +5276,8 @@ https://github.com/minio/minio
 
 https://min.io/
 
+minio镜像：https://hub.docker.com/r/minio/minio/tags
+
 # 九十九、用户信息
 
 ## 1、 系统用户

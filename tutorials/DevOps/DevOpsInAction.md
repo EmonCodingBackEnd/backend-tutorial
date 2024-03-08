@@ -2117,3 +2117,47 @@ $ docker run --name rabbitmq \
 $ docker exec -it rabbitmq /bin/bash
 ```
 
+
+
+## 10、minio
+
+minio镜像：https://hub.docker.com/r/minio/minio/tags
+
+参考：https://blog.csdn.net/qq_54673740/article/details/134731886
+
+Minio 是一个基于Apache License v2.0开源协议的对象存储服务，虽然轻量，却拥有着不错的性能。它兼容亚马逊S3云存储服务接口，非常适合于存储大容量非结构化的数据。
+
+例如图片、视频、日志文件、备份数据和容器/虚拟机镜像等，而一个对象文件可以是任意大小，从几 kb 到最大 5T 不等。
+
+最重要的是免费
+
+- 创建目录
+
+```bash
+$ mkdir -p /usr/local/dockerv/minio/{config,data}
+```
+
+- 启动
+
+```bash
+$ docker run --name minio --restart always \
+-e MINIO_ACCESS_KEY=minio -e MINIO_SECRET_KEY=minio123 \
+-v /usr/local/dockerv/minio/config:/root/.minio \
+-v /usr/local/dockerv/minio/data:/data \
+-p 9000:9000 -p 9090:9090 \
+-d minio/minio:RELEASE.2024-03-07T00-43-48Z.fips server /data --console-address ":9090" -address ":9000"
+```
+
+说明：
+
+-p 9000:9000：这个参数将容器内的9000端口映射到宿主机的9000端口。MinIO服务默认使用9000端口提供API服务。
+
+-p 9090:9090：这个参数将容器内的9090端口映射到宿主机的9090端口。这是MinIO的控制台（Console）端口，用于访问MinIO的图形用户界面。
+
+容器内要运行的命令，启动一个名为 “minio” 的服务器，数据存储在 /data 目录下，服务器的控制台地址为 “:9090”，服务地址为 “:9000”
+
+- 登录
+
+http://emon:/9090/login
+
+用户名密码：minio/minio123
