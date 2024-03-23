@@ -2014,7 +2014,23 @@ sentinel/sentinel
 
 
 
-## 6、Elasticsearch
+## 6、ElasticStack
+
+### 6.1、Elasticsearch
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/es/{config,data}
+```
+
+- 配置
+
+```bash
+echo "http.host:0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
+```
+
+
 
 - 创建网络（同一网络的services互相连接）
 
@@ -2025,8 +2041,15 @@ $ docker network create esnet
 - 启动
 
 ```bash
-$ docker run --name es --net esnet -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d elasticsearch:7.17.5
+$ docker run --name es \
+--net esnet \
+-e "discovery.type=single-node" \
+-e ES_JAVA_OPTS="-Xms64m -Xmx128m" \
+-p 9200:9200 -p 9300:9300 \
+-d elasticsearch:7.17.5
 ```
+
+### 6.2、Kibana
 
 
 

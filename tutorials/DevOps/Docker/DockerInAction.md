@@ -853,11 +853,12 @@ centos              7.8                 b5b4d78bc90c        2 days ago          
 | --filter=is-automated=true\|false | 仅显示自动创建的镜像，默认为否                               |
 | --no-trunc=true\|false            | 输出信息不截断显示，默认为否                                 |
 | --filter=stars=3                  | 指定仅显示评价为指定星级以上的镜像，默认为0，即输出所有镜像。 |
+| --filter=is-official=true         | 仅查询官方镜像                                               |
 
 示例：
 
 ```shell
-[emon@emon ~]$ docker search --filter=is-automated=true --filter=stars=3 nginx
+[emon@emon ~]$ docker search --filter=stars=3 --filter=is-official=true nginx
 ```
 
 ## 7、删除镜像
