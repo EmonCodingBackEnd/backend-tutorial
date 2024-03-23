@@ -2046,8 +2046,8 @@ $ docker network create esnet
 
 ```bash
 $ docker run --name es \
---priveleged=true \
---net esnet \
+--privileged=true \
+--network esnet \
 -e "discovery.type=single-node" \
 -e "ES_JAVA_OPTS=-Xms64m -Xmx128m" \
 -v /usr/local/dockerv/es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
@@ -2058,14 +2058,35 @@ $ docker run --name es \
 -d elasticsearch:7.17.18
 ```
 
+- 浏览器打开
+
+http://192.168.32.116:9200/
+
+- 辅助命令
+
+  - 如何进入容器内部？
+
+  ```bash
+  $ docker exec -it es /bin/bash
+  ```
+
+  - 查看日志
+
+  ```bash
+  # 追加查看日志
+  $ docker logs -f es
+  # 查看最近n条日志
+  $ docker logs --tail n es
+  ```
+
 ### 6.2、Kibana
 
 ```bash
-docker pull kibana:7.17.18
-
-docker pull elasticsearch:7.17.18
-
-docker logs -f es
+$ docker run --name kibana \
+--network esnet \
+-e "ELASTICSEARCH_HOSTS=http://es:9200" \
+-p 5601:5601 \
+-d kibana:7.17.18
 ```
 
 
