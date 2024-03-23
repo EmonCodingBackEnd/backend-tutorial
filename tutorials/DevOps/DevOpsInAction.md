@@ -2046,10 +2046,16 @@ $ docker run --name es \
 -e "discovery.type=single-node" \
 -e ES_JAVA_OPTS="-Xms64m -Xmx128m" \
 -p 9200:9200 -p 9300:9300 \
--d elasticsearch:7.17.5
+-d elasticsearch:7.17.18
 ```
 
 ### 6.2、Kibana
+
+```bash
+docker pull kibana:7.17.18
+
+docker pull elasticsearch:7.17.18
+```
 
 
 

@@ -471,13 +471,22 @@ net.bridge.bridge-nf-call-iptables = 1
   # - insecure-registries：设置私服可信地址
   sudo tee /etc/docker/daemon.json <<-'EOF'
   {
-    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],
     "graph": "/var/lib/docker",
     "exec-opts": ["native.cgroupdriver=cgroupfs"],
     "insecure-registries": ["emon:5080"]
   }
   EOF
   ```
+
+  说明：
+
+  1. 阿里云加速器
+  2. DockerProxy代理加速
+  3. 百度云Mirror
+  4. 南京大学
+  5. 上海交通大学
+  6. USTC
 
 - 查看
 
