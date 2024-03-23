@@ -2089,7 +2089,9 @@ $ docker run --name kibana \
 -d kibana:7.17.18
 ```
 
+- 浏览器打开
 
+http://192.168.32.116:5601/
 
 ## 7、MongoDB
 
