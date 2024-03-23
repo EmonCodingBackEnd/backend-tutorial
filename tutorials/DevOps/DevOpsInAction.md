@@ -2021,13 +2021,15 @@ sentinel/sentinel
 - 创建目录
 
 ```bash
-$ mkdir -pv /usr/local/dockerv/es/{config,data}
+$ mkdir -pv /usr/local/dockerv/es/{config,data,logs,plugins}
+$ chmod -R 777 /usr/local/dockerv/es
 ```
 
 - 配置
 
 ```bash
-echo "http.host:0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
+# 表示es可以被任何外部机器访问到
+$ echo "http.host: 0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
 ```
 
 
@@ -2044,7 +2046,11 @@ $ docker network create esnet
 $ docker run --name es \
 --net esnet \
 -e "discovery.type=single-node" \
--e ES_JAVA_OPTS="-Xms64m -Xmx128m" \
+-e "ES_JAVA_OPTS=-Xms64m -Xmx128m" \
+-v /usr/local/dockerv/es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /usr/local/dockerv/es/data:/usr/share/elasticsearch/data \
+-v /usr/local/dockerv/es/plugins:/usr/share/elasticsearch/plugins \
+-v /usr/local/dockerv/es/logs:/usr/share/elasticsearch/logs \
 -p 9200:9200 -p 9300:9300 \
 -d elasticsearch:7.17.18
 ```
@@ -2055,6 +2061,8 @@ $ docker run --name es \
 docker pull kibana:7.17.18
 
 docker pull elasticsearch:7.17.18
+
+docker logs --tail -f es
 ```
 
 
