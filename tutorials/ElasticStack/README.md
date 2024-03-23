@@ -34,6 +34,8 @@
 
 下载地址页： https://www.elastic.co/downloads
 
+官方文档：https://www.elastic.co/guide/en/elasticsearch/reference/7.6/getting-started.html
+
 # 二、安装
 
 ## 1、Elasticsearch
@@ -1278,7 +1280,7 @@ Available Commands:
   
   ```bash
   # 编辑文件
-[emon@emon ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
+  [emon@emon ~]$ vim /usr/local/logstash/config/custom_config/hbsite/hbsite_log.conf
   ```
   
   ```bash

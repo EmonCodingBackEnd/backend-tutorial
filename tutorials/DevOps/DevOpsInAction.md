@@ -2121,6 +2121,12 @@ $ docker exec -it rabbitmq /bin/bash
 
 ## 10、minio
 
+https://github.com/minio/minio
+
+https://min.io/
+
+https://github.com/minio/minio-java
+
 minio镜像：https://hub.docker.com/r/minio/minio/tags
 
 参考：https://blog.csdn.net/qq_54673740/article/details/134731886
