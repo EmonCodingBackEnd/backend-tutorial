@@ -1616,7 +1616,7 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 | 选项名           | 默认值 | 描述                         |
 | ---------------- | ------ | ---------------------------- |
 | -i,--interactive | false  | 打开标准输入接受用户输入命令 |
-| --priveleged     | false  | 是否给执行命令以高权限       |
+| --privileged     | false  | 是否给执行命令以高权限       |
 | -t,--tty         | false  | 分配伪终端，默认为false      |
 | -u,--user        |        | 执行命令的用户名或者ID       |
 

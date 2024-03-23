@@ -2030,6 +2030,8 @@ $ chmod -R 777 /usr/local/dockerv/es
 ```bash
 # 表示es可以被任何外部机器访问到
 $ echo "http.host: 0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
+$ echo "network.host: 0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
+$ echo "ingest.geoip.downloader.enabled: false">>/usr/local/dockerv/es/config/elasticsearch.yml
 ```
 
 
@@ -2044,6 +2046,7 @@ $ docker network create esnet
 
 ```bash
 $ docker run --name es \
+--priveleged=true \
 --net esnet \
 -e "discovery.type=single-node" \
 -e "ES_JAVA_OPTS=-Xms64m -Xmx128m" \
@@ -2062,7 +2065,7 @@ docker pull kibana:7.17.18
 
 docker pull elasticsearch:7.17.18
 
-docker logs --tail -f es
+docker logs -f es
 ```
 
 
