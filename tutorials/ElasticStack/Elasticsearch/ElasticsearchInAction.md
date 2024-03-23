@@ -665,9 +665,9 @@ https://www.bilibili.com/video/BV1hh411D7sb/?p=4&spm_id_from=pageDriver&vd_sourc
 
 ## 1、常用术语
 
-- `Document` 文档数据，是可以被索引的基本数据单位=>相当于一条表的记录
 - `Index` 索引，含有相同属性的文档集合=>相当于数据库
 - `Type` 索引中的数据类型，可以定义一个或多个类型，文档必须属于一个类型=>相当于数据表
+- `Document` 文档数据，是可以被索引的基本数据单位=>相当于一条表的记录
 - `Field` 字段，文档的属性
 - `Query DSL` 查询语法
 - `分片` 每个索引都有多个分片，每个分片是一个Lucene索引
