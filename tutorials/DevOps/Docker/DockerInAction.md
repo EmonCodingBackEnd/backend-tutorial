@@ -1796,6 +1796,14 @@ docker logs <container_id|container_name>
 [emon@emon ~]$ docker inspect <container_id|container_name>
 ```
 
+## 10、更新容器
+
+- 设置容器自动重启（在docker重启时）
+
+```bash
+docker update <container_id|container_name> --restart=always
+```
+
 # 五、Dockerfile语法梳理及最佳实践
 
 [Docker reference](https://docs.docker.com/engine/reference/builder/)
