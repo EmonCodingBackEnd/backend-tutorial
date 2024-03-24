@@ -666,18 +666,20 @@ https://www.bilibili.com/video/BV1hh411D7sb/?p=4&spm_id_from=pageDriver&vd_sourc
 ## 1、常用术语
 
 - `Index` 索引，含有相同属性的文档集合=>相当于数据库
-- `Type` 索引中的数据类型，可以定义一个或多个类型，文档必须属于一个类型=>相当于数据表
+- `Type` 索引中的数据类型，可以定义一个或多个类型，文档必须属于一个类型=>相当于数据表<span style="color:red;font-weight:bold;">切记Elasticsearch7开始，不建议使用type了！！！</span>
 - `Document` 文档数据，是可以被索引的基本数据单位=>相当于一条表的记录
 - `Field` 字段，文档的属性
 - `Query DSL` 查询语法
 - `分片` 每个索引都有多个分片，每个分片是一个Lucene索引
 - `备份` 拷贝一个分片，就完成了分片的备份
 
-## 2、Elasticsearch CRUD
+# 四、基本增删改查
+
+## 1、Elasticsearch CRUD
 
 <span style="color:red;font-weight:bold;">请使用Kibana执行如下命令！（也可以转换为Postman）</span>
 
-### 2.1、初步检索
+### 1.1、初步检索
 
 -  查看所有节点
 
@@ -703,7 +705,7 @@ GET /_cat/master
 GET /_cat/indices
 ```
 
-### 2.2、索引一个文档（保存）
+### 1.2、索引一个文档（保存）
 
 - PUT保存一个数据
 
@@ -729,11 +731,13 @@ POST customer/external/1
 }
 ```
 
-### 2.3、查询文档
+### 1.3、查询文档
 
 ```bash
 GET customer/external/1
 ```
+
+应答：
 
 ```json
 {
@@ -763,7 +767,7 @@ PUT customer/external/1?if_seq_no=7&if_primary_term=1
 }
 ```
 
-### 2.4、更新文档
+### 1.4、更新文档
 
 - 方式一：<span style="color:red;font-weight:bold;">会对比数据，决定是否需要更新；若数据不变，忽略操作，各种版本号也不变化。</span>
 
@@ -793,7 +797,7 @@ PUT customer/external/1
 }
 ```
 
-### 2.5、删除文档&索引
+### 1.5、删除文档&索引
 
 - 删除文档
 
@@ -807,7 +811,7 @@ DELETE customer/external/1
 DELETE customer
 ```
 
-### 2.6、bulk批量API
+### 1.6、bulk批量API
 
 - 语法格式
 
@@ -843,9 +847,9 @@ POST /_bulk
 {"doc":{"title":"My updated blog post"}}
 ```
 
-### 2.7、样本测试数据
+### 1.7、样本测试数据
 
-测试数据（2000行）：https://github.com/elastic/elasticsearch/blob/v7.11.2/docs/src/test/resources/accounts.json
+测试数据（2000行共1000条文档）：https://github.com/elastic/elasticsearch/blob/v7.11.2/docs/src/test/resources/accounts.json
 
 这是一份基于v7.11.2的测试数据，文档的结构如下：
 
@@ -868,220 +872,603 @@ POST /_bulk
 - 导入测试数据
 
 ```bash
-# 2000行，"took" : 338
+# 2000行共1000条文档，"took" : 338
 POST bank/account/_bulk
 # <这里加入测试数据>
 ```
 
+## 2、Elasticsearch Query
 
+<span style="color:red;font-weight:bold;">从7开始，每个索引下已经不建议指定types了，会默认一个_doc类型，查询时也不再需要指定类型。</span>
 
-
-
-
-
-
-
-## 3、Elasticsearch Query
+<span style="color:blue;">也即是： `/bank/account`等效于`/bank`也等效于`bank`</span>
 
 - Query String
 
-```
-GET accounts/person/_search?q=John
+```bash
+GET bank/_search?q=*&sort=account_number:asc
 ```
 
-- Query DSL
+应答：
 
 ```json
-
+{
+  "took" : 6, 
+  "timed_out" : false, 
+  "_shards" : { 
+    "total" : 1, 
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : { 
+    "total" : { 
+      "value" : 1000,
+      "relation" : "eq"
+    },
+    "max_score" : null, 
+    "hits" : [
+        ......
+    ]
+  }
+}
+#! Elasticsearch built-in security features are not enabled. Without authentication, your cluster could be accessible to anyone. See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/security-minimal-setup.html to enable security.
+#! [types removal] Specifying types in search requests is deprecated.
+{
+  "took" : 11, // Elasticsearch执行搜索的时间（毫秒）
+  "timed_out" : false, // 搜索是否超时
+  "_shards" : { // 告诉我们多少个分片被搜索了，以及统计了成功/失败的搜索分片
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : { // 搜索结果
+    "total" : { // 搜索到的数据量
+      "value" : 2,
+      "relation" : "eq"
+    },
+    "max_score" : null, // 相关性最高分
+    "hits" : [ // 实际的搜索结果数组（默认去前10的文档）
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "996",
+        "_score" : null,
+        "_source" : {
+          "account_number" : 996,
+          "balance" : 17541,
+          "firstname" : "Andrews",
+          "lastname" : "Herrera",
+          "age" : 30,
+          "gender" : "F",
+          "address" : "570 Vandam Street",
+          "employer" : "Klugger",
+          "email" : "andrewsherrera@klugger.com",
+          "city" : "Whitehaven",
+          "state" : "MN"
+        },
+        "sort" : [ // 结果的排序key（键）（没有则按score排序）
+          996
+        ]
+      },
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "548",
+        "_score" : null, // 相关性得分
+        "_source" : {
+          "account_number" : 548,
+          "balance" : 36930,
+          "firstname" : "Sandra",
+          "lastname" : "Andrews",
+          "age" : 37,
+          "gender" : "M",
+          "address" : "973 Prospect Street",
+          "employer" : "Datagene",
+          "email" : "sandraandrews@datagene.com",
+          "city" : "Inkerman",
+          "state" : "MO"
+        },
+        "sort" : [
+          548
+        ]
+      }
+    ]
+  }
+}
 ```
 
-# 四、风格
-
-## 1、RESTFul API
-
-### 1.1、API基本格式
-
-```http://<ip>:<port>/<索引>/<类型>/<文档id>
-http://<ip>:<port>/<索引>/<类型>/<文档id>
-```
-
-### 1.2、常用HTTP动词
-
-GET/PUT/POST/DELETE
-
-## 2、索引创建
-
-### 2.1、非结构化创建
-
-### 2.2、结构化创建
-
-使用Postman：
-
-1. 请求
-
-```
-
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-## 3、插入文档
-
-### 3.1、指定文档ID插入
-
-使用Postman：
-
-1. 请求
-
-```
-
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-### 3.2、自动文档ID插入
-
-使用Postman：
-
-1. 请求
-
-```
-POST http://192.168.8.116:9200/emon/man/
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-## 4、修改文档
-
-### 4.1、直接修改文档
-
-使用Postman：
-
-1. 请求
-
-```
-
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-### 4.2、脚本修改文档
-
-- 第一种方式
-
-使用Postman：
-
-1. 请求
-
-```
-
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-- 第二种方式
-
-使用Postman：
-
-1. 请求
-
-```
-POST http://192.168.8.116:9200/emon/man/1/_update
-```
-
-```json
-
-```
-
-2. 应答
-
-```json
-
-```
-
-## 5、删除
-
-### 5.1、删除文档
-
-使用Postman：
-
-1. 请求
-
-```
-
-```
-
-2. 应答
+- Query DSL（domain-specific language 领域的特定语言）
 
 ```bash
-
+GET bank/_search
+{
+    "query": {"match_all":{}},
+    "sort": [
+        {"account_number":"asc"}
+    ]
+}
 ```
 
-### 5.2、删除索引
+### 3.1、Query String
 
-使用Postman：
+### 3.2、Query DSL
 
-1. 请求
+- match_all
 
+```bash
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "account_number": {
+        "order": "desc"
+      }
+    }
+  ],
+  "from": 0,
+  "size": 5,
+  "_source": ["account_number","balance","firstname","lastname","age"]
+}
 ```
 
+- match【全文检索】
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "account_number": 20
+    }
+  }
+}
+
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "mill lane"
+    }
+  }
+}
 ```
 
-2. 应答
+- match_phrase【短语匹配】
 
-```json
-
+```bash
+GET bank/_search
+{
+  "query": {
+    "match_phrase": {
+      "address": "mill lane"
+    }
+  }
+}
 ```
 
-## 6、查询
+- multi_match【多字段匹配】
 
-### 6.0、查询的依赖索引创建
-
-- 创建索引
-
+```bash
+GET bank/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "mill Movico",
+      "fields": ["address", "city"]
+    }
+  }
+}
 ```
-PUT http://192.168.8.116:9200/book
+
+- bool【符合查询】
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "gender": "M"
+          }
+        },
+        {
+          "match": {
+            "address": "mill"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "age": 18
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "lastname": "Wallace"
+          }
+        }
+      ]
+    }
+  }
+}
 ```
+
+说明：must_not不会贡献得分。
+
+- filter【过滤】
+
+不会计算得分
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "age": {
+              "gte": 18,
+              "lte": 30
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# ----------
+
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "gender": "M"
+          }
+        },
+        {
+          "match": {
+            "address": "mill"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "age": 18
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "lastname": "Wallace"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "age": {
+              "gte": 18,
+              "lte": 30
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+- term【查询】
+
+若是全文检索的字段推荐使用math，非全文检索字段建议使用term。
+
+```bash
+# 关键词（keyword）匹配：匹配不到，必须全等，和term一样
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address.keyword": "789 Madison"
+    }
+  }
+}
+
+# 短语匹配：能匹配到，只要目标文本包含当前短语即可！
+GET bank/_search
+{
+  "query": {
+    "match_phrase": {
+      "address": "789 Madison"
+    }
+  }
+}
+```
+
+## 3、aggregations（执行聚合）
+
+聚合提供了从数据中分组和提取数据的能力。最简单的聚合方法大致等于SQL GROUP BY和SQL聚合函数。在Elasticsearch中，您有执行搜索返回hits（命中结果），并且同时返回聚合结果，把一个响应中的所有hits（命中结果）分隔开的能力。这是非常强大且有效的，您可以执行查询和多个聚合，并且在一次使用中得到各自的（任何一个的）返回结果，使用一次简洁的简化的API来避免网络往返。
+
+- 搜索address中包含mill的所有人的年龄分布以及平均年龄，但不显示这些人的详情。
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "mill"
+    }
+  },
+  "aggs": {
+    "ageAgg": {
+      "terms": {
+        "field": "age",
+        "size": 10
+      }
+    },
+    "ageAvg": {
+      "avg": {
+        "field": "age"
+      }
+    },
+    "balanceAvg": {
+      "avg": {
+        "field": "balance"
+      }
+    }
+  },
+  "size": 0
+}
+```
+
+说明：
+
+`"size": 0` => 不显示搜索数据
+
+- 按照年龄聚合，并且计算这些年龄段的这些人的平均薪资
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "ageAgg": {
+      "terms": {
+        "field": "age",
+        "size": 100
+      },
+      "aggs": {
+        "ageAgg": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+- 按照年龄聚合，并且这些年龄段中M的平均薪资和F的平均薪资以及这些年龄段的总体平均薪资
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "ageAgg": {
+      "terms": {
+        "field": "age",
+        "size": 100
+      },
+      "aggs": {
+        "genderAgg": {
+          "terms": {
+            "field": "gender.keyword",
+            "size": 10
+          },
+          "aggs": {
+            "ageAgg": {
+              "avg": {
+                "field": "balance"
+              }
+            }
+          }
+        },
+        "ageAgg": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+# 五、Mapping
+
+## 1、字段类型
+
+参考：https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping-types.html#_core_datatypes
+
+## 2、映射
+
+Mapping（映射）是用来定义一个文档（document），以及它所包含的属性（field）是如何存储和索引的。比如，使用mapping来定义：
+
+- 哪些字符串属性应该被看做全文本属性（full text fields）。
+- 哪些属性包含数字，日期或者地理位置。
+- 文档中的所有属性是否都能被索引（_all配置）。
+- 日期的格式。
+- 自定义映射规则来执行动态添加属性。
+
+### 2.1、查看映射
+
+- 查看mapping信息：
+
+```bash
+GET bank/_mapping
+```
+
+### 2.2、创建索引时定义映射
+
+```bash
+PUT my_index
+{
+  "mappings": {
+    "properties": {
+      "age": {
+        "type": "integer"
+      },
+      "email": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text"
+      }
+    }
+  }
+}
+```
+
+### 2.3、添加新映射字段
+
+- 为索引添加新的映射字段
+
+```bash
+PUT my_index/_mapping
+{
+  "properties": {
+    "employee-id": {
+      "type": "keyword",
+      "index": false
+    }
+  }
+}
+```
+
+### 2.4、修改映射
+
+对于已经存在的映射字段，我们不能更新。更新必须创建新的索引进行数据迁移。
+
+### 2.5、数据迁移
+
+先创建出newbank的正确映射。然后使用如下方式进行数据迁移。
+
+- 创建新索引
+
+```bash
+PUT newbank
+{
+  "mappings": {
+    "properties": {
+      "account_number": {
+        "type": "long"
+      },
+      "address": {
+        "type": "text"
+      },
+      "age": {
+        "type": "integer"
+      },
+      "balance": {
+        "type": "long"
+      },
+      "city": {
+        "type": "keyword"
+      },
+      "email": {
+        "type": "keyword"
+      },
+      "employer": {
+        "type": "keyword"
+      },
+      "firstname": {
+        "type": "text"
+      },
+      "gender": {
+        "type": "keyword"
+      },
+      "lastname": {
+        "type": "text"
+      },
+      "state": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+```
+
+- 将就索引的指定type下的数据迁移到新的索引上
+
+```bash
+POST _reindex
+{
+  "source": {
+    "index": "bank",
+    "type": "account"
+  },
+  "dest": {
+    "index": "newbank"
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 3、Elasticsearch7为什么去掉type概念？
+
+- 关系型数据库中两个数据表示时独立的，即使他们里面有相同名称的列，也不影响使用，但ES中不是这样的。Elasticsearch是基于Lucene开发的搜索引起，二ES中不同type下名称相同的field最终在Lucene中的处理方式是一样的。
+  - 两个不同type下的两个user_name，在ES同一个索引下其实被认为是同一个filed，你必须在两个不同的type中定义相同的field映射。否则，不同type中的相同字段名称就会在处理中出现冲突的情况，导致Lucene处理效率下降。
+  - 去掉type就是为了提高ES处理数据的效率。
+- Elasticsearch7.x
+  - URL中的type参数为可旋。比如，索引一个文档不再要求提供文档类型。
+- Elasticsearch8.x
+  - 不再支持URL中的type参数。
+- 解决：将索引从多类型迁移到单类型，每种类型文档一个独立索引。
+
+# 六、分词
+
+一个tokenizer（分词器）接收一个字符流，将之分割为独立的tokens（词元，通常是独立的单词），然后输出tokens流。
+
+例如：whitespace tokenizer遇到空白字符时分隔文本。它会将文本“Quick brown fox!”分割为[Quick, brown, fox!]。
+
+
 
 ```json
 {
@@ -1110,14 +1497,6 @@ PUT http://192.168.8.116:9200/book
 	}
 }
 ```
-
-- 创建文档
-
-### 6.1、简单查询
-
-### 6.2、条件查询
-
-### 6.3、聚合查询
 
 
 
