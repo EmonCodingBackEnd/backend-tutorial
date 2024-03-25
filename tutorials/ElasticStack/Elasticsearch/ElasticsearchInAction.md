@@ -1435,22 +1435,6 @@ POST _reindex
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## 3、Elasticsearch7为什么去掉type概念？
 
 - 关系型数据库中两个数据表示时独立的，即使他们里面有相同名称的列，也不影响使用，但ES中不是这样的。Elasticsearch是基于Lucene开发的搜索引起，二ES中不同type下名称相同的field最终在Lucene中的处理方式是一样的。
@@ -1467,6 +1451,39 @@ POST _reindex
 一个tokenizer（分词器）接收一个字符流，将之分割为独立的tokens（词元，通常是独立的单词），然后输出tokens流。
 
 例如：whitespace tokenizer遇到空白字符时分隔文本。它会将文本“Quick brown fox!”分割为[Quick, brown, fox!]。
+
+该tokenizer（分词器）还负责记录各个term（词条）的顺序或position位置（用于phrase短语和word proximity词近邻查询），以及term（词条）所代表的原始word（单词）的start（起始）和end（结束）的character offsets（字符偏移量）（用于高亮显示搜索的内容）。
+
+Elasticsearch提供了很多内置的分词器，可以用来构建custom analyzers（自定义分词器）。
+
+## 0、标准分词器
+
+```bash
+POST _analyze
+{
+  "analyzer": "standard",
+  "text": "尚硅谷电商项目"
+}
+```
+
+## 1、安装ik分词器
+
+注意：不能用默认elasticsearch-plugin install xxx.zip 进行自动安装
+
+```bash
+$ docker exec -it es /bin/bash
+$ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+```
+
+- 分词演练
+
+```bash
+POST _analyze
+{
+  "analyzer": "ik_smart",
+  "text": "美国留给伊拉克的是个烂摊子吗"
+}
+```
 
 
 

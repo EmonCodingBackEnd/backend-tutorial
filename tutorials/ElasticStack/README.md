@@ -570,6 +570,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 可以找一个可以下载的服务器，或者通过：[GitHub代下载服务-永久免费](http://gitd.cc/) 下载后拷贝过来，再安装！
 
+[也可以通过GitClone下载](https://www.gitclone.com/)
+
 ```bash
 [emon@emon ~]$ sudo /usr/local/es/bin/elasticsearch-plugin install file:///usr/local/src/elasticsearch-analysis-pinyin-7.6.2.zip
 ```
