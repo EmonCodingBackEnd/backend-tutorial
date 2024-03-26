@@ -2039,6 +2039,7 @@ $ echo "ingest.geoip.downloader.enabled: false">>/usr/local/dockerv/es/config/el
 - 创建网络（同一网络的services互相连接）
 
 ```bash
+# 注意：若网络不会经常变更，可以使用创建新网络；若网络经常变更，建议使用默认网络bridge，会随着网络变化而变化。
 $ docker network create esnet
 ```
 

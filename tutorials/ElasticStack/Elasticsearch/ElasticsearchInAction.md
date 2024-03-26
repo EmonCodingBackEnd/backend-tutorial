@@ -1472,7 +1472,10 @@ POST _analyze
 
 ```bash
 $ docker exec -it es /bin/bash
+# 安装并重启生效
 $ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+# 查看已经安装过的插件
+$ ./bin/elasticsearch-plugin list 
 ```
 
 - 分词演练
@@ -1481,7 +1484,13 @@ $ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/r
 POST _analyze
 {
   "analyzer": "ik_smart",
-  "text": "美国留给伊拉克的是个烂摊子吗"
+  "text": "我是一个中国人"
+}
+
+POST _analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "我是一个中国人"
 }
 ```
 
