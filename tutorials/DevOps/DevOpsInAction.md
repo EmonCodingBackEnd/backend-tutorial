@@ -2050,7 +2050,7 @@ $ docker run --name es \
 --privileged=true \
 --network esnet \
 -e "discovery.type=single-node" \
--e "ES_JAVA_OPTS=-Xms64m -Xmx128m" \
+-e "ES_JAVA_OPTS=-Xms64m -Xmx256m" \
 -v /usr/local/dockerv/es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
 -v /usr/local/dockerv/es/data:/usr/share/elasticsearch/data \
 -v /usr/local/dockerv/es/plugins:/usr/share/elasticsearch/plugins \
@@ -2231,3 +2231,61 @@ $ docker run --name minio --restart always \
 http://emon:/9090/login
 
 用户名密码：minio/minio123
+
+
+
+## 11、Nginx
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/nginx/{html,logs,conf}
+```
+
+- 启动一个临时nginx实例，并从中复制出nginx配置文件
+
+```bash
+$ docker run --name nginx -p 80:80 -d nginx:1.25.4
+# 从容器中复制出来
+$ docker cp nginx:/etc/nginx .
+# 复制到目标目录
+$ mv nginx/* /usr/local/dockerv/nginx/conf/
+# 删除临时容器实例
+$ docker stop nginx;docker rm -v nginx
+```
+
+- 启动
+
+```bash
+$ docker run --name nginx \
+-v /usr/local/dockerv/nginx/conf:/etc/nginx \
+-v /usr/local/dockerv/nginx/logs:/var/log/nginx \
+-v /usr/local/dockerv/nginx/html:/usr/share/nginx/html \
+-p 80:80 \
+-d nginx:1.25.4
+```
+
+- 创建index.html页面
+
+```bash
+$ vim /usr/local/dockerv/nginx/html/index.html
+```
+
+```bash
+<h1>fullstack</h1>
+```
+
+- 浏览器访问
+
+http://192.168.32.116
+
+
+
+
+
+
+
+
+
+
+

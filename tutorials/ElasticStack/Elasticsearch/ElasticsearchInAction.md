@@ -1478,7 +1478,7 @@ $ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/r
 $ ./bin/elasticsearch-plugin list 
 ```
 
-- 分词演练
+## 2、分词演练
 
 ```bash
 POST _analyze
@@ -1492,6 +1492,34 @@ POST _analyze
   "analyzer": "ik_max_word",
   "text": "我是一个中国人"
 }
+
+POST _analyze
+{
+  "analyzer": "ik_smart",
+  "text": [
+    "乔碧萝殿下",
+    "是一个中国人"
+  ]
+}
+```
+
+## 3、自定义词库
+
+- 启用一个nginx服务
+
+```bash
+[root@emon ~]# mkdir /usr/local/dockerv/nginx/html/es
+[root@emon ~]# vim /usr/local/dockerv/nginx/html/es/fenci.txt
+```
+
+```bash
+乔碧萝
+```
+
+- 配置
+
+```bash
+$ docker exec -it es /bin/bash
 ```
 
 
