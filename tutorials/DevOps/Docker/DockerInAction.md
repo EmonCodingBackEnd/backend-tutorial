@@ -1520,7 +1520,7 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P+Q]退出而不是终止容器。
 
-**异常情况：**
+### 3.2、创建容器遇到IPv4错误问题
 
 如果创建容器时，发现如下错误的处理办法：
 
@@ -1538,7 +1538,7 @@ net.ipv4.ip_forward=1
 [emon@emon ~]$ sudo systemctl restart network
 ```
 
-### 3.2、容器资源限制
+### 3.3、容器资源限制
 
 - 限定内存
 
@@ -1557,7 +1557,30 @@ net.ipv4.ip_forward=1
 [emon@emon ~]$ docker run --cpu-shares=5 --name=test2 rushing/ubuntu-stress --cpu 1
 ```
 
+### 3.4、虚拟机挂起并恢复后docker网络问题
 
+- 第一步：首先确保IPv4的转发正常： **net.ipv4.ip_forward=1** 已经被设置
+
+- 第二步：将docker的网络接口设置为不被NetworkManager管理
+
+  - 添加配置
+
+  ```bash
+  $ vim /etc/NetworkManager/conf.d/10-unmanage-docker-interfaces.conf
+  ```
+
+  配置文件中内容如下：
+
+  ```bash
+  [keyfile]
+  unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*
+  ```
+
+  - 重启NetworkManager
+
+  ```bash
+  $ systemctl restart NetworkManager
+  ```
 
 ## 4、终止容器
 
