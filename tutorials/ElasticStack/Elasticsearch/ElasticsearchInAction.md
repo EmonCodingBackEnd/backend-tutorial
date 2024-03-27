@@ -1466,16 +1466,16 @@ POST _analyze
 }
 ```
 
-## 1、安装ik分词器
+## 1、ik分词器
 
-注意：不能用默认elasticsearch-plugin install xxx.zip 进行自动安装
+请先安装ik分词器！！！
 
 ```bash
-$ docker exec -it es /bin/bash
-# 安装并重启生效
-$ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
-# 查看已经安装过的插件
-$ ./bin/elasticsearch-plugin list 
+POST _analyze
+{
+  "analyzer": "standard",
+  "text": "尚硅谷电商项目"
+}
 ```
 
 ## 2、分词演练
@@ -1520,6 +1520,12 @@ POST _analyze
 
 ```bash
 $ docker exec -it es /bin/bash
+# 修改docker容器es的插件挂载目录
+$ vim /usr/local/dockerv/es/plugins/analysis-ik/config/IKAnalyzer.cfg.xml
+```
+
+```bash
+
 ```
 
 

@@ -2021,7 +2021,7 @@ sentinel/sentinel
 - 创建目录
 
 ```bash
-$ mkdir -pv /usr/local/dockerv/es/{config,data,logs,plugins}
+$ mkdir -pv /usr/local/dockerv/es/{config,data,plugins,software}
 $ chmod -R 777 /usr/local/dockerv/es
 ```
 
@@ -2054,7 +2054,7 @@ $ docker run --name es \
 -v /usr/local/dockerv/es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
 -v /usr/local/dockerv/es/data:/usr/share/elasticsearch/data \
 -v /usr/local/dockerv/es/plugins:/usr/share/elasticsearch/plugins \
--v /usr/local/dockerv/es/logs:/usr/share/elasticsearch/logs \
+-v /usr/local/dockerv/es/software:/usr/share/elasticsearch/software \
 -p 9200:9200 -p 9300:9300 \
 -d elasticsearch:7.17.18
 ```
@@ -2079,6 +2079,96 @@ http://192.168.32.116:9200/
   # 查看最近n条日志
   $ docker logs --tail n es
   ```
+
+#### 6.1.1、安装ik分词器
+
+- 安装
+
+  - 方式一：直接安装（适用于网络好的情况）
+
+  <span style="color:red;font-weight:bold;">缺点是ik的安装目录下config目录不存在，很致命！</span>
+
+  ```bash
+  # 进入容器
+  $ docker exec -it es /bin/bash
+  $ ./bin/elasticsearch-plugin install https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+  ```
+
+  - 方式二：先下载到本地再安装（适用于网络慢，直接安装容易断开的情况）
+
+  <span style="color:red;font-weight:bold;">缺点是ik的安装目录下config目录不存在，很致命！</span>
+
+  ```bash
+  # 在挂载点目录下载【切记】不要下载到plugins文件夹下，因为从plugins安装会失败！！！
+  $ wget -cP /usr/local/dockerv/es/software/ https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+  
+  # 进入容器
+  $ docker exec -it es /bin/bash
+  # 基于本地文件安装
+  $ ./bin/elasticsearch-plugin install file:///usr/share/elasticsearch/software/elasticsearch-analysis-ik-7.17.18.zip
+  ```
+
+  - 方式三：解压安装（适用于网络慢，先下载安装包的情况）【推荐】
+
+  ```bash
+  # 在挂载点目录下载
+  $ wget -cP /usr/local/dockerv/es/software/ https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+  # 解压安装
+  $ unzip /usr/local/dockerv/es/software/elasticsearch-analysis-ik-7.17.18.zip -d /usr/local/dockerv/es/plugins/analysis-ik
+  ```
+
+- 重启es
+
+```bash
+# 重启es
+$ docker restart es
+# 进入容器
+$ docker exec -it es /bin/bash
+# 查看已经安装过的插件
+$ ./bin/elasticsearch-plugin list 
+```
+
+#### 6.1.2、配置自定义分词
+
+- 启动一个nginx，访问路径： http://192.168.32.116/es/fenci.txt 能得到如下应答
+
+```bash
+# 请确保文件是utf-8编码
+$ curl http://192.168.32.116/es/fenci.txt 
+尚硅谷
+乔碧萝
+```
+
+- 配置Ik自定义分词
+
+```bash
+# 打开并修改remote_ext_dict
+$ vim /usr/local/dockerv/es/plugins/analysis-ik/config/IKAnalyzer.cfg.xml
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>IK Analyzer 扩展配置</comment>
+    <!--用户可以在这里配置自己的扩展字典 -->
+    <entry key="ext_dict"></entry>
+     <!--用户可以在这里配置自己的扩展停止词字典-->
+    <entry key="ext_stopwords"></entry>
+    <!--用户可以在这里配置远程扩展字典 -->
+    <!-- <entry key="remote_ext_dict">words_location</entry> -->
+    <entry key="remote_ext_dict">http://nginx/es/fenci.txt</entry>
+    <!--用户可以在这里配置远程扩展停止词字典-->
+    <!-- <entry key="remote_ext_stopwords">words_location</entry> -->
+</properties>
+```
+
+- 重启es
+
+```bash
+# 重启es
+$ docker restart es
+```
 
 ### 6.2、Kibana
 
