@@ -705,6 +705,14 @@ GET /_cat/master
 GET /_cat/indices
 ```
 
+- 查询索引的分片
+
+```bash
+GET /_cat/shards
+```
+
+
+
 ### 1.2、索引一个文档（保存）
 
 - PUT保存一个数据
@@ -1380,6 +1388,10 @@ PUT my_index/_mapping
 ```bash
 PUT newbank
 {
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
   "mappings": {
     "properties": {
       "account_number": {
@@ -1446,7 +1458,15 @@ POST _reindex
   - 不再支持URL中的type参数。
 - 解决：将索引从多类型迁移到单类型，每种类型文档一个独立索引。
 
-# 六、分词
+# 六、配置
+
+- 查看配置
+
+```absh
+$ PUT my_index/_settings
+```
+
+# 七、分词
 
 一个tokenizer（分词器）接收一个字符流，将之分割为独立的tokens（词元，通常是独立的单词），然后输出tokens流。
 
