@@ -1503,31 +1503,6 @@ POST _analyze
 }
 ```
 
-## 3、自定义词库
-
-- 启用一个nginx服务
-
-```bash
-[root@emon ~]# mkdir /usr/local/dockerv/nginx/html/es
-[root@emon ~]# vim /usr/local/dockerv/nginx/html/es/fenci.txt
-```
-
-```bash
-乔碧萝
-```
-
-- 配置
-
-```bash
-$ docker exec -it es /bin/bash
-# 修改docker容器es的插件挂载目录
-$ vim /usr/local/dockerv/es/plugins/analysis-ik/config/IKAnalyzer.cfg.xml
-```
-
-```bash
-
-```
-
 
 
 ```json

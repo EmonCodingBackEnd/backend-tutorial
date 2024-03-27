@@ -2170,6 +2170,8 @@ $ vim /usr/local/dockerv/es/plugins/analysis-ik/config/IKAnalyzer.cfg.xml
 $ docker restart es
 ```
 
+说明：若自定义分词不生效，可以进入es容器，确认 `curl http://192.168.32.116/es/fenci.txt`和`curl http://nginx/es/fenci.txt`都可以被访问到。否则可能是网络问题导致es加载不到自定义的分词的原因。比如：一种可能的原因是`firewalld`是不是开启了。
+
 ### 6.2、Kibana
 
 ```bash
