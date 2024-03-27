@@ -659,6 +659,8 @@ select * from loginfo;
 
 # 二、Elasticsearch学习
 
+Elasticsearch官网文档：https://www.elastic.co/guide/index.html
+
 https://www.bilibili.com/video/BV1hh411D7sb/?p=4&spm_id_from=pageDriver&vd_source=b850b3a29a70c8eb888ce7dff776a5d1
 
 # 三、概念
@@ -1552,6 +1554,62 @@ POST _analyze
 	}
 }
 ```
+
+# 八、Java访问Elasticsearch
+
+Elasticsearch Clients：https://www.elastic.co/guide/en/elasticsearch/client/index.html
+
+## 1、9300-TCP
+
+- 7.x已经不建议使用，8以后就要废弃！
+
+## 2、9200-HTTP
+
+- JestClient：非官方，更新慢
+- RestTemplate：模拟发HTTP请求，ES很多操作需要自己封装，比较麻烦
+- HttpClient：同上
+- Elasticsearch-Rest-High-Level-Client：官方RestClient，封装了ES操作。【8之后废弃】但可兼容模式配合ES8使用。
+
+[Elasticsearch-Rest-High-Level-Client官网文档](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-search.html)
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client -->
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>elasticsearch-rest-high-level-client</artifactId>
+    <version>7.17.18</version>
+</dependency>
+```
+
+- Elasticsearch-Rest-Client：官方RestClient，封装了ES操作，API层次分明且上手简单。【贯穿始终，一直可用】
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>elasticsearch-rest-client</artifactId>
+    <version>7.17.18</version>
+</dependency>
+```
+
+- Elasticsearch Java API Client【7.15.0开始启用的新客户端】
+
+```xml
+<!-- https://mvnrepository.com/artifact/co.elastic.clients/elasticsearch-java -->
+<dependency>
+    <groupId>co.elastic.clients</groupId>
+    <artifactId>elasticsearch-java</artifactId>
+    <version>7.17.18</version>
+</dependency>
+```
+
+
+
+
+
+
+
+
 
 
 
