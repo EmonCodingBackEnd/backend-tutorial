@@ -2350,6 +2350,7 @@ $ docker stop nginx;docker rm -v nginx
 
 ```bash
 $ docker run --name nginx \
+--network esnet \
 -v /usr/local/dockerv/nginx/conf:/etc/nginx \
 -v /usr/local/dockerv/nginx/logs:/var/log/nginx \
 -v /usr/local/dockerv/nginx/html:/usr/share/nginx/html \
