@@ -4363,8 +4363,6 @@ PING whoami (10.0.0.19): 56 data bytes
 sudo du -sh /var/lib/docker
 ```
 
-
-
 - 清理docker的`/var/lib/docker`目录
 
 如果碰到问题：no space left on device
@@ -4401,6 +4399,20 @@ Build Cache         0                   0                   0B                  
 [emon@emon ~]$ docker system prune
 # 清理docker无用数据：会清理停止的容器，也会清理镜像
 [emon@emon ~]$ docker system prune -a
+```
+
+## 99.1、查看容器的资源使用情况统计
+
+- 查看所有运行中的容器
+
+```bash
+$ docker stats 
+```
+
+- 查看某些个运行中的容器
+
+```bash
+$ docker stats nginx
 ```
 
 

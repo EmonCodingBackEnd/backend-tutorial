@@ -1238,6 +1238,23 @@ $ top -H -p pid
 
 插件地址：https://visualvm.github.io/pluginscenters.html 拷贝对应JDK版本的插件地址。
 
+比如：
+
+- 查看Java版本
+
+```bash
+$ java -version
+java version "1.8.0_91"
+Java(TM) SE Runtime Environment (build 1.8.0_91-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 25.91-b15, mixed mode)
+```
+
+- 找到对应版本的插件地址
+
+得到JDK 8 Update 40 - 121（包含了版本1.8.0_91）的地址，点击后打卡页面 https://visualvm.github.io/archive/uc/8u40/updates.html 上寻找到：
+
+Catalog URL:	https://visualvm.github.io/archive/uc/8u40/updates.xml.gz
+
 打开 `jvisualvm` -> 【工具】 -> 【插件】 -> 【设置】 -> 【编辑】 -> 粘贴拷贝的地址，结果如下：
 
 ![image-20220522155255976](images/image-20220522155255976.png)
@@ -1366,3 +1383,99 @@ public @interface SuppressWarnings {
 - 密码管理->配置文件中的明文密码
 - 密码管理->硬编码加密秘钥
 - XSS攻击
+
+# 五、压力测试
+
+## 1、性能指标
+
+- 响应时间（Response Time：RT）
+  - 响应事件是指用户从客户端发起一个请求开始，到客户端接收到从服务器端返回的响应结束，整个过程所耗费的时间。
+- HPS（Hits Per Second）：每秒点击次数，单位是次/秒。
+- TPS（Transaction Per Second）：系统每秒处理交易数，单位是笔/秒。
+- QPS（Query Per Second）：系统每秒处理查询次数，单位是次/秒。
+  - 对于互联网业务中，如果某些业务有且仅有一个请求连接，那么TPS=QPS=HPS，一般情况下用TPS来衡量整个业务流程，用QPS来衡量接口查询次数，用HPS来表示对服务器单击请求。
+- 无论TPS、QPS、HPS，此指标是衡量系统处理能力非常重要的指标，越大越好，根据经验，一般情况下：
+  - 金融行业：1000TPS~50000TPS，不包括互联网化的活动。
+  - 保险行业：100TPS~100000TPS，不包括互联网化的活动。
+  - 制造行业：10TPS~5000TPS。
+  - 互联网电子商务：10000TPS~1000000TPS。
+  - 互联网中型网站：1000TPS~50000TPS。
+  - 互联网小型网站：500TPS~10000TPS。
+- 最大响应时间（Max Response Time）指用户发出请求或者指令到系统做出反应（响应）的最大时间。
+- 最少响应时间（Mininum Response Time）指用户发出请求或者指令到系统做出反应（响应）的最少时间。
+- 90%响应时间（90% Response Time）是指所有用户的响应时间进行排序，第90%的响应时间。
+- 从外部看，性能测试主要关注如下三个指标：
+  - 吞吐量：没秒钟系统能够处理的请求数、任务数。
+  - 响应时间：服务处理一个请求或者一个任务的耗时。
+  - 错误了：一批请求中结果出错的请求所占比例。
+
+## 2、JMeter
+
+### 2.1、安装JMeter
+
+官网：https://jmeter.apache.org/
+
+下载页面：https://jmeter.apache.org/download_jmeter.cgi
+
+老版本下载页面：https://archive.apache.org/dist/jmeter/binaries/
+
+比如，下载：apache-jmeter-5.6.3.zip
+
+然后，解压安装即可！！！解压，即安装！
+
+- 启动
+
+双击：安装目录/bin/jmeter.bat 
+
+- 配置中文
+
+  - 临时
+
+    Options=>Choose Language=>Chinese(Simplified)
+
+  - 永久
+
+  打开安装目录/bin/jmeter.properties，找到`#language=en`，并添加如下内容：
+
+  ```properties
+  #language=en
+  language=zh_CN
+  ```
+
+  
+
+### 2.2、JMeter压测示例
+
+1、创建测试计划
+
+![image-20240331204551523](images/image-20240331204551523.png)
+
+2、添加线程组
+
+![image-20240331204636424](images/image-20240331204636424.png)
+
+3、添加取样器HTTP请求
+
+![image-20240331204840690](images/image-20240331204840690.png)
+
+4、添加监听器查看结果树
+
+![image-20240331205053126](images/image-20240331205053126.png)
+
+5、添加监听器汇总报告
+
+![image-20240331205137822](images/image-20240331205137822.png)
+
+6、添加监听器聚合报告
+
+![image-20240331205401980](images/image-20240331205401980.png)
+
+7、添加监听器汇总图（额外）
+
+![image-20240331205618406](images/image-20240331205618406.png)
+
+
+
+## 9、一个Window下我并未出现的问题
+
+![image-20240331213019734](images/image-20240331213019734.png)
