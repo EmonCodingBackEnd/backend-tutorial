@@ -1093,3 +1093,51 @@ null结果缓存，并加入短暂过期时间。
 
 加锁。大量并发只让一个去查，其他人等待，查到以后释放锁，其他人获取到锁，先查缓存，就会有数据，不用去db。
 
+## 2、缓存一致性问题
+
+### 2.1、双写模式
+
+![image-20240405094847272](images/image-20240405094847272.png)
+
+### 2.2、失效模式
+
+![image-20240405095003305](images/image-20240405095003305.png)
+
+### 2.3、解决方案
+
+![image-20240405095333238](images/image-20240405095333238.png)
+
+## 3、Spring Cache
+
+### 3.1、简介
+
+- Spring从3.1开始定义了org.springframework.cache.Cache和org.spring.framework.cache.CacheManager接口来统一不同的缓存技术；并支持使用JCache（JSR-107）注解简化我们的开发。
+- Cache接口为缓存的组件规范定义，包含缓存的各种操作集合；Cache接口下Spring提供了各种xxxCache的实现；如RedisCache、EnCacheCache、ConcurrentMapCache等。
+
+### 3.2、Spring Cache的不足之处
+
+<span style="color:red;font-weight:bold;">常规数据（读多写少，对及时性和一致性要求不高的数据），可以使用Spring-Cache！！！</span>
+
+<span style="color:red;font-weight:bold;">特殊数据：需要特殊的设计！！！</span>
+
+- 读模式
+
+  - 缓存穿透-支持
+
+  - 缓存雪崩-加过期时间
+
+  - 缓存击穿-加锁（sync=true，本地锁，一定层度放置击穿）
+
+- 写模式（缓存与数据库一致性）
+
+  - 读写加锁-（SpringCache仅加了本地锁，通过sync=true）
+  - 引入Canal，感知到MySQL的binlog
+  - 读多写多，直接去数据库查询就行
+
+# 七、锁
+
+## 1、Redis锁
+
+## 2、Redisson锁
+
+是升级的Redis锁，推荐使用！
