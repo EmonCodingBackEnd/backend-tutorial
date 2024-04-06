@@ -2186,6 +2186,43 @@ $ docker run --name kibana \
 
 http://192.168.32.116:5601/
 
+### 6.2.1、当虚拟机或者物理机异常关闭后导致kibana异常
+
+问题描述：访问kibana得到“Kibana server is not ready yet”。
+
+查看es日志：Search rejected due to missing shards
+
+查看kibana日志：Waiting until all Elasticsearch nodes are compatible with Kibana before starting saved objects migrations..
+
+- 查看索引得到：注意有一个red
+
+```bash
+$ curl http://localhost:9200/_cat/indices
+```
+
+```bash
+yellow open bank                             vgdy5q9FRLWAo1QUTI-oUg 1 1 1000 0 374.6kb 374.6kb
+green  open product                          GDPBVXuETleygS9koHMcmw 1 0  120 0  15.5kb  15.5kb
+green  open .apm-custom-link                 TJgrFTfyRIGE9Y7JTIrpDA 1 0    0 0    227b    227b
+red    open .kibana_task_manager_7.17.18_001 pJPl4akIQAerlSjxRbz6qg 1 0                       
+green  open .apm-agent-configuration         VJuYHpDgQqmoW961-NGzDg 1 0    0 0    227b    227b
+green  open newbank                          XCh5tktFQF6z8qjyOQLMDw 1 0 1000 0 250.8kb 250.8kb
+green  open .kibana_7.17.18
+_001              K-rZl6tSRUqlRsOUxjJVkA 1 0   53 0   2.3mb   2.3mb
+green  open .tasks                           f4qBXYniQj-fjuRswFTviQ 1 0    8 0  48.7kb  48.7kb
+```
+
+解决方案：
+
+1. 先停止kibana
+2. 删除.kibana相关索引
+
+```bash
+$ curl -X DELETE http://localhost:9200/.kibana*
+```
+
+3. 启动kibana
+
 ## 7、MongoDB
 
 ### 7.1、普通启动

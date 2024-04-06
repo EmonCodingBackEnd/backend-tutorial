@@ -6,6 +6,8 @@
 
 [临时：ES配置文件详解](https://www.cnblogs.com/sunxucool/p/3799190.html)
 
+[ES基础知识和常用查询](https://blog.csdn.net/weixin_38931408/article/details/125761305)
+
 # 一、使用`canal`同步数据
 
 **canal [kə'næl]**，译意为水道/管道/沟渠，主要用途是基于 MySQL 数据库增量日志解析，提供增量数据订阅和消费。
@@ -1187,7 +1189,7 @@ GET bank/_search
 
 - term【查询】
 
-若是全文检索的字段推荐使用math，非全文检索字段建议使用term。
+若是全文检索的字段推荐使用match，非全文检索字段建议使用term。
 
 ```bash
 # 关键词（keyword）匹配：匹配不到，必须全等，和term一样
