@@ -400,7 +400,29 @@ rabbitmqctl forget_cluster_node [--offline]
 rabbitmqctl rename_cluster_node oldnode1 newnode1 [oldnode2] [newnode2] ...
 ```
 
+# 四、概述
 
+1. 大多应用中，可通过消息服务中间件来提升系统异步通信、扩展解耦能力。
+
+2. 消息服务中两个重要概念：
+
+   <span style="color:red;font-weight:bold;">消息代理（message broker）</span>和<span style="color:red;font-weight:bold;">目的地（destination）</span>
+
+当消息发送者发送消息以后，将由消息代理接管，消息代理保证消息传递到指定目的地。
+
+3. 消息队列主要有两种形式的目的地
+
+   1. <span style="color:red;font-weight:bold;">队列（queue）</span>：点对点消息通信（point-to-point）
+
+   2. <span style="color:red;font-weight:bold;">主题（topic）</span>：发布（publish）/订阅（subscribe）消息通信
+
+# 五、MQ应用场景
+
+## 1、异步任务
+
+## 2、应用解耦
+
+## 3、流量控制、流量削峰
 
 
 
