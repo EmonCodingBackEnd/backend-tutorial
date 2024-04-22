@@ -400,7 +400,7 @@ rabbitmqctl forget_cluster_node [--offline]
 rabbitmqctl rename_cluster_node oldnode1 newnode1 [oldnode2] [newnode2] ...
 ```
 
-# 四、概述
+# 四、MQ概述
 
 1. 大多应用中，可通过消息服务中间件来提升系统异步通信、扩展解耦能力。
 
@@ -415,8 +415,103 @@ rabbitmqctl rename_cluster_node oldnode1 newnode1 [oldnode2] [newnode2] ...
    1. <span style="color:red;font-weight:bold;">队列（queue）</span>：点对点消息通信（point-to-point）
 
    2. <span style="color:red;font-weight:bold;">主题（topic）</span>：发布（publish）/订阅（subscribe）消息通信
+4. 点对点式：
+   1. 消息发送者发送消息，消息代理将其放入一个队列中，消息接收者从队列中获取消息内容，消息读取后被移出队列。
+   2. 消息只有唯一的发送者和接收者，但并不是说只能有一个接收者。哪一个接收者收取了，其他接收者就不能得到了。
 
-# 五、MQ应用场景
+5. 发布订阅式：
+   1. 发送者（发布者）发送消息到主题，多个接收者（订阅者）监听（订阅）这个主题，那么就会在消息到达时同时收到消息。
+
+6. JMS（Java Message Service）Java消息服务：
+   1. 基于JVM消息代理的规范。ActiveMQ、HornetMQ是JMS实现。
+
+7. AMQP（Advanced Message Queuing Protocol）
+   1. 高级消息队列协议，也是一个消息代理的规范，兼容JMS
+   2. RabbitMQ是AMQP的实现
+
+
+|              | JMS（Java Message Service）                                  | AMQP（Advanced Message Queuing Protocol）                    |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 定义         | Java api                                                     | 网络线级协议                                                 |
+| 跨语言       | 否                                                           | 是                                                           |
+| 跨平台       | 否                                                           | 是                                                           |
+| Model        | 提供两种消息模型：<br />（1）、Peer-2-Peer<br />（2）、Pub/sub | 提供了五种消息模型：<br />（1）、direct exchange<br />（2）、fanout exchange<br />（3）、topic change<br />（4）、headers exchange<br />（5）、system exchange<br />本质来讲，后四种和JMS的pub/sub模型没有太大差别，仅是在路由机制上做了更详细的划分； |
+| 支持消息类型 | 多种消息类型：<br />TextMessage<br />MapMessage<br />BytesMessage<br />StreamMessage<br />ObjectMessage<br />Message（只有消息头和属性） | byte[] 当实际应用时，有复杂的消息，可以将消息序列化后发送。  |
+| 综合评价     | JMS定义了Java API层面的标准；在java体系中，多个client均可以通过JMS进行交互，不需要应用修改代码，但是其对跨平台的支持较差； | AMQP定义了wire-level层的协议标准；天然具有跨平台、跨语言特性。 |
+
+8. Spring支持
+   1. spring-jms提供了对JMS的支持
+   2. spring-rabbit提供了对AMQP的支持
+   3. 需要ConnectionFactory的实现来连接消息代理
+   4. 提供JmsTemplate、RabbitTemplate来发送消息
+   5. @JmsListener（JSM）、@RabbitListener（AMQP）注解在方法上监听消息代理发布的消息
+   6. @EnableJms、@EnableRabbit开启支持
+9. SpringBoot自动配置
+   1. JmsAutoConfiguration
+   2. RabbitAutoConfiguration
+10. 市面上的MQ产品
+    1. ActiveMQ
+    2. RabbitMQ
+    3. RocketMQ
+    4. Kafka
+
+# 五、RabbitMQ概念
+
+## 1、RabbitMQ简介：
+
+RabbitMQ是一个由erlang开发的AMQP（Advanved Message Queue Protocol）的开源实现。
+
+## 2、核心概念
+
+Message
+
+消息，消息是不具名的，它由消息头和消息体组成。消息体时不透明的，而消息头则由一系列的可选属性组成，这些属性包括routing-key（路由键）、priority（相对于其他消息的优先权）、delivery-mode（指出该消息可能需要持久性存储）等等。
+
+## 3、Publisher
+
+消息的生产者，也是一个向交换器发布消息的客户端应用程序。
+
+## 4、Exchange
+
+交换器，用来接收生产者发送的消息并将这些消息路由给服务器中的队列。
+
+Exchange有4种类型：direct（默认）、fanout、topic以及headers，不同类型的Exchange转发消息的策略有所不同。
+
+## 5、Queue
+
+消息队列，用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走。
+
+## 6、Binding
+
+绑定，用于消息队列和交换器之间的关联。一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成一个由绑定构成的路由表。
+
+Exchange和Queue的绑定可以是多对多的关系。
+
+## 7、Connection
+
+网络连接，比如一个TCP连接。
+
+## 8、Channel
+
+信道，多路复用连接中的一条独立的双向数据流通道。信道是建立在真实的TCP连接内的虚拟连接，AMQP命令都是通过信道发出去的，不管是发布消息、订阅队列还是接收消息，这些动作都是通过信道完成。因为对于操作系统来说建立和销毁TCP都是非常昂贵的开销，所以引入了信道的概念，以复用一条TCP连接。
+
+## 9、Consumer
+
+消息的消费者，表示一个从消息队列中取得消息的客户端应用程序。
+
+## 10、Virtual Host
+
+虚拟主机，表示一批交换器、消息队列和相关对象。虚拟主机是共享相同的身份认证和加密环境的独立服务器域。每个vhost本质上就是一个mini版本的RabbitMQ服务器，拥有自己的队列、交换器、绑定和权限机制。vhost是AMQP概念的基础，必须在连接时指定，RabbitMQ默认的vhost是`/`。
+
+## 11、Broker
+
+表示消息队列服务器实体。
+
+![image-20240422133228347](images/image-20240422133228347.png)
+
+
+
+# 六、MQ应用场景
 
 ## 1、异步任务
 
