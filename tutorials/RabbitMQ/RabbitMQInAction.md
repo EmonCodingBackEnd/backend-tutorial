@@ -477,6 +477,28 @@ Message
 
 Exchange有4种类型：direct（默认）、fanout、topic以及headers，不同类型的Exchange转发消息的策略有所不同。
 
+### 4.1、direct
+
+消息中的路由键（routing key）如果和Binding中的binding key一致，交换器就将消息发送到对应的队列中。路由键与队列名完全匹配，如果一个队列绑定到交换机要求路由键为“dog”，则只转发routing key标记为“dog”的消息，不会转发“dog.puppy”，也不会转发“dog.guard”等等。它是完全匹配、单播的模式。
+
+### 4.2、fanout
+
+每个发送到fanout类型交换器的消息都会分到所有绑定的队列上去。fanout交换器不处理路由键，只是简单的将队列绑定到交换器上，每个发送到交换器的消息都会被转发到与该交换器绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。fanout类型转发消息是最快的。
+
+![image-20240423131335605](images/image-20240423131335605.png)
+
+### 4.3、topic
+
+topic交换器通过模式匹配分配消息的路由键属性，将路由键和某个模式进行匹配，此时队列需要绑定到一个模式上。它将路由键和绑定键的字符串切分成单词，这些单词之间用点`.`隔开。它同样也会识别两个通配符：符号`#`和符号`*`。
+
+`#`匹配0个或多个单词，`*`匹配一个单词。
+
+![image-20240423131044598](images/image-20240423131044598.png)
+
+### 4.4、headers
+
+headers匹配AMQP消息的header而不是路由键，headers交换器和direct交换器完全一致，但性能差很多，目前几乎用不到了。
+
 ## 5、Queue
 
 消息队列，用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走。
@@ -509,9 +531,44 @@ Exchange和Queue的绑定可以是多对多的关系。
 
 ![image-20240422133228347](images/image-20240422133228347.png)
 
+## 六、RabbitMQ消息确认机制-可靠抵达
 
+- 保证消息不丢失，可靠抵达，可以使用事务消息，性能下降250倍，为此引入确认机制。
+- publisher confirmCallback 确认模式
+- publisher returnCallback 未投递到queue退回模式
+- consumer ack机制
 
-# 六、MQ应用场景
+![image-20240423225609956](images/image-20240423225609956.png)
+
+### 1、消息抵达交换器（成功/失败）-confirmCallback
+
+- spring.rabbitmq.publisher-confirms=true
+  - 在创建connectionFactory的时候设置PublisherConfirms(true)选项，开启ConfirmCallback。
+  - CorrelationData：用来表示当前消息唯一性。
+  - 消息只要被broker接收到就会执行ConfirmCallback，如果是cluster模式，需要所有broker接收到才会调用ConfirmCallback。
+  - 被broker接收到只能表示message已经到达服务器，并不能保证消息一定会被投递到目标queue里。所以需要用到接下来的returnCallback。
+
+### 2、消息抵达队列（失败） -returnCallback
+
+- spring.rabbitmq.publisher-returns=true
+- spring.rabbitmq.template.mandatory=true
+  - confirm 模式只能保证消息到达broker，不能保证消息准确投递到目标queue里。在有些业务场景下，我们需要保证消息一定要投递到目标queue里，此时就需要用到return退回模式。
+  - 这样如果未能投递到目标queue里将调用returnCallback，可以记录下详细的投递数据，定期的巡检或者自动纠错都需要这些数据。
+
+### 3、消息抵达消费者-Ack消息确认机制
+
+- 消费者获取到消息，成功处理，可以回复Ack给Broker
+  - basic.ack 用于肯定确认；broker将移除此消息，可以批量
+  - basic.nack用于否定确定；可以指定broker是否丢弃此消息，可以批量
+  - basic.reject用于否定确定；同上，但是不能批量
+- 默认，消息被消费者收到，就会从broker的queue中移除
+- queue无消费者，默认依然会被存储，直到消费者消费
+- 消费者收到消息，默认会自动ack。但是如果无法确定此消息是否被处理完成，或者成功处理。我们可以开启手动ack模式。
+  - 消息处理成功，ack()，接受下一个消息，此消息broker就会移除
+  - 消息处理失败，nack()/reject()，重新发送给其他人进行处理，或者容错处理后ack
+  - 消息一直没有调用ack/nack方法，broker认为此消息正在被处理（状态Unacked），不会投递给别人，此时客户端断开，消息不会被broker移除（状态Ready），会投递给别人。
+
+# 七、MQ应用场景
 
 ## 1、异步任务
 

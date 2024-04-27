@@ -1582,6 +1582,12 @@ net.ipv4.ip_forward=1
   $ systemctl restart NetworkManager
   ```
 
+### 3.5、创建容器失败Operation not permitted
+
+docker 容器启动报错Failed to create thread: Operation not permitted (1)
+
+解决办法：启动容器时增加选项 `docker run --privileged=true` 即可！
+
 ## 4、终止容器
 
 可以使用docker stop来终止一个运行中的容器。该命令的格式为docker stop [-t|--time[=10]][CONTAINER...]。

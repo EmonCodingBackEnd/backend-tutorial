@@ -2297,11 +2297,22 @@ Base URL：http://repo.emon.vip
 
 - 启动
 
+  - 5671/5672 - AMQP端口
+  - 15671/15672 - Web管理后台端口
+  - 4369,25672 - Erlang发现&集群端口
+  - 61613,61614 - STOMP协议端口
+  - 1883,8883 - MQTT协议端口
+  - 默认的用户名密码：guest/guest
+
+  官方端口说明：https://www.rabbitmq.com/docs/networking
+
 ```bash
-$ docker run --name rabbitmq \
+$ docker run --privileged=true --name rabbitmq \
 -e RABBITMQ_DEFAULT_USER=rabbit -e RABBITMQ_DEFAULT_PASS=rabbit123 \
--p 5672:5672 -p 15672:15672 \
--d rabbitmq:3.8.3-management
+-p 5671:5671 -p 5672:5672 \
+-p 15671:15671 -p 15672:15672 \
+-p 4369:4369 -p 25672:25672 \
+-d rabbitmq:3.13.1-management
 ```
 
 - docker命令访问
@@ -2310,7 +2321,9 @@ $ docker run --name rabbitmq \
 $ docker exec -it rabbitmq /bin/bash
 ```
 
+- 访问管理台
 
+http://192.168.32.116:15672/
 
 ## 10、minio
 
