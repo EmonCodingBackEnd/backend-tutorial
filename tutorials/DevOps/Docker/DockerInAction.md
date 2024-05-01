@@ -1520,7 +1520,9 @@ docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filte
 
 TIPS：退出时，使用[Ctrl+D]，这样会结束docker当前线程，容器结束，可以使用[Ctrl+P+Q]退出而不是终止容器。
 
-### 3.2、创建容器遇到IPv4错误问题
+### 3.2、创建容器遇到IPv4错误问题（虚拟机可达但服务不可达的原因）
+
+<span style="color:red;font-weight:bold;">虚拟机恢复到某个快照后会出现虚拟机可达（可telnet通），但其上的docker服务不可达（不可telnet通）的情况，此时ping都是通的，也是这个ipv4转发的原因！</span>
 
 如果创建容器时，发现如下错误的处理办法：
 
@@ -1831,6 +1833,14 @@ docker logs <container_id|container_name>
 
 ```bash
 docker update <container_id|container_name> --restart=always
+```
+
+## 11、查看容器port
+
+- 查看容器的port
+
+```bash
+$ docker port <container_id|container_name>
 ```
 
 # 五、Dockerfile语法梳理及最佳实践
