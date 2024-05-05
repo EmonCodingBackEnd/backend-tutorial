@@ -1604,6 +1604,8 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 
 # 九十、各种软件的容器化部署
 
+[docker hub官网](hub.docker.com)
+
 ## 0、请注意，先关闭防火墙，并重启Docker
 
 ```shell
@@ -2424,7 +2426,96 @@ http://192.168.32.116
 
 
 
+## 12、Nacos
 
+[nacos官网](https://nacos.io/zh-cn/docs/v2/quickstart/quick-start-docker.html)
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/nacos/{logs,conf}
+```
+
+- 启动一个临时nacos实例，并从中复制出配置文件
+
+```bash
+$ docker run --name nacos -p 8848:8848 -d nacos/nacos-server:v2.2.3
+# 从容器中复制出来
+$ docker cp nacos:/home/nacos/logs /usr/local/dockerv/nacos
+$ docker cp nacos:/home/nacos/conf /usr/local/dockerv/nacos
+# 删除临时容器实例
+$ docker stop nacos;docker rm -v nacos
+```
+
+- 准备数据库
+
+```bash
+# 创建库
+CREATE database if NOT EXISTS `nacos_config` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `nacos_config`;
+```
+
+然后执行：https://github.com/alibaba/nacos/blob/2.2.3/distribution/conf/mysql-schema.sql
+
+说明：mysql-schema.sql也可以使用`/usr/local/dockerv/nacos/conf/mysql-schema.sql`
+
+- 启动
+
+```bash
+$ docker run --name nacos \
+-e MODE=standalone \
+-e SPRING_DATASOURCE_PLATFORM=mysql \
+-e MYSQL_SERVICE_HOST=192.168.32.116 -e MYSQL_SERVICE_PORT=3306 -e MYSQL_SERVICE_DB_NAME=nacos_config \
+-e MYSQL_SERVICE_USER=root -e MYSQL_SERVICE_PASSWORD=root123 \
+-e JVM_XMS=256m -e JVM_XMX=512m \
+-v /usr/local/dockerv/nacos/logs:/home/nacos/logs \
+-v /usr/local/dockerv/nacos/conf:/home/nacos/conf \
+-p 8848:8848 -p 9848:9848 \
+-d nacos/nacos-server:v2.2.3
+```
+
+- 访问
+
+http://192.168.32.116:8848/nacos
+
+## 13、Seata
+
+[Seata官网](https://seata.apache.org/zh-cn/docs/v1.6/user/quickstart)
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/seata
+```
+
+- 启动一个临时seata实例，并从中复制出配置文件
+
+```bash
+$ docker run --name seata -p 8091:8901 -d seataio/seata-server:1.6.1
+# 从容器中复制出来
+$ docker cp seata:/seata-server /usr/local/dockerv/seata
+# 删除临时容器实例
+$ docker stop seata;docker rm -v seata
+```
+
+- 准备数据库（每一个使用seata的at事务的微服务对应的数据库，都需要创建该表）【<span style="color:red;font-weight:bold;">并非seata-server所需</span>】
+
+https://github.com/apache/incubator-seata/blob/v1.6.1/script/client/at/db/mysql.sql
+
+- 启动
+
+```bash
+$ docker run --name seata \
+-v /usr/local/dockerv/seata/seata-server:/seata-server \
+-p 8091:8091 -p 7091:7091 \
+-d seataio/seata-server:1.6.1
+```
+
+- 访问
+
+http://192.168.32.116:7091
+
+用户名/密码：seata/seata
 
 
 
