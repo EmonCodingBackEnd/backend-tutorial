@@ -2491,11 +2491,40 @@ $ mkdir -pv /usr/local/dockerv/seata
 - 启动一个临时seata实例，并从中复制出配置文件
 
 ```bash
-$ docker run --name seata -p 8091:8901 -d seataio/seata-server:1.6.1
+$ docker run --name seata -p 8091:8091 -d seataio/seata-server:1.6.1
 # 从容器中复制出来
 $ docker cp seata:/seata-server /usr/local/dockerv/seata
 # 删除临时容器实例
 $ docker stop seata;docker rm -v seata
+```
+
+- 调整配置
+
+```bash
+# 调整注册方式为nacos
+$ vim /usr/local/dockerv/seata/seata-server/resources/application.yml 
+```
+
+```bash
+seata:
+  config:
+    # support: nacos, consul, apollo, zk, etcd3
+    type: file
+  registry:
+    # support: nacos, eureka, redis, zk, consul, etcd3, sofa
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 192.168.32.116:8848
+      group: SEATA_GROUP
+      namespace:
+      cluster: default
+      username:
+      password:
+      context-path:
+      ##if use MSE Nacos with auth, mutex with username/password attribute
+      #access-key:
+      #secret-key:
 ```
 
 - 准备数据库（每一个使用seata的at事务的微服务对应的数据库，都需要创建该表）【<span style="color:red;font-weight:bold;">并非seata-server所需</span>】
