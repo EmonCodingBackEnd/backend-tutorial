@@ -531,7 +531,7 @@ Exchange和Queue的绑定可以是多对多的关系。
 
 ![image-20240422133228347](images/image-20240422133228347.png)
 
-## 六、RabbitMQ消息确认机制-可靠抵达
+# 六、RabbitMQ消息确认机制-可靠抵达
 
 - 保证消息不丢失，可靠抵达，可以使用事务消息，性能下降250倍，为此引入确认机制。
 - publisher confirmCallback 确认模式
@@ -540,7 +540,7 @@ Exchange和Queue的绑定可以是多对多的关系。
 
 ![image-20240423225609956](images/image-20240423225609956.png)
 
-### 1、消息抵达交换器（成功/失败）-confirmCallback
+## 1、消息抵达交换器（成功/失败）-confirmCallback
 
 - spring.rabbitmq.publisher-confirms=true
   - 在创建connectionFactory的时候设置PublisherConfirms(true)选项，开启ConfirmCallback。
@@ -548,14 +548,14 @@ Exchange和Queue的绑定可以是多对多的关系。
   - 消息只要被broker接收到就会执行ConfirmCallback，如果是cluster模式，需要所有broker接收到才会调用ConfirmCallback。
   - 被broker接收到只能表示message已经到达服务器，并不能保证消息一定会被投递到目标queue里。所以需要用到接下来的returnCallback。
 
-### 2、消息抵达队列（失败） -returnCallback
+## 2、消息抵达队列（失败） -returnCallback
 
 - spring.rabbitmq.publisher-returns=true
 - spring.rabbitmq.template.mandatory=true
   - confirm 模式只能保证消息到达broker，不能保证消息准确投递到目标queue里。在有些业务场景下，我们需要保证消息一定要投递到目标queue里，此时就需要用到return退回模式。
   - 这样如果未能投递到目标queue里将调用returnCallback，可以记录下详细的投递数据，定期的巡检或者自动纠错都需要这些数据。
 
-### 3、消息抵达消费者-Ack消息确认机制
+## 3、消息抵达消费者-Ack消息确认机制
 
 - 消费者获取到消息，成功处理，可以回复Ack给Broker
   - basic.ack 用于肯定确认；broker将移除此消息，可以批量
@@ -568,7 +568,77 @@ Exchange和Queue的绑定可以是多对多的关系。
   - 消息处理失败，nack()/reject()，重新发送给其他人进行处理，或者容错处理后ack
   - 消息一直没有调用ack/nack方法，broker认为此消息正在被处理（状态Unacked），不会投递给别人，此时客户端断开，消息不会被broker移除（状态Ready），会投递给别人。
 
-# 七、MQ应用场景
+## 4、如何保证消息可靠性——消息丢失
+
+### 4.1、消息丢失场景
+
+- 消息发送出去，由于网络问题没有抵达服务器
+  - 做好容错方法（try-catch），发送消息可能会网络失败，失败后要有重试机制，可记录到数据库，采用定期扫描重发的方式。
+  - 做好日志记录，每个消息状态是否都被服务器收到都应该被记录。
+  - 做好定期重发，如果消息没有发送成功，定期去数据库扫描未成功的消息进行重发。
+- 消息抵达Broker，Broker要将消息写入磁盘（持久化）才算成功。此时Broker尚未持久化完成，宕机。
+  - publisher也必须加入确认回调机制，确认成功的消息，修改数据库消息状态。
+- 自动ACK的状态下。消费者收到消息，但没来得及消费，宕机。
+  - 一定开启手动ACK，消费成功才移除，失败或者没来得及处理就noAck并重新入队。
+
+## 5、如何保证消息可靠性——消息重复
+
+### 5.1、消息重复场景
+
+- 消息消费成功，事务已经提交，ack时，机器宕机。导致没有ack成功。Broker的消息重新由unack变为ready，并发送给其他消费者。
+  - 消费者的业务消费接口应该涉及为<span style="color:red;font-weight:bold;">幂等性</span>的比如扣库存有工作单的状态标志。【推荐】
+  - 使用防重表（redis/mysql），发送消息每一个都有业务的唯一标识，处理过就不用处理。
+  - rabbitMQ的每一个消息都有redelivered字段，可以获取是否是被重新投递过来的，而不是第一次投递过来的。【不推荐】
+- 消息消费失败，由于重试机制，自动又将消息发送出去。
+
+## 6、如何保证消息可靠性——消息积压
+
+### 6.1、消息积压场景
+
+- 消费者宕机积压
+- 消费者消费能力不足积压
+- 发送者发送流量太大
+  - 上线更多的消费者，进行正常消费。上线专门的队列消费服务，将消息先批量取出来，记录数据库、离线慢慢处理。
+
+# 七、RabbitMQ延时队列（实现定时任务）
+
+## 1、场景：
+
+比如未付款订单，超过一定时间后，系统自动取消订单并释放占有物品。
+
+**常用解决方案**：
+
+spring的schedule定时任务轮训数据库
+
+**缺点**：
+
+消耗系统内存、增加了数据库压力、存在较大的时间误差。
+
+**解决**：rabbitmq的消息TTL和死信Exchange结合。
+
+## 2、消息的TTL（Time To Live）
+
+- 消息的TTL就是消息的<span style="color:red;font-weight:bold;">存活时间</span>。
+- RabbitMQ可以对<span style="color:red;font-weight:bold;">队列</span>和<span style="color:red;font-weight:bold;">消息</span>分别设置TTL。
+  - 对队列设置就是队列没有消费者连着的保留时间，<span style="color:red;font-weight:bold;">也可以对每一个单独的消息做单独的设置。超过了这个时间，我们认为这个消息就死了，称之为死信。</span>
+  - 如果队列设置了，消息也设置了，那么会<span style="color:red;font-weight:bold;">取小的</span>。所以一个消息如果被路由到不同的队列中，这个消息死亡的时间有可能不一样（不同的队列设置）。这里单讲单个消息的TTL，因为它才是实现延迟任务的关键。可以通过<span style="color:red;font-weight:bold;">设置消息的expiration字段或者队列的x-message-ttl属性来设置时间，</span>两者是一样的效果。
+
+## 3、Dead Letter Exchanges（DLX）
+
+- 一个消息在满足如下条件下，会进入<span style="color:red;font-weight:bold;">死信路由</span>，记住这里是路由而不是队列，一个路由可以对应很多队列。（什么是死信）
+  - 一个消息被Consumer拒收了，并且reject方法的参数里requeue是false。也就是说不会被再次放在队列里，被其他消费者使用。（basic.reject/basic.nack）requeue=false
+  - 上面的消息的TTL到了，消息过期了。
+  - 队列的长度限制满了。排在前面的消息会被丢弃或者扔到死信路由上。
+- Dead Letter Exchange其实就是一种普通的exchange，和创建其他exchange没啥两样。只是在某一个设置Dead Letter Exchange的队列中有消息过期了，会自动触发消息的转发，发送到Dead Letter Exchange中去。
+- 我们既可以控制消息在一段时间后变成死信，又可以控制变成死信的消息被路由到某一个指定的交换机，结合二者，其实就可以实现一个延时队列。
+
+![image-20240516085440352](images/image-20240516085440352.png)
+
+<span style="color:red;font-weight:bold;">推荐队列过期时间</span>
+
+![image-20240516085515854](images/image-20240516085515854.png)
+
+# 八、MQ应用场景
 
 ## 1、异步任务
 
