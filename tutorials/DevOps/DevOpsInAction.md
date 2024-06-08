@@ -1604,7 +1604,7 @@ emon3                      : ok=2    changed=0    unreachable=0    failed=0    s
 
 # 九十、各种软件的容器化部署
 
-[docker hub官网](hub.docker.com)
+[docker hub官网](https://hub.docker.com)
 
 ## 0、请注意，先关闭防火墙，并重启Docker
 
@@ -1973,12 +1973,14 @@ admin/123456
 
 ## 5、sentinel-dashboard
 
+[Sentinel官网](https://sentinelguard.io/zh-cn/docs/introduction.html)
+
 - 下载
 
 ```bash
-$ mkdir /usr/local/sentinel-dashboard && cd /usr/local/sentinel-dashboard/
-$ wget https://github.com/alibaba/Sentinel/releases/download/1.8.4/sentinel-dashboard-1.8.4.jar
+$ mkdir /usr/local/sentinel-dashboard && cd /usr/local/sentinel-dashboard
 # 备注：如下使用的不是官方版，因为官方默认不支持限流规则持久化！！！
+# $ https://github.com/EmonCodingBackEnd/Sentinel-customized/tree/1.8.6.1
 $ vim Dockerfile
 ```
 
@@ -1986,7 +1988,7 @@ $ vim Dockerfile
 FROM openjdk:8-jre
 MAINTAINER 问秋 liming2011071@163.com
 
-COPY sentinel-dashboard-1.8.0-zookeeper.jar sentinel-dashboard.jar
+COPY sentinel-dashboard.jar sentinel-dashboard.jar
 
 ENTRYPOINT ["java", "-jar", "/sentinel-dashboard.jar"]
 ```
@@ -1994,16 +1996,18 @@ ENTRYPOINT ["java", "-jar", "/sentinel-dashboard.jar"]
 - 制作镜像
 
 ```bash
-$ docker build -t rushing/sentinel-dashboard:ds-1.8.0 .
-$ docker push rushing/sentinel-dashboard:ds-1.8.0
+$ docker build -t rushing/sentinel-dashboard:1.8.6.1 .
+$ docker push rushing/sentinel-dashboard:1.8.6.1
 ```
 
 - 运行
 
+启动时加入 JVM 参数 `-Dcsp.sentinel.dashboard.server=consoleIp:port` 指定nacos控制台地址和端口
+
 ```bash
 $ docker run --name sentinel \
--e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Ddatasource.provider=zookeeper -Ddatasource.provider.zookeeper.server-addr=192.168.32.116:2181" \
--p 8791:8791 -d rushing/sentinel-dashboard:ds-1.8.0
+-e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Dsentinel.datasource.provider=nacos -Dsentinel.datasource.nacos.server-addr=192.168.32.116:8848" \
+-p 8791:8791 -d rushing/sentinel-dashboard:1.8.6.1
 ```
 
 - 登录访问
@@ -2013,6 +2017,14 @@ http://repo.emon.vip:8791
 账号密码：
 
 sentinel/sentinel
+
+也支持zookeeper：
+
+```shell
+$ docker run --name sentinel \
+-e JAVA_TOOL_OPTIONS="-Dserver.port=8791 -Dcsp.sentinel.dashboard.server=localhost:8791 -Dproject.name=sentinel-dashboard -Dsentinel.datasource.provider=zk -Dsentinel.datasource.zk.server-addr=192.168.32.116:2181" \
+-p 8791:8791 -d rushing/sentinel-dashboard:1.8.6.1
+```
 
 
 
@@ -2546,9 +2558,19 @@ http://192.168.32.116:7091
 
 用户名/密码：seata/seata
 
+## 14、zipkin
 
+- 启动
 
+```bash
+$ docker run --name zipkin \
+-p 9411:9411 \
+-d openzipkin/zipkin
+```
 
+- 访问
+
+http://192.168.32.116:9411/zipkin
 
 
 
