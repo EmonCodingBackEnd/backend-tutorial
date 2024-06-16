@@ -2565,7 +2565,7 @@ http://192.168.32.116:7091
 ```bash
 $ docker run --name zipkin \
 -p 9411:9411 \
--d openzipkin/zipkin
+-d openzipkin/zipkin:3.1.0
 ```
 
 - 访问

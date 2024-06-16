@@ -4,6 +4,18 @@
 
 [TOC]
 
+# 零、k8s快速入门
+
+Kubernetes简称k8s。是用于自动部署，扩缩和管理容器化应用程序的开源系统。
+
+中文官网：https://kubernetes.io/zh-cn/【推荐】
+
+中文社区：https://www.kubernetes.org.cn/
+
+官方文档：https://kubernetes.io/zh/docs/home/
+
+社区文档：http://docs.kubernetes.org.cn/
+
 # 一、Kubeadmin安装K8S V1.20
 
 单点版本：https://blog.csdn.net/Josh_scott/article/details/121961369?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=3
@@ -88,7 +100,7 @@ $ systemctl stop dnsmasq && systemctl disable dnsmasq
 #### 1.2.5、系统参数设置
 
 ```bash
-# 制作配置文件
+# 将桥接的IPv4流量传递到 iptables 的链：
 $ cat > /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -119,9 +131,15 @@ $ sysctl -p /etc/sysctl.d/kubernetes.conf
 > > [ -x $file ] && $file
 > > done
 > > EOF
+> >
+> > 
+> >
 > > cat > /etc/sysconfig/modules/br_netfilter.modules << EOF
 > > modprobe br_netfilter
 > > EOF
+> >
+> > 
+> >
 > > chmod 755 /etc/sysconfig/modules/br_netfilter.modules
 > > lsmod |grep br_netfilter
 
@@ -171,7 +189,7 @@ sudo yum remove docker \
 yum remove -y docker* container-selinux
 ```
 
-如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
+如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，表示环境干净，没有历史遗留旧版安装。
 
 #### 2.1.1、CentOS环境下安装Docker
 
@@ -184,7 +202,9 @@ $ yum install -y yum-utils device-mapper-persistent-data lvm2
 2. 设置yum源
 
 ```shell
-$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# 若上面命令网络不可达，请利用阿里云
+$ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
 3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
@@ -197,10 +217,20 @@ $ yum list docker-ce --showduplicates |sort -r
 
 ```shell
 # 安装最新
-# $ sudo yum install -y docker-ce
+# $ yum install -y docker-ce
 # 安装指定版本
-$ yum install -y docker-ce-18.06.3.ce
+# $ yum install -y docker-ce-18.06.3.ce
+# $ yum install -y docker-ce-19.03.15
+# $ yum install -y docker-ce-20.10.24
+# $ yum install -y docker-ce-23.0.6
+# $ yum install -y docker-ce-24.0.9
+# $ yum install -y docker-ce-25.0.5
+$ yum install -y docker-ce-26.1.4
 ```
+
+> `docker-ce-cli` 是Docker的命令行客户端，用于与Docker守护程序交互；`docker-ce` 是Docker的社区版，提供了完整的容器化平台；而  `containerd.io`则是底层的容器运行时组件，用于管理容器的生命周期和镜像管理。这些组件在Docker生态系统中各自发挥着不同的作用，共同构成了强大的容器化解决方案。
+>
+> `docker-ce`：它是一个完整的容器化平台，包括了**Docker-ce-cli**以及其他必要的组件，如Docker守护程序和基础设施管理工具
 
 5. 启动
 
@@ -229,13 +259,15 @@ $ docker run hello-world
 ```bash
 # - registry-mirrors：加速器地址
 # - graph: 设置docker数据目录：选择比较大的分区（如果这里是根目录就不需要配置了，默认为/var/lib/docker）
+# - data-root：版本docker-ce-23.0.6及以上，graph -> data-root，否则报错Active: failed (Result: start-limit
 # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
 # - insecure-registries：设置私服可信地址
+# - debug: true 开启调试，若启动失败，可以在 /var/log/messages 查看原因
+# "data-root": "/var/lib/docker",
+# "exec-opts": ["native.cgroupdriver=cgroupfs"],
 tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
-  "graph": "/var/lib/docker",
-  "exec-opts": ["native.cgroupdriver=cgroupfs"],
   "insecure-registries": ["192.168.32.116:5080"]
 }
 EOF
