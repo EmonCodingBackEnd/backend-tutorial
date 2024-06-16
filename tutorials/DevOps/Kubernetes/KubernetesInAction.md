@@ -219,13 +219,13 @@ $ yum list docker-ce --showduplicates |sort -r
 # 安装最新
 # $ yum install -y docker-ce
 # 安装指定版本
-# $ yum install -y docker-ce-18.06.3.ce
-# $ yum install -y docker-ce-19.03.15
+# $ yum install -y docker-ce-18.06.3.ce 【一个使用了很久的版本】
+$ yum install -y docker-ce-19.03.15
 # $ yum install -y docker-ce-20.10.24
 # $ yum install -y docker-ce-23.0.6
 # $ yum install -y docker-ce-24.0.9
 # $ yum install -y docker-ce-25.0.5
-$ yum install -y docker-ce-26.1.4
+# $ yum install -y docker-ce-26.1.4
 ```
 
 > `docker-ce-cli` 是Docker的命令行客户端，用于与Docker守护程序交互；`docker-ce` 是Docker的社区版，提供了完整的容器化平台；而  `containerd.io`则是底层的容器运行时组件，用于管理容器的生命周期和镜像管理。这些组件在Docker生态系统中各自发挥着不同的作用，共同构成了强大的容器化解决方案。
@@ -287,6 +287,10 @@ $ systemctl enable docker && systemctl restart docker
 
 ### 2.2、安装kubeadm/kubelet/kubectl
 
+K8S依赖的Docker最佳版本：19.03
+
+https://github.com/kubernetes/kubernetes/blob/release-1.20/build/dependencies.yaml
+
 #### 2.2.1、安装
 
 1. 设置k8s源
@@ -316,17 +320,64 @@ $ systemctl enable kubelet
 
 ## 3、部署Kubernetes Mater（仅master节点）
 
+### 3.0、预下载镜像
+
+- 查看依赖镜像
+
+```bash
+$ kubeadm config images list
+```
+
+- 配置并执行脚本 
+
+```bash
+$ vim master_images.sh
+```
+
+```bash
+#!/bin/bash
+
+images=(
+	kube-apiserver:v1.20.15
+	kube-controller-manager:v1.20.15
+	kube-scheduler:v1.20.15
+	kube-proxy:v1.20.15
+	pause:3.2
+	etcd:3.4.13-0
+	coredns:1.7.0
+)
+
+for imageName in ${images[@]} ; do
+    docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
+#   docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName  k8s.gcr.io/$imageName
+done
+# 若不希望制定kubeadm init的镜像--image-repository，这里可以放开docker tag到k8s.gcr.io
+```
+
+```bash
+$ chmod +x master_images.sh
+```
+
+- 执行
+
+```bash
+$ sh master_images.sh
+```
+
 ### 3.1、kubeadm init
 
 ```bash
 # 在Master上执行，由于默认拉取镜像地址 k8s.gcr.io 国内无法访问，这里指定阿里云镜像仓库地址。
 # 执行该步骤之前，也可以执行 kubeadm config images pull 预下载镜像
+# 查看镜像 kubeadm config images list 查看默认配置 kubeadm config print init-defaults
+# 无类别域间路由 (Classless Inter -Domain Routing、CIDR)是一个用于给用户分配IP地址以及在互联网上有效地路由IP数据包的对# IP地址进行归类的方法。
+# 镜像地址也可以是 registry.aliyuncs.com/google_containers
 $ kubeadm init \
 --apiserver-advertise-address=192.168.32.116 \
---image-repository registry.aliyuncs.com/google_containers \
---kubernetes-version v1.20.0 \
---service-cidr=10.233.0.0/16 \
---pod-network-cidr=10.200.0.0/16
+--image-repository registry.cn-hangzhou.aliyuncs.com/google_containers \
+--kubernetes-version v1.20.15 \
+--service-cidr=10.96.0.0/16 \
+--pod-network-cidr=10.244.0.0/16
 
 # 使用 kubectl 工具（Master&&Node节点）
 $ mkdir -p $HOME/.kube 
@@ -337,12 +388,32 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # 【临时】无需执行，仅做记录参考
-# Then you can join any number of worker nodes by running the following on each as root:
-kubeadm join 192.168.32.116:6443 --token jqgqm7.ax7b938u5xheiu6d \
-    --discovery-token-ca-cert-hash sha256:882f6812169b4103fcae6065975c3cb231184cd4950301b7fcc5f769ddd265cb
+# ==============================初始化部分日志==============================
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.32.116:6443 --token miuck2.4c4w8zckt4fkmgp7 \
+    --discovery-token-ca-cert-hash sha256:83eb4e4ce0ae9714289c3ffe1d62757cf9819b6d6cadf630e3bb5d92f85b5154
 ```
 
-### 3.2、安装网络插件-calico（仅master节点）
+网络插件列表： https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/addons/
+
+### 3.2、网络插件多选1-[Calico](https://www.tigera.io/project-calico/)（仅master节点）
 
 #### 3.2.1、切换目录
 
@@ -396,11 +467,11 @@ $ curl https://docs.projectcalico.org/v3.20/manifests/calico.yaml -O
 #   value: "192.168.0.0/16"
 ```
 
-修改后（修改成你自己的value，我这里是10.200.0.0/16）
+修改后（修改成你自己的value，我这里是10.244.0.0/16）
 
 ```bash
 - name: CALICO_IPV4POOL_CIDR
-  value: "10.200.0.0/16"
+  value: "10.244.0.0/16"
 ```
 
 #### 3.2.3、执行安装
@@ -463,6 +534,54 @@ NAME    STATUS   ROLES                  AGE     VERSION
 emon    Ready    control-plane,master   12m     v1.20.15
 emon2   Ready    <none>                 5m21s   v1.20.15
 ```
+
+### 3.2、网络插件多选1-[Flannel](https://github.com/flannel-io/flannel#deploying-flannel-manually)（仅master节点）
+
+#### 3.2.1、切换目录
+
+```bash
+$ cd
+$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+```
+
+#### 3.2.2、下载文件
+
+Flannel是配置为Kubernetes设计的第3层网络结构的一种简单易行的方法。
+
+For Kubernetes v1.17+
+
+```bash
+# 下载calico.yaml文件
+# $ curl https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml -O 会加载最新版本，对K8S版本V1.20.15不再适合。
+$ wget https://github.com/flannel-io/flannel/releases/download/v0.25.4/kube-flannel.yml
+```
+
+#### 3.2.3、执行安装
+
+```bash
+# 查看nodes
+$ kubectl get nodes
+NAME   STATUS     ROLES                  AGE   VERSION
+emon   NotReady   control-plane,master   16m   v1.20.15
+# 安装
+$ kubectl apply -f kube-flannel.yml
+# 查看pods
+$ kubectl get pods -n kube-system
+NAME                           READY   STATUS    RESTARTS   AGE
+coredns-54d67798b7-6zrxt       0/1     Pending   0          15m
+coredns-54d67798b7-7c2vm       0/1     Pending   0          15m
+etcd-emon                      1/1     Running   0          16m
+kube-apiserver-emon            1/1     Running   0          16m
+kube-controller-manager-emon   1/1     Running   0          16m
+kube-proxy-hgmd2               1/1     Running   0          15m
+kube-scheduler-emon            1/1     Running   0          16m
+# 查看coredns中Pending的镜像问题
+$ kubectl describe pods coredns-54d67798b7-7c2vm -n kube-system
+```
+
+
+
+
 
 ### 3.3、加入节点到集群（仅worker节点）
 
