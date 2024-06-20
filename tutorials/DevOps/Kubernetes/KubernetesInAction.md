@@ -1763,9 +1763,9 @@ sysctl -p /etc/sysctl.d/kubernetes.conf
 ### 2.6、移除docker相关软件包（可选）
 
 ```bash
-yum remove -y docker*
-rm -f /etc/docker/daemon.json
-rm -rf /var/lib/docker/
+$ yum remove -y docker* container-selinux
+$ rm -f /etc/docker/daemon.json
+$ rm -rf /var/lib/docker/
 ```
 
 ## 3、使用kubespray部署集群
@@ -1862,9 +1862,9 @@ https_proxy: "http://192.168.32.116:8118"
 
 ```yaml
 # [修改]
-kube_service_addresses: 10.200.0.0/16
+kube_service_addresses: 10.96.0.0/16
 # [修改]
-kube_pods_subnet: 10.233.0.0/16
+kube_pods_subnet: 10.244.0.0/16
 # [不变]
 container_manager: docker
 ```
