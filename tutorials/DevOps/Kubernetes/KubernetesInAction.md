@@ -753,10 +753,6 @@ kube-scheduler-emon            1/1     Running   0          16m
 $ kubectl describe pods coredns-54d67798b7-7c2vm -n kube-system
 ```
 
-
-
-
-
 ### 3.3、加入节点到集群（仅worker节点）
 
 - 加入集群
