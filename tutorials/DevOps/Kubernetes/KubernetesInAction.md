@@ -366,6 +366,8 @@ $ sh master_images.sh
 
 ### 3.1、kubeadm init
 
+- 初始化
+
 ```bash
 # 在Master上执行，由于默认拉取镜像地址 k8s.gcr.io 国内无法访问，这里指定阿里云镜像仓库地址。
 # 执行该步骤之前，也可以执行 kubeadm config images pull 预下载镜像
@@ -407,13 +409,35 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 
 Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 192.168.32.116:6443 --token miuck2.4c4w8zckt4fkmgp7 \
-    --discovery-token-ca-cert-hash sha256:83eb4e4ce0ae9714289c3ffe1d62757cf9819b6d6cadf630e3bb5d92f85b5154
+kubeadm join 192.168.32.116:6443 --token 6tkbi6.v2f0u9gvsr9aq3bw \
+    --discovery-token-ca-cert-hash sha256:367b7db9c3756a089122521b9cdaa9c287d8026d97f61b17d671bd12f06783fe
 ```
+
+- 等待一小会后，查看当前pods
+
+```bash
+$ kubectl get pods -n kube-system
+NAME                           READY   STATUS    RESTARTS   AGE
+coredns-54d67798b7-xnb28       0/1     Pending   0          7m33s
+coredns-54d67798b7-zctdm       0/1     Pending   0          7m33s
+etcd-emon                      1/1     Running   0          7m47s
+kube-apiserver-emon            1/1     Running   0          7m47s
+kube-controller-manager-emon   1/1     Running   0          7m47s
+kube-proxy-zwqzm               1/1     Running   0          7m33s
+kube-scheduler-emon            1/1     Running   0          7m47s
+```
+
+分析：coredns是Pending状态，表示缺少网络插件，下面开始安装网络插件！
 
 网络插件列表： https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/addons/
 
 ### 3.2、网络插件多选1-[Calico](https://www.tigera.io/project-calico/)（仅master节点）
+
+GitHub： https://github.com/projectcalico/calico
+
+官网：https://docs.tigera.io/archive
+
+系统需求： https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
 
 #### 3.2.1、切换目录
 
@@ -474,7 +498,86 @@ $ curl https://docs.projectcalico.org/v3.20/manifests/calico.yaml -O
   value: "10.244.0.0/16"
 ```
 
-#### 3.2.3、执行安装
+#### 3.2.3、预下载镜像（所有节点都下载）
+
+- 查看依赖镜像
+
+```bash
+$ cat calico.yaml |grep image
+          image: docker.io/calico/cni:v3.20.6
+          image: docker.io/calico/cni:v3.20.6
+          image: docker.io/calico/pod2daemon-flexvol:v3.20.6
+          image: docker.io/calico/node:v3.20.6
+          image: docker.io/calico/kube-controllers:v3.20.6
+```
+
+- 配置并执行脚本：利用科学上网，去谷歌云下载，并上传到阿里云
+
+https://console.cloud.google.com 登录谷歌云，并在命令行执行如下操作
+
+```bash
+$ vim calico_images.sh
+```
+
+```bash
+#!/bin/bash
+
+images=(
+	cni:v3.20.6
+	pod2daemon-flexvol:v3.20.6
+	node:v3.20.6
+	kube-controllers:v3.20.6
+)
+
+# 登录到阿里云
+docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
+
+for imageName in ${images[@]} ; do
+    docker pull docker.io/calico/$imageName
+    docker tag docker.io/calico/$imageName  registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+    docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+done
+```
+
+```bash
+$ chmod +x calico_images.sh
+$ sh calico_images.sh
+```
+
+- 登录阿里云镜像服务查看，从阿里云镜像服务迁移回来
+
+https://cr.console.aliyun.com/cn-hangzhou/instance/dashboard
+
+```bash
+$ vim calico_images.sh
+```
+
+```bash
+#!/bin/bash
+
+images=(
+	cni:v3.20.6
+	pod2daemon-flexvol:v3.20.6
+	node:v3.20.6
+	kube-controllers:v3.20.6
+)
+
+# 登录到阿里云
+docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
+
+for imageName in ${images[@]} ; do
+    docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+    docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName docker.io/calico/$imageName
+    docker rmi registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+done
+```
+
+```bash
+$ chmod +x calico_images.sh
+$ sh calico_images.sh
+```
+
+#### 3.2.4、执行安装
 
 ```bash
 # 生效之前查看
@@ -535,7 +638,7 @@ emon    Ready    control-plane,master   12m     v1.20.15
 emon2   Ready    <none>                 5m21s   v1.20.15
 ```
 
-### 3.2、网络插件多选1-[Flannel](https://github.com/flannel-io/flannel#deploying-flannel-manually)（仅master节点）
+### 3.2、网络插件多选2-[Flannel](https://github.com/flannel-io/flannel#deploying-flannel-manually)（仅master节点）
 
 #### 3.2.1、切换目录
 
@@ -551,12 +654,83 @@ Flannel是配置为Kubernetes设计的第3层网络结构的一种简单易行的方法。
 For Kubernetes v1.17+
 
 ```bash
-# 下载calico.yaml文件
-# $ curl https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml -O 会加载最新版本，对K8S版本V1.20.15不再适合。
 $ wget https://github.com/flannel-io/flannel/releases/download/v0.25.4/kube-flannel.yml
 ```
 
-#### 3.2.3、执行安装
+#### 3.2.3、预下载镜像（所有节点都下载）
+
+- 查看依赖镜像
+
+```bash
+$ cat kube-flannel.yml |grep image
+        image: docker.io/flannel/flannel:v0.25.4
+        image: docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1
+        image: docker.io/flannel/flannel:v0.25.4
+```
+
+- 配置并执行脚本：利用科学上网，去谷歌云下载，并上传到阿里云
+
+https://console.cloud.google.com 登录谷歌云，并在命令行执行如下操作
+
+```bash
+$ vim flannel_images.sh
+```
+
+```bash
+#!/bin/bash
+
+images=(
+	flannel:v0.25.4
+	flannel-cni-plugin:v1.4.1-flannel1
+)
+
+# 登录到阿里云
+docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
+
+for imageName in ${images[@]} ; do
+    docker pull docker.io/flannel/$imageName
+    docker tag docker.io/flannel/$imageName  registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+    docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+done
+```
+
+```bash
+$ chmod +x flannel_images.sh
+$ sh flannel_images.sh
+```
+
+- 登录阿里云镜像服务查看，从阿里云镜像服务迁移回来
+
+https://cr.console.aliyun.com/cn-hangzhou/instance/dashboard
+
+```bash
+$ vim flannel_images.sh
+```
+
+```bash
+#!/bin/bash
+
+images=(
+	flannel:v0.25.4
+	flannel-cni-plugin:v1.4.1-flannel1
+)
+
+# 登录到阿里云
+docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
+
+for imageName in ${images[@]} ; do
+    docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+    docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName docker.io/flannel/$imageName
+    docker rmi registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
+done
+```
+
+```bash
+$ chmod +x flannel_images.sh
+$ sh flannel_images.sh
+```
+
+#### 3.2.4、执行安装
 
 ```bash
 # 查看nodes
@@ -585,32 +759,35 @@ $ kubectl describe pods coredns-54d67798b7-7c2vm -n kube-system
 
 ### 3.3、加入节点到集群（仅worker节点）
 
+- 加入集群
+
 ```bash
-# 如下是kubeadm init执行成功后，得到的日志
-......省略......
-[addons] Applied essential addon: CoreDNS
-[addons] Applied essential addon: kube-proxy
-
-Your Kubernetes control-plane has initialized successfully!
-
-To start using your cluster, you need to run the following as a regular user:
-
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-Alternatively, if you are the root user, you can run:
-
-  export KUBECONFIG=/etc/kubernetes/admin.conf
-
-You should now deploy a pod network to the cluster.
-Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
-  https://kubernetes.io/docs/concepts/cluster-administration/addons/
-
-Then you can join any number of worker nodes by running the following on each as root:
-
-kubeadm join 192.168.32.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
+# kubeadm init的执行结果中有如下命令，在各个worker节点执行加入即可
+$ kubeadm join 192.168.32.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
     --discovery-token-ca-cert-hash sha256:2ab2809af3d7ea7b684e1dcdea1859b226ec8b9185a82a56344aade4d3000f99
+```
+
+- 查看节点
+
+```bash
+$ kubectl get nodes
+NAME    STATUS   ROLES                  AGE     VERSION
+emon    Ready    control-plane,master   40m     v1.20.15
+emon2   Ready    <none>                 13m     v1.20.15
+emon3   Ready    <none>                 9m57s   v1.20.15
+
+# 网络插件flannel时的查询结果
+$ kubectl get pods -n kube-system -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
+coredns-54d67798b7-h2797       1/1     Running   0          40m   10.244.0.3       emon    <none>           <none>
+coredns-54d67798b7-qqngc       1/1     Running   0          40m   10.244.0.2       emon    <none>           <none>
+etcd-emon                      1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
+kube-apiserver-emon            1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
+kube-controller-manager-emon   1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
+kube-proxy-cz2gt               1/1     Running   0          10m   192.168.32.118   emon3   <none>           <none>
+kube-proxy-mfgtr               1/1     Running   0          40m   192.168.32.116   emon    <none>           <none>
+kube-proxy-nzkxz               1/1     Running   0          14m   192.168.32.117   emon2   <none>           <none>
+kube-scheduler-emon            1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
 ```
 
 
@@ -8485,11 +8662,14 @@ $ kubectl explain svc
 
 # 取得确认对象信息列表
 $ kubectl get < xxx >
+
 # 显示node的信息
+$ kubectl get nodes
 $ kubectl get nodes -o wide
 
 # 列出namespace信息
 $ kubectl get namespaces
+$ kubectl get ns
 # 命令行输出结果
 NAME              STATUS   AGE
 default           Active   45h
@@ -8499,8 +8679,6 @@ kube-system       Active   45h
 
 # 列出deployment信息
 $ kubectl get deployment -n ingress-nginx
-
-
 # 取得确认对象的详细信息
 $ kubectl describe < xxx > < xxx >
 # 描述node详细信息
@@ -8568,6 +8746,7 @@ $ kubectl get pods -l group=dev -n dev
 $ kubectl get pods -l 'group in (dev,test)' -n dev
 # 查询所有命名空间中的pods
 $ kubectl get pods -A
+$ kubectl get pods --all-namespaces
 # 查询所有命名空间中的svc
 $ kubectl get svc -A
 # 查询所有命名空间中的deploy
@@ -8611,7 +8790,7 @@ kubectl run name --image=(镜像名) --replicas=(备份数) --port=(容器要暴露的端口) 
 kubectl create -f **.yaml  陈述式对象配置管理方式
 kubectl apply -f **.yaml  声明式对象配置管理方式（也适用于更新等）
 
-# 查看资源对象
+# 删除资源对象
 kubectl delete [pods/services/deployments/...] name 删除指定资源对象
 kubectl delete [pods/services/deployments/...] -l key=value -n kube-system  删除kube-system下指定标签的资源对象
 kubectl delete [pods/services/deployments/...] --all -n kube-system 删除kube-system下所有资源对象
