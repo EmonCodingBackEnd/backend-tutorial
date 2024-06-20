@@ -163,33 +163,20 @@ $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
 #### 1.2.7、移除docker相关软件包（可选）
 
 ```bash
-$ yum remove -y docker*
+$ yum remove -y docker* container-selinux
 $ rm -f /etc/docker/daemon.json
 $ rm -rf /var/lib/docker/
 ```
+
+如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，表示环境干净，没有历史遗留旧版安装。
+
+
 
 ## 2、基础安装（所有节点）
 
 ### 2.1、安装Docker
 
 [查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
-
-####  2.1.0、删除旧版Docker
-
-```bash
-sudo yum remove docker \
-                  docker-client \
-                  docker-client-latest \
-                  docker-common \
-                  docker-latest \
-                  docker-latest-logrotate \
-                  docker-logrotate \
-                  docker-engine
-# 必要时：清理yum安装的新版本docker
-yum remove -y docker* container-selinux
-```
-
-如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，表示环境干净，没有历史遗留旧版安装。
 
 #### 2.1.1、CentOS环境下安装Docker
 
