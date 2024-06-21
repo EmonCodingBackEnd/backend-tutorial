@@ -466,9 +466,13 @@ net.bridge.bridge-nf-call-iptables = 1
 
   ```bash
   # - registry-mirrors：加速器地址
-  # - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
+  # - graph: 设置docker数据目录：选择比较大的分区（如果这里是根目录就不需要配置了，默认为/var/lib/docker）
+  # - data-root：版本docker-ce-23.0.6及以上，graph -> data-root，否则报错Active: failed (Result: start-limit
   # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
   # - insecure-registries：设置私服可信地址
+  # - debug: true 开启调试，若启动失败，可以在 /var/log/messages 查看原因
+  # "data-root": "/var/lib/docker",
+  # "exec-opts": ["native.cgroupdriver=cgroupfs"],
   sudo tee /etc/docker/daemon.json <<-'EOF'
   {
     "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],

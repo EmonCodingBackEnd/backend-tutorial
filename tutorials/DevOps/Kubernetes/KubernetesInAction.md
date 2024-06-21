@@ -254,7 +254,7 @@ $ docker run hello-world
 # "exec-opts": ["native.cgroupdriver=cgroupfs"],
 tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],
   "insecure-registries": ["192.168.32.116:5080"]
 }
 EOF
@@ -412,6 +412,16 @@ kube-apiserver-emon            1/1     Running   0          7m47s
 kube-controller-manager-emon   1/1     Running   0          7m47s
 kube-proxy-zwqzm               1/1     Running   0          7m33s
 kube-scheduler-emon            1/1     Running   0          7m47s
+$ kubectl get all
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   8h
+$ kubectl get ns
+NAME              STATUS   AGE
+default           Active   8h
+kube-flannel      Active   8h
+kube-node-lease   Active   8h
+kube-public       Active   8h
+kube-system       Active   8h
 ```
 
 分析：coredns是Pending状态，表示缺少网络插件，下面开始安装网络插件！
@@ -1601,7 +1611,7 @@ $ vim /etc/docker/daemon.json
 
 ```bash
 {
-  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],
   "graph": "/usr/local/lib/docker",
   "exec-opts": ["native.cgroupdriver=cgroupfs"],
   "insecure-registries": ["192.168.32.116:5080"]
@@ -4218,197 +4228,90 @@ $ kubectl get pods
 No resources found in default namespace.
 ```
 
+# 四、常用场景
 
-
-# 四、Docker的安装与配置（在emon主机root用户安装）
-
-## 1、安装Docker
-
-[查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
-
-## 1.0、删除旧版Docker
+## 1、部署一个tomcat
 
 ```bash
-sudo yum remove docker \
-                  docker-client \
-                  docker-client-latest \
-                  docker-common \
-                  docker-latest \
-                  docker-latest-logrotate \
-                  docker-logrotate \
-                  docker-engine
-# 必要时：清理yum安装的新版本docker
-yum remote -y docker* container-selinux
+# 部署一个tomcat
+$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8
+# 暴露nginx访问，Pod的80映射容器的8080；service会代理Pod的80.
+$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort
+# 应用升级
+# $ kubectl set image
+# 扩容：扩容了多份，所以无论访问哪个node的指定端口，都可以访问到tomcat6
+$ kubectl scale --replicas=3 deployment tomcat6
+# 删除
+$ kubectl get all
+$ kubectl delete deployment.apps/tomcat6 service/tomcat6
 ```
 
-如果yum报告说以上安装包未安装，未匹配，未删除任何安装包，活码环境干净，没有历史遗留旧版安装。
-
-### 1.1、安装要求
-
-安装Docker的基本要求如下：
-
-- Dockr只支持64位的CPU架构的计算机，目前不支持32位CPU
-- 建议系统的Linux内核版本为3.10及以上
-- Linux内核需要开启cgroups和namespace功能
-- 对于非Linux内核的平台，如Microsoft Windows和OS X，需要安装使用Boot2Docker工具
-
-### 1.2、CentOS环境下安装Docker
-
-	Docker目前只能运行在64位平台上，并且要求内核版本不低于3.10，实际上内核版本越新越好，过低的内核版本容易造成功能不稳定。
-	
-	用户可以通过如下命令检查自己的内核版本详细信息：
-
-```shell
-$ uname -a
-Linux emon 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
-$ cat /proc/version
-Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) #1 SMP Fri Apr 20 16:44:24 UTC 2018
-```
-
-1. 安装需要的软件包，yum-util提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
-
-```shell
-$ yum install -y yum-utils device-mapper-persistent-data lvm2
-```
-
-2. 设置yum源
-
-```shell
-$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-```
-
-3. 可以查看所有仓库中所有docker版本，并选择安装特定的版本
-
-```shell
-$ yum list docker-ce --showduplicates |sort -r
-```
-
-4. 安装docker
-
-```shell
-# 安装最新
-# $ sudo yum install -y docker-ce
-# 安装指定版本
-$ yum install -y docker-ce-18.06.3.ce
-```
-
-5. 启动
-
-```shell
-$ systemctl start docker
-```
-
-6. 验证安装
-
-```shell
-$ docker version
-$ docker info
-$ docker run hello-world
-```
-
-> 说明：如果docker info有提示：
-> WARNING: bridge-nf-call-iptables is disabled
-> WARNING: bridge-nf-call-ip6tables is disabled
-
-解决办法：
+- 查看部署一个tomcat对应的yaml信息
 
 ```bash
-$ vim /etc/sysctl.conf 
+$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8 --dry-run -o yaml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: tomcat6
+  name: tomcat6
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat6
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: tomcat6
+    spec:
+      containers:
+      - image: tomcat:6.0.53-jre8
+        name: tomcat
+        resources: {}
+status: {}
 ```
 
 ```bash
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
+$ kubectl apply -f tomcat6.yml
 ```
 
-使之生效：
+- 查看暴露nginx访问对应的yaml信息
 
 ```bash
-$ sysctl -p
+$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort --dry-run=client -o yaml
 ```
 
-无需重启，此时docker info就看不到此报错了。
-
-### 1.3、配置docker加速器
-
-- 配置
-
-  - DaoCloud
-
-  采用 DaoCloud: https://www.daocloud.io/ 提供的Docker加速器。
-
-  登录DaoCloud，找到小火箭图标，根据说明操作：
-
-  ```bash
-  $ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
-  docker version >= 1.12
-  {"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
-  Success.
-  You need to restart docker to take effect: sudo systemctl restart docker
-  ```
-
-  - 阿里云
-
-  登录阿里开发者平台： https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
-
-  点击【镜像搜索】按钮，自动跳转到控制台的镜像搜索，根据提示注册并登录：
-
-  在左侧【镜像工具】中选择【镜像加速器】，右边是生成的加速地址：比如我的：`https://pyk8pf3k.mirror.aliyuncs.com`，执行命令配置上即可：
-
-  ```bash
-  # - registry-mirrors：加速器地址
-  # - graph: 设置docker数据目录：选择比较大的分区（我这里是根目录就不需要配置了，默认为/var/lib/docker）
-  # - exec-opts: 设置cgroup driver（默认是cgroupfs，不推荐设置systemd）
-  # - insecure-registries：设置私服可信地址
-  tee /etc/docker/daemon.json <<-'EOF'
-  {
-    "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
-    "graph": "/usr/local/lib/docker",
-    "exec-opts": ["native.cgroupdriver=cgroupfs"],
-    "insecure-registries": ["192.168.32.116:5080"]
-  }
-  EOF
-  ```
-
-- 查看
-
-```bash
-$ cat /etc/docker/daemon.json 
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: tomcat6
+  name: tomcat6
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat6
+  type: NodePort
+status:
+  loadBalancer: {}
 ```
 
-- 重启
+## 2、Kubesphere
 
-```bash
-$ systemctl enable docker && systemctl restart docker
-# 删掉旧的存储位置
-$ rm -rf /var/lib/docker/
-```
-
-
-
-## 2、安装docker-compose
-
-1：下载
-
-```bash
-$ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-```
-
-2：添加可执行权限
-
-```bash
-$ chmod +x /usr/local/bin/docker-compose
-# 创建软连，避免安装Harbor时报错：? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
-$ ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
-```
-
-33：测试
-
-```bash
-$ docker-compose --version
-# 命令行输出结果
-docker-compose version 1.29.2, build 5becea4c
-```
+https://github.com/kubesphere/kubesphere/blob/master/README_zh.md
 
 # 五、Harbor镜像私服（在emon主机root用户安装）
 
@@ -4569,7 +4472,7 @@ $ vim /etc/docker/daemon.json
 
 ```bash
 {
-  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com"],
+  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],
   "graph": "/usr/local/lib/docker",
   "exec-opts": ["native.cgroupdriver=cgroupfs"],
   "insecure-registries": ["emon:5080"]
@@ -8632,47 +8535,82 @@ $ crictl pods
 
 ## 90.3、kubectl
 
+https://kubernetes.io/zh-cn/docs/reference/kubectl/introduction/
+
+### 90.3.1、资源类型
+
+| 资源        | 简写    | 是否需指定命名空间 |
+| ----------- | ------- | ------------------ |
+| namespaces  | ns      | false              |
+| nodes       | node/no | false              |
+| service     | svc     | false              |
+| pods        | pod/po  | true               |
+| deployments | deploy  | true               |
+
+
+
+- 版本
+
 ```bash
 # 查看客户端和服务器侧版本信息
 $ kubectl version
 # 以group/version的格式显示服务器侧所支持的API版本
 $ kubectl api-versions
-# 显示资源文档信息
-$ kubectl explain < xxx >
-$ kubectl explain svc
-$ kubectl explain svc.spec
-$ kubectl explain svc
+```
 
-# 取得确认对象信息列表
-$ kubectl get < xxx >
+- 显示资源文档信息
 
+```bash
+$ kubectl explain svc
+```
+
+- 查看对象信息
+
+```bash
 # 显示node的信息
 $ kubectl get nodes
-$ kubectl get nodes -o wide
-
-# 列出namespace信息
+# 显示service的信息
+$ kubectl get service
+$ kubectl get svc
+# 显示deployment信息
+$ kubectl get deployment
+$ kubectl get deploy
+# 查看命名空间
 $ kubectl get namespaces
 $ kubectl get ns
-# 命令行输出结果
-NAME              STATUS   AGE
-default           Active   45h
-kube-node-lease   Active   45h
-kube-public       Active   45h
-kube-system       Active   45h
+```
 
-# 列出deployment信息
-$ kubectl get deployment -n ingress-nginx
-# 取得确认对象的详细信息
-$ kubectl describe < xxx > < xxx >
-# 描述node详细信息
-$ kubectl describe node emon2
+- 查看node详细信息
+
+```bash
 # 获取node对应yaml详情
 $ kubectl get node emon2 -o yaml
+```
+
+- 取得确定对象的详细信息
+
+```bash
+# 描述node详细信息
+$ kubectl describe node emon2
 # 列出某一个pod详细信息：-n指定命名空间
 $ kubectl describe pod ingress-nginx-admission-patch-kpnds -n ingress-nginx
 # 列出某一个deployment详细信息
 $ kubectl describe deployment ingress-nginx-controller -n ingress-nginx
+```
 
+
+
+
+
+
+
+
+
+
+
+
+
+```bash
 # 取得pod中容器的log信息
 $ kubectl logs < xxx >
 $ kubectl logs nginx-ds-tbtkz
@@ -9534,7 +9472,7 @@ services:
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml up -d
 # 停止
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml down -v
-# 重启：建议走down -v再up -d，二部是restart
+# 重启：建议走down -v再up -d，而不是restart
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml restart
 ```
 
