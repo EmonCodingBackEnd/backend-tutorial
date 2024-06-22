@@ -1579,7 +1579,7 @@ net.ipv4.ip_forward=1
 
   ```bash
   [keyfile]
-  unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*
+  unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:flannel*;interface-name:cni
   ```
 
   - ÷ÿ∆ÙNetworkManager

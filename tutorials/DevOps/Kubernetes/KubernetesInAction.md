@@ -412,6 +412,18 @@ kube-apiserver-emon            1/1     Running   0          7m47s
 kube-controller-manager-emon   1/1     Running   0          7m47s
 kube-proxy-zwqzm               1/1     Running   0          7m33s
 kube-scheduler-emon            1/1     Running   0          7m47s
+$ kubectl get pods -n kube-system -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
+coredns-54d67798b7-h2797       1/1     Running   0          32h   10.244.0.3       emon    <none>           <none>
+coredns-54d67798b7-qqngc       1/1     Running   0          32h   10.244.0.2       emon    <none>           <none>
+etcd-emon                      1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
+kube-apiserver-emon            1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
+kube-controller-manager-emon   1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
+kube-proxy-cz2gt               1/1     Running   0          31h   192.168.32.118   emon3   <none>           <none>
+kube-proxy-mfgtr               1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
+kube-proxy-nzkxz               1/1     Running   0          31h   192.168.32.117   emon2   <none>           <none>
+kube-scheduler-emon            1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
+
 $ kubectl get all
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   8h
@@ -4230,15 +4242,13 @@ No resources found in default namespace.
 
 # 四、常用场景
 
-## 1、部署一个tomcat
+## 1、常规命令部署一个tomcat
 
 ```bash
 # 部署一个tomcat
 $ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8
 # 暴露nginx访问，Pod的80映射容器的8080；service会代理Pod的80.
 $ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort
-# 应用升级
-# $ kubectl set image
 # 扩容：扩容了多份，所以无论访问哪个node的指定端口，都可以访问到tomcat6
 $ kubectl scale --replicas=3 deployment tomcat6
 # 删除
@@ -4249,7 +4259,7 @@ $ kubectl delete deployment.apps/tomcat6 service/tomcat6
 - 查看部署一个tomcat对应的yaml信息
 
 ```bash
-$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8 --dry-run -o yaml
+$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8 --dry-run=client -o yaml > tomcat6.yml
 ```
 
 ```yaml
@@ -4286,7 +4296,7 @@ $ kubectl apply -f tomcat6.yml
 - 查看暴露nginx访问对应的yaml信息
 
 ```bash
-$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort --dry-run=client -o yaml
+$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort --dry-run=client -o yaml > service.yml
 ```
 
 ```yaml
@@ -4308,6 +4318,73 @@ spec:
 status:
   loadBalancer: {}
 ```
+
+- 查看暴露pod对应的yaml信息
+
+```bash
+$ kubectl get pods tomcat6-56fcc999cb-g8bs5 -o yaml > pod.yaml
+```
+
+## 2、通过yaml部署一个tomcat
+
+- 准备一个部署
+
+```bash
+$ vim tomcat6.yml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tomcat6
+  name: tomcat6
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tomcat6
+  template:
+    metadata:
+      labels:
+        app: tomcat6
+    spec:
+      containers:
+      - image: tomcat:6.0.53-jre8
+        name: tomcat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tomcat6
+  name: tomcat6
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat6
+  type: NodePort
+```
+
+```bash
+$ kubectl apply -f tomcat6.yml
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## 2、Kubesphere
 
