@@ -1343,7 +1343,7 @@ token：
 XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
-# 二、常用场景
+# 二、演练与理解
 
 ## 1、常规命令部署一个tomcat
 
@@ -1448,16 +1448,16 @@ kind: Deployment
 metadata:
   labels:
     app: tomcat8
-  name: tomcat8
+  name: tomcat8-deploy
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: tomcat8
+      app: tomcat8-pod
   template:
     metadata:
       labels:
-        app: tomcat8
+        app: tomcat8-pod
     spec:
       containers:
       - image: tomcat:8.5-jre8-slim
@@ -1468,32 +1468,41 @@ kind: Service
 metadata:
   labels:
     app: tomcat8
-  name: tomcat8
+  name: tomcat8-service
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 8080
   selector:
-    app: tomcat8
+    app: tomcat8-pod
   type: NodePort
+
+---
+#ingress
+#old version: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-http
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: tomcat.fsmall.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat8-service
+            port:
+              number: 80
 ```
 
 ```bash
-$ kubectl apply -f tomcat8.yml
+$ kubectl apply -f tomcat8.yaml
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## 9、Kubesphere
 
