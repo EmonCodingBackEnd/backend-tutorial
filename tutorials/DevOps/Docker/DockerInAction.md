@@ -505,6 +505,43 @@ net.bridge.bridge-nf-call-iptables = 1
 [emon@emon ~]$ sudo systemctl restart docker
 ```
 
+### 1.4、配置docker代理服务器
+
+若加速器不好使，请使用代理服务器，前提是能科学上网，这里推荐一个：Aurora
+
+- 安装了Aurora后，通过【设置】=>【网络和 Internet】=>【代理】=>【手动设置代理】（发现是开启的）=>编辑，查看代理地址。
+
+![image-20240623081417693](images/image-20240623081417693.png)
+
+点击编辑后，看到的代理配置：
+
+![image-20240623081523824](images/image-20240623081523824.png)
+
+其中127.0.0.1可以更换为其他网卡地址（比如VMware Network Adapter VMnet8）：192.168.32.1
+
+![image-20240623081740357](images/image-20240623081740357.png)
+
+- 配置Docker代理
+
+```bash
+$ mkdir -p /etc/systemd/system/docker.service.d
+$ vim /etc/systemd/system/docker.service.d/proxy.conf
+```
+
+```bash
+[Service]
+Environment="HTTP_PROXY=http://192.168.32.1:29290"
+Environment="HTTPS_PROXY=http://192.168.32.1:29290"
+```
+
+- 重启Docker并查看代理配置情况
+
+```bash
+$ systemctl daemon-reload && systemctl restart docker
+$ systemctl show --property=Environment docker
+Environment=HTTP_PROXY=http://192.168.32.1:29290 HTTPS_PROXY=http://192.168.32.1:29290
+```
+
 ## 2、配置Docker服务
 
 ### 2.1、推荐通过配置sudo的方式：
@@ -1565,28 +1602,34 @@ net.ipv4.ip_forward=1
 
 ### 3.4、虚拟机挂起并恢复后docker网络问题
 
-- 第一步：首先确保IPv4的转发正常： **net.ipv4.ip_forward=1** 已经被设置
+- 查看设备状态
 
-- 第二步：将docker的网络接口设置为不被NetworkManager管理
+```bash
+$ nmcli device status
+```
 
-  - 添加配置
+- 临时unmanaged
 
-  ```bash
-  $ vim /etc/NetworkManager/conf.d/10-unmanage-docker-interfaces.conf
-  ```
+```bash
+$ nmcli device set xxx managed no
+```
 
-  配置文件中内容如下：
+- 永久unmanaged
 
-  ```bash
-  [keyfile]
-  unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:flannel*;interface-name:cni
-  ```
+```bash
+$ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
+```
 
-  - 重启NetworkManager
+```bash
+[keyfile]
+unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*
+```
 
-  ```bash
-  $ systemctl restart NetworkManager
-  ```
+- 重启NetworkManager
+
+```bash
+$ systemctl restart NetworkManager
+```
 
 ### 3.5、创建容器失败Operation not permitted
 
