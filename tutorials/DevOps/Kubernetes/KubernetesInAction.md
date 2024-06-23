@@ -1506,7 +1506,118 @@ $ kubectl apply -f tomcat8.yaml
 
 ## 9、Kubesphere
 
-https://github.com/kubesphere/kubesphere/blob/master/README_zh.md
+官网：https://kubesphere.com.cn/
+
+Github：https://github.com/kubesphere/kubesphere/blob/master/README_zh.md  可以查看与k8s版本关系
+
+v3.4.1安装文档：https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/introduction/overview/
+
+### 准备
+
+<span style="color:green;font-weight:bold;">3台3G的服务器，安装后emon剩余1.2G/emon2剩余1.8G/emon3剩余1.8G。</span>
+
+若直接按照官网安装，会报错：“Default StorageClass was not found”，原因是K8S没有默认的存储，需要安装storageclass和persistentVolumeClaim。
+
+- 创建文件 storageclass.yaml
+
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+```
+
+- 创建文件 persistentVolumeClaim.yaml
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pve
+spec:
+  accessModes:
+     - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: local-storage
+```
+
+### 下载kubersphere安装文件
+
+```bash
+$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/kubesphere-installer.yaml
+$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/cluster-configuration.yaml
+```
+
+### 执行安装
+
+- 安装存储
+
+```bash
+$ kubectl apply -f storageclass.yaml
+$ kubectl apply -f persistentVolumeClaim.yaml
+```
+
+- 将sc设置为默认存储
+
+```bash
+$ kubectl patch sc local-storage -p '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "true"}}}'
+```
+
+- 安装kubesphere
+
+```bash
+$ kubectl apply -f kubesphere-installer.yaml   
+$ kubectl apply -f cluster-configuration.yaml
+```
+
+### 查看安装日志，确认安装成功
+
+```bash
+$ kubectl logs -n kubesphere-system $(kubectl get po -n kubesphere-system|grep 'ks-installer'|awk '{print $1}') -f
+# 或者
+$ kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l 'app in (ks-install, ks-installer)' -o jsonpath='{.items[0].metadata.name}') -f
+```
+
+```bash
+**************************************************
+Waiting for all tasks to be completed ...
+task openpitrix status is successful  (1/4)
+task network status is successful  (2/4)
+task multicluster status is successful  (3/4)
+task monitoring status is successful  (4/4)
+**************************************************
+Collecting installation results ...
+#####################################################
+###              Welcome to KubeSphere!           ###
+#####################################################
+
+Console: http://192.168.32.116:30880
+Account: admin
+Password: P@88w0rd
+NOTES：
+  1. After you log into the console, please check the
+     monitoring status of service components in
+     "Cluster Management". If any service is not
+     ready, please wait patiently until all components 
+     are up and running.
+  2. Please change the default password after login.
+
+#####################################################
+https://kubesphere.io             2024-06-23 23:43:35
+#####################################################
+```
+
+### 登录
+
+http://192.168.32.116:30880
+
+修改密码为： admin/Ks@12345
+
+
 
 # 三、使用Kubespray部署Kubernetes生产集群
 
@@ -8314,8 +8425,7 @@ https://kubernetes.io/zh-cn/docs/reference/kubectl/introduction/
 | service     | svc     | false              |
 | pods        | pod/po  | true               |
 | deployments | deploy  | true               |
-
-
+| ingress     | ing     | false              |
 
 - 版本
 
