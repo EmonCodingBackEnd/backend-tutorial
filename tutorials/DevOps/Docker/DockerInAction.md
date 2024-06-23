@@ -396,9 +396,15 @@ Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc versi
 
 ```shell
 # 安装最新
-[emon@emon ~]$ sudo yum install -y docker-ce
+# $ sudo yum install -y docker-ce
 # 安装指定版本
-[emon@emon ~]$ sudo yum install -y docker-ce-18.06.3.ce
+# $ sudo yum install -y docker-ce-18.06.3.ce 【一个使用了很久的版本】
+# $ sudo yum install -y docker-ce-19.03.15
+$ sudo yum install -y docker-ce-20.10.24
+# $ sudo yum install -y docker-ce-23.0.6
+# $ sudo yum install -y docker-ce-24.0.9
+# $ sudo yum install -y docker-ce-25.0.5
+# $ sudo yum install -y docker-ce-26.1.4
 ```
 
 5. 启动
@@ -563,7 +569,7 @@ emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 
 ### 2.2、配置alias
 
-	配置永久的alias：
+配置永久的alias：
 
 ```shell
 # 如果是root用户安装的，不需要带sudo命令

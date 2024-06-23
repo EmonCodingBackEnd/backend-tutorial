@@ -1,59 +1,59 @@
-# KubernetesÊµ¼ù
+# Kuberneteså®è·µ
 
-[·µ»ØÁĞ±í](https://github.com/EmonCodingBackEnd/backend-tutorial)
+[è¿”å›åˆ—è¡¨](https://github.com/EmonCodingBackEnd/backend-tutorial)
 
 [TOC]
 
-# Áã¡¢k8s¿ìËÙÈëÃÅ
+# é›¶ã€k8så¿«é€Ÿå…¥é—¨
 
-Kubernetes¼ò³Æk8s¡£ÊÇÓÃÓÚ×Ô¶¯²¿Êğ£¬À©ËõºÍ¹ÜÀíÈİÆ÷»¯Ó¦ÓÃ³ÌĞòµÄ¿ªÔ´ÏµÍ³¡£
+Kubernetesç®€ç§°k8sã€‚æ˜¯ç”¨äºè‡ªåŠ¨éƒ¨ç½²ï¼Œæ‰©ç¼©å’Œç®¡ç†å®¹å™¨åŒ–åº”ç”¨ç¨‹åºçš„å¼€æºç³»ç»Ÿã€‚
 
-ÖĞÎÄ¹ÙÍø£ºhttps://kubernetes.io/zh-cn/¡¾ÍÆ¼ö¡¿
+ä¸­æ–‡å®˜ç½‘ï¼šhttps://kubernetes.io/zh-cn/ã€æ¨èã€‘
 
-ÖĞÎÄÉçÇø£ºhttps://www.kubernetes.org.cn/
+ä¸­æ–‡ç¤¾åŒºï¼šhttps://www.kubernetes.org.cn/
 
-¹Ù·½ÎÄµµ£ºhttps://kubernetes.io/zh/docs/home/
+å®˜æ–¹æ–‡æ¡£ï¼šhttps://kubernetes.io/zh/docs/home/
 
-ÉçÇøÎÄµµ£ºhttp://docs.kubernetes.org.cn/
+ç¤¾åŒºæ–‡æ¡£ï¼šhttp://docs.kubernetes.org.cn/
 
-# Ò»¡¢Kubeadmin°²×°K8S V1.20
+# ä¸€ã€Kubeadminå®‰è£…K8S V1.23
 
-µ¥µã°æ±¾£ºhttps://blog.csdn.net/Josh_scott/article/details/121961369?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=3
-
-
-
-¸ß¿ÉÓÃ°æ±¾£ºhttps://blog.csdn.net/qq_16538827/article/details/120175489
+å•ç‚¹ç‰ˆæœ¬ï¼šhttps://blog.csdn.net/Josh_scott/article/details/121961369?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=3
 
 
 
-KubeadmÊÇÒ»¸öK8s²¿Êğ¹¤¾ß£¬Ìá¹©kubeadm initºÍkubeadm join£¬ÓÃÓÚ¿ìËÙ²¿ÊğKubernetes¼¯Èº¡£
+é«˜å¯ç”¨ç‰ˆæœ¬ï¼šhttps://blog.csdn.net/qq_16538827/article/details/120175489
 
-## 1¡¢»ù´¡»·¾³×¼±¸
 
-### 1.1¡¢·şÎñÆ÷¹æ»®
 
-| »úÆ÷Ãû | ÏµÍ³ÀàĞÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊğÄÚÈİ |
+Kubeadmæ˜¯ä¸€ä¸ªK8séƒ¨ç½²å·¥å…·ï¼Œæä¾›kubeadm initå’Œkubeadm joinï¼Œç”¨äºå¿«é€Ÿéƒ¨ç½²Kubernetesé›†ç¾¤ã€‚
+
+## 1ã€åŸºç¡€ç¯å¢ƒå‡†å¤‡
+
+### 1.1ã€æœåŠ¡å™¨è§„åˆ’
+
+| æœºå™¨å | ç³»ç»Ÿç±»å‹  | IPåœ°å€         | å†…å­˜ | éƒ¨ç½²å†…å®¹ |
 | ------ | --------- | -------------- | ---- | -------- |
 | emon   | CentOS7.7 | 192.168.32.116 | >=2G | master   |
 | emon2  | CentOS7.7 | 192.168.32.117 | >=2G | worker   |
 | emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker   |
 
-### 1.2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓĞ½Úµã£©
+### 1.2ã€ç³»ç»Ÿè®¾ç½®ï¼ˆæ‰€æœ‰èŠ‚ç‚¹ï¼‰
 
-#### 1.2.1¡¢Ö÷»úÃû
+#### 1.2.1ã€ä¸»æœºå
 
-Ö÷»úÃû±ØĞëÃ¿¸ö½Úµã¶¼²»Ò»Ñù£¨½¨ÒéÃüÃû¹æ·¶£ºÊı×Ö+×ÖÄ¸+ÖĞ»®Ïß×éºÏ£¬²»Òª°üº¬ÆäËûÌØÊâ×Ö·û£©¡£
+ä¸»æœºåå¿…é¡»æ¯ä¸ªèŠ‚ç‚¹éƒ½ä¸ä¸€æ ·ï¼ˆå»ºè®®å‘½åè§„èŒƒï¼šæ•°å­—+å­—æ¯+ä¸­åˆ’çº¿ç»„åˆï¼Œä¸è¦åŒ…å«å…¶ä»–ç‰¹æ®Šå­—ç¬¦ï¼‰ã€‚
 
 ```bash
-# ²é¿´Ö÷»úÃû
+# æŸ¥çœ‹ä¸»æœºå
 $ hostname
-# ÉèÖÃÖ÷»úÃû£º×¢ÒâĞŞ¸ÄÎª¾ßÌåµÄÖ÷»úÃû
+# è®¾ç½®ä¸»æœºåï¼šæ³¨æ„ä¿®æ”¹ä¸ºå…·ä½“çš„ä¸»æœºå
 $ hostnamectl set-hostname emon
 ```
 
-#### 1.2.2¡¢±¾µØDNS
+#### 1.2.2ã€æœ¬åœ°DNS
 
-ÅäÖÃhost£¬Ê¹µÃËùÓĞ½ÚµãÖ®¼ä¿ÉÒÔÍ¨¹ıhostname»¥Ïà·ÃÎÊ¡£
+é…ç½®hostï¼Œä½¿å¾—æ‰€æœ‰èŠ‚ç‚¹ä¹‹é—´å¯ä»¥é€šè¿‡hostnameäº’ç›¸è®¿é—®ã€‚
 
 ```bash
 $ vim /etc/hosts
@@ -65,42 +65,42 @@ $ vim /etc/hosts
 192.168.32.118 emon3
 ```
 
-#### 1.2.3¡¢°²×°ÒÀÀµ°ü
+#### 1.2.3ã€å®‰è£…ä¾èµ–åŒ…
 
 ```bash
-# ¸üĞÂyum
+# æ›´æ–°yum
 $ yum update -y
-# °²×°ÒÀÀµ°ü
+# å®‰è£…ä¾èµ–åŒ…
 $ yum install -y socat conntrack ipvsadm ipset jq sysstat curl iptables libseccomp yum-utils
 ```
 
-#### 1.2.4¡¢¹Ø±Õ·À»ğÇ½¡¢ÖØÖÃiptables¡¢¹Ø±Õswap¡¢¹Ø±ÕselinuxºÍdnsmasq
+#### 1.2.4ã€å…³é—­é˜²ç«å¢™ã€é‡ç½®iptablesã€å…³é—­swapã€å…³é—­selinuxå’Œdnsmasq
 
 ```bash
-# ¹Ø±Õ·À»ğÇ½
+# å…³é—­é˜²ç«å¢™
 $ systemctl stop firewalld && systemctl disable firewalld
 
-# ÉèÖÃiptables¹æÔò
+# è®¾ç½®iptablesè§„åˆ™
 $ iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat && iptables -P FORWARD ACCEPT
 
-# ¹Ø±Õswap
+# å…³é—­swap
 $ swapoff -a
-# È¥µôswap¿ª»úÆô¶¯
+# å»æ‰swapå¼€æœºå¯åŠ¨
 $ sed -i '/swap/s/^\(.*\)$/#\1/g' /etc/fstab
 
-# ¹Ø±Õselinux
+# å…³é—­selinux
 $ setenforce 0
-# ·ÀÖ¹ÖØÆô»Ö¸´
+# é˜²æ­¢é‡å¯æ¢å¤
 $ sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
 
-# ¹Ø±Õdnsmasq£¨·ñÔò¿ÉÄÜµ¼ÖÂdockerÈİÆ÷ÎŞ·¨½âÎöÓòÃû£©£ºÈç¹ûÃ»ÓĞ¸ÃÆô¶¯µ¥Ôª£¬¿ÉÒÔºöÂÔ£¡
+# å…³é—­dnsmasqï¼ˆå¦åˆ™å¯èƒ½å¯¼è‡´dockerå®¹å™¨æ— æ³•è§£æåŸŸåï¼‰ï¼šå¦‚æœæ²¡æœ‰è¯¥å¯åŠ¨å•å…ƒï¼Œå¯ä»¥å¿½ç•¥ï¼
 $ systemctl stop dnsmasq && systemctl disable dnsmasq
 ```
 
-#### 1.2.5¡¢ÏµÍ³²ÎÊıÉèÖÃ
+#### 1.2.5ã€ç³»ç»Ÿå‚æ•°è®¾ç½®
 
 ```bash
-# ½«ÇÅ½ÓµÄIPv4Á÷Á¿´«µİµ½ iptables µÄÁ´£º
+# å°†æ¡¥æ¥çš„IPv4æµé‡ä¼ é€’åˆ° iptables çš„é“¾ï¼š
 $ cat > /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -109,21 +109,21 @@ net.ipv4.ip_forward = 1
 vm.swappiness = 0
 vm.overcommit_memory = 1
 EOF
-# ÉúĞ§ÎÄ¼ş
+# ç”Ÿæ•ˆæ–‡ä»¶
 $ sysctl -p /etc/sysctl.d/kubernetes.conf
 ```
 
-> Èç¹ûÖ´ĞĞsysctl -p±¨´í£º
+> å¦‚æœæ‰§è¡Œsysctl -pæŠ¥é”™ï¼š
 >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 > >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 >
-> ÁÙÊ±·½°¸£¡ÎŞĞèÖØÆô£¡
+> ä¸´æ—¶æ–¹æ¡ˆï¼æ— éœ€é‡å¯ï¼
 >
 > > modprobe br_netfilter
 >
-> ÓÀ¾Ã·½°¸£¡ÖØÆôºóÉúĞ§£¡
+> æ°¸ä¹…æ–¹æ¡ˆï¼é‡å¯åç”Ÿæ•ˆï¼
 >
 > > cat > /etc/rc.sysinit << EOF
 > > #!/bin/bash
@@ -143,24 +143,24 @@ $ sysctl -p /etc/sysctl.d/kubernetes.conf
 > > chmod 755 /etc/sysconfig/modules/br_netfilter.modules
 > > lsmod |grep br_netfilter
 
-#### 1.2.6¡¢ÅäÖÃSSHÃâÃÜµÇÂ¼£¨½öÖĞ×ª½Úµã£©
+#### 1.2.6ã€é…ç½®SSHå…å¯†ç™»å½•ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
-ÎªÁË·½±ãÎÄ¼şµÄcopyÎÒÃÇÑ¡ÔñÒ»¸öÖĞ×ª½Úµã£¨Ëæ±ãÒ»¸ö½Úµã£¬¿ÉÒÔÊÇ¼¯ÈºÖĞµÄÒ²¿ÉÒÔÊÇ·Ç¼¯ÈºÖĞµÄ£©£¬ÅäÖÃºÃ¸úÆäËûËùÓĞ½ÚµãµÄÃâÃÜµÇÂ¼¡£ÕâÀïÑ¡Ôñemon½Úµã£º
+ä¸ºäº†æ–¹ä¾¿æ–‡ä»¶çš„copyæˆ‘ä»¬é€‰æ‹©ä¸€ä¸ªä¸­è½¬èŠ‚ç‚¹ï¼ˆéšä¾¿ä¸€ä¸ªèŠ‚ç‚¹ï¼Œå¯ä»¥æ˜¯é›†ç¾¤ä¸­çš„ä¹Ÿå¯ä»¥æ˜¯éé›†ç¾¤ä¸­çš„ï¼‰ï¼Œé…ç½®å¥½è·Ÿå…¶ä»–æ‰€æœ‰èŠ‚ç‚¹çš„å…å¯†ç™»å½•ã€‚è¿™é‡Œé€‰æ‹©emonèŠ‚ç‚¹ï¼š
 
 ```bash
-# ¿´¿´ÊÇ·ñÒÑ¾­´æÔÚrsa¹«Ô¿
+# çœ‹çœ‹æ˜¯å¦å·²ç»å­˜åœ¨rsaå…¬é’¥
 $ cat ~/.ssh/id_rsa.pub
 
-# Èç¹û²»´æÔÚ¾Í´´½¨Ò»¸öĞÂµÄ
+# å¦‚æœä¸å­˜åœ¨å°±åˆ›å»ºä¸€ä¸ªæ–°çš„
 $ ssh-keygen -t rsa
 
-# °Ñid_rsa.pubÎÄ¼şÄÚÈİcopyµ½ÆäËû»úÆ÷µÄÊÚÈ¨ÎÄ¼şÖĞ
+# æŠŠid_rsa.pubæ–‡ä»¶å†…å®¹copyåˆ°å…¶ä»–æœºå™¨çš„æˆæƒæ–‡ä»¶ä¸­
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
 ```
 
-#### 1.2.7¡¢ÒÆ³ıdockerÏà¹ØÈí¼ş°ü£¨¿ÉÑ¡£©
+#### 1.2.7ã€ç§»é™¤dockerç›¸å…³è½¯ä»¶åŒ…ï¼ˆå¯é€‰ï¼‰
 
 ```bash
 $ yum remove -y docker* container-selinux
@@ -168,64 +168,64 @@ $ rm -f /etc/docker/daemon.json
 $ rm -rf /var/lib/docker/
 ```
 
-Èç¹ûyum±¨¸æËµÒÔÉÏ°²×°°üÎ´°²×°£¬Î´Æ¥Åä£¬Î´É¾³ıÈÎºÎ°²×°°ü£¬±íÊ¾»·¾³¸É¾»£¬Ã»ÓĞÀúÊ·ÒÅÁô¾É°æ°²×°¡£
+å¦‚æœyumæŠ¥å‘Šè¯´ä»¥ä¸Šå®‰è£…åŒ…æœªå®‰è£…ï¼ŒæœªåŒ¹é…ï¼Œæœªåˆ é™¤ä»»ä½•å®‰è£…åŒ…ï¼Œè¡¨ç¤ºç¯å¢ƒå¹²å‡€ï¼Œæ²¡æœ‰å†å²é—ç•™æ—§ç‰ˆå®‰è£…ã€‚
 
 
 
-## 2¡¢»ù´¡°²×°£¨ËùÓĞ½Úµã£©
+## 2ã€åŸºç¡€å®‰è£…ï¼ˆæ‰€æœ‰èŠ‚ç‚¹ï¼‰
 
-### 2.1¡¢°²×°Docker
+### 2.1ã€å®‰è£…Docker
 
-[²é¿´¹Ù·½CentOS°²×°Docker½Ì³Ì](https://docs.docker.com/engine/install/centos/)
+[æŸ¥çœ‹å®˜æ–¹CentOSå®‰è£…Dockeræ•™ç¨‹](https://docs.docker.com/engine/install/centos/)
 
-#### 2.1.1¡¢CentOS»·¾³ÏÂ°²×°Docker
+#### 2.1.1ã€CentOSç¯å¢ƒä¸‹å®‰è£…Docker
 
-1. °²×°ĞèÒªµÄÈí¼ş°ü£¬yum-utilÌá¹©yum-config-manager¹¦ÄÜ£¬ÁíÍâÁ½¸öÊÇdevicemapperÇı¶¯ÒÀÀµµÄ
+1. å®‰è£…éœ€è¦çš„è½¯ä»¶åŒ…ï¼Œyum-utilæä¾›yum-config-manageråŠŸèƒ½ï¼Œå¦å¤–ä¸¤ä¸ªæ˜¯devicemapperé©±åŠ¨ä¾èµ–çš„
 
 ```shell
 $ yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
-2. ÉèÖÃyumÔ´
+2. è®¾ç½®yumæº
 
 ```shell
 # $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-# ÈôÉÏÃæÃüÁîÍøÂç²»¿É´ï£¬ÇëÀûÓÃ°¢ÀïÔÆ
+# è‹¥ä¸Šé¢å‘½ä»¤ç½‘ç»œä¸å¯è¾¾ï¼Œè¯·åˆ©ç”¨é˜¿é‡Œäº‘
 $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
-3. ¿ÉÒÔ²é¿´ËùÓĞ²Ö¿âÖĞËùÓĞdocker°æ±¾£¬²¢Ñ¡Ôñ°²×°ÌØ¶¨µÄ°æ±¾
+3. å¯ä»¥æŸ¥çœ‹æ‰€æœ‰ä»“åº“ä¸­æ‰€æœ‰dockerç‰ˆæœ¬ï¼Œå¹¶é€‰æ‹©å®‰è£…ç‰¹å®šçš„ç‰ˆæœ¬
 
 ```shell
 $ yum list docker-ce --showduplicates |sort -r
 ```
 
-4. °²×°docker
+4. å®‰è£…docker
 
 ```shell
-# °²×°×îĞÂ
+# å®‰è£…æœ€æ–°
 # $ yum install -y docker-ce
-# °²×°Ö¸¶¨°æ±¾
-# $ yum install -y docker-ce-18.06.3.ce ¡¾Ò»¸öÊ¹ÓÃÁËºÜ¾ÃµÄ°æ±¾¡¿
-$ yum install -y docker-ce-19.03.15
-# $ yum install -y docker-ce-20.10.24
+# å®‰è£…æŒ‡å®šç‰ˆæœ¬
+# $ yum install -y docker-ce-18.06.3.ce ã€ä¸€ä¸ªä½¿ç”¨äº†å¾ˆä¹…çš„ç‰ˆæœ¬ã€‘
+# $ yum install -y docker-ce-19.03.15
+$ yum install -y docker-ce-20.10.24
 # $ yum install -y docker-ce-23.0.6
 # $ yum install -y docker-ce-24.0.9
 # $ yum install -y docker-ce-25.0.5
 # $ yum install -y docker-ce-26.1.4
 ```
 
-> `docker-ce-cli` ÊÇDockerµÄÃüÁîĞĞ¿Í»§¶Ë£¬ÓÃÓÚÓëDockerÊØ»¤³ÌĞò½»»¥£»`docker-ce` ÊÇDockerµÄÉçÇø°æ£¬Ìá¹©ÁËÍêÕûµÄÈİÆ÷»¯Æ½Ì¨£»¶ø  `containerd.io`ÔòÊÇµ×²ãµÄÈİÆ÷ÔËĞĞÊ±×é¼ş£¬ÓÃÓÚ¹ÜÀíÈİÆ÷µÄÉúÃüÖÜÆÚºÍ¾µÏñ¹ÜÀí¡£ÕâĞ©×é¼şÔÚDockerÉúÌ¬ÏµÍ³ÖĞ¸÷×Ô·¢»Ó×Å²»Í¬µÄ×÷ÓÃ£¬¹²Í¬¹¹³ÉÁËÇ¿´óµÄÈİÆ÷»¯½â¾ö·½°¸¡£
+> `docker-ce-cli` æ˜¯Dockerçš„å‘½ä»¤è¡Œå®¢æˆ·ç«¯ï¼Œç”¨äºä¸Dockerå®ˆæŠ¤ç¨‹åºäº¤äº’ï¼›`docker-ce` æ˜¯Dockerçš„ç¤¾åŒºç‰ˆï¼Œæä¾›äº†å®Œæ•´çš„å®¹å™¨åŒ–å¹³å°ï¼›è€Œ  `containerd.io`åˆ™æ˜¯åº•å±‚çš„å®¹å™¨è¿è¡Œæ—¶ç»„ä»¶ï¼Œç”¨äºç®¡ç†å®¹å™¨çš„ç”Ÿå‘½å‘¨æœŸå’Œé•œåƒç®¡ç†ã€‚è¿™äº›ç»„ä»¶åœ¨Dockerç”Ÿæ€ç³»ç»Ÿä¸­å„è‡ªå‘æŒ¥ç€ä¸åŒçš„ä½œç”¨ï¼Œå…±åŒæ„æˆäº†å¼ºå¤§çš„å®¹å™¨åŒ–è§£å†³æ–¹æ¡ˆã€‚
 >
-> `docker-ce`£ºËüÊÇÒ»¸öÍêÕûµÄÈİÆ÷»¯Æ½Ì¨£¬°üÀ¨ÁË**Docker-ce-cli**ÒÔ¼°ÆäËû±ØÒªµÄ×é¼ş£¬ÈçDockerÊØ»¤³ÌĞòºÍ»ù´¡ÉèÊ©¹ÜÀí¹¤¾ß
+> `docker-ce`ï¼šå®ƒæ˜¯ä¸€ä¸ªå®Œæ•´çš„å®¹å™¨åŒ–å¹³å°ï¼ŒåŒ…æ‹¬äº†**Docker-ce-cli**ä»¥åŠå…¶ä»–å¿…è¦çš„ç»„ä»¶ï¼Œå¦‚Dockerå®ˆæŠ¤ç¨‹åºå’ŒåŸºç¡€è®¾æ–½ç®¡ç†å·¥å…·
 
-5. Æô¶¯
+5. å¯åŠ¨
 
 ```shell
-$ systemctl start docker
+$ systemctl enable docker && systemctl start docker
 ```
 
-6. ÑéÖ¤°²×°
+6. éªŒè¯å®‰è£…
 
 ```shell
 $ docker version
@@ -233,54 +233,77 @@ $ docker info
 $ docker run hello-world
 ```
 
-#### 2.1.2¡¢ÅäÖÃdocker¼ÓËÙÆ÷
+#### 2.1.2ã€é…ç½®Dockerçš„cgroup driver
 
-- °¢ÀïÔÆ
+k8sçš„v1.23ç‰ˆæœ¬ä½¿ç”¨çš„ systemdï¼Œè€ŒDockerçš„20.10ç‰ˆæœ¬é»˜è®¤ 
 
-µÇÂ¼°¢Àï¿ª·¢ÕßÆ½Ì¨£º https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
-
-µã»÷¡¾¾µÏñËÑË÷¡¿°´Å¥£¬×Ô¶¯Ìø×ªµ½¿ØÖÆÌ¨µÄ¾µÏñËÑË÷£¬¸ù¾İÌáÊ¾×¢²á²¢µÇÂ¼£º
-
-ÔÚ×ó²à¡¾¾µÏñ¹¤¾ß¡¿ÖĞÑ¡Ôñ¡¾¾µÏñ¼ÓËÙÆ÷¡¿£¬ÓÒ±ßÊÇÉú³ÉµÄ¼ÓËÙµØÖ·£º±ÈÈçÎÒµÄ£º`https://pyk8pf3k.mirror.aliyuncs.com`£¬Ö´ĞĞÃüÁîÅäÖÃÉÏ¼´¿É£º
+- æŸ¥çœ‹Dockerçš„cgroup
 
 ```bash
-# - registry-mirrors£º¼ÓËÙÆ÷µØÖ·
-# - graph: ÉèÖÃdockerÊı¾İÄ¿Â¼£ºÑ¡Ôñ±È½Ï´óµÄ·ÖÇø£¨Èç¹ûÕâÀïÊÇ¸ùÄ¿Â¼¾Í²»ĞèÒªÅäÖÃÁË£¬Ä¬ÈÏÎª/var/lib/docker£©
-# - data-root£º°æ±¾docker-ce-23.0.6¼°ÒÔÉÏ£¬graph -> data-root£¬·ñÔò±¨´íActive: failed (Result: start-limit
-# - exec-opts: ÉèÖÃcgroup driver£¨Ä¬ÈÏÊÇcgroupfs£¬²»ÍÆ¼öÉèÖÃsystemd£©
-# - insecure-registries£ºÉèÖÃË½·ş¿ÉĞÅµØÖ·
-# - debug: true ¿ªÆôµ÷ÊÔ£¬ÈôÆô¶¯Ê§°Ü£¬¿ÉÒÔÔÚ /var/log/messages ²é¿´Ô­Òò
-# "data-root": "/var/lib/docker",
-# "exec-opts": ["native.cgroupdriver=cgroupfs"],
-tee /etc/docker/daemon.json <<-'EOF'
+$ docker info|grep group
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 1
+```
+
+```bash
+$ sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["https://pyk8pf3k.mirror.aliyuncs.com","https://dockerproxy.com","https://mirror.baidubce.com","https://docker.nju.edu.cn","https://docker.mirrors.sjtug.sjtu.edu.cn","https://docker.mirrors.ustc.edu.cn"],
-  "insecure-registries": ["192.168.32.116:5080"]
+  "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
+$ systemctl restart docker
 ```
 
-- ²é¿´
+#### 2.1.3ã€é…ç½®Dockerä»£ç†æœåŠ¡
+
+- é…ç½®Dockerä»£ç†
 
 ```bash
-$ cat /etc/docker/daemon.json 
+$ mkdir -p /etc/systemd/system/docker.service.d
+$ vim /etc/systemd/system/docker.service.d/proxy.conf
 ```
-
-- ÖØÆô
 
 ```bash
-$ systemctl enable docker && systemctl restart docker
+[Service]
+Environment="HTTP_PROXY=http://192.168.32.1:29290"
+Environment="HTTPS_PROXY=http://192.168.32.1:29290"
 ```
 
-### 2.2¡¢°²×°kubeadm/kubelet/kubectl
+- é‡å¯Dockerå¹¶æŸ¥çœ‹ä»£ç†é…ç½®æƒ…å†µ
 
-K8SÒÀÀµµÄDocker×î¼Ñ°æ±¾£º19.03
+```bash
+$ systemctl daemon-reload && systemctl restart docker
+$ systemctl show --property=Environment docker
+Environment=HTTP_PROXY=http://192.168.32.1:29290 HTTPS_PROXY=http://192.168.32.1:29290
+```
 
-https://github.com/kubernetes/kubernetes/blob/release-1.20/build/dependencies.yaml
+#### 2.1.4ã€é…ç½®alias
 
-#### 2.2.1¡¢°²×°
+é…ç½®æ°¸ä¹…çš„aliasï¼š
 
-1. ÉèÖÃk8sÔ´
+```shell
+# å¦‚æœæ˜¯rootç”¨æˆ·å®‰è£…çš„ï¼Œä¸éœ€è¦å¸¦sudoå‘½ä»¤
+[emon@emon ~]$ vim ~/.bashrc
+alias docker="sudo /usr/bin/docker"
+alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
+alias dockerps="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
+```
+
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
+
+```shell
+[emon@emon ~]$ source ~/.bashrc
+```
+
+### 2.2ã€å®‰è£…kubeadm/kubelet/kubectl
+
+K8Sä¾èµ–çš„Dockeræœ€ä½³ç‰ˆæœ¬ï¼š 20.10
+
+https://github.com/kubernetes/kubernetes/blob/release-1.23/build/dependencies.yaml
+
+#### 2.2.1ã€å®‰è£…
+
+1. è®¾ç½®k8sæº
 
 ```bash
 $ cat > /etc/yum.repos.d/kubernetes.repo << EOF
@@ -295,27 +318,31 @@ EOF
 $ yum update
 ```
 
-2.  °²×°kubeadm/kubelet/kubectl
+2. å¯ä»¥æŸ¥çœ‹æ‰€æœ‰ä»“åº“ä¸­æ‰€æœ‰k8sç‰ˆæœ¬ï¼Œå¹¶é€‰æ‹©å®‰è£…ç‰¹å®šçš„ç‰ˆæœ¬
 
 ```bash
-$ yum install -y kubelet-1.20.15 kubeadm-1.20.15 kubectl-1.20.15
-# ÔÚ kubeadm init ºó join ÃüÁî£¬kubelet·şÎñ»áÆô¶¯£¬ÕâÀï²»ĞèÒªÊÖ¹¤Æô¶¯£¬µ«ĞèÒª¼ÓÈë¿ª»úÆô¶¯£¡£¡£¡
+$ yum list kubelet --showduplicates |sort -r
+```
+
+3. å®‰è£…kubeadm/kubelet/kubectl
+
+```bash
+$ yum install -y kubelet-1.23.17 kubeadm-1.23.17 kubectl-1.23.17
+# åœ¨ kubeadm init å join å‘½ä»¤ï¼ŒkubeletæœåŠ¡ä¼šå¯åŠ¨ï¼Œè¿™é‡Œä¸éœ€è¦æ‰‹å·¥å¯åŠ¨ï¼Œä½†éœ€è¦åŠ å…¥å¼€æœºå¯åŠ¨ï¼ï¼ï¼ï¼ˆmasterå’ŒworkerèŠ‚ç‚¹ï¼‰
 $ systemctl enable kubelet
 ```
 
+## 3ã€éƒ¨ç½²Kubernetes Materï¼ˆä»…masterèŠ‚ç‚¹ï¼‰
 
+### 3.0ã€é¢„ä¸‹è½½é•œåƒï¼ˆå¼€å¯Dockerä»£ç†å¯å¿½ç•¥ï¼‰
 
-## 3¡¢²¿ÊğKubernetes Mater£¨½ömaster½Úµã£©
-
-### 3.0¡¢Ô¤ÏÂÔØ¾µÏñ
-
-- ²é¿´ÒÀÀµ¾µÏñ
+- æŸ¥çœ‹ä¾èµ–é•œåƒ
 
 ```bash
 $ kubeadm config images list
 ```
 
-- ÅäÖÃ²¢Ö´ĞĞ½Å±¾ 
+- é…ç½®å¹¶æ‰§è¡Œè„šæœ¬ 
 
 ```bash
 $ vim master_images.sh
@@ -325,59 +352,59 @@ $ vim master_images.sh
 #!/bin/bash
 
 images=(
-	kube-apiserver:v1.20.15
-	kube-controller-manager:v1.20.15
-	kube-scheduler:v1.20.15
-	kube-proxy:v1.20.15
-	pause:3.2
-	etcd:3.4.13-0
-	coredns:1.7.0
+	kube-apiserver:v1.23.17
+	kube-controller-manager:v1.23.17
+	kube-scheduler:v1.23.17
+	kube-proxy:v1.23.17
+	pause:3.6
+	etcd:3.5.6-0
+	coredns:v1.8.6
 )
 
 for imageName in ${images[@]} ; do
     docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
 #   docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName  k8s.gcr.io/$imageName
 done
-# Èô²»Ï£ÍûÖÆ¶¨kubeadm initµÄ¾µÏñ--image-repository£¬ÕâÀï¿ÉÒÔ·Å¿ªdocker tagµ½k8s.gcr.io
+# è‹¥ä¸å¸Œæœ›åˆ¶å®škubeadm initçš„é•œåƒ--image-repositoryï¼Œè¿™é‡Œå¯ä»¥æ”¾å¼€docker tagåˆ°k8s.gcr.io
 ```
 
 ```bash
 $ chmod +x master_images.sh
 ```
 
-- Ö´ĞĞ
+- æ‰§è¡Œ
 
 ```bash
 $ sh master_images.sh
 ```
 
-### 3.1¡¢kubeadm init
+### 3.1ã€kubeadm init
 
-- ³õÊ¼»¯
+- åˆå§‹åŒ–
 
 ```bash
-# ÔÚMasterÉÏÖ´ĞĞ£¬ÓÉÓÚÄ¬ÈÏÀ­È¡¾µÏñµØÖ· k8s.gcr.io ¹úÄÚÎŞ·¨·ÃÎÊ£¬ÕâÀïÖ¸¶¨°¢ÀïÔÆ¾µÏñ²Ö¿âµØÖ·¡£
-# Ö´ĞĞ¸Ã²½ÖèÖ®Ç°£¬Ò²¿ÉÒÔÖ´ĞĞ kubeadm config images pull Ô¤ÏÂÔØ¾µÏñ
-# ²é¿´¾µÏñ kubeadm config images list ²é¿´Ä¬ÈÏÅäÖÃ kubeadm config print init-defaults
-# ÎŞÀà±ğÓò¼äÂ·ÓÉ (Classless Inter -Domain Routing¡¢CIDR)ÊÇÒ»¸öÓÃÓÚ¸øÓÃ»§·ÖÅäIPµØÖ·ÒÔ¼°ÔÚ»¥ÁªÍøÉÏÓĞĞ§µØÂ·ÓÉIPÊı¾İ°üµÄ¶Ô# IPµØÖ·½øĞĞ¹éÀàµÄ·½·¨¡£
-# ¾µÏñµØÖ·Ò²¿ÉÒÔÊÇ registry.aliyuncs.com/google_containers
+# åœ¨Masterä¸Šæ‰§è¡Œï¼Œç”±äºé»˜è®¤æ‹‰å–é•œåƒåœ°å€ k8s.gcr.io å›½å†…æ— æ³•è®¿é—®ï¼Œè¿™é‡ŒæŒ‡å®šé˜¿é‡Œäº‘é•œåƒä»“åº“åœ°å€ã€‚
+# æ‰§è¡Œè¯¥æ­¥éª¤ä¹‹å‰ï¼Œä¹Ÿå¯ä»¥æ‰§è¡Œ kubeadm config images pull é¢„ä¸‹è½½é•œåƒ
+# æŸ¥çœ‹é•œåƒ kubeadm config images list æŸ¥çœ‹é»˜è®¤é…ç½® kubeadm config print init-defaults
+# æ— ç±»åˆ«åŸŸé—´è·¯ç”± (Classless Inter -Domain Routingã€CIDR)æ˜¯ä¸€ä¸ªç”¨äºç»™ç”¨æˆ·åˆ†é…IPåœ°å€ä»¥åŠåœ¨äº’è”ç½‘ä¸Šæœ‰æ•ˆåœ°è·¯ç”±IPæ•°æ®åŒ…çš„å¯¹# IPåœ°å€è¿›è¡Œå½’ç±»çš„æ–¹æ³•ã€‚
+# --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers æŒ‡å®šé•œåƒåœ°å€ï¼Œé»˜è®¤æ˜¯ k8s.gcr.io
+# é•œåƒåœ°å€ä¹Ÿå¯ä»¥æ˜¯ registry.aliyuncs.com/google_containers è¯·æ³¨æ„ï¼šæ²¡æœ‰å¼€å¯Dockerä»£ç†æœåŠ¡å™¨æ—¶å¿…é¡»æŒ‡å®š
 $ kubeadm init \
 --apiserver-advertise-address=192.168.32.116 \
---image-repository registry.cn-hangzhou.aliyuncs.com/google_containers \
---kubernetes-version v1.20.15 \
+--kubernetes-version v1.23.17 \
 --service-cidr=10.96.0.0/16 \
 --pod-network-cidr=10.244.0.0/16
 
-# Ê¹ÓÃ kubectl ¹¤¾ß£¨Master&&Node½Úµã£©
+# ä½¿ç”¨ kubectl å·¥å…·ï¼ˆMaster&&NodeèŠ‚ç‚¹ï¼‰
 $ mkdir -p $HOME/.kube 
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# ¡¾¶şÑ¡Ò»¡¿Èç¹ûÊÇrootÓÃ»§£¬¿ÉÒÔÊ¹ÓÃÈçÏÂÅäÖÃÌæ»»ÉÏÃæ£º£¨ÓëÉÏÃæ¶şÑ¡Ò»£©
+# ã€äºŒé€‰ä¸€ã€‘å¦‚æœæ˜¯rootç”¨æˆ·ï¼Œå¯ä»¥ä½¿ç”¨å¦‚ä¸‹é…ç½®æ›¿æ¢ä¸Šé¢ï¼šï¼ˆä¸ä¸Šé¢äºŒé€‰ä¸€ï¼‰
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
-# ¡¾ÁÙÊ±¡¿ÎŞĞèÖ´ĞĞ£¬½ö×ö¼ÇÂ¼²Î¿¼
-# ==============================³õÊ¼»¯²¿·ÖÈÕÖ¾==============================
+# ã€ä¸´æ—¶ã€‘æ— éœ€æ‰§è¡Œï¼Œä»…åšè®°å½•å‚è€ƒ
+# ==============================åˆå§‹åŒ–éƒ¨åˆ†æ—¥å¿—==============================
 Your Kubernetes control-plane has initialized successfully!
 
 To start using your cluster, you need to run the following as a regular user:
@@ -396,93 +423,92 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 
 Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 192.168.32.116:6443 --token 6tkbi6.v2f0u9gvsr9aq3bw \
-    --discovery-token-ca-cert-hash sha256:367b7db9c3756a089122521b9cdaa9c287d8026d97f61b17d671bd12f06783fe
+kubeadm join 192.168.32.116:6443 --token h5hwp6.uee0zzwxesbghzom \
+	--discovery-token-ca-cert-hash sha256:689bd2149ef17b545e03507289c660c1c8795ff1d88405c7b826364a86f8c246
 ```
 
-- µÈ´ıÒ»Ğ¡»áºó£¬²é¿´µ±Ç°pods
+- ç­‰å¾…ä¸€å°ä¼šåï¼ŒæŸ¥çœ‹å½“å‰pods
 
 ```bash
 $ kubectl get pods -n kube-system
 NAME                           READY   STATUS    RESTARTS   AGE
-coredns-54d67798b7-xnb28       0/1     Pending   0          7m33s
-coredns-54d67798b7-zctdm       0/1     Pending   0          7m33s
-etcd-emon                      1/1     Running   0          7m47s
-kube-apiserver-emon            1/1     Running   0          7m47s
-kube-controller-manager-emon   1/1     Running   0          7m47s
-kube-proxy-zwqzm               1/1     Running   0          7m33s
-kube-scheduler-emon            1/1     Running   0          7m47s
+coredns-74ff55c5b-q9t88        0/1     Pending   0          4m58s
+coredns-74ff55c5b-xjsdg        0/1     Pending   0          4m58s
+etcd-emon                      1/1     Running   0          5m12s
+kube-apiserver-emon            1/1     Running   0          5m12s
+kube-controller-manager-emon   1/1     Running   0          5m12s
+kube-proxy-8b7qv               1/1     Running   0          4m58s
+kube-scheduler-emon            1/1     Running   0          5m12s
 $ kubectl get pods -n kube-system -o wide
-NAME                           READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
-coredns-54d67798b7-h2797       1/1     Running   0          32h   10.244.0.3       emon    <none>           <none>
-coredns-54d67798b7-qqngc       1/1     Running   0          32h   10.244.0.2       emon    <none>           <none>
-etcd-emon                      1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
-kube-apiserver-emon            1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
-kube-controller-manager-emon   1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
-kube-proxy-cz2gt               1/1     Running   0          31h   192.168.32.118   emon3   <none>           <none>
-kube-proxy-mfgtr               1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
-kube-proxy-nzkxz               1/1     Running   0          31h   192.168.32.117   emon2   <none>           <none>
-kube-scheduler-emon            1/1     Running   0          32h   192.168.32.116   emon    <none>           <none>
-
+NAME                           READY   STATUS    RESTARTS   AGE     IP               NODE     NOMINATED NODE   READINESS GATES
+coredns-74ff55c5b-q9t88        0/1     Pending   0          5m29s   <none>           <none>   <none>           <none>
+coredns-74ff55c5b-xjsdg        0/1     Pending   0          5m29s   <none>           <none>   <none>           <none>
+etcd-emon                      1/1     Running   0          5m43s   192.168.32.116   emon     <none>           <none>
+kube-apiserver-emon            1/1     Running   0          5m43s   192.168.32.116   emon     <none>           <none>
+kube-controller-manager-emon   1/1     Running   0          5m43s   192.168.32.116   emon     <none>           <none>
+kube-proxy-8b7qv               1/1     Running   0          5m29s   192.168.32.116   emon     <none>           <none>
+kube-scheduler-emon            1/1     Running   0          5m43s   192.168.32.116   emon     <none>           <none>
 $ kubectl get all
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
-service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   8h
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   7m57s
+$ kubectl get nodes
+NAME   STATUS     ROLES                  AGE    VERSION
+emon   NotReady   control-plane,master   8m1s   v1.23.17
 $ kubectl get ns
 NAME              STATUS   AGE
-default           Active   8h
-kube-flannel      Active   8h
-kube-node-lease   Active   8h
-kube-public       Active   8h
-kube-system       Active   8h
+default           Active   8m13s
+kube-node-lease   Active   8m14s
+kube-public       Active   8m14s
+kube-system       Active   8m14s
 ```
 
-·ÖÎö£ºcorednsÊÇPending×´Ì¬£¬±íÊ¾È±ÉÙÍøÂç²å¼ş£¬ÏÂÃæ¿ªÊ¼°²×°ÍøÂç²å¼ş£¡
+åˆ†æï¼šcorednsæ˜¯PendingçŠ¶æ€ï¼Œè¡¨ç¤ºç¼ºå°‘ç½‘ç»œæ’ä»¶ï¼Œä¸‹é¢å¼€å§‹å®‰è£…ç½‘ç»œæ’ä»¶ï¼
 
-ÍøÂç²å¼şÁĞ±í£º https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/addons/
+ç½‘ç»œæ’ä»¶åˆ—è¡¨ï¼š https://kubernetes.io/zh-cn/docs/concepts/cluster-administration/addons/
 
-### 3.2¡¢ÍøÂç²å¼ş¶àÑ¡1-[Calico](https://www.tigera.io/project-calico/)£¨½ömaster½Úµã£©
+### 3.2ã€ç½‘ç»œæ’ä»¶å¤šé€‰1-[Calico](https://www.tigera.io/project-calico/)ï¼ˆä»…masterèŠ‚ç‚¹ï¼‰
 
-GitHub£º https://github.com/projectcalico/calico
+GitHubï¼š https://github.com/projectcalico/calico
 
-¹ÙÍø£ºhttps://docs.tigera.io/archive
+å®˜ç½‘ï¼šhttps://docs.tigera.io/archive
 
-ÏµÍ³ĞèÇó£º https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
+ç³»ç»Ÿéœ€æ±‚ï¼š https://docs.tigera.io/calico/latest/getting-started/kubernetes/requirements
 
-#### 3.2.1¡¢ÇĞ»»Ä¿Â¼
+#### 3.2.1ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
-$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+$ mkdir -pv /root/k8s_soft/k8s_v1.23.17 && cd /root/k8s_soft/k8s_v1.23.17
 ```
 
-Õâ²¿·ÖÎÒÃÇ²¿ÊğkubernetesµÄÍøÂç²é¼ş CNI¡£
+è¿™éƒ¨åˆ†æˆ‘ä»¬éƒ¨ç½²kubernetesçš„ç½‘ç»œæŸ¥ä»¶ CNIã€‚
 
-ÎÄµµµØÖ·£ºhttps://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
+æ–‡æ¡£åœ°å€ï¼šhttps://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
 
-#### 3.2.2¡¢ÏÂÔØÎÄ¼şÓëÅäÖÃµ÷Õû
+#### 3.2.2ã€ä¸‹è½½æ–‡ä»¶ä¸é…ç½®è°ƒæ•´
 
-ÎÄµµÖĞÓĞÁ½¸öÅäÖÃ£¬50ÒÔÏÂ½ÚµãºÍ50ÒÔÉÏ½Úµã£¬ËüÃÇµÄÖ÷ÒªÇø±ğÔÚÓÚÕâ¸ö£ºtypha¡£
-µ±½ÚµãÊı±È½Ï¶àµÄÇé¿öÏÂ£¬Calico µÄ Felix×é¼ş¿ÉÍ¨¹ı Typha Ö±½ÓºÍ Etcd ½øĞĞÊı¾İ½»»¥£¬²»Í¨¹ı kube-apiserver£¬½µµÍkube-apiserverµÄÑ¹Á¦¡£´ó¼Ò¸ù¾İ×Ô¼ºµÄÊµ¼ÊÇé¿öÑ¡ÔñÏÂÔØ¡£
-ÏÂÔØºóµÄÎÄ¼şÊÇÒ»¸öall-in-oneµÄyamlÎÄ¼ş£¬ÎÒÃÇÖ»ĞèÒªÔÚ´Ë»ù´¡ÉÏ×öÉÙĞíĞŞ¸Ä¼´¿É¡£
+æ–‡æ¡£ä¸­æœ‰ä¸¤ä¸ªé…ç½®ï¼Œ50ä»¥ä¸‹èŠ‚ç‚¹å’Œ50ä»¥ä¸ŠèŠ‚ç‚¹ï¼Œå®ƒä»¬çš„ä¸»è¦åŒºåˆ«åœ¨äºè¿™ä¸ªï¼štyphaã€‚
+å½“èŠ‚ç‚¹æ•°æ¯”è¾ƒå¤šçš„æƒ…å†µä¸‹ï¼ŒCalico çš„ Felixç»„ä»¶å¯é€šè¿‡ Typha ç›´æ¥å’Œ Etcd è¿›è¡Œæ•°æ®äº¤äº’ï¼Œä¸é€šè¿‡ kube-apiserverï¼Œé™ä½kube-apiserverçš„å‹åŠ›ã€‚å¤§å®¶æ ¹æ®è‡ªå·±çš„å®é™…æƒ…å†µé€‰æ‹©ä¸‹è½½ã€‚
+ä¸‹è½½åçš„æ–‡ä»¶æ˜¯ä¸€ä¸ªall-in-oneçš„yamlæ–‡ä»¶ï¼Œæˆ‘ä»¬åªéœ€è¦åœ¨æ­¤åŸºç¡€ä¸Šåšå°‘è®¸ä¿®æ”¹å³å¯ã€‚
 
 ```bash
-# ÏÂÔØcalico.yamlÎÄ¼ş
-# $ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O »á¼ÓÔØ×îĞÂ°æ±¾£¬¶ÔK8S°æ±¾V1.20.15²»ÔÙÊÊºÏ¡£
+# ä¸‹è½½calico.yamlæ–‡ä»¶
+# $ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O ä¼šåŠ è½½æœ€æ–°ç‰ˆæœ¬ï¼Œå¯¹K8Sç‰ˆæœ¬V1.20.15ä¸å†é€‚åˆã€‚
 $ curl https://docs.projectcalico.org/v3.20/manifests/calico.yaml -O
 ```
 
-ĞŞ¸ÄIP×Ô¶¯·¢ÏÖ
+ä¿®æ”¹IPè‡ªåŠ¨å‘ç°
 
-> µ±kubeletµÄÆô¶¯²ÎÊıÖĞ´æÔÚ--node-ipµÄÊ±ºò£¬ÒÔhost-networkÄ£Ê½Æô¶¯µÄpodµÄstatus.hostIP×Ö¶Î¾Í»á×Ô¶¯ÌîÈëkubeletÖĞÖ¸¶¨µÄipµØÖ·¡£
+> å½“kubeletçš„å¯åŠ¨å‚æ•°ä¸­å­˜åœ¨--node-ipçš„æ—¶å€™ï¼Œä»¥host-networkæ¨¡å¼å¯åŠ¨çš„podçš„status.hostIPå­—æ®µå°±ä¼šè‡ªåŠ¨å¡«å…¥kubeletä¸­æŒ‡å®šçš„ipåœ°å€ã€‚
 
-ĞŞ¸ÄÇ°£º
+ä¿®æ”¹å‰ï¼š
 
 ```bash
 - name: IP
   value: "autodetect"
 ```
 
-ĞŞ¸Äºó£º
+ä¿®æ”¹åï¼š
 
 ```bash
 - name: IP
@@ -491,115 +517,32 @@ $ curl https://docs.projectcalico.org/v3.20/manifests/calico.yaml -O
       fieldPath: status.hostIP
 ```
 
-ĞŞ¸ÄCIDR
+ä¿®æ”¹CIDR
 
-ĞŞ¸ÄÇ°£º
+ä¿®æ”¹å‰ï¼š
 
 ```bash
 # - name: CALICO_IPV4POOL_CIDR
 #   value: "192.168.0.0/16"
 ```
 
-ĞŞ¸Äºó£¨ĞŞ¸Ä³ÉÄã×Ô¼ºµÄvalue£¬ÎÒÕâÀïÊÇ10.244.0.0/16£©
+ä¿®æ”¹åï¼ˆä¿®æ”¹æˆä½ è‡ªå·±çš„valueï¼Œæˆ‘è¿™é‡Œæ˜¯10.244.0.0/16ï¼‰
 
 ```bash
 - name: CALICO_IPV4POOL_CIDR
   value: "10.244.0.0/16"
 ```
 
-#### 3.2.3¡¢Ô¤ÏÂÔØ¾µÏñ£¨ËùÓĞ½Úµã¶¼ÏÂÔØ£©
-
-- ²é¿´ÒÀÀµ¾µÏñ
+#### 3.2.3ã€æ‰§è¡Œå®‰è£…
 
 ```bash
-$ cat calico.yaml |grep image
-          image: docker.io/calico/cni:v3.20.6
-          image: docker.io/calico/cni:v3.20.6
-          image: docker.io/calico/pod2daemon-flexvol:v3.20.6
-          image: docker.io/calico/node:v3.20.6
-          image: docker.io/calico/kube-controllers:v3.20.6
-```
-
-- ÅäÖÃ²¢Ö´ĞĞ½Å±¾£ºÀûÓÃ¿ÆÑ§ÉÏÍø£¬È¥¹È¸èÔÆÏÂÔØ£¬²¢ÉÏ´«µ½°¢ÀïÔÆ
-
-https://console.cloud.google.com µÇÂ¼¹È¸èÔÆ£¬²¢ÔÚÃüÁîĞĞÖ´ĞĞÈçÏÂ²Ù×÷
-
-```bash
-$ vim calico_images.sh
-```
-
-```bash
-#!/bin/bash
-
-images=(
-	cni:v3.20.6
-	pod2daemon-flexvol:v3.20.6
-	node:v3.20.6
-	kube-controllers:v3.20.6
-)
-
-# µÇÂ¼µ½°¢ÀïÔÆ
-docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
-
-for imageName in ${images[@]} ; do
-    docker pull docker.io/calico/$imageName
-    docker tag docker.io/calico/$imageName  registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-    docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-done
-```
-
-```bash
-$ chmod +x calico_images.sh
-$ sh calico_images.sh
-```
-
-- µÇÂ¼°¢ÀïÔÆ¾µÏñ·şÎñ²é¿´£¬´Ó°¢ÀïÔÆ¾µÏñ·şÎñÇ¨ÒÆ»ØÀ´
-
-https://cr.console.aliyun.com/cn-hangzhou/instance/dashboard
-
-```bash
-$ vim calico_images.sh
-```
-
-```bash
-#!/bin/bash
-
-images=(
-	cni:v3.20.6
-	pod2daemon-flexvol:v3.20.6
-	node:v3.20.6
-	kube-controllers:v3.20.6
-)
-
-# µÇÂ¼µ½°¢ÀïÔÆ
-docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
-
-for imageName in ${images[@]} ; do
-    docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-    docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName docker.io/calico/$imageName
-    docker rmi registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-done
-```
-
-```bash
-$ chmod +x calico_images.sh
-$ sh calico_images.sh
-```
-
-#### 3.2.4¡¢Ö´ĞĞ°²×°
-
-```bash
-# ÉúĞ§Ö®Ç°²é¿´
+# ç”Ÿæ•ˆä¹‹å‰æŸ¥çœ‹
 $ kubectl get nodes
 NAME   STATUS     ROLES                  AGE     VERSION
-emon   NotReady   control-plane,master   5m31s   v1.20.15
-# Ê¹Ö®ÉúĞ§
+emon   NotReady   control-plane,master   5m31s   v1.23.17
+# ä½¿ä¹‹ç”Ÿæ•ˆ
 $ kubectl apply -f calico.yaml
-# ²é¿´node
-$ kubectl get nodes
-NAME    STATUS     ROLES                  AGE    VERSION
-emon    Ready      control-plane,master   7m2s   v1.20.15
-# ²é¿´pod
+# æŸ¥çœ‹pod
 $ kubectl get po -n kube-system
 NAME                                       READY   STATUS    RESTARTS   AGE
 calico-kube-controllers-577f77cb5c-g78c7   1/1     Running   0          13h
@@ -611,54 +554,24 @@ kube-apiserver-emon                        1/1     Running   0          14h
 kube-controller-manager-emon               1/1     Running   0          14h
 kube-proxy-f2r8l                           1/1     Running   0          14h
 kube-scheduler-emon                        1/1     Running   0          14h
-
-# ===== µÈ´ı¼ÓÈëÒ»¸öworker½Úµã½øÀ´Ö®ºó£¬ÔÙ²é¿´ÏÂÃæĞÅÏ¢£¬·ñÔò»á¿´µ½pending£¬ÒòÎªÕÒ²»µ½ºÏÊÊµÄ½Úµã²¿Êğpod =====
-# ²é¿´podĞÅÏ¢
-$ kubectl get po -n kube-system
-NAME                                       READY   STATUS     RESTARTS   AGE
-calico-kube-controllers-858c9597c8-ktgcf   0/1     Pending    0          7s
-calico-node-4282z                          0/1     Init:0/3   0          7s
-coredns-7f89b7bc75-5262d                   0/1     Pending    0          5m30s
-coredns-7f89b7bc75-tf6tl                   0/1     Pending    0          5m30s
-etcd-emon                                  1/1     Running    0          5m45s
-kube-apiserver-emon                        1/1     Running    0          5m45s
-kube-controller-manager-emon               1/1     Running    0          5m45s
-kube-proxy-vwxmm                           1/1     Running    0          5m30s
-kube-scheduler-emon                        1/1     Running    0          5m45s
-# ===================================================================================================
-# ¹ı¼¸·ÖÖÓÔÙ´Î²é¿´
-$ kubectl get po -n kube-system
-NAME                                       READY   STATUS    RESTARTS   AGE
-calico-kube-controllers-858c9597c8-ktgcf   1/1     Running   0          6m9s
-calico-node-4282z                          1/1     Running   0          6m9s
-calico-node-xjwc4                          1/1     Running   0          5m4s
-coredns-7f89b7bc75-5262d                   1/1     Running   0          11m
-coredns-7f89b7bc75-tf6tl                   1/1     Running   0          11m
-etcd-emon                                  1/1     Running   0          11m
-kube-apiserver-emon                        1/1     Running   0          11m
-kube-controller-manager-emon               1/1     Running   0          11m
-kube-proxy-mcwts                           1/1     Running   0          5m4s
-kube-proxy-vwxmm                           1/1     Running   0          11m
-kube-scheduler-emon                        1/1     Running   0          11m
-# ÔÙ´Î²é¿´node
+# æŸ¥çœ‹node
 $ kubectl get nodes
-NAME    STATUS   ROLES                  AGE     VERSION
-emon    Ready    control-plane,master   12m     v1.20.15
-emon2   Ready    <none>                 5m21s   v1.20.15
+NAME    STATUS     ROLES                  AGE    VERSION
+emon    Ready      control-plane,master   7m2s   v1.23.17
 ```
 
-### 3.2¡¢ÍøÂç²å¼ş¶àÑ¡2-[Flannel](https://github.com/flannel-io/flannel#deploying-flannel-manually)£¨½ömaster½Úµã£©
+### 3.2ã€ç½‘ç»œæ’ä»¶å¤šé€‰2-[Flannel](https://github.com/flannel-io/flannel#deploying-flannel-manually)ï¼ˆä»…masterèŠ‚ç‚¹ï¼‰
 
-#### 3.2.1¡¢ÇĞ»»Ä¿Â¼
+#### 3.2.1ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
-$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+$ mkdir -pv /root/k8s_soft/k8s_v1.23.17 && cd /root/k8s_soft/k8s_v1.23.17
 ```
 
-#### 3.2.2¡¢ÏÂÔØÎÄ¼ş
+#### 3.2.2ã€ä¸‹è½½æ–‡ä»¶
 
-FlannelÊÇÅäÖÃÎªKubernetesÉè¼ÆµÄµÚ3²ãÍøÂç½á¹¹µÄÒ»ÖÖ¼òµ¥Ò×ĞĞµÄ·½·¨¡£
+Flannelæ˜¯é…ç½®ä¸ºKubernetesè®¾è®¡çš„ç¬¬3å±‚ç½‘ç»œç»“æ„çš„ä¸€ç§ç®€å•æ˜“è¡Œçš„æ–¹æ³•ã€‚
 
 For Kubernetes v1.17+
 
@@ -666,214 +579,231 @@ For Kubernetes v1.17+
 $ wget https://github.com/flannel-io/flannel/releases/download/v0.25.4/kube-flannel.yml
 ```
 
-#### 3.2.3¡¢Ô¤ÏÂÔØ¾µÏñ£¨ËùÓĞ½Úµã¶¼ÏÂÔØ£©
-
-- ²é¿´ÒÀÀµ¾µÏñ
+#### 3.2.3ã€æ‰§è¡Œå®‰è£…
 
 ```bash
-$ cat kube-flannel.yml |grep image
-        image: docker.io/flannel/flannel:v0.25.4
-        image: docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1
-        image: docker.io/flannel/flannel:v0.25.4
-```
-
-- ÅäÖÃ²¢Ö´ĞĞ½Å±¾£ºÀûÓÃ¿ÆÑ§ÉÏÍø£¬È¥¹È¸èÔÆÏÂÔØ£¬²¢ÉÏ´«µ½°¢ÀïÔÆ
-
-https://console.cloud.google.com µÇÂ¼¹È¸èÔÆ£¬²¢ÔÚÃüÁîĞĞÖ´ĞĞÈçÏÂ²Ù×÷
-
-```bash
-$ vim flannel_images.sh
-```
-
-```bash
-#!/bin/bash
-
-images=(
-	flannel:v0.25.4
-	flannel-cni-plugin:v1.4.1-flannel1
-)
-
-# µÇÂ¼µ½°¢ÀïÔÆ
-docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
-
-for imageName in ${images[@]} ; do
-    docker pull docker.io/flannel/$imageName
-    docker tag docker.io/flannel/$imageName  registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-    docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-done
-```
-
-```bash
-$ chmod +x flannel_images.sh
-$ sh flannel_images.sh
-```
-
-- µÇÂ¼°¢ÀïÔÆ¾µÏñ·şÎñ²é¿´£¬´Ó°¢ÀïÔÆ¾µÏñ·şÎñÇ¨ÒÆ»ØÀ´
-
-https://cr.console.aliyun.com/cn-hangzhou/instance/dashboard
-
-```bash
-$ vim flannel_images.sh
-```
-
-```bash
-#!/bin/bash
-
-images=(
-	flannel:v0.25.4
-	flannel-cni-plugin:v1.4.1-flannel1
-)
-
-# µÇÂ¼µ½°¢ÀïÔÆ
-docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
-
-for imageName in ${images[@]} ; do
-    docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-    docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName docker.io/flannel/$imageName
-    docker rmi registry.cn-hangzhou.aliyuncs.com/emon-k8s/$imageName
-done
-```
-
-```bash
-$ chmod +x flannel_images.sh
-$ sh flannel_images.sh
-```
-
-#### 3.2.4¡¢Ö´ĞĞ°²×°
-
-```bash
-# ²é¿´nodes
+# æŸ¥çœ‹nodes
 $ kubectl get nodes
 NAME   STATUS     ROLES                  AGE   VERSION
-emon   NotReady   control-plane,master   16m   v1.20.15
-# °²×°
+emon   NotReady   control-plane,master   16m   v1.23.17
+# å®‰è£…
 $ kubectl apply -f kube-flannel.yml
-# ²é¿´pods
-$ kubectl get pods -n kube-system
-NAME                           READY   STATUS    RESTARTS   AGE
-coredns-54d67798b7-6zrxt       0/1     Pending   0          15m
-coredns-54d67798b7-7c2vm       0/1     Pending   0          15m
-etcd-emon                      1/1     Running   0          16m
-kube-apiserver-emon            1/1     Running   0          16m
-kube-controller-manager-emon   1/1     Running   0          16m
-kube-proxy-hgmd2               1/1     Running   0          15m
-kube-scheduler-emon            1/1     Running   0          16m
-# ²é¿´corednsÖĞPendingµÄ¾µÏñÎÊÌâ
-$ kubectl describe pods coredns-54d67798b7-7c2vm -n kube-system
-```
-
-### 3.3¡¢¼ÓÈë½Úµãµ½¼¯Èº£¨½öworker½Úµã£©
-
-- ¼ÓÈë¼¯Èº
-
-```bash
-# kubeadm initµÄÖ´ĞĞ½á¹ûÖĞÓĞÈçÏÂÃüÁî£¬ÔÚ¸÷¸öworker½ÚµãÖ´ĞĞ¼ÓÈë¼´¿É
-$ kubeadm join 192.168.32.116:6443 --token bizkzu.r7xeo57jugvd2ia3 \
-    --discovery-token-ca-cert-hash sha256:2ab2809af3d7ea7b684e1dcdea1859b226ec8b9185a82a56344aade4d3000f99
-```
-
-- ²é¿´½Úµã
-
-```bash
+# æŸ¥çœ‹pods
+$ kubectl get po -n kube-system -o wide
+NAME                           READY   STATUS    RESTARTS   AGE     IP               NODE   NOMINATED NODE   READINESS GATES
+coredns-bd6b6df9f-72cb6        1/1     Running   0          3m3s    10.244.0.3       emon   <none>           <none>
+coredns-bd6b6df9f-nqfn5        1/1     Running   0          3m3s    10.244.0.2       emon   <none>           <none>
+etcd-emon                      1/1     Running   0          3m17s   192.168.32.116   emon   <none>           <none>
+kube-apiserver-emon            1/1     Running   0          3m18s   192.168.32.116   emon   <none>           <none>
+kube-controller-manager-emon   1/1     Running   0          3m15s   192.168.32.116   emon   <none>           <none>
+kube-proxy-cbb2x               1/1     Running   0          3m3s    192.168.32.116   emon   <none>           <none>
+kube-scheduler-emon            1/1     Running   0          3m17s   192.168.32.116   emon   <none>           <none>
 $ kubectl get nodes
-NAME    STATUS   ROLES                  AGE     VERSION
-emon    Ready    control-plane,master   40m     v1.20.15
-emon2   Ready    <none>                 13m     v1.20.15
-emon3   Ready    <none>                 9m57s   v1.20.15
-
-# ÍøÂç²å¼şflannelÊ±µÄ²éÑ¯½á¹û
-$ kubectl get pods -n kube-system -o wide
-NAME                           READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
-coredns-54d67798b7-h2797       1/1     Running   0          40m   10.244.0.3       emon    <none>           <none>
-coredns-54d67798b7-qqngc       1/1     Running   0          40m   10.244.0.2       emon    <none>           <none>
-etcd-emon                      1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
-kube-apiserver-emon            1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
-kube-controller-manager-emon   1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
-kube-proxy-cz2gt               1/1     Running   0          10m   192.168.32.118   emon3   <none>           <none>
-kube-proxy-mfgtr               1/1     Running   0          40m   192.168.32.116   emon    <none>           <none>
-kube-proxy-nzkxz               1/1     Running   0          14m   192.168.32.117   emon2   <none>           <none>
-kube-scheduler-emon            1/1     Running   0          41m   192.168.32.116   emon    <none>           <none>
+NAME   STATUS   ROLES                  AGE     VERSION
+emon   Ready    control-plane,master   4m29s   v1.23.17
 ```
 
+### 3.3ã€åŠ å…¥èŠ‚ç‚¹åˆ°é›†ç¾¤ï¼ˆä»…workerèŠ‚ç‚¹ï¼‰
 
+- åŠ å…¥é›†ç¾¤
 
-## 4¡¢°²×°ingress-nginx£¨½ömaster½Úµã£©
+```bash
+# kubeadm initçš„æ‰§è¡Œç»“æœä¸­æœ‰å¦‚ä¸‹å‘½ä»¤ï¼Œåœ¨å„ä¸ªworkerèŠ‚ç‚¹æ‰§è¡ŒåŠ å…¥å³å¯
+$ kubeadm join 192.168.32.116:6443 --token h5hwp6.uee0zzwxesbghzom \
+	--discovery-token-ca-cert-hash sha256:689bd2149ef17b545e03507289c660c1c8795ff1d88405c7b826364a86f8c246
+```
 
-### 4.1¡¢ÇĞ»»Ä¿Â¼
+- æŸ¥çœ‹èŠ‚ç‚¹
+
+```bash
+# ç­‰èŠ‚ç‚¹åŠ å…¥æˆåŠŸï¼Œè¿‡ä¸€ä¼šæŸ¥çœ‹å¾—åˆ°
+$ kubectl get nodes
+NAME    STATUS   ROLES                  AGE    VERSION
+emon    Ready    control-plane,master   7m5s   v1.23.17
+emon2   Ready    <none>                 85s    v1.23.17
+emon3   Ready    <none>                 83s    v1.23.17
+
+# ç½‘ç»œæ’ä»¶flannelæ—¶çš„æŸ¥è¯¢ç»“æœ
+$ kubectl get pods -n kube-system -o wide
+NAME                           READY   STATUS    RESTARTS   AGE     IP               NODE    NOMINATED NODE   READINESS GATES
+coredns-bd6b6df9f-72cb6        1/1     Running   0          8m40s   10.244.0.3       emon    <none>           <none>
+coredns-bd6b6df9f-nqfn5        1/1     Running   0          8m40s   10.244.0.2       emon    <none>           <none>
+etcd-emon                      1/1     Running   0          8m54s   192.168.32.116   emon    <none>           <none>
+kube-apiserver-emon            1/1     Running   0          8m55s   192.168.32.116   emon    <none>           <none>
+kube-controller-manager-emon   1/1     Running   0          8m52s   192.168.32.116   emon    <none>           <none>
+kube-proxy-9wvmt               1/1     Running   0          3m17s   192.168.32.117   emon2   <none>           <none>
+kube-proxy-cbb2x               1/1     Running   0          8m40s   192.168.32.116   emon    <none>           <none>
+kube-proxy-xgnpf               1/1     Running   0          3m15s   192.168.32.118   emon3   <none>           <none>
+kube-scheduler-emon            1/1     Running   0          8m54s   192.168.32.116   emon    <none>           <none>
+```
+
+## 3.4ã€è™šæ‹ŸæœºæŒ‚èµ·å¹¶æ¢å¤åk8sç½‘ç»œé—®é¢˜
+
+- æŸ¥çœ‹è®¾å¤‡çŠ¶æ€
+
+```bash
+$ nmcli device status
+```
+
+- æ°¸ä¹…unmanaged
+
+```bash
+$ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
+```
+
+```bash
+[keyfile]
+unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*
+```
+
+- é‡å¯NetworkManager
+
+```bash
+$ systemctl restart NetworkManager
+```
+
+## 4ã€å®‰è£…ingress-nginxï¼ˆä»…masterèŠ‚ç‚¹ï¼‰
+
+ingress-nginx GitHubï¼šhttps://github.com/kubernetes/ingress-nginx
+
+ingress-nginxå®˜ç½‘ï¼šhttps://kubernetes.github.io/ingress-nginx/deploy/
+
+### 4.1ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
-$ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
+$ mkdir -pv /root/k8s_soft/k8s_v1.23.17 && cd /root/k8s_soft/k8s_v1.23.17
 ```
 
-### 4.2¡¢ÏÂÔØÎÄ¼şÓëÅäÖÃµ÷Õû¡¾ÔİÎ´ÆôÓÃ¡¿
+### 4.2ã€ä¸‹è½½æ–‡ä»¶ä¸é…ç½®è°ƒæ•´
 
 ```bash
-# ÏÂÔØ
-curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml -O
+# ä¸‹è½½ https://github.com/kubernetes/ingress-nginx/blob/controller-v1.6.4/deploy/static/provider/cloud/deploy.yaml åˆ° ingress-nginx.yaml
+# è‹¥ raw.githubusercontent.com æ— æ³•è®¿é—®ï¼Œå¯ä»¥é€šè¿‡ https://www.ipaddress.com æŸ¥è¯¢å…¶ipåœ°å€å¹¶é…ç½®æœ¬åœ°dns
+$ curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.6.4/deploy/static/provider/cloud/deploy.yaml -O
 ```
 
-ĞŞ¸ÄkindÄ£Ê½ Deployment ==> DaemonSet
+#### 4.2.1ã€è°ƒæ•´é•œåƒ
+
+- è°ƒæ•´é•œåƒåç§°1
+
+image: registry.k8s.io/ingress-nginx/controller:v1.6.3@sha256:b92667e0afde1103b736e6a3f00dd75ae66eec4e71827d19f19f471699e909d2
+
+==>
+
+image: registry.k8s.io/ingress-nginx/controller:v1.6.3
+
+- è°ƒæ•´é•œåƒåç§°2
+
+image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343@sha256:39c5b2e3310dc4264d638ad28d9d1d96c4cbb2b2dcfb52368fe4e3c63f61e10f
+
+==>
+
+image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343
+
+#### 4.2.2ã€è°ƒæ•´Service
+
+- è°ƒæ•´Serviceçš„typeä¸º NodePort å¹¶å›ºå®š nodePort ä¸º80å’Œ443
 
 ```yaml
-#kind: Deployment ¸ù¾İingress-nginx-controllerÕÒµ½¸Ã´¦²¢ĞŞ¸Ä
-kind: DaemonSet
+apiVersion: v1
+kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-    app.kubernetes.io/version: 1.3.0
+    app.kubernetes.io/version: 1.6.3
   name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  externalTrafficPolicy: Local
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - appProtocol: http
+    name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+    nodePort: 80
+  - appProtocol: https
+    name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+    nodePort: 443
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  #type: LoadBalancer
+  type: NodePort
 ```
 
-µÚ¶ş´¦ĞŞ¸Ä£ºÔö¼Ó
+- è°ƒæ•´nodePortå…è®¸çš„ç«¯å£èŒƒå›´ï¼ˆåœ¨masterèŠ‚ç‚¹ï¼‰
+
+ä¸Šé¢ç›´æ¥è®¾ç½®ä¸º80å’Œ443ä¼šæŠ¥é”™ï¼šnodePort: Invalid value valid ports is 30000-32767
+
+æ˜¯å› ä¸ºk8sçš„nodeèŠ‚ç‚¹çš„ç«¯å£é»˜è®¤è¢«é™åˆ¶åœ¨30000-32767çš„èŒƒå›´ã€‚
+
+ä¿®æ”¹nodeèŠ‚ç‚¹çš„å…è®¸èŒƒå›´ï¼š
 
 ```bash
-# ÕÒµ½nginx-ingress-controllerÕâ¸öcontainers£¬Ôö¼ÓnodeSelectorÊôĞÔ
-	spec:
-      nodeSelector:
-        app: ingress
-      containers:
-      - args:
-        - /nginx-ingress-controller
+$ vim /etc/kubernetes/manifests/kube-apiserver.yaml 
 ```
 
-
-
-### 4.3¡¢°²×°ingress-nginx
-
-- °²×°²å¼ş£¨master½Úµã£©
+åœ¨ spec.containers.command ä¸­æ‰¾åˆ°`- --service-cluster-ip-range`ï¼Œå¹¶åœ¨å…¶åå¢åŠ ä¸€è¡Œï¼š
 
 ```bash
-# ÓÉÓÚmandatory.yamlÌí¼ÓÁË nodeSelector£¬¶Ônode½øĞĞÁËlabelÑ¡Ôñ£¬ÕâÀï±ØĞëÌí¼Ó±êÇ©£¬·ñÔò£º
-# Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
-$ kubectl label node emon2 app=ingress
+    - --service-node-port-range=1-65535
+```
 
-# ===== ¾µÏñÏÂÔØÒ»Ö±ÊÇÀÏ´óÄÑÎÊÌâ£¬ÏÈÏÂÔØ°É beg =====¡¾½öworker½ÚµãÏÂÔØ¾µÏñ¼´¿É¡¿
-# ²é¿´ËùĞè¾µÏñ
-$ grep image ingress-nginx.yaml
-# ÊÖ¹¤ÏÂÔØËùĞè¾µÏñ£º×¢ÒâµÚÒ»¸ö¾µÏñ±¾À´Ó¦¸ÃÊÇ k8s.gcr.io/defaultbackend-amd64:1.5
-$ docker pull registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5
-$ docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
-# ¶ÔµÚÒ»¸ö¾µÏñÖØĞÂ´ò±êÇ©²ÅÄÜÊ¹ÓÃ
-# ÏÂÔØ²»¿É·ÃÎÊµÄ¾µÏñ
-$ docker tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
-# ===== ¾µÏñÏÂÔØÒ»Ö±ÊÇÀÏ´óÄÑÎÊÌâ£¬ÏÈÏÂÔØ°É end =====
+- é‡å¯
 
-# ÅäÖÃ×ÊÔ´
+```bash
+$ systemctl daemon-reload && systemctl restart kubelet
+```
+
+#### 4.2.3ã€è°ƒæ•´Deployment
+
+ä¿®æ”¹kindæ¨¡å¼ Deployment ==> DaemonSet
+
+### 4.3ã€å®‰è£…ingress-nginx
+
+- å®‰è£…æ’ä»¶ï¼ˆmasterèŠ‚ç‚¹ï¼‰
+
+```bash
+# é…ç½®èµ„æº
 $ kubectl apply -f ingress-nginx.yaml
-# ²é¿´
+# æŸ¥çœ‹
 $ kubectl get all -n ingress-nginx -o wide
+NAME                                       READY   STATUS      RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES
+pod/ingress-nginx-admission-create-gdv6g   0/1     Completed   0          57m   10.244.1.20   emon2   <none>           <none>
+pod/ingress-nginx-admission-patch-cdfj9    0/1     Completed   0          57m   10.244.2.21   emon3   <none>           <none>
+pod/ingress-nginx-controller-mpx75         1/1     Running     0          57m   10.244.1.21   emon2   <none>           <none>
+pod/ingress-nginx-controller-vx8qg         1/1     Running     0          57m   10.244.2.22   emon3   <none>           <none>
+
+NAME                                         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                 AGE   SELECTOR
+service/ingress-nginx-controller             NodePort    10.96.57.167   <none>        80:80/TCP,443:443/TCP   57m   app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/name=ingress-nginx
+service/ingress-nginx-controller-admission   ClusterIP   10.96.171.51   <none>        443/TCP                 57m   app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/name=ingress-nginx
+
+NAME                                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE   CONTAINERS   IMAGES                                            SELECTOR
+daemonset.apps/ingress-nginx-controller   2         2         2       2            2           kubernetes.io/os=linux   57m   controller   registry.k8s.io/ingress-nginx/controller:v1.6.3   app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/name=ingress-nginx
+
+NAME                                       COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES                                                                    SELECTOR
+job.batch/ingress-nginx-admission-create   1/1           3s         57m   create       registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343   controller-uid=e4a52a60-df3f-48e7-92f7-e60dacdb5cde
+job.batch/ingress-nginx-admission-patch    1/1           3s         57m   patch        registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343   controller-uid=046a9d6b-cf6d-45b5-9f08-0c3f0d5d4fa6
 ```
 
-### 4.4¡¢²âÊÔ·şÎñ
+### 4.4ã€æµ‹è¯•æœåŠ¡
 
-#### 4.4.1¡¢ingress-demo.yamlÅäÖÃ
+#### 4.5.1ã€ingress-test.yamlé…ç½®
 
 ```bash
-$ vim ingress-demo.yaml
+$ vim ingress-test.yaml
 ```
 
 ```yaml
@@ -881,35 +811,74 @@ $ vim ingress-demo.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tomcat-demo
+  name: nginx-deploy
 spec:
   selector:
     matchLabels:
-      app: tomcat-demo
+      app: nginx-pod
   replicas: 1
   template:
     metadata:
       labels:
-        app: tomcat-demo
+        app: nginx-pod
     spec:
       containers:
-      - name: tomcat-demo
-        image: registry.cn-hangzhou.aliyuncs.com/liuyi01/tomcat:8.0.51-alpine
+      - name: nginx
+        image: nginx:1.22
+        ports:
+        - containerPort: 80
+
+---      
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-deploy
+spec:
+  selector:
+    matchLabels:
+      app: tomcat-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tomcat-pod
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat:8.5-jre8-slim
         ports:
         - containerPort: 8080
+        
 ---
 #service
 apiVersion: v1
 kind: Service
 metadata:
-  name: tomcat-demo
+  name: nginx-service
 spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   selector:
-    app: tomcat-demo
+    app: nginx-pod
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+spec:
+  selector:
+    app: tomcat-pod
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
 
 ---
 #ingress
@@ -917,394 +886,99 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tomcat-demo
+  name: ingress-http
 spec:
+  ingressClassName: nginx
   rules:
-  - host: tomcat.mooc.com
+  - host: nginx.fsmall.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: tomcat-demo
+            name: nginx-service
+            port:
+              number: 80
+  - host: tomcat.fsmall.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat-service
             port:
               number: 80
 ```
 
-ÅäÖÃ×ÊÔ´ÉúĞ§£º
+é…ç½®èµ„æºç”Ÿæ•ˆï¼š
 
 ```bash
-# Ó¦ÓÃ×ÊÔ´£º½ö´´½¨²¢Ê¹ÓÃ£¬¿Éµ÷ÕûÎª create -> apply  ¾ßÓĞÊ¹ÓÃºÍ´´½¨²¢Ê¹ÓÃµÄĞ§¹û
-$ kubectl create -f ingress-demo.yaml
-# ²é¿´·¢ÏÖingressÆô¶¯ÔÚemon3ÉÏ
+# åˆ›å»º
+$ kubectl apply -f ingress-test.yaml
+# æŸ¥çœ‹ingress-testçš„podçŠ¶æ€
+$ kubectl get all -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE    IP            NODE    NOMINATED NODE   READINESS GATES
+pod/nginx-deploy-ddbb599fb-5z9kd     1/1     Running   0          3m1s   10.244.2.23   emon3   <none>           <none>
+pod/tomcat-deploy-54ccd7f798-l6r2r   1/1     Running   0          3m1s   10.244.1.22   emon2   <none>           <none>
+
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE    SELECTOR
+service/kubernetes       ClusterIP   10.96.0.1       <none>        443/TCP   9h     <none>
+service/nginx-service    ClusterIP   10.96.221.149   <none>        80/TCP    3m1s   app=nginx-pod
+service/tomcat-service   ClusterIP   10.96.174.145   <none>        80/TCP    3m1s   app=tomcat-pod
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS   IMAGES                 SELECTOR
+deployment.apps/nginx-deploy    1/1     1            1           3m1s   nginx        nginx:1.22             app=nginx-pod
+deployment.apps/tomcat-deploy   1/1     1            1           3m1s   tomcat       tomcat:8.5-jre8-slim   app=tomcat-pod
+
+NAME                                       DESIRED   CURRENT   READY   AGE    CONTAINERS   IMAGES                 SELECTOR
+replicaset.apps/nginx-deploy-ddbb599fb     1         1         1       3m1s   nginx        nginx:1.22             app=nginx-pod,pod-template-hash=ddbb599fb
+replicaset.apps/tomcat-deploy-54ccd7f798   1         1         1       3m1s   tomcat       tomcat:8.5-jre8-slim   app=tomcat-pod,pod-template-hash=54ccd7f798
+
+# å‘½ä»¤è¡Œè®¿é—®service
+$ curl 10.96.221.149:80
+$ curl 10.96.174.145:80
+
+# --------------------------------------------------------------------------------
+# æŸ¥çœ‹å‘ç°ingresså¯åŠ¨åœ¨emon2å’Œemon3ä¸Š
 $ kubectl get po -n ingress-nginx -o wide
-# ²é¿´ingress-demoµÄpod×´Ì¬
-$ kubectl get pod -o wide
+# æŸ¥çœ‹ingressçš„NodePortåœ°å€
+$ kubectl get svc -n ingress-nginx
+NAME                                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)                 AGE
+ingress-nginx-controller             NodePort    10.96.57.167   <none>        80:80/TCP,443:443/TCP   62m
+ingress-nginx-controller-admission   ClusterIP   10.96.171.51   <none>        443/TCP                 62m
 
-# ÅäÖÃ±¾µØDNS£º·ÃÎÊemon3µÄDNS
+# å‘½ä»¤è¡Œè®¿é—®service
+$ curl  -H "Host: nginx.fsmall.com" 10.96.57.167:80
+$ curl  -H "Host: tomcat.fsmall.com" 10.96.57.167:80
+
+# --------------------------------------------------------------------------------
+$ kubectl get ing
+NAME           CLASS   HOSTS                                ADDRESS        PORTS   AGE
+ingress-http   nginx   nginx.fsmall.com,tomcat.fsmall.com   10.96.57.167   80      5m46s
+
+# é…ç½®æœ¬åœ°DNSï¼šè®¿é—®emon2æˆ–emon3çš„DNS
 $ vim /etc/hosts
-192.168.32.118 tomcat.mooc.com
-192.168.32.118 api.mooc.com
+192.168.32.117 nginx.fsmall.com
+192.168.32.118 tomcat.fsmall.com
+192.168.32.117 api.fsmall.com
 
-# ·ÃÎÊ
-http://tomcat.mooc.com # ¿´µ½Õı³£tomcat½çÃæ
-http://api.mooc.com # ¿´µ½ default backend - 404
+# è®¿é—®
+http://nginx.fsmall.com # çœ‹åˆ°æ­£å¸¸nginxç•Œé¢
+http://tomcat.fsmall.com # çœ‹åˆ°æ­£å¸¸tomcatç•Œé¢
+http://api.fsmall.com # çœ‹åˆ° nginx çš„ 404 é¡µé¢
 
-# É¾³ı×ÊÔ´
-$ kubectl delete -f ingress-demo.yaml
+# åˆ é™¤èµ„æº
+$ kubectl delete -f ingress-test.yaml
 ```
 
-#### 4.4.2¡¢ingress-nginx.yaml
+## 5ã€é›†ç¾¤å†’çƒŸæµ‹è¯•ï¼ˆåœ¨ä¸»èŠ‚ç‚¹emonæ“ä½œï¼‰
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ingress-nginx
-
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: default-http-backend
-  labels:
-    app.kubernetes.io/name: default-http-backend
-    app.kubernetes.io/part-of: ingress-nginx
-  namespace: ingress-nginx
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: default-http-backend
-      app.kubernetes.io/part-of: ingress-nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: default-http-backend
-        app.kubernetes.io/part-of: ingress-nginx
-    spec:
-      terminationGracePeriodSeconds: 60
-      containers:
-        - name: default-http-backend
-          # Any image is permissible as long as:
-          # 1. It serves a 404 page at /
-          # 2. It serves 200 on a /healthz endpoint
-          image: k8s.gcr.io/defaultbackend-amd64:1.5
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
-          ports:
-            - containerPort: 8080
-          resources:
-            limits:
-              cpu: 10m
-              memory: 20Mi
-            requests:
-              cpu: 10m
-              memory: 20Mi
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: default-http-backend
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: default-http-backend
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    app.kubernetes.io/name: default-http-backend
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: nginx-configuration
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: tcp-services
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: udp-services
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: nginx-ingress-serviceaccount
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: nginx-ingress-clusterrole
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - endpoints
-      - nodes
-      - pods
-      - secrets
-    verbs:
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - services
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - "extensions"
-    resources:
-      - ingresses
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - events
-    verbs:
-      - create
-      - patch
-  - apiGroups:
-      - "extensions"
-    resources:
-      - ingresses/status
-    verbs:
-      - update
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: nginx-ingress-role
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-      - pods
-      - secrets
-      - namespaces
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    resourceNames:
-      # Defaults to "<election-id>-<ingress-class>"
-      # Here: "<ingress-controller-leader>-<nginx>"
-      # This has to be adapted if you change either parameter
-      # when launching the nginx-ingress-controller.
-      - "ingress-controller-leader-nginx"
-    verbs:
-      - get
-      - update
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - endpoints
-    verbs:
-      - get
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: nginx-ingress-role-nisa-binding
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: nginx-ingress-role
-subjects:
-  - kind: ServiceAccount
-    name: nginx-ingress-serviceaccount
-    namespace: ingress-nginx
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: nginx-ingress-clusterrole-nisa-binding
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: nginx-ingress-clusterrole
-subjects:
-  - kind: ServiceAccount
-    name: nginx-ingress-serviceaccount
-    namespace: ingress-nginx
-
----
-
-apiVersion: apps/v1
-# µÚÒ»´¦£ºµ÷Õû Deployment ==> DaemonSet
-kind: DaemonSet
-metadata:
-  name: nginx-ingress-controller
-  namespace: ingress-nginx
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: ingress-nginx
-      app.kubernetes.io/part-of: ingress-nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: ingress-nginx
-        app.kubernetes.io/part-of: ingress-nginx
-      annotations:
-        prometheus.io/port: "10254"
-        prometheus.io/scrape: "true"
-    spec:
-      serviceAccountName: nginx-ingress-serviceaccount
-      hostNetwork: true
-      nodeSelector:
-        app: ingress
-      containers:
-        - name: nginx-ingress-controller
-          # µÚ¶ş´¦£ºµ÷Õû 0.19.0 ==> 0.23.0
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
-          args:
-            - /nginx-ingress-controller
-            - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
-            - --configmap=$(POD_NAMESPACE)/nginx-configuration
-            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
-            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
-            - --annotations-prefix=nginx.ingress.kubernetes.io
-          securityContext:
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - NET_BIND_SERVICE
-            # www-data -> 33
-            runAsUser: 33
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - name: http
-              containerPort: 80
-            - name: https
-              containerPort: 443
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-
----
-```
-
-## 5¡¢¼¯ÈºÃ°ÑÌ²âÊÔ£¨ÔÚÖ÷½Úµãemon²Ù×÷£©
-
-### 5.0¡¢ÍøÂç»·¾³ÇĞ»»ºók8sÍøÂç²»Í¨Ğ¡ÃîÕĞ
+### 5.1ã€åˆ›å»ºnginx ds
 
 ```bash
-# Èç¹û·¢ÏÖÃ°ÑÌ²âÊÔ²»Í¨£¬ÔÙ³¢ÊÔ
-$ systemctl restart NetworkManager
-```
-
-### 5.1¡¢´´½¨nginx ds
-
-```bash
- # Ğ´ÈëÅäÖÃ
+ # å†™å…¥é…ç½®
 $ cat > nginx-ds.yml <<EOF
 apiVersion: v1
 kind: Service
@@ -1341,33 +1015,33 @@ spec:
         - containerPort: 80
 EOF
 
-# ´´½¨ds
+# åˆ›å»ºds
 $ kubectl apply -f nginx-ds.yml
 ```
 
-### 5.2¡¢¼ì²é¸÷ÖÖipÁ¬Í¨ĞÔ
+### 5.2ã€æ£€æŸ¥å„ç§ipè¿é€šæ€§
 
 ```bash
-# ¼ì²é¸÷ Node ÉÏµÄ Pod IP Á¬Í¨ĞÔ
+# æ£€æŸ¥å„ Node ä¸Šçš„ Pod IP è¿é€šæ€§
 $ kubectl get pods -o wide
 
-# ÔÚÃ¿¸öworker½ÚµãÉÏping pod ip
+# åœ¨æ¯ä¸ªworkerèŠ‚ç‚¹ä¸Šping pod ip
 $ ping <pod-ip>
 
-# ¼ì²éservice¿É´ïĞÔ
+# æ£€æŸ¥serviceå¯è¾¾æ€§
 $ kubectl get svc
 
-# ÔÚÃ¿¸öworker½ÚµãÉÏ·ÃÎÊ·şÎñ
+# åœ¨æ¯ä¸ªworkerèŠ‚ç‚¹ä¸Šè®¿é—®æœåŠ¡
 $ curl <service-ip>:<port>
 
-# ÔÚÃ¿¸ö½Úµã¼ì²énode-port¿ÉÓÃĞÔ
+# åœ¨æ¯ä¸ªèŠ‚ç‚¹æ£€æŸ¥node-portå¯ç”¨æ€§
 $ curl <node-ip>:<port>
 ```
 
-### 5.3¡¢¼ì²édns¿ÉÓÃĞÔ
+### 5.3ã€æ£€æŸ¥dnså¯ç”¨æ€§
 
 ```bash
-# ´´½¨Ò»¸önginx pod
+# åˆ›å»ºä¸€ä¸ªnginx pod
 $ cat > pod-nginx.yaml <<EOF
 apiVersion: v1
 kind: Pod
@@ -1381,97 +1055,97 @@ spec:
     - containerPort: 80
 EOF
 
-# ´´½¨pod
+# åˆ›å»ºpod
 $ kubectl apply -f pod-nginx.yaml
 
-# ½øÈëpod£¬²é¿´dns
+# è¿›å…¥podï¼ŒæŸ¥çœ‹dns
 $ kubectl exec nginx -it -- /bin/bash
 
-# ²é¿´dnsÅäÖÃ
+# æŸ¥çœ‹dnsé…ç½®
 root@nginx:/# cat /etc/resolv.conf
 
-# ²é¿´Ãû×ÖÊÇ·ñ¿ÉÒÔÕıÈ·½âÎö
+# æŸ¥çœ‹åå­—æ˜¯å¦å¯ä»¥æ­£ç¡®è§£æ
 root@nginx:/# curl nginx-ds
 
-# ÍË³ö²âÊÔ
+# é€€å‡ºæµ‹è¯•
 root@nginx:/# exit
 ```
 
-### 5..4¡¢ÈÕÖ¾¹¦ÄÜ
+### 5..4ã€æ—¥å¿—åŠŸèƒ½
 
-²âÊÔÊ¹ÓÃkubectl²é¿´podµÄÈİÆ÷ÈÕÖ¾
+æµ‹è¯•ä½¿ç”¨kubectlæŸ¥çœ‹podçš„å®¹å™¨æ—¥å¿—
 
 ```bash
 $ kubectl get pods
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 NAME             READY   STATUS    RESTARTS   AGE
 nginx            1/1     Running   0          54s
 nginx-ds-dkfjm   1/1     Running   0          2m54s
 nginx-ds-rx6mj   1/1     Running   0          2m54s
 
-# ²é¿´ÈÕÖ¾
+# æŸ¥çœ‹æ—¥å¿—
 $ kubectl logs <pod-name>
 ```
 
-### 5.5¡¢Exec¹¦ÄÜ
+### 5.5ã€ExecåŠŸèƒ½
 
-²âÊÔkubectlµÄexec¹¦ÄÜ
+æµ‹è¯•kubectlçš„execåŠŸèƒ½
 
 ```bash
-# ²éÑ¯Ö¸¶¨±êÇ©µÄpod
+# æŸ¥è¯¢æŒ‡å®šæ ‡ç­¾çš„pod
 $ kubectl get pods -l app=nginx-ds
 $ kubectl exec -it <nginx-pod-name> -- nginx -v
 ```
 
-### 5.6¡¢É¾³ıÅäÖÃµÄ²âÊÔ×ÊÔ´
+### 5.6ã€åˆ é™¤é…ç½®çš„æµ‹è¯•èµ„æº
 
 ```bash
 $ kubectl delete -f pod-nginx.yaml
 $ kubectl delete -f nginx-ds.yml
-# ²é¿´ÊÇ·ñÇåÀíÍê³É
+# æŸ¥çœ‹æ˜¯å¦æ¸…ç†å®Œæˆ
 $ kubectl get pods
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 No resources found in default namespace.
 ```
 
-## 6¡¢Harbor¾µÏñË½·ş£¨ÔÚemonÖ÷»úrootÓÃ»§°²×°£©
+## 6ã€Harboré•œåƒç§æœï¼ˆåœ¨emonä¸»æœºrootç”¨æˆ·å®‰è£…ï¼‰
 
-### 6.1¡¢°²×°docker-compose
+### 6.1ã€å®‰è£…docker-compose
 
-1£ºÏÂÔØ
+1ï¼šä¸‹è½½
 
 ```bash
 $ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 
-2£ºÌí¼Ó¿ÉÖ´ĞĞÈ¨ÏŞ
+2ï¼šæ·»åŠ å¯æ‰§è¡Œæƒé™
 
 ```bash
 $ chmod +x /usr/local/bin/docker-compose
-# ´´½¨ÈíÁ¬£¬±ÜÃâ°²×°HarborÊ±±¨´í£º? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+# åˆ›å»ºè½¯è¿ï¼Œé¿å…å®‰è£…Harboræ—¶æŠ¥é”™ï¼š? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 $ ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
-33£º²âÊÔ
+33ï¼šæµ‹è¯•
 
 ```bash
 $ docker-compose --version
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 docker-compose version 1.29.2, build 5becea4c
 ```
 
-### 6.2¡¢°²×°Harbor¾µÏñË½·ş
+### 6.2ã€å®‰è£…Harboré•œåƒç§æœ
 
-Harbor¾µÏñË½·ş£¨ÔÚemonÖ÷»úrootÓÃ»§°²×°£©
+Harboré•œåƒç§æœï¼ˆåœ¨emonä¸»æœºrootç”¨æˆ·å®‰è£…ï¼‰
 
-0. ÇĞ»»Ä¿Â¼
+0. åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
 ```
 
-1. ÏÂÔØµØÖ·
+1. ä¸‹è½½åœ°å€
 
 https://github.com/goharbor/harbor/releases
 
@@ -1479,64 +1153,64 @@ https://github.com/goharbor/harbor/releases
 $ wget https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
-2. ´´½¨½âÑ¹Ä¿Â¼
+2. åˆ›å»ºè§£å‹ç›®å½•
 
 ```bash
-# ´´½¨Harbor½âÑ¹Ä¿Â¼
+# åˆ›å»ºHarborè§£å‹ç›®å½•
 $ mkdir /usr/local/Harbor
-# ´´½¨HarborµÄvolumeÄ¿Â¼
+# åˆ›å»ºHarborçš„volumeç›®å½•
 $ mkdir -p /usr/local/dockerv/harbor_home
 ```
 
-3. ½âÑ¹
+3. è§£å‹
 
 ```bash
-# ÍÆ¼öv2.2.4°æ±¾£¬¸ü¸ß°æ±¾±ÈÈç2.3ºÍ2.4ÓĞdocker-compose down -v ==> down-compose up -dÊ±postgresql·şÎñÆô¶¯²»ÁËµÄbug£¬Êı¾İ¿âÖØÆôÊ§°Ü£¡
+# æ¨èv2.2.4ç‰ˆæœ¬ï¼Œæ›´é«˜ç‰ˆæœ¬æ¯”å¦‚2.3å’Œ2.4æœ‰docker-compose down -v ==> down-compose up -dæ—¶postgresqlæœåŠ¡å¯åŠ¨ä¸äº†çš„bugï¼Œæ•°æ®åº“é‡å¯å¤±è´¥ï¼
 $ tar -zxvf harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
 $ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
-4. ´´½¨×ÔÇ©ÃûÖ¤Êé¡¾²Î¿¼ÊµÏÖ£¬½¨Òé×ßÕı¹æÇşµÀµÄCAÖ¤Êé¡¿¡¾È±ÉÙÖ¤ÊéÎŞ·¨ä¯ÀÀÆ÷µÇÂ¼¡¿
+4. åˆ›å»ºè‡ªç­¾åè¯ä¹¦ã€å‚è€ƒå®ç°ï¼Œå»ºè®®èµ°æ­£è§„æ¸ é“çš„CAè¯ä¹¦ã€‘ã€ç¼ºå°‘è¯ä¹¦æ— æ³•æµè§ˆå™¨ç™»å½•ã€‘
 
-- ´´½¨Ö¤Êé´æ·ÅÄ¿Â¼
+- åˆ›å»ºè¯ä¹¦å­˜æ”¾ç›®å½•
 
 ```bash
-# ÇĞ»»Ä¿Â¼
+# åˆ‡æ¢ç›®å½•
 $ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
 ```
 
-- ´´½¨CA¸ùÖ¤Êé
+- åˆ›å»ºCAæ ¹è¯ä¹¦
 
 ```bash
-# ÆäÖĞCÊÇCountry£¬STÊÇState£¬LÊÇlocal£¬OÊÇOriganization£¬OUÊÇOrganization Unit£¬CNÊÇcommon name(eg, your name or your server's hostname)
+# å…¶ä¸­Cæ˜¯Countryï¼ŒSTæ˜¯Stateï¼ŒLæ˜¯localï¼ŒOæ˜¯Origanizationï¼ŒOUæ˜¯Organization Unitï¼ŒCNæ˜¯common name(eg, your name or your server's hostname)
 $ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key
 ```
 
-- Éú³ÉÒ»¸öÖ¤ÊéÇ©Ãû£¬ÉèÖÃ·ÃÎÊÓòÃûÎª emon
+- ç”Ÿæˆä¸€ä¸ªè¯ä¹¦ç­¾åï¼Œè®¾ç½®è®¿é—®åŸŸåä¸º emon
 
 ```bash
 $ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key  emon.csr  emon.key
 ```
 
-- Éú³ÉÖ÷»úµÄÖ¤Êé
+- ç”Ÿæˆä¸»æœºçš„è¯ä¹¦
 
 ```bash
 $ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
-5. ±à¼­ÅäÖÃ
+5. ç¼–è¾‘é…ç½®
 
 ```bash
 $ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
@@ -1544,38 +1218,38 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```
 
 ```yaml
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # hostname: reg.mydomain.com
 hostname: 192.168.32.116
-# ĞŞ¸Ä
+# ä¿®æ”¹
   # port: 80
   port: 5080
-# ĞŞ¸Ä
+# ä¿®æ”¹
 https:
   # https port for harbor, default is 443
   port: 5443
   # The path of cert and key files for nginx
   # certificate: /your/certificate/path
   # private_key: /your/private/key/path
-  # ĞŞ¸Ä£º×¢Òâ£¬ÕâÀï²»ÄÜÊ¹ÓÃÈíÁ¬½ÓÄ¿Â¼ /usr/loca/harborÌæ»»/usr/local/Harbor/harbor-2.2.4
-  # ·ñÔò»á·¢ÉúÖ¤ÊéÕÒ²»µ½´íÎó£ºFileNotFoundError: [Errno 2] No such file or directory: 
+  # ä¿®æ”¹ï¼šæ³¨æ„ï¼Œè¿™é‡Œä¸èƒ½ä½¿ç”¨è½¯è¿æ¥ç›®å½• /usr/loca/harboræ›¿æ¢/usr/local/Harbor/harbor-2.2.4
+  # å¦åˆ™ä¼šå‘ç”Ÿè¯ä¹¦æ‰¾ä¸åˆ°é”™è¯¯ï¼šFileNotFoundError: [Errno 2] No such file or directory: 
   certificate: /usr/local/Harbor/cert/emon.crt
   private_key: /usr/local/Harbor/cert/emon.key
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # data_volume: /data
 data_volume: /usr/local/dockerv/harbor_home
 ```
 
-6. °²×°
+6. å®‰è£…
 
 ```bash
-# °²×°Ê±£¬È·±£ /usr/bin/docker-compose ´æÔÚ£¬·ñÔò»á±¨´í£º? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+# å®‰è£…æ—¶ï¼Œç¡®ä¿ /usr/bin/docker-compose å­˜åœ¨ï¼Œå¦åˆ™ä¼šæŠ¥é”™ï¼š? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 $ /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
-# ÇĞ»»Ä¿Â¼
+# åˆ‡æ¢ç›®å½•
 $  cd /usr/local/Harbor/harbor/
-# ²é¿´·şÎñ×´Ì¬
+# æŸ¥çœ‹æœåŠ¡çŠ¶æ€
 $ docker-compose ps
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
       Name                     Command                  State                           Ports                     
 ------------------------------------------------------------------------------------------------------------------
 chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
@@ -1591,31 +1265,31 @@ registryctl         /home/harbor/start.sh            Up (healthy)
 trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 ```
 
-8. µÇÂ¼
+8. ç™»å½•
 
-·ÃÎÊ£ºhttp://192.168.32.116:5080 £¨»á±»Ìø×ªµ½http://192.168.32.116:5443£©
+è®¿é—®ï¼šhttp://192.168.32.116:5080 ï¼ˆä¼šè¢«è·³è½¬åˆ°http://192.168.32.116:5443ï¼‰
 
-ÓÃ»§ÃûÃÜÂë£º admin/Harbor12345
+ç”¨æˆ·åå¯†ç ï¼š admin/Harbor12345
 
-harborÊı¾İ¿âÃÜÂë£º root123
+harboræ•°æ®åº“å¯†ç ï¼š root123
 
-µÇÂ¼ºó´´½¨ÁËÓÃ»§£ºemon/Emon@123
+ç™»å½•ååˆ›å»ºäº†ç”¨æˆ·ï¼šemon/Emon@123
 
-µÇÂ¼ºó´´½¨ÁËÃüÃû¿Õ¼ä£ºdevops-learning ²¢½«emonÓÃ»§ÓÃÓÚ¸ÃÃüÃû¿Õ¼ä
+ç™»å½•ååˆ›å»ºäº†å‘½åç©ºé—´ï¼šdevops-learning å¹¶å°†emonç”¨æˆ·ç”¨äºè¯¥å‘½åç©ºé—´
 
-9. ĞŞ¸ÄÅäÖÃÖØÆô
+9. ä¿®æ”¹é…ç½®é‡å¯
 
 ```bash
 $ cd /usr/local/Harbor/harbor/
 $ docker-compose down -v
-# Èç¹ûÅöµ½ postgresql ·şÎñ²»ÊÇUP×´Ì¬£¬µ¼ÖÂµÇÂ¼ÌáÊ¾£ººËĞÄ·şÎñ²»¿ÉÓÃ¡£ ÇëÖ´ĞĞÏÂÃæÃüÁî£¨¸ù¾İdata_volumeÅäÖÃµ÷ÕûÂ·¾¶£©£¬Õâ¸öÊÇ¸Ã°æ±¾µÄbug¡£Ä¿Ç°£¬v2.2.4°æ±¾¿ÉÒÔÕıÈ·ÖØÆô£¬ÎŞĞèÉ¾³ıpg13
+# å¦‚æœç¢°åˆ° postgresql æœåŠ¡ä¸æ˜¯UPçŠ¶æ€ï¼Œå¯¼è‡´ç™»å½•æç¤ºï¼šæ ¸å¿ƒæœåŠ¡ä¸å¯ç”¨ã€‚ è¯·æ‰§è¡Œä¸‹é¢å‘½ä»¤ï¼ˆæ ¹æ®data_volumeé…ç½®è°ƒæ•´è·¯å¾„ï¼‰ï¼Œè¿™ä¸ªæ˜¯è¯¥ç‰ˆæœ¬çš„bugã€‚ç›®å‰ï¼Œv2.2.4ç‰ˆæœ¬å¯ä»¥æ­£ç¡®é‡å¯ï¼Œæ— éœ€åˆ é™¤pg13
 # [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
 $ docker-compose up -d
 ```
 
-10. Ë½·ş°²È«¿ØÖÆ
+10. ç§æœå®‰å…¨æ§åˆ¶
 
-- ¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ£º
+- å¯¹æ–‡ä»¶ `/etc/docker/daemon.json` è¿½åŠ  `insecure-registries`å†…å®¹ï¼š
 
 ```bash
 $ vim /etc/docker/daemon.json
@@ -1630,73 +1304,229 @@ $ vim /etc/docker/daemon.json
 }
 ```
 
-- ¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º¡¾¿ÉÊ¡ÂÔ¡¿
+- å¯¹æ–‡ä»¶ `/lib/systemd/system/docker.service` è¿½åŠ `EnvironmentFile`ï¼šã€å¯çœç•¥ã€‘
 
 ```bash
 $ vim /lib/systemd/system/docker.service 
 ```
 
 ```bash
-# ÔÚExecStartºóÃæÒ»ĞĞ×·¼Ó£º¾­ÑéÖ¤daemon.jsonÅäÖÃÁËinsecure-registries¼´¿É£¬ÎŞĞèÕâÀïÔÙÅäÖÃ
+# åœ¨ExecStartåé¢ä¸€è¡Œè¿½åŠ ï¼šç»éªŒè¯daemon.jsoné…ç½®äº†insecure-registrieså³å¯ï¼Œæ— éœ€è¿™é‡Œå†é…ç½®
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
-ÖØÆôDocker·şÎñ£º
+é‡å¯DockeræœåŠ¡ï¼š
 
 ```bash
 $ systemctl daemon-reload
 $ systemctl restart docker
 ```
 
-10. ÍÆËÍ¾µÏñ
+10. æ¨é€é•œåƒ
 
-µÇÂ¼harborºó£¬ÏÈ´´½¨devops-learningÏîÄ¿£¬²¢´´½¨emonÓÃ»§¡£
+ç™»å½•harboråï¼Œå…ˆåˆ›å»ºdevops-learningé¡¹ç›®ï¼Œå¹¶åˆ›å»ºemonç”¨æˆ·ã€‚
 
 ```bash
-# ÏÂÔØ
+# ä¸‹è½½
 $ docker pull openjdk:8-jre
-# ´ò±êÇ©
+# æ‰“æ ‡ç­¾
 $ docker tag openjdk:8-jre 192.168.32.116:5080/devops-learning/openjdk:8-jre
-# µÇÂ¼
+# ç™»å½•
 $ docker login -u emon -p Emon@123 192.168.32.116:5080
-# ÉÏ´«¾µÏñ
+# ä¸Šä¼ é•œåƒ
 $ docker push 192.168.32.116:5080/devops-learning/openjdk:8-jre
-# ÍË³öµÇÂ¼
+# é€€å‡ºç™»å½•
 $ docker logout 192.168.32.116:5080
 
-»úÆ÷ÈËÕË»§£º
-token£º  
+æœºå™¨äººè´¦æˆ·ï¼š
+tokenï¼š  
 XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
-# ¶ş¡¢Ê¹ÓÃKubespray²¿ÊğKubernetesÉú²ú¼¯Èº
+# äºŒã€å¸¸ç”¨åœºæ™¯
 
-## 1¡¢·şÎñÆ÷¹æ»®
+## 1ã€å¸¸è§„å‘½ä»¤éƒ¨ç½²ä¸€ä¸ªtomcat
 
-| »úÆ÷Ãû | ÏµÍ³ÀàĞÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊğÄÚÈİ |
+```bash
+# éƒ¨ç½²ä¸€ä¸ªtomcat
+$ kubectl create deployment tomcat8 --image=tomcat:8.5-jre8-slim
+# æš´éœ²nginxè®¿é—®ï¼ŒPodçš„80æ˜ å°„å®¹å™¨çš„8080ï¼›serviceä¼šä»£ç†Podçš„80.
+$ kubectl expose deployment tomcat8 --port=80 --target-port=8080 --type=NodePort
+# æŸ¥è¯¢NodePortç«¯å£
+$ kubectl get svc|grep tomcat8
+tomcat8      NodePort    10.96.82.16   <none>        80:3736/TCP   86s
+# è®¿é—® http://192.168.32.116:3736
+# æŸ¥çœ‹æ‰€æœ‰
+$ kubectl get all
+
+# æ‰©å®¹ï¼šæ‰©å®¹äº†å¤šä»½ï¼Œæ‰€ä»¥æ— è®ºè®¿é—®å“ªä¸ªnodeçš„æŒ‡å®šç«¯å£ï¼Œéƒ½å¯ä»¥è®¿é—®åˆ°tomcat6
+$ kubectl scale --replicas=3 deployment tomcat8
+# åˆ é™¤
+$ kubectl delete deployment.apps/tomcat8 service/tomcat8
+```
+
+- æŸ¥çœ‹éƒ¨ç½²ä¸€ä¸ªtomcatå¯¹åº”çš„yamlä¿¡æ¯
+
+```bash
+$ kubectl create deployment tomcat8 --image=tomcat:8.5-jre8-slim --dry-run=client -o yaml > tomcat8-deploy.yml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: tomcat8
+  name: tomcat8
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat8
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: tomcat8
+    spec:
+      containers:
+      - image: tomcat:8.5-jre8-slim
+        name: tomcat
+        resources: {}
+status: {}
+```
+
+```bash
+$ kubectl apply -f tomcat8.yml
+```
+
+- æŸ¥çœ‹æš´éœ²nginxè®¿é—®å¯¹åº”çš„yamlä¿¡æ¯
+
+```bash
+$ kubectl expose deployment tomcat8 --port=80 --target-port=8080 --type=NodePort --dry-run=client -o yaml > tomcat8-svc.yml
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: tomcat8
+  name: tomcat8
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat8
+  type: NodePort
+status:
+  loadBalancer: {}
+```
+
+- æŸ¥çœ‹æš´éœ²podå¯¹åº”çš„yamlä¿¡æ¯
+
+```bash
+$ kubectl get pods tomcat8-5796df556f-rzdf6 -o yaml > pod.yaml
+```
+
+## 2ã€é€šè¿‡yamléƒ¨ç½²ä¸€ä¸ªtomcat
+
+- å‡†å¤‡ä¸€ä¸ªéƒ¨ç½²
+
+```bash
+$ vim tomcat8.yml
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tomcat8
+  name: tomcat8
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tomcat8
+  template:
+    metadata:
+      labels:
+        app: tomcat8
+    spec:
+      containers:
+      - image: tomcat:8.5-jre8-slim
+        name: tomcat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tomcat8
+  name: tomcat8
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tomcat8
+  type: NodePort
+```
+
+```bash
+$ kubectl apply -f tomcat8.yml
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 9ã€Kubesphere
+
+https://github.com/kubesphere/kubesphere/blob/master/README_zh.md
+
+# ä¸‰ã€ä½¿ç”¨Kubesprayéƒ¨ç½²Kubernetesç”Ÿäº§é›†ç¾¤
+
+## 1ã€æœåŠ¡å™¨è§„åˆ’
+
+| æœºå™¨å | ç³»ç»Ÿç±»å‹  | IPåœ°å€         | å†…å­˜ | éƒ¨ç½²å†…å®¹ |
 | ------ | --------- | -------------- | ---- | -------- |
 | emon   | CentOS7.7 | 192.168.32.116 | >=2G | master   |
 | emon2  | CentOS7.7 | 192.168.32.117 | >=2G | worker   |
 | emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker   |
 
-## 2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓĞ½Úµã£©
+## 2ã€ç³»ç»Ÿè®¾ç½®ï¼ˆæ‰€æœ‰èŠ‚ç‚¹ï¼‰
 
-> ×¢Òâ£ºÒÔÏÂÃüÁîÔÚrootÈ¨ÏŞÏÂÖ´ĞĞ£»ÇĞ»»µ½rootÓÃ»§»òÕßÌáÉıÈ¨ÏŞ£º```sudo -i```
+> æ³¨æ„ï¼šä»¥ä¸‹å‘½ä»¤åœ¨rootæƒé™ä¸‹æ‰§è¡Œï¼›åˆ‡æ¢åˆ°rootç”¨æˆ·æˆ–è€…æå‡æƒé™ï¼š```sudo -i```
 
-### 2.1¡¢Ö÷»úÃû
+### 2.1ã€ä¸»æœºå
 
-Ö÷»úÃû±ØĞëÃ¿¸ö½Úµã¶¼²»Ò»Ñù£¨½¨ÒéÃüÃû¹æ·¶£ºÊı×Ö+×ÖÄ¸+ÖĞ»®Ïß×éºÏ£¬²»Òª°üº¬ÆäËûÌØÊâ×Ö·û£©¡£
+ä¸»æœºåå¿…é¡»æ¯ä¸ªèŠ‚ç‚¹éƒ½ä¸ä¸€æ ·ï¼ˆå»ºè®®å‘½åè§„èŒƒï¼šæ•°å­—+å­—æ¯+ä¸­åˆ’çº¿ç»„åˆï¼Œä¸è¦åŒ…å«å…¶ä»–ç‰¹æ®Šå­—ç¬¦ï¼‰ã€‚
 
 ```bash
-# ²é¿´Ö÷»úÃû
+# æŸ¥çœ‹ä¸»æœºå
 hostname
-# ÉèÖÃÖ÷»úÃû£º×¢ÒâĞŞ¸ÄÎª¾ßÌåµÄÖ÷»úÃû
+# è®¾ç½®ä¸»æœºåï¼šæ³¨æ„ä¿®æ”¹ä¸ºå…·ä½“çš„ä¸»æœºå
 hostnamectl set-hostname emon
 ```
 
-### 2.2¡¢±¾µØDNS
+### 2.2ã€æœ¬åœ°DNS
 
-ÅäÖÃhost£¬Ê¹µÃËùÓĞ½ÚµãÖ®¼ä¿ÉÒÔÍ¨¹ıhostname»¥Ïà·ÃÎÊ¡£
+é…ç½®hostï¼Œä½¿å¾—æ‰€æœ‰èŠ‚ç‚¹ä¹‹é—´å¯ä»¥é€šè¿‡hostnameäº’ç›¸è®¿é—®ã€‚
 
 ```bash
 vim /etc/hosts
@@ -1708,42 +1538,42 @@ vim /etc/hosts
 192.168.32.118 emon3
 ```
 
-### 2.3¡¢°²×°ÒÀÀµ°ü
+### 2.3ã€å®‰è£…ä¾èµ–åŒ…
 
 ```bash
-# ¸üĞÂyum
+# æ›´æ–°yum
 yum update
-# °²×°ÒÀÀµ°ü
+# å®‰è£…ä¾èµ–åŒ…
 yum install -y conntrack ipvsadm ipset jq sysstat curl iptables libseccomp
 ```
 
-### 2.4¡¢¹Ø±Õ·À»ğÇ½¡¢ÖØÖÃiptables¡¢¹Ø±Õswap¡¢¹Ø±ÕselinuxºÍdnsmasq
+### 2.4ã€å…³é—­é˜²ç«å¢™ã€é‡ç½®iptablesã€å…³é—­swapã€å…³é—­selinuxå’Œdnsmasq
 
 ```bash
-# ¹Ø±Õ·À»ğÇ½
+# å…³é—­é˜²ç«å¢™
 systemctl stop firewalld && sudo systemctl disable firewalld
 
-# ÖØÖÃiptables
+# é‡ç½®iptables
 iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat && iptables -P FORWARD ACCEPT
 
-# ¹Ø±Õswap
+# å…³é—­swap
 swapoff -a
-# È¥µôswap¿ª»úÆô¶¯
+# å»æ‰swapå¼€æœºå¯åŠ¨
 sed -i '/swap/s/^\(.*\)$/#\1/g' /etc/fstab
 
-# ¹Ø±Õselinux
+# å…³é—­selinux
 setenforce 0
-# ·ÀÖ¹ÖØÆô»Ö¸´
+# é˜²æ­¢é‡å¯æ¢å¤
 sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
 
-# ¹Ø±Õdnsmasq£¨·ñÔò¿ÉÄÜµ¼ÖÂdockerÈİÆ÷ÎŞ·¨½âÎöÓòÃû£©£ºÈç¹ûÃ»ÓĞ¸ÃÆô¶¯µ¥Ôª£¬¿ÉÒÔºöÂÔ£¡
+# å…³é—­dnsmasqï¼ˆå¦åˆ™å¯èƒ½å¯¼è‡´dockerå®¹å™¨æ— æ³•è§£æåŸŸåï¼‰ï¼šå¦‚æœæ²¡æœ‰è¯¥å¯åŠ¨å•å…ƒï¼Œå¯ä»¥å¿½ç•¥ï¼
 systemctl stop dnsmasq && systemctl disable dnsmasq
 ```
 
-### 2.5¡¢ÏµÍ³²ÎÊıÉèÖÃ
+### 2.5ã€ç³»ç»Ÿå‚æ•°è®¾ç½®
 
 ```bash
-# ÖÆ×÷ÅäÖÃÎÄ¼ş
+# åˆ¶ä½œé…ç½®æ–‡ä»¶
 cat > /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-iptables=1
 net.bridge.bridge-nf-call-ip6tables=1
@@ -1754,21 +1584,21 @@ vm.overcommit_memory=1
 vm.panic_on_oom=0
 fs.inotify.max_user_watches=89100
 EOF
-# ÉúĞ§ÎÄ¼ş
+# ç”Ÿæ•ˆæ–‡ä»¶
 sysctl -p /etc/sysctl.d/kubernetes.conf
 ```
 
-> Èç¹ûÖ´ĞĞsysctl -p±¨´í£º
+> å¦‚æœæ‰§è¡Œsysctl -pæŠ¥é”™ï¼š
 >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 > >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 >
-> ÁÙÊ±·½°¸£¡ÎŞĞèÖØÆô£¡
+> ä¸´æ—¶æ–¹æ¡ˆï¼æ— éœ€é‡å¯ï¼
 >
 > > modprobe br_netfilter
 >
-> ÓÀ¾Ã·½°¸£¡ÖØÆôºóÉúĞ§£¡
+> æ°¸ä¹…æ–¹æ¡ˆï¼é‡å¯åç”Ÿæ•ˆï¼
 >
 > > cat > /etc/rc.sysinit << EOF
 > > #!/bin/bash
@@ -1782,7 +1612,7 @@ sysctl -p /etc/sysctl.d/kubernetes.conf
 > > chmod 755 /etc/sysconfig/modules/br_netfilter.modules
 > > lsmod |grep br_netfilter
 
-### 2.6¡¢ÒÆ³ıdockerÏà¹ØÈí¼ş°ü£¨¿ÉÑ¡£©
+### 2.6ã€ç§»é™¤dockerç›¸å…³è½¯ä»¶åŒ…ï¼ˆå¯é€‰ï¼‰
 
 ```bash
 $ yum remove -y docker* container-selinux
@@ -1790,132 +1620,132 @@ $ rm -f /etc/docker/daemon.json
 $ rm -rf /var/lib/docker/
 ```
 
-## 3¡¢Ê¹ÓÃkubespray²¿Êğ¼¯Èº
+## 3ã€ä½¿ç”¨kubesprayéƒ¨ç½²é›†ç¾¤
 
-Õâ²¿·ÖÖ»ĞèÒªÔÚÒ»¸ö **²Ù×÷** ½ÚµãÖ´ĞĞ£¬¿ÉÒÔÊÇ¼¯ÈºÖĞµÄÒ»¸ö½Úµã£¬Ò²¿ÉÒÔÊÇ¼¯ÈºÖ®ÍâµÄ½Úµã¡£ÉõÖÁ¿ÉÒÔÊÇÄã×Ô¼ºµÄ±Ê¼Ç±¾µçÄÔ¡£ÎÒÃÇÕâÀïÊ¹ÓÃ¸üÆÕ±éµÄ¼¯ÈºÖĞµÄÈÎÒâÒ»¸ölinux½Úµã¡£
+è¿™éƒ¨åˆ†åªéœ€è¦åœ¨ä¸€ä¸ª **æ“ä½œ** èŠ‚ç‚¹æ‰§è¡Œï¼Œå¯ä»¥æ˜¯é›†ç¾¤ä¸­çš„ä¸€ä¸ªèŠ‚ç‚¹ï¼Œä¹Ÿå¯ä»¥æ˜¯é›†ç¾¤ä¹‹å¤–çš„èŠ‚ç‚¹ã€‚ç”šè‡³å¯ä»¥æ˜¯ä½ è‡ªå·±çš„ç¬”è®°æœ¬ç”µè„‘ã€‚æˆ‘ä»¬è¿™é‡Œä½¿ç”¨æ›´æ™®éçš„é›†ç¾¤ä¸­çš„ä»»æ„ä¸€ä¸ªlinuxèŠ‚ç‚¹ã€‚
 
-### 3.1¡¢SSHÃâÃÜµÇÂ¼
+### 3.1ã€SSHå…å¯†ç™»å½•
 
-×¢Òâ£ºÕâÀïÊÇrootÓÃ»§£¡
+æ³¨æ„ï¼šè¿™é‡Œæ˜¯rootç”¨æˆ·ï¼
 
 ```bash
-# ¿´¿´ÊÇ·ñÒÑ¾­´æÔÚrsa¹«Ô¿
+# çœ‹çœ‹æ˜¯å¦å·²ç»å­˜åœ¨rsaå…¬é’¥
 $ cat ~/.ssh/id_rsa.pub
 
-# Èç¹û²»´æÔÚ¾Í´´½¨Ò»¸öĞÂµÄ
+# å¦‚æœä¸å­˜åœ¨å°±åˆ›å»ºä¸€ä¸ªæ–°çš„
 $ ssh-keygen -t rsa
 
-# °Ñid_rsa.pubÎÄ¼şÄÚÈİcopyµ½ÆäËû»úÆ÷µÄÊÚÈ¨ÎÄ¼şÖĞ
+# æŠŠid_rsa.pubæ–‡ä»¶å†…å®¹copyåˆ°å…¶ä»–æœºå™¨çš„æˆæƒæ–‡ä»¶ä¸­
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
 ```
 
-### 3.2¡¢ÒÀÀµÈí¼şÏÂÔØ¡¢°²×°
+### 3.2ã€ä¾èµ–è½¯ä»¶ä¸‹è½½ã€å®‰è£…
 
 ```bash
-# °²×°»ù´¡Èí¼ş£ºÕâÒ»²½²Î¼ûpython±àÒë°²×°£¬°²×°ºó×Ô´øpip
-# °²×°»ù´¡Èí¼ş
+# å®‰è£…åŸºç¡€è½¯ä»¶ï¼šè¿™ä¸€æ­¥å‚è§pythonç¼–è¯‘å®‰è£…ï¼Œå®‰è£…åè‡ªå¸¦pip
+# å®‰è£…åŸºç¡€è½¯ä»¶
 $ yum install -y epel-release python36 python36-pip git
-# ÏÂÔØkubesprayÔ´Âë
+# ä¸‹è½½kubesprayæºç 
 $ wget https://github.com/kubernetes-sigs/kubespray/archive/v2.15.0.tar.gz
-# ½âÑ¹Ëõ
+# è§£å‹ç¼©
 $ tar -xvf v2.15.0.tar.gz && cd kubespray-2.15.0
-# °²×°requirements
+# å®‰è£…requirements
 $ cat requirements.txt
 $ pip3.6 install -r requirements.txt
 
-## Èç¹ûinstallÓöµ½ÎÊÌâ¿ÉÒÔÏÈ³¢ÊÔÉı¼¶pip
+## å¦‚æœinstallé‡åˆ°é—®é¢˜å¯ä»¥å…ˆå°è¯•å‡çº§pip
 $ pip3.6 install --upgrade pip
 ```
 
-### 3.3¡¢Éú³ÉÅäÖÃ
+### 3.3ã€ç”Ÿæˆé…ç½®
 
-ÏîÄ¿ÖĞÓĞÒ»¸öÄ¿Â¼ÊÇ¼¯ÈºµÄ»ù´¡ÅäÖÃ£¬Ê¾ÀıÅäÖÃÔÚÄ¿Â¼inventory/sampleÖĞ£¬ÎÒÃÇ¸´ÖÆÒ»·İ³öÀ´×÷Îª×Ô¼º¼¯ÈºµÄÅäÖÃ¡£
+é¡¹ç›®ä¸­æœ‰ä¸€ä¸ªç›®å½•æ˜¯é›†ç¾¤çš„åŸºç¡€é…ç½®ï¼Œç¤ºä¾‹é…ç½®åœ¨ç›®å½•inventory/sampleä¸­ï¼Œæˆ‘ä»¬å¤åˆ¶ä¸€ä»½å‡ºæ¥ä½œä¸ºè‡ªå·±é›†ç¾¤çš„é…ç½®ã€‚
 
 ```bash
-# copyÒ»·İdemoÅäÖÃ£¬×¼±¸×Ô¶¨Òå
+# copyä¸€ä»½demoé…ç½®ï¼Œå‡†å¤‡è‡ªå®šä¹‰
 cp -rpf inventory/sample inventory/mycluster
 ```
 
-ÓÉÓÚkubespray¸øÎÒÃÇ×¼±¸ÁËpy½Å±¾£¬¿ÉÒÔÖ±½Ó¸ù¾İ»·¾³±äÁ¿×Ô¶¯Éú³ÉÅäÖÃÎÄ¼ş£¬ËùÒÔÎÒÃÇÏÖÔÚÖ»ĞèÒªÉè¶¨ºÃ»·¾³±äÁ¿¾Í¿ÉÒÔÀ­£¡
+ç”±äºkubesprayç»™æˆ‘ä»¬å‡†å¤‡äº†pyè„šæœ¬ï¼Œå¯ä»¥ç›´æ¥æ ¹æ®ç¯å¢ƒå˜é‡è‡ªåŠ¨ç”Ÿæˆé…ç½®æ–‡ä»¶ï¼Œæ‰€ä»¥æˆ‘ä»¬ç°åœ¨åªéœ€è¦è®¾å®šå¥½ç¯å¢ƒå˜é‡å°±å¯ä»¥æ‹‰ï¼
 
 ```bash
-# Ê¹ÓÃÕæÊµµÄhostname£¨·ñÔò»á×Ô¶¯°ÑÄãµÄhostname¸Ä³Énode1/node2...ÕâÖÖÅ¶£©
+# ä½¿ç”¨çœŸå®çš„hostnameï¼ˆå¦åˆ™ä¼šè‡ªåŠ¨æŠŠä½ çš„hostnameæ”¹æˆnode1/node2...è¿™ç§å“¦ï¼‰
 export USE_REAL_HOSTNAME=true
-# Ö¸¶¨ÅäÖÃÎÄ¼şÎ»ÖÃ
+# æŒ‡å®šé…ç½®æ–‡ä»¶ä½ç½®
 export CONFIG_FILE=inventory/mycluster/hosts.yaml
-# ¶¨ÒåipÁĞ±í£¨ÄãµÄ·şÎñÆ÷ÄÚÍøipµØÖ·ÁĞ±í£¬3Ì¨¼°ÒÔÉÏ£¬Ç°Á½Ì¨Ä¬ÈÏÎªmaster½Úµã£©
+# å®šä¹‰ipåˆ—è¡¨ï¼ˆä½ çš„æœåŠ¡å™¨å†…ç½‘ipåœ°å€åˆ—è¡¨ï¼Œ3å°åŠä»¥ä¸Šï¼Œå‰ä¸¤å°é»˜è®¤ä¸ºmasterèŠ‚ç‚¹ï¼‰
 declare -a IPS=(192.168.32.116 192.168.32.117 192.168.32.118)
-# Éú³ÉÅäÖÃÎÄ¼ş
+# ç”Ÿæˆé…ç½®æ–‡ä»¶
 python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 ```
 
-### 3.4¡¢¸öĞÔ»¯ÅäÖÃ
+### 3.4ã€ä¸ªæ€§åŒ–é…ç½®
 
-ÅäÖÃÎÄ¼ş¶¼Éú³ÉºÃÁË£¬ËäÈ»¿ÉÒÔÖ±½ÓÓÃ£¬µ«²¢²»ÄÜÍêÈ«Âú×ã´ó¼ÒµÄ¸öĞÔ»¯ĞèÇó£¬±ÈÈçÓÃdocker»¹ÊÇcontainerd£¿dockerµÄ¹¤×÷Ä¿Â¼ÊÇ·ñÓÃÄ¬ÈÏµÄ/var/lib/docker£¿µÈµÈ¡£µ±È»Ä¬ÈÏµÄÇé¿ökubespray»¹»áµ½googleµÄ¹Ù·½²Ö¿âÏÂÔØ¾µÏñ¡¢¶ş½øÖÆÎÄ¼ş£¬Õâ¸ö¾ÍĞèÒªÄãµÄ·şÎñÆ÷¿ÉÒÔÉÏÍâÃæµÄÍø£¬ÏëÉÏÍâÍøÒ²ĞèÒªĞŞ¸ÄÒ»Ğ©ÅäÖÃ¡£
+é…ç½®æ–‡ä»¶éƒ½ç”Ÿæˆå¥½äº†ï¼Œè™½ç„¶å¯ä»¥ç›´æ¥ç”¨ï¼Œä½†å¹¶ä¸èƒ½å®Œå…¨æ»¡è¶³å¤§å®¶çš„ä¸ªæ€§åŒ–éœ€æ±‚ï¼Œæ¯”å¦‚ç”¨dockerè¿˜æ˜¯containerdï¼Ÿdockerçš„å·¥ä½œç›®å½•æ˜¯å¦ç”¨é»˜è®¤çš„/var/lib/dockerï¼Ÿç­‰ç­‰ã€‚å½“ç„¶é»˜è®¤çš„æƒ…å†µkubesprayè¿˜ä¼šåˆ°googleçš„å®˜æ–¹ä»“åº“ä¸‹è½½é•œåƒã€äºŒè¿›åˆ¶æ–‡ä»¶ï¼Œè¿™ä¸ªå°±éœ€è¦ä½ çš„æœåŠ¡å™¨å¯ä»¥ä¸Šå¤–é¢çš„ç½‘ï¼Œæƒ³ä¸Šå¤–ç½‘ä¹Ÿéœ€è¦ä¿®æ”¹ä¸€äº›é…ç½®ã€‚
 
 ```bash
-# ¶¨ÖÆ»¯ÅäÖÃÎÄ¼ş
-# 1. ½Úµã×éÖ¯ÅäÖÃ£¨ÕâÀï¿ÉÒÔµ÷ÕûÃ¿¸ö½ÚµãµÄ½ÇÉ«£©
+# å®šåˆ¶åŒ–é…ç½®æ–‡ä»¶
+# 1. èŠ‚ç‚¹ç»„ç»‡é…ç½®ï¼ˆè¿™é‡Œå¯ä»¥è°ƒæ•´æ¯ä¸ªèŠ‚ç‚¹çš„è§’è‰²ï¼‰
 vim inventory/mycluster/hosts.yaml
-# 2. containerdÅäÖÃ£¨½Ì³ÌÊ¹ÓÃcontainerd×÷ÎªÈİÆ÷ÒıÇæ£©
+# 2. containerdé…ç½®ï¼ˆæ•™ç¨‹ä½¿ç”¨containerdä½œä¸ºå®¹å™¨å¼•æ“ï¼‰
 vim inventory/mycluster/group_vars/all/containerd.yml
-# 3. È«¾ÖÅäÖÃ£¨¿ÉÒÔÔÚÕâÅäÖÃhttp(s)´úÀíÊµÏÖÍâÍø·ÃÎÊ£©
+# 3. å…¨å±€é…ç½®ï¼ˆå¯ä»¥åœ¨è¿™é…ç½®http(s)ä»£ç†å®ç°å¤–ç½‘è®¿é—®ï¼‰
 vim inventory/mycluster/group_vars/all/all.yml
-# 4. k8s¼¯ÈºÅäÖÃ£¨°üÀ¨ÉèÖÃÈİÆ÷ÔËĞĞÊ±¡¢svcÍø¶Î¡¢podÍø¶ÎµÈ£©
+# 4. k8sé›†ç¾¤é…ç½®ï¼ˆåŒ…æ‹¬è®¾ç½®å®¹å™¨è¿è¡Œæ—¶ã€svcç½‘æ®µã€podç½‘æ®µç­‰ï¼‰
 vim inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
-# 5. ĞŞ¸Äetcd²¿ÊğÀàĞÍÎªhost£¨Ä¬ÈÏÊÇdocker£©
+# 5. ä¿®æ”¹etcdéƒ¨ç½²ç±»å‹ä¸ºhostï¼ˆé»˜è®¤æ˜¯dockerï¼‰
 vim inventory/mycluster/group_vars/etcd.yml
-# 6. ¸½¼Ó×é¼ş£¨ingress¡¢dashboardµÈ£©
+# 6. é™„åŠ ç»„ä»¶ï¼ˆingressã€dashboardç­‰ï¼‰
 vim inventory/mycluster/group_vars/k8s-cluster/addons.yml
 ```
 
 - `vim inventory/mycluster/group_vars/all/all.yml`
 
 ```bash
-# [ĞÂÔö]
+# [æ–°å¢]
 http_proxy: "http://192.168.32.116:8118"
-# [ĞÂÔö]
+# [æ–°å¢]
 https_proxy: "http://192.168.32.116:8118"
 ```
 
 - `vim inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
 
 ```yaml
-# [ĞŞ¸Ä]
+# [ä¿®æ”¹]
 kube_service_addresses: 10.96.0.0/16
-# [ĞŞ¸Ä]
+# [ä¿®æ”¹]
 kube_pods_subnet: 10.244.0.0/16
-# [²»±ä]
+# [ä¸å˜]
 container_manager: docker
 ```
 
 - `vim inventory/mycluster/group_vars/k8s-cluster/addons.yml`
 
 ```yaml
-# [ĞÂÔö]
+# [æ–°å¢]
 dashboard_enabled: true
-# [ĞŞ¸Ä]
+# [ä¿®æ”¹]
 ingress_nginx_enabled: true
 ```
 
-### 3.5¡¢Ò»¼ü²¿Êğ
+### 3.5ã€ä¸€é”®éƒ¨ç½²
 
-ÅäÖÃÎÄ¼ş¶¼µ÷ÕûºÃÁËºó£¬¾Í¿ÉÒÔ¿ªÊ¼Ò»¼ü²¿ÊğÀ²£¬²»¹ı²¿Êğ¹ı³Ì²»³öÒâÍâ»á·Ç³£Âı¡£
+é…ç½®æ–‡ä»¶éƒ½è°ƒæ•´å¥½äº†åï¼Œå°±å¯ä»¥å¼€å§‹ä¸€é”®éƒ¨ç½²å•¦ï¼Œä¸è¿‡éƒ¨ç½²è¿‡ç¨‹ä¸å‡ºæ„å¤–ä¼šéå¸¸æ…¢ã€‚
 
-- Ò»¼ü²¿Êğ
+- ä¸€é”®éƒ¨ç½²
 
 ```bash
-# -vvvv»á´òÓ¡×îÏêÏ¸µÄÈÕÖ¾ĞÅÏ¢£¬½¨Òé¿ªÆô
+# -vvvvä¼šæ‰“å°æœ€è¯¦ç»†çš„æ—¥å¿—ä¿¡æ¯ï¼Œå»ºè®®å¼€å¯
 $ ansible-playbook -i inventory/mycluster/hosts.yaml  -b cluster.yml -vvvv
 ```
 
-### 3.6¡¢ÇåÀí´úÀíÉèÖÃ
+### 3.6ã€æ¸…ç†ä»£ç†è®¾ç½®
 
-ÇåÀí´úÀíÉèÖÃ£¨ÔËĞĞÊ±²»ÔÙĞèÒª´úÀí£¬É¾µô´úÀíÅäÖÃ¼´¿É£©
+æ¸…ç†ä»£ç†è®¾ç½®ï¼ˆè¿è¡Œæ—¶ä¸å†éœ€è¦ä»£ç†ï¼Œåˆ æ‰ä»£ç†é…ç½®å³å¯ï¼‰
 
-##### É¾³ıdockerµÄhttp´úÀí£¨ÔÚÃ¿¸ö½ÚµãÖ´ĞĞ£©
+##### åˆ é™¤dockerçš„httpä»£ç†ï¼ˆåœ¨æ¯ä¸ªèŠ‚ç‚¹æ‰§è¡Œï¼‰
 
 ```bash
 $ rm -f /etc/systemd/system/containerd.service.d/http-proxy.conf
@@ -1923,59 +1753,59 @@ $ systemctl daemon-reload
 $ systemctl restart containerd
 ```
 
-##### É¾³ıyum´úÀí
+##### åˆ é™¤yumä»£ç†
 
 ```bash
-# °Ñgrep³öÀ´µÄ´úÀíÅäÖÃÊÖ¶¯É¾³ı¼´¿É
+# æŠŠgrepå‡ºæ¥çš„ä»£ç†é…ç½®æ‰‹åŠ¨åˆ é™¤å³å¯
 $ grep 8118 -r /etc/yum*
 ```
 
-# Èı¡¢kubernetes-the-hard-way
+# å››ã€kubernetes-the-hard-way
 
-> ×¢Òâ£ºÒÔÏÂÃüÁîÔÚrootÈ¨ÏŞÏÂÖ´ĞĞ£»ÇĞ»»µ½rootÓÃ»§»òÕßÌáÉıÈ¨ÏŞ£º```sudo -i```
+> æ³¨æ„ï¼šä»¥ä¸‹å‘½ä»¤åœ¨rootæƒé™ä¸‹æ‰§è¡Œï¼›åˆ‡æ¢åˆ°rootç”¨æˆ·æˆ–è€…æå‡æƒé™ï¼š```sudo -i```
 
-## Ö÷ÒªÌØĞÔ
+## ä¸»è¦ç‰¹æ€§
 
-- Ñ§Ï°: ÒÀÕÕgithubÖªÃûÏîÄ¿kubernetes-the-hard-wayµÄÁ÷³Ì£¬È«²¿ÊÖ¶¯²¿Êğ£¬ÉîÈëÁË½â¼¯Èº¸÷¸ö×é¼ş
-- Éú²ú¼¶¸ß¿ÉÓÃ: ÔÚkubernetes-the-hard-way»ù´¡ÉÏÔö¼ÓÁË¸÷¸ö×é¼şµÄ¸ß¿ÉÓÃ·½°¸£¬Âú×ãÉú²ú¼¯ÈºÒªÇó
-- 99ÄêÓÀ¾ÃÖ¤Êé£¬²»ÓÃÎªÖ¤Êé¹ıÆÚ·³ÄÕ
-- ²»ÒÀÀµansibleµÈµÚÈı·½¹¤¾ß
-- ¸ß¿ÉÓÃ²»ÒÀÀµhaproxy¡¢keepalived£¬²ÉÓÃ±¾µØ´úÀíµÄ·½Ê½£¬¼òµ¥ÓÅÑÅ
+- å­¦ä¹ : ä¾ç…§githubçŸ¥åé¡¹ç›®kubernetes-the-hard-wayçš„æµç¨‹ï¼Œå…¨éƒ¨æ‰‹åŠ¨éƒ¨ç½²ï¼Œæ·±å…¥äº†è§£é›†ç¾¤å„ä¸ªç»„ä»¶
+- ç”Ÿäº§çº§é«˜å¯ç”¨: åœ¨kubernetes-the-hard-wayåŸºç¡€ä¸Šå¢åŠ äº†å„ä¸ªç»„ä»¶çš„é«˜å¯ç”¨æ–¹æ¡ˆï¼Œæ»¡è¶³ç”Ÿäº§é›†ç¾¤è¦æ±‚
+- 99å¹´æ°¸ä¹…è¯ä¹¦ï¼Œä¸ç”¨ä¸ºè¯ä¹¦è¿‡æœŸçƒ¦æ¼
+- ä¸ä¾èµ–ansibleç­‰ç¬¬ä¸‰æ–¹å·¥å…·
+- é«˜å¯ç”¨ä¸ä¾èµ–haproxyã€keepalivedï¼Œé‡‡ç”¨æœ¬åœ°ä»£ç†çš„æ–¹å¼ï¼Œç®€å•ä¼˜é›…
 
-## Èç¹ûÊÇÄã
+## å¦‚æœæ˜¯ä½ 
 
-- Èç¹ûÄãÏëÉîÈëÑ§Ï°kubernetes
-- Èç¹ûÄãÏ²»¶¶ş½øÖÆµÄÔËÎ¬·½Ê½
-- Èç¹ûÄãÕıÔÚ²¿ÊğÉú²ú»·¾³µÄkubernetes
+- å¦‚æœä½ æƒ³æ·±å…¥å­¦ä¹ kubernetes
+- å¦‚æœä½ å–œæ¬¢äºŒè¿›åˆ¶çš„è¿ç»´æ–¹å¼
+- å¦‚æœä½ æ­£åœ¨éƒ¨ç½²ç”Ÿäº§ç¯å¢ƒçš„kubernetes
 
-## ²¿ÊğÎÄµµ
+## éƒ¨ç½²æ–‡æ¡£
 
-## 1¡¢»ù´¡»·¾³×¼±¸
+## 1ã€åŸºç¡€ç¯å¢ƒå‡†å¤‡
 
-### 1.1¡¢·şÎñÆ÷¹æ»®
+### 1.1ã€æœåŠ¡å™¨è§„åˆ’
 
-| »úÆ÷Ãû | ÏµÍ³ÀàĞÍ  | IPµØÖ·         | ÄÚ´æ | ²¿ÊğÄÚÈİ       |
+| æœºå™¨å | ç³»ç»Ÿç±»å‹  | IPåœ°å€         | å†…å­˜ | éƒ¨ç½²å†…å®¹       |
 | ------ | --------- | -------------- | ---- | -------------- |
 | emon   | CentOS7.7 | 192.168.32.116 | >=2G | master         |
-| emon2  | CentOS7.7 | 192.168.32.117 | >=2G | master¡¢worker |
+| emon2  | CentOS7.7 | 192.168.32.117 | >=2G | masterã€worker |
 | emon3  | CentOS7.7 | 192.168.32.118 | >=2G | worker         |
 
-### 1.2¡¢ÏµÍ³ÉèÖÃ£¨ËùÓĞ½Úµã£©
+### 1.2ã€ç³»ç»Ÿè®¾ç½®ï¼ˆæ‰€æœ‰èŠ‚ç‚¹ï¼‰
 
-#### 1.2.1¡¢Ö÷»úÃû
+#### 1.2.1ã€ä¸»æœºå
 
-Ö÷»úÃû±ØĞëÃ¿¸ö½Úµã¶¼²»Ò»Ñù£¨½¨ÒéÃüÃû¹æ·¶£ºÊı×Ö+×ÖÄ¸+ÖĞ»®Ïß×éºÏ£¬²»Òª°üº¬ÆäËûÌØÊâ×Ö·û£©¡£
+ä¸»æœºåå¿…é¡»æ¯ä¸ªèŠ‚ç‚¹éƒ½ä¸ä¸€æ ·ï¼ˆå»ºè®®å‘½åè§„èŒƒï¼šæ•°å­—+å­—æ¯+ä¸­åˆ’çº¿ç»„åˆï¼Œä¸è¦åŒ…å«å…¶ä»–ç‰¹æ®Šå­—ç¬¦ï¼‰ã€‚
 
 ```bash
-# ²é¿´Ö÷»úÃû
+# æŸ¥çœ‹ä¸»æœºå
 $ hostname
-# ÉèÖÃÖ÷»úÃû£º×¢ÒâĞŞ¸ÄÎª¾ßÌåµÄÖ÷»úÃû
+# è®¾ç½®ä¸»æœºåï¼šæ³¨æ„ä¿®æ”¹ä¸ºå…·ä½“çš„ä¸»æœºå
 $ hostnamectl set-hostname emon
 ```
 
-#### 1.2.2¡¢±¾µØDNS
+#### 1.2.2ã€æœ¬åœ°DNS
 
-ÅäÖÃhost£¬Ê¹µÃËùÓĞ½ÚµãÖ®¼ä¿ÉÒÔÍ¨¹ıhostname»¥Ïà·ÃÎÊ¡£
+é…ç½®hostï¼Œä½¿å¾—æ‰€æœ‰èŠ‚ç‚¹ä¹‹é—´å¯ä»¥é€šè¿‡hostnameäº’ç›¸è®¿é—®ã€‚
 
 ```bash
 $ vim /etc/hosts
@@ -1987,42 +1817,42 @@ $ vim /etc/hosts
 192.168.32.118 emon3
 ```
 
-#### 1.2.3¡¢°²×°ÒÀÀµ°ü
+#### 1.2.3ã€å®‰è£…ä¾èµ–åŒ…
 
 ```bash
-# ¸üĞÂyum
+# æ›´æ–°yum
 $ yum update -y
-# °²×°ÒÀÀµ°ü
+# å®‰è£…ä¾èµ–åŒ…
 $ yum install -y socat conntrack ipvsadm ipset jq sysstat curl iptables libseccomp yum-utils
 ```
 
-#### 1.2.4¡¢¹Ø±Õ·À»ğÇ½¡¢ÖØÖÃiptables¡¢¹Ø±Õswap¡¢¹Ø±ÕselinuxºÍdnsmasq
+#### 1.2.4ã€å…³é—­é˜²ç«å¢™ã€é‡ç½®iptablesã€å…³é—­swapã€å…³é—­selinuxå’Œdnsmasq
 
 ```bash
-# ¹Ø±Õ·À»ğÇ½
+# å…³é—­é˜²ç«å¢™
 $ systemctl stop firewalld && systemctl disable firewalld
 
-# ÉèÖÃiptables¹æÔò
+# è®¾ç½®iptablesè§„åˆ™
 $ iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat && iptables -P FORWARD ACCEPT
 
-# ¹Ø±Õswap
+# å…³é—­swap
 $ swapoff -a
-# È¥µôswap¿ª»úÆô¶¯
+# å»æ‰swapå¼€æœºå¯åŠ¨
 $ sed -i '/swap/s/^\(.*\)$/#\1/g' /etc/fstab
 
-# ¹Ø±Õselinux
+# å…³é—­selinux
 $ setenforce 0
-# ·ÀÖ¹ÖØÆô»Ö¸´
+# é˜²æ­¢é‡å¯æ¢å¤
 $ sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
 
-# ¹Ø±Õdnsmasq£¨·ñÔò¿ÉÄÜµ¼ÖÂdockerÈİÆ÷ÎŞ·¨½âÎöÓòÃû£©£ºÈç¹ûÃ»ÓĞ¸ÃÆô¶¯µ¥Ôª£¬¿ÉÒÔºöÂÔ£¡
+# å…³é—­dnsmasqï¼ˆå¦åˆ™å¯èƒ½å¯¼è‡´dockerå®¹å™¨æ— æ³•è§£æåŸŸåï¼‰ï¼šå¦‚æœæ²¡æœ‰è¯¥å¯åŠ¨å•å…ƒï¼Œå¯ä»¥å¿½ç•¥ï¼
 $ systemctl stop dnsmasq && systemctl disable dnsmasq
 ```
 
-#### 1.2.5¡¢ÏµÍ³²ÎÊıÉèÖÃ
+#### 1.2.5ã€ç³»ç»Ÿå‚æ•°è®¾ç½®
 
 ```bash
-# ÖÆ×÷ÅäÖÃÎÄ¼ş
+# åˆ¶ä½œé…ç½®æ–‡ä»¶
 $ cat > /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -2031,21 +1861,21 @@ net.ipv4.ip_forward = 1
 vm.swappiness = 0
 vm.overcommit_memory = 1
 EOF
-# ÉúĞ§ÎÄ¼ş
+# ç”Ÿæ•ˆæ–‡ä»¶
 $ sysctl -p /etc/sysctl.d/kubernetes.conf
 ```
 
-> Èç¹ûÖ´ĞĞsysctl -p±¨´í£º
+> å¦‚æœæ‰§è¡Œsysctl -pæŠ¥é”™ï¼š
 >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-ip6tables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 > >
-> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: Ã»ÓĞÄÇ¸öÎÄ¼ş»òÄ¿Â¼
+> > sysctl: cannot stat /proc/sys/net/bridge/bridge-nf-call-iptables: æ²¡æœ‰é‚£ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 >
-> ÁÙÊ±·½°¸£¡ÎŞĞèÖØÆô£¡
+> ä¸´æ—¶æ–¹æ¡ˆï¼æ— éœ€é‡å¯ï¼
 >
 > > modprobe br_netfilter
 >
-> ÓÀ¾Ã·½°¸£¡ÖØÆôºóÉúĞ§£¡
+> æ°¸ä¹…æ–¹æ¡ˆï¼é‡å¯åç”Ÿæ•ˆï¼
 >
 > > cat > /etc/rc.sysinit << EOF
 > > #!/bin/bash
@@ -2059,24 +1889,24 @@ $ sysctl -p /etc/sysctl.d/kubernetes.conf
 > > chmod 755 /etc/sysconfig/modules/br_netfilter.modules
 > > lsmod |grep br_netfilter
 
-#### 1.2.6¡¢ÅäÖÃSSHÃâÃÜµÇÂ¼£¨½öÖĞ×ª½Úµã£©
+#### 1.2.6ã€é…ç½®SSHå…å¯†ç™»å½•ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
-ÎªÁË·½±ãÎÄ¼şµÄcopyÎÒÃÇÑ¡ÔñÒ»¸öÖĞ×ª½Úµã£¨Ëæ±ãÒ»¸ö½Úµã£¬¿ÉÒÔÊÇ¼¯ÈºÖĞµÄÒ²¿ÉÒÔÊÇ·Ç¼¯ÈºÖĞµÄ£©£¬ÅäÖÃºÃ¸úÆäËûËùÓĞ½ÚµãµÄÃâÃÜµÇÂ¼¡£ÕâÀïÑ¡Ôñemon½Úµã£º
+ä¸ºäº†æ–¹ä¾¿æ–‡ä»¶çš„copyæˆ‘ä»¬é€‰æ‹©ä¸€ä¸ªä¸­è½¬èŠ‚ç‚¹ï¼ˆéšä¾¿ä¸€ä¸ªèŠ‚ç‚¹ï¼Œå¯ä»¥æ˜¯é›†ç¾¤ä¸­çš„ä¹Ÿå¯ä»¥æ˜¯éé›†ç¾¤ä¸­çš„ï¼‰ï¼Œé…ç½®å¥½è·Ÿå…¶ä»–æ‰€æœ‰èŠ‚ç‚¹çš„å…å¯†ç™»å½•ã€‚è¿™é‡Œé€‰æ‹©emonèŠ‚ç‚¹ï¼š
 
 ```bash
-# ¿´¿´ÊÇ·ñÒÑ¾­´æÔÚrsa¹«Ô¿
+# çœ‹çœ‹æ˜¯å¦å·²ç»å­˜åœ¨rsaå…¬é’¥
 $ cat ~/.ssh/id_rsa.pub
 
-# Èç¹û²»´æÔÚ¾Í´´½¨Ò»¸öĞÂµÄ
+# å¦‚æœä¸å­˜åœ¨å°±åˆ›å»ºä¸€ä¸ªæ–°çš„
 $ ssh-keygen -t rsa
 
-# °Ñid_rsa.pubÎÄ¼şÄÚÈİcopyµ½ÆäËû»úÆ÷µÄÊÚÈ¨ÎÄ¼şÖĞ
+# æŠŠid_rsa.pubæ–‡ä»¶å†…å®¹copyåˆ°å…¶ä»–æœºå™¨çš„æˆæƒæ–‡ä»¶ä¸­
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon2
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub emon3
 ```
 
-#### 1.2.7¡¢ÒÆ³ıdockerÏà¹ØÈí¼ş°ü£¨¿ÉÑ¡£©
+#### 1.2.7ã€ç§»é™¤dockerç›¸å…³è½¯ä»¶åŒ…ï¼ˆå¯é€‰ï¼‰
 
 ```bash
 $ yum remove -y docker*
@@ -2084,39 +1914,39 @@ $ rm -f /etc/docker/daemon.json
 $ rm -rf /var/lib/docker/
 ```
 
-### 1.3¡¢×¼±¸k8sÈí¼ş°ü£¨½ömaster½Úµãemon£©
+### 1.3ã€å‡†å¤‡k8sè½¯ä»¶åŒ…ï¼ˆä»…masterèŠ‚ç‚¹emonï¼‰
 
-#### 1.3.0¡¢ÇĞ»»Ä¿Â¼
+#### 1.3.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-#### 1.3.1¡¢Èí¼ş°üÏÂÔØ
+#### 1.3.1ã€è½¯ä»¶åŒ…ä¸‹è½½
 
-ÔÚÈÎÒâÒ»¸ö½ÚµãÏÂÔØºÃÑ¹Ëõ°üºó£¬¸´ÖÆµ½ËùÓĞ½Úµã¼´¿É
+åœ¨ä»»æ„ä¸€ä¸ªèŠ‚ç‚¹ä¸‹è½½å¥½å‹ç¼©åŒ…åï¼Œå¤åˆ¶åˆ°æ‰€æœ‰èŠ‚ç‚¹å³å¯
 
-master½Úµã×é¼ş£ºkube-apiserver¡¢kube-controller-manager¡¢kube-scheduler¡¢kubectl
+masterèŠ‚ç‚¹ç»„ä»¶ï¼škube-apiserverã€kube-controller-managerã€kube-schedulerã€kubectl
 
-worker½Úµã×é¼ş£ºkubelet¡¢kube-proxy
+workerèŠ‚ç‚¹ç»„ä»¶ï¼škubeletã€kube-proxy
 
 ```bash
-# Éè¶¨°æ±¾ºÅ
+# è®¾å®šç‰ˆæœ¬å·
 $ export VERSION=v1.20.2
 
-# ÏÂÔØmaster½Úµã×é¼ş
+# ä¸‹è½½masterèŠ‚ç‚¹ç»„ä»¶
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kube-apiserver
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kube-controller-manager
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kube-scheduler
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubectl
 
-# ÏÂÔØworker½Úµã×é¼ş
+# ä¸‹è½½workerèŠ‚ç‚¹ç»„ä»¶
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kube-proxy
 $ wget https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubelet
 
 # =================================================================================================
-# ÏÂÔØetcd×é¼ş
+# ä¸‹è½½etcdç»„ä»¶
 $ export VERSION=v3.4.10
 $ wget https://github.com/etcd-io/etcd/releases/download/${VERSION}/etcd-${VERSION}-linux-amd64.tar.gz
 $ tar -zxvf etcd-${VERSION}-linux-amd64.tar.gz -C .
@@ -2124,41 +1954,41 @@ $ mv etcd-${VERSION}-linux-amd64/etcd* .
 $ rm -rf etcd-${VERSION}-linux-amd64
 
 # =================================================================================================
-# Í³Ò»ĞŞ¸ÄÎÄ¼şÈ¨ÏŞÎª¿ÉÖ´ĞĞ
+# ç»Ÿä¸€ä¿®æ”¹æ–‡ä»¶æƒé™ä¸ºå¯æ‰§è¡Œ
 $ chmod +x kube*
 
-# ÏÂÔØ
+# ä¸‹è½½
 $ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64
 $ wget https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssljson_1.6.1_linux_amd64
 
-# ĞŞ¸ÄÎª¿ÉÖ´ĞĞÈ¨ÏŞ
+# ä¿®æ”¹ä¸ºå¯æ‰§è¡Œæƒé™
 $ chmod +x cfssl_1.6.1_linux_amd64 cfssljson_1.6.1_linux_amd64
 
 # =================================================================================================
-# Éè¶¨containerdµÄ°æ±¾ºÅ
+# è®¾å®šcontainerdçš„ç‰ˆæœ¬å·
 $ VERSION=1.4.3
-# ÏÂÔØÑ¹Ëõ°ü
+# ä¸‹è½½å‹ç¼©åŒ…
 $ wget https://github.com/containerd/containerd/releases/download/v${VERSION}/cri-containerd-cni-${VERSION}-linux-amd64.tar.gz
 ```
 
-#### 1.3.2¡¢Èí¼ş°ü·Ö·¢
+#### 1.3.2ã€è½¯ä»¶åŒ…åˆ†å‘
 
-Íê³ÉÏÂÔØºó£¬·Ö·¢ÎÄ¼ş£¬½«Ã¿¸ö½ÚµãĞèÒªµÄÎÄ¼şscp¹ıÈ¥
+å®Œæˆä¸‹è½½åï¼Œåˆ†å‘æ–‡ä»¶ï¼Œå°†æ¯ä¸ªèŠ‚ç‚¹éœ€è¦çš„æ–‡ä»¶scpè¿‡å»
 
 ```bash
-# °ÑmasterÏà¹Ø×é¼ş·Ö·¢µ½master½Úµã
+# æŠŠmasterç›¸å…³ç»„ä»¶åˆ†å‘åˆ°masterèŠ‚ç‚¹
 $ MASTERS=(emon emon2)
 for instance in ${MASTERS[@]}; do
   scp kube-apiserver kube-controller-manager kube-scheduler kubectl root@${instance}:/usr/local/bin/
 done
 
-# °ÑworkerÏÈ¹Ø×é¼ş·Ö·¢µ½worker½Úµã
+# æŠŠworkerå…ˆå…³ç»„ä»¶åˆ†å‘åˆ°workerèŠ‚ç‚¹
 $ WORKERS=(emon2 emon3)
 for instance in ${WORKERS[@]}; do
   scp kubelet kube-proxy root@${instance}:/usr/local/bin/
 done
 
-# °Ñetcd×é¼ş·Ö·¢µ½etcd½Úµã
+# æŠŠetcdç»„ä»¶åˆ†å‘åˆ°etcdèŠ‚ç‚¹
 $ ETCDS=(emon emon2 emon3)
 for instance in ${ETCDS[@]}; do
   scp etcd etcdctl etcdutl root@${instance}:/usr/local/bin/
@@ -2167,34 +1997,34 @@ done
 
 
 
-## 2¡¢Éú³ÉÖ¤Êé£¨½öÖĞ×ª½Úµã£©
+## 2ã€ç”Ÿæˆè¯ä¹¦ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
-ÈçÏÂ²Ù×÷£¬¶¼ÔÚ`/root/k8s_soft/k8s_v1.20.2`Ä¿Â¼Ö´ĞĞ¡£
+å¦‚ä¸‹æ“ä½œï¼Œéƒ½åœ¨`/root/k8s_soft/k8s_v1.20.2`ç›®å½•æ‰§è¡Œã€‚
 
-### 2.0¡¢°²×°cfssl
+### 2.0ã€å®‰è£…cfssl
 
-- °²×°cfssl
+- å®‰è£…cfssl
 
-cfsslÊÇ·Ç³£ºÃÓÃµÄCA¹¤¾ß£¬ÎÒÃÇÓÃËüÀ´Éú³ÉÖ¤ÊéºÍÃØÔ¿ÎÄ¼ş °²×°¹ı³Ì±È½Ï¼òµ¥£¬ÈçÏÂ£º
+cfsslæ˜¯éå¸¸å¥½ç”¨çš„CAå·¥å…·ï¼Œæˆ‘ä»¬ç”¨å®ƒæ¥ç”Ÿæˆè¯ä¹¦å’Œç§˜é’¥æ–‡ä»¶ å®‰è£…è¿‡ç¨‹æ¯”è¾ƒç®€å•ï¼Œå¦‚ä¸‹ï¼š
 
 ```bash
-# ¼ÓÈë¿ÉÖ´ĞĞÄ¿Â¼
+# åŠ å…¥å¯æ‰§è¡Œç›®å½•
 $ cp cfssl_1.6.1_linux_amd64 /usr/local/bin/cfssl
 $ cp cfssljson_1.6.1_linux_amd64 /usr/local/bin/cfssljson
 
-# ÑéÖ¤
+# éªŒè¯
 $ cfssl version
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Version: 1.6.1
 Runtime: go1.12.12
 ```
 
-### 2.1¡¢¸ùÖ¤Êé
+### 2.1ã€æ ¹è¯ä¹¦
 
-¸ùÖ¤ÊéÊÇ¼¯ÈºËùÓĞ½Úµã¹²ÏíµÄ£¬Ö»ĞèÒª´´½¨Ò»¸ö CA Ö¤Êé£¬ºóĞø´´½¨µÄËùÓĞÖ¤Êé¶¼ÓÉËüÇ©Ãû¡£
-ÔÚÈÎÒâ½Úµã£¨¿ÉÒÔÃâÃÜµÇÂ¼µ½ÆäËû½Úµã£©´´½¨Ò»¸öµ¥¶ÀµÄÖ¤ÊéÄ¿Â¼£¬Èç£º`mkdir pki && cd pki`
+æ ¹è¯ä¹¦æ˜¯é›†ç¾¤æ‰€æœ‰èŠ‚ç‚¹å…±äº«çš„ï¼Œåªéœ€è¦åˆ›å»ºä¸€ä¸ª CA è¯ä¹¦ï¼Œåç»­åˆ›å»ºçš„æ‰€æœ‰è¯ä¹¦éƒ½ç”±å®ƒç­¾åã€‚
+åœ¨ä»»æ„èŠ‚ç‚¹ï¼ˆå¯ä»¥å…å¯†ç™»å½•åˆ°å…¶ä»–èŠ‚ç‚¹ï¼‰åˆ›å»ºä¸€ä¸ªå•ç‹¬çš„è¯ä¹¦ç›®å½•ï¼Œå¦‚ï¼š`mkdir pki && cd pki`
 
-#### ¸ùÖ¤ÊéÅäÖÃÎÄ¼ş
+#### æ ¹è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```json
 $ cat > ca-config.json <<EOF
@@ -2233,19 +2063,19 @@ $ cat > ca-csr.json <<EOF
 EOF
 ```
 
-#### Éú³ÉÖ¤ÊéºÍË½Ô¿
+#### ç”Ÿæˆè¯ä¹¦å’Œç§é’¥
 
 ```bash
-# Éú³ÉÖ¤ÊéºÍË½Ô¿
+# ç”Ÿæˆè¯ä¹¦å’Œç§é’¥
 $ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
-# Éú³ÉÍê³Éºó»áÓĞÒÔÏÂÎÄ¼ş£¨ÎÒÃÇ×îÖÕÏëÒªµÄ¾ÍÊÇca-key.pemºÍca.pem£¬Ò»¸öÃØÔ¿£¬Ò»¸öÖ¤Êé£©
+# ç”Ÿæˆå®Œæˆåä¼šæœ‰ä»¥ä¸‹æ–‡ä»¶ï¼ˆæˆ‘ä»¬æœ€ç»ˆæƒ³è¦çš„å°±æ˜¯ca-key.pemå’Œca.pemï¼Œä¸€ä¸ªç§˜é’¥ï¼Œä¸€ä¸ªè¯ä¹¦ï¼‰
 $ ls ca*
 ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem
 ```
 
-### 2.2¡¢admin¿Í»§¶ËÖ¤Êé
+### 2.2ã€adminå®¢æˆ·ç«¯è¯ä¹¦
 
-#### admin¿Í»§¶ËÖ¤ÊéÅäÖÃÎÄ¼ş
+#### adminå®¢æˆ·ç«¯è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > admin-csr.json <<EOF
@@ -2268,7 +2098,7 @@ $ cat > admin-csr.json <<EOF
 EOF
 ```
 
-#### Éú³Éadmin¿Í»§¶ËÖ¤ÊéºÍË½Ô¿
+#### ç”Ÿæˆadminå®¢æˆ·ç«¯è¯ä¹¦å’Œç§é’¥
 
 ```bash
 $ cfssl gencert \
@@ -2278,22 +2108,22 @@ $ cfssl gencert \
   -profile=kubernetes \
   admin-csr.json | cfssljson -bare admin
 
-# ²é¿´
+# æŸ¥çœ‹
 $ ls admin*
 admin.csr  admin-csr.json  admin-key.pem  admin.pem
 ```
 
-### 2.3¡¢kubelet¿Í»§¶ËÖ¤Êé
+### 2.3ã€kubeletå®¢æˆ·ç«¯è¯ä¹¦
 
-KubernetesÊ¹ÓÃÒ»ÖÖ³ÆÎªNode AuthorizerµÄ×¨ÓÃÊÚÈ¨Ä£Ê½À´ÊÚÈ¨Kubelets·¢³öµÄAPIÇëÇó¡£ KubeletÊ¹ÓÃ½«Æä±êÊ¶Îªsystem:nodes×éÖĞµÄÆ¾¾İ£¬ÆäÓÃ»§ÃûÎªsystem£ºnode:nodeName£¬½ÓÏÂÀï¾Í¸øÃ¿¸ö¹¤×÷½ÚµãÉú³ÉÖ¤Êé¡£
+Kubernetesä½¿ç”¨ä¸€ç§ç§°ä¸ºNode Authorizerçš„ä¸“ç”¨æˆæƒæ¨¡å¼æ¥æˆæƒKubeletså‘å‡ºçš„APIè¯·æ±‚ã€‚ Kubeletä½¿ç”¨å°†å…¶æ ‡è¯†ä¸ºsystem:nodesç»„ä¸­çš„å‡­æ®ï¼Œå…¶ç”¨æˆ·åä¸ºsystemï¼šnode:nodeNameï¼Œæ¥ä¸‹é‡Œå°±ç»™æ¯ä¸ªå·¥ä½œèŠ‚ç‚¹ç”Ÿæˆè¯ä¹¦ã€‚
 
-#### Éú³Ékubelet¿Í»§¶ËÖ¤ÊéºÍË½Ô¿
+#### ç”Ÿæˆkubeletå®¢æˆ·ç«¯è¯ä¹¦å’Œç§é’¥
 
 ```bash
-# ÉèÖÃÄãµÄworker½ÚµãÁĞ±í
+# è®¾ç½®ä½ çš„workerèŠ‚ç‚¹åˆ—è¡¨
 $ WORKERS=(emon2 emon3)
 $ WORKER_IPS=(192.168.32.117 192.168.32.118)
-# Éú³ÉËùÓĞworker½ÚµãµÄÖ¤ÊéÅäÖÃ
+# ç”Ÿæˆæ‰€æœ‰workerèŠ‚ç‚¹çš„è¯ä¹¦é…ç½®
 $ for ((i=0;i<${#WORKERS[@]};i++)); do
 cat > ${WORKERS[$i]}-csr.json <<EOF
 {
@@ -2322,14 +2152,14 @@ cfssl gencert \
   ${WORKERS[$i]}-csr.json | cfssljson -bare ${WORKERS[$i]}
 done
 
-# ²é¿´
+# æŸ¥çœ‹
 $ ls emon*
 emon2.csr  emon2-csr.json  emon2-key.pem  emon2.pem  emon3.csr  emon3-csr.json  emon3-key.pem  emon3.pem
 ```
 
-### 2.4¡¢kube-controller-manager¿Í»§¶ËÖ¤Êé
+### 2.4ã€kube-controller-managerå®¢æˆ·ç«¯è¯ä¹¦
 
-#### kube-controller-manager¿Í»§¶ËÖ¤ÊéÅäÖÃÎÄ¼ş
+#### kube-controller-managerå®¢æˆ·ç«¯è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > kube-controller-manager-csr.json <<EOF
@@ -2352,7 +2182,7 @@ $ cat > kube-controller-manager-csr.json <<EOF
 EOF
 ```
 
-#### Éú³Ékube-controller-manager¿Í»§¶ËÖ¤Êé
+#### ç”Ÿæˆkube-controller-managerå®¢æˆ·ç«¯è¯ä¹¦
 
 ```bash
 $ cfssl gencert \
@@ -2362,7 +2192,7 @@ $ cfssl gencert \
   -profile=kubernetes \
   kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
   
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1 kube-controller-manager*
 kube-controller-manager
 kube-controller-manager.csr
@@ -2371,9 +2201,9 @@ kube-controller-manager-key.pem
 kube-controller-manager.pem
 ```
 
-### 2.5¡¢kube-proxy¿Í»§¶ËÖ¤Êé
+### 2.5ã€kube-proxyå®¢æˆ·ç«¯è¯ä¹¦
 
-#### kube-proxy¿Í»§¶ËÖ¤ÊéÅäÖÃÎÄ¼ş
+#### kube-proxyå®¢æˆ·ç«¯è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > kube-proxy-csr.json <<EOF
@@ -2396,7 +2226,7 @@ $ cat > kube-proxy-csr.json <<EOF
 EOF
 ```
 
-#### Éú³Ékube-proxy¿Í»§¶ËÖ¤Êé
+#### ç”Ÿæˆkube-proxyå®¢æˆ·ç«¯è¯ä¹¦
 
 ```bash
 $ cfssl gencert \
@@ -2405,7 +2235,7 @@ $ cfssl gencert \
   -config=ca-config.json \
   -profile=kubernetes \
   kube-proxy-csr.json | cfssljson -bare kube-proxy
-# ²é¿´  
+# æŸ¥çœ‹  
 $ ls -1 kube-proxy*
 kube-proxy
 kube-proxy.csr
@@ -2414,9 +2244,9 @@ kube-proxy-key.pem
 kube-proxy.pem
 ```
 
-### 2.6¡¢kube-scheduler¿Í»§¶ËÖ¤Êé
+### 2.6ã€kube-schedulerå®¢æˆ·ç«¯è¯ä¹¦
 
-#### kube-scheduler¿Í»§¶ËÖ¤ÊéÅäÖÃÎÄ¼ş
+#### kube-schedulerå®¢æˆ·ç«¯è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > kube-scheduler-csr.json <<EOF
@@ -2439,7 +2269,7 @@ $ cat > kube-scheduler-csr.json <<EOF
 EOF
 ```
 
-#### Éú³Ékube-scheduler¿Í»§¶ËÖ¤Êé
+#### ç”Ÿæˆkube-schedulerå®¢æˆ·ç«¯è¯ä¹¦
 
 ```bash
 $ cfssl gencert \
@@ -2448,7 +2278,7 @@ $ cfssl gencert \
   -config=ca-config.json \
   -profile=kubernetes \
   kube-scheduler-csr.json | cfssljson -bare kube-scheduler
-# ²é¿´
+# æŸ¥çœ‹
 ls -1 kube-scheduler*
 kube-scheduler
 kube-scheduler.csr
@@ -2457,9 +2287,9 @@ kube-scheduler-key.pem
 kube-scheduler.pem
 ```
 
-### 2.7¡¢kube-apiserver·şÎñ¶ËÖ¤Êé
+### 2.7ã€kube-apiserveræœåŠ¡ç«¯è¯ä¹¦
 
-#### kube-apiserver·şÎñ¶ËÖ¤ÊéÅäÖÃÎÄ¼ş
+#### kube-apiserveræœåŠ¡ç«¯è¯ä¹¦é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > kubernetes-csr.json <<EOF
@@ -2482,16 +2312,16 @@ $ cat > kubernetes-csr.json <<EOF
 EOF
 ```
 
-#### Éú³Ékube-apiserver·şÎñ¶ËÖ¤Êé
+#### ç”Ÿæˆkube-apiserveræœåŠ¡ç«¯è¯ä¹¦
 
-·şÎñ¶ËÖ¤ÊéÓë¿Í»§¶ËÂÔÓĞ²»Í¬£¬¿Í»§¶ËĞèÒªÍ¨¹ıÒ»¸öÃû×Ö»òÕßÒ»¸öipÈ¥·ÃÎÊ·şÎñ¶Ë£¬ËùÒÔÖ¤Êé±ØĞëÒª°üº¬¿Í»§¶ËËù·ÃÎÊµÄÃû×Ö»òip£¬ÓÃÒÔ¿Í»§¶ËÑéÖ¤¡£
+æœåŠ¡ç«¯è¯ä¹¦ä¸å®¢æˆ·ç«¯ç•¥æœ‰ä¸åŒï¼Œå®¢æˆ·ç«¯éœ€è¦é€šè¿‡ä¸€ä¸ªåå­—æˆ–è€…ä¸€ä¸ªipå»è®¿é—®æœåŠ¡ç«¯ï¼Œæ‰€ä»¥è¯ä¹¦å¿…é¡»è¦åŒ…å«å®¢æˆ·ç«¯æ‰€è®¿é—®çš„åå­—æˆ–ipï¼Œç”¨ä»¥å®¢æˆ·ç«¯éªŒè¯ã€‚
 
 ```bash
-# apiserverµÄservice ipµØÖ·£¨Ò»°ãÊÇsvcÍø¶ÎµÄµÚÒ»¸öip£©
+# apiserverçš„service ipåœ°å€ï¼ˆä¸€èˆ¬æ˜¯svcç½‘æ®µçš„ç¬¬ä¸€ä¸ªipï¼‰
 $ KUBERNETES_SVC_IP=10.233.0.1
-# ËùÓĞµÄmasterÄÚÍøip£¬¶ººÅ·Ö¸ô£¨ÔÆ»·¾³¿ÉÒÔ¼ÓÉÏmaster¹«ÍøipÒÔ±ãÖ§³Ö¹«Íøip·ÃÎÊ£©£ºËäÈ»118²»ÊÇmaster£¬µ«Î´À´¿ÉÄÜÊÇ
+# æ‰€æœ‰çš„masterå†…ç½‘ipï¼Œé€—å·åˆ†éš”ï¼ˆäº‘ç¯å¢ƒå¯ä»¥åŠ ä¸Šmasterå…¬ç½‘ipä»¥ä¾¿æ”¯æŒå…¬ç½‘ipè®¿é—®ï¼‰ï¼šè™½ç„¶118ä¸æ˜¯masterï¼Œä½†æœªæ¥å¯èƒ½æ˜¯
 $ MASTER_IPS=192.168.32.116,192.168.32.117,192.168.32.118
-# Éú³ÉÖ¤Êé
+# ç”Ÿæˆè¯ä¹¦
 $ cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
@@ -2499,7 +2329,7 @@ $ cfssl gencert \
   -hostname=${KUBERNETES_SVC_IP},${MASTER_IPS},127.0.0.1,kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local \
   -profile=kubernetes \
   kubernetes-csr.json | cfssljson -bare kubernetes
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1 kubernetes*
 kubernetes.csr
 kubernetes-csr.json
@@ -2507,9 +2337,9 @@ kubernetes-key.pem
 kubernetes.pem
 ```
 
-### 2.8¡¢Service AccountÖ¤Êé
+### 2.8ã€Service Accountè¯ä¹¦
 
-#### ÅäÖÃÎÄ¼ş
+#### é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > service-account-csr.json <<EOF
@@ -2532,7 +2362,7 @@ $ cat > service-account-csr.json <<EOF
 EOF
 ```
 
-#### Éú³ÉÖ¤Êé
+#### ç”Ÿæˆè¯ä¹¦
 
 ```bash
 $ cfssl gencert \
@@ -2541,7 +2371,7 @@ $ cfssl gencert \
   -config=ca-config.json \
   -profile=kubernetes \
   service-account-csr.json | cfssljson -bare service-account
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1 service-account*
 service-account.csr
 service-account-csr.json
@@ -2549,9 +2379,9 @@ service-account-key.pem
 service-account.pem
 ```
 
-### 2.9¡¢proxy-clientÖ¤Êé
+### 2.9ã€proxy-clientè¯ä¹¦
 
-#### ÅäÖÃÎÄ¼ş
+#### é…ç½®æ–‡ä»¶
 
 ```bash
 $ cat > proxy-client-csr.json <<EOF
@@ -2574,7 +2404,7 @@ $ cat > proxy-client-csr.json <<EOF
 EOF
 ```
 
-#### Éú³ÉÖ¤Êé
+#### ç”Ÿæˆè¯ä¹¦
 
 ```bash
 $ cfssl gencert \
@@ -2583,7 +2413,7 @@ $ cfssl gencert \
   -config=ca-config.json \
   -profile=kubernetes \
   proxy-client-csr.json | cfssljson -bare proxy-client
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1 proxy-client*
 proxy-client.csr
 proxy-client-csr.json
@@ -2591,9 +2421,9 @@ proxy-client-key.pem
 proxy-client.pem
 ```
 
-### 2.10¡¢·Ö·¢¿Í»§¶Ë¡¢·şÎñ¶ËÖ¤Êé
+### 2.10ã€åˆ†å‘å®¢æˆ·ç«¯ã€æœåŠ¡ç«¯è¯ä¹¦
 
-#### ·Ö·¢worker½ÚµãĞèÒªµÄÖ¤ÊéºÍË½Ô¿
+#### åˆ†å‘workerèŠ‚ç‚¹éœ€è¦çš„è¯ä¹¦å’Œç§é’¥
 
 ```bash
 $ WORKERS=(emon2 emon3)
@@ -2602,9 +2432,9 @@ for instance in ${WORKERS[@]}; do
 done
 ```
 
-#### ·Ö·¢master½ÚµãĞèÒªµÄÖ¤ÊéºÍË½Ô¿
+#### åˆ†å‘masterèŠ‚ç‚¹éœ€è¦çš„è¯ä¹¦å’Œç§é’¥
 
-> ×¢Òâ£ºÓÉÓÚÏÂÃæ·Ö·¢µÄÖ¤Êé¼´°üº¬ÁËetcdµÄÖ¤ÊéÒ²°üº¬ÁËk8sÖ÷½ÚµãµÄÖ¤Êé¡£ ËùÒÔ MASTER_IPS ÖĞ±ØĞë°üº¬ËùÓĞ `master` ½ÚµãÒÔ¼° `etcd` ½Úµã¡£Èç¹ûÃ»ÓĞ°üº¬ËùÓĞetcd½ÚµãµÄÖ¤Êé£¬ĞèÒªÖØĞÂ¶¨Òå£¬¶ººÅ·Ö¸ô
+> æ³¨æ„ï¼šç”±äºä¸‹é¢åˆ†å‘çš„è¯ä¹¦å³åŒ…å«äº†etcdçš„è¯ä¹¦ä¹ŸåŒ…å«äº†k8sä¸»èŠ‚ç‚¹çš„è¯ä¹¦ã€‚ æ‰€ä»¥ MASTER_IPS ä¸­å¿…é¡»åŒ…å«æ‰€æœ‰ `master` èŠ‚ç‚¹ä»¥åŠ `etcd` èŠ‚ç‚¹ã€‚å¦‚æœæ²¡æœ‰åŒ…å«æ‰€æœ‰etcdèŠ‚ç‚¹çš„è¯ä¹¦ï¼Œéœ€è¦é‡æ–°å®šä¹‰ï¼Œé€—å·åˆ†éš”
 
 ```bash
 $ MASTER_IPS=192.168.32.116,192.168.32.117,192.168.32.118
@@ -2617,27 +2447,27 @@ done
 IFS=$OIFS
 ```
 
-## 3¡¢kubernetes¸÷×é¼şµÄÈÏÖ¤ÅäÖÃ£¨½öÖĞ×ª½Úµã£©
+## 3ã€kuberneteså„ç»„ä»¶çš„è®¤è¯é…ç½®ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
->  µ±Ç°Î»ÖÃ£ºemonÖ÷»ú
+>  å½“å‰ä½ç½®ï¼šemonä¸»æœº
 
-kubernetesµÄÈÏÖ¤ÅäÖÃÎÄ¼ş£¬Ò²½Ğkubeconfigs£¬ÓÃÓÚÈÃkubernetesµÄ¿Í»§¶Ë¶¨Î»kube-apiserver²¢Í¨¹ıapiserverµÄ°²È«ÈÏÖ¤¡£
+kubernetesçš„è®¤è¯é…ç½®æ–‡ä»¶ï¼Œä¹Ÿå«kubeconfigsï¼Œç”¨äºè®©kubernetesçš„å®¢æˆ·ç«¯å®šä½kube-apiserverå¹¶é€šè¿‡apiserverçš„å®‰å…¨è®¤è¯ã€‚
 
-½ÓÏÂÀ´ÎÒÃÇÒ»ÆğÀ´Éú³É¸÷¸ö×é¼şµÄkubeconfigs£¬°üÀ¨controller-manager£¬kubelet£¬kube-proxy£¬scheduler£¬ÒÔ¼°adminÓÃ»§¡£
+æ¥ä¸‹æ¥æˆ‘ä»¬ä¸€èµ·æ¥ç”Ÿæˆå„ä¸ªç»„ä»¶çš„kubeconfigsï¼ŒåŒ…æ‹¬controller-managerï¼Œkubeletï¼Œkube-proxyï¼Œschedulerï¼Œä»¥åŠadminç”¨æˆ·ã€‚
 
-ÒÔÏÂÃüÁîĞèÒªÓëÉÏÒ»½Ú¡°Éú³ÉÖ¤Êé¡±ÔÚÍ¬Ò»¸öÄ¿Â¼ÏÂÖ´ĞĞ¡£
+ä»¥ä¸‹å‘½ä»¤éœ€è¦ä¸ä¸Šä¸€èŠ‚â€œç”Ÿæˆè¯ä¹¦â€åœ¨åŒä¸€ä¸ªç›®å½•ä¸‹æ‰§è¡Œã€‚
 
-### 3.0¡¢ÇĞ»»Ä¿Â¼
+### 3.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-### 3.1¡¢kubelet
+### 3.1ã€kubelet
 
 ```bash
-# Ö¸¶¨ÄãµÄworkerÁĞ±í£¨hostname£©£¬¿Õ¸ñ·Ö¸ô
+# æŒ‡å®šä½ çš„workeråˆ—è¡¨ï¼ˆhostnameï¼‰ï¼Œç©ºæ ¼åˆ†éš”
 $ WORKERS="emon2 emon3"
 $ for instance in ${WORKERS}; do
   kubectl config set-cluster kubernetes \
@@ -2659,13 +2489,13 @@ $ for instance in ${WORKERS}; do
 
   kubectl config use-context default --kubeconfig=${instance}.kubeconfig
 done
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1tr|tail -n 2
 emon2.kubeconfig
 emon3.kubeconfig
 ```
 
-### 3.2¡¢kube-proxy
+### 3.2ã€kube-proxy
 
 ```bash
 kubectl config set-cluster kubernetes \
@@ -2686,12 +2516,12 @@ kubectl config set-context default \
    --kubeconfig=kube-proxy.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1tr|tail -n 1
 kube-proxy.kubeconfig
 ```
 
-### 3.3¡¢kube-controller-manager
+### 3.3ã€kube-controller-manager
 
 ```bash
 kubectl config set-cluster kubernetes \
@@ -2712,12 +2542,12 @@ kubectl config set-context default \
   --kubeconfig=kube-controller-manager.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1tr|tail -n 1
 kube-controller-manager.kubeconfig
 ```
 
-### 3.4¡¢kube-scheduler
+### 3.4ã€kube-scheduler
 
 ```bash
 kubectl config set-cluster kubernetes \
@@ -2738,14 +2568,14 @@ kubectl config set-context default \
   --kubeconfig=kube-scheduler.kubeconfig
 
 kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
-# ²é¿´
+# æŸ¥çœ‹
 ls -1tr|tail -n 1
 kube-scheduler.kubeconfig
 ```
 
-### 3.5¡¢adminÓÃ»§ÅäÖÃ
+### 3.5ã€adminç”¨æˆ·é…ç½®
 
-ÎªadminÓÃ»§Éú³ÉkubeconfigÅäÖÃ
+ä¸ºadminç”¨æˆ·ç”Ÿæˆkubeconfigé…ç½®
 
 ```bash
 kubectl config set-cluster kubernetes \
@@ -2766,14 +2596,14 @@ kubectl config set-context default \
   --kubeconfig=admin.kubeconfig
 
 kubectl config use-context default --kubeconfig=admin.kubeconfig
-# ²é¿´
+# æŸ¥çœ‹
 $ ls -1tr|tail -n 1
 admin.kubeconfig
 ```
 
-### 3.6¡¢·Ö·¢ÅäÖÃÎÄ¼ş
+### 3.6ã€åˆ†å‘é…ç½®æ–‡ä»¶
 
-#### 3.6.1¡¢°ÑkubeletºÍkube-proxyĞèÒªµÄkubeconfigÅäÖÃ·Ö·¢µ½Ã¿¸öworker½Úµã
+#### 3.6.1ã€æŠŠkubeletå’Œkube-proxyéœ€è¦çš„kubeconfigé…ç½®åˆ†å‘åˆ°æ¯ä¸ªworkerèŠ‚ç‚¹
 
 ```bash
 $ WORKERS="emon2 emon3"
@@ -2782,7 +2612,7 @@ for instance in ${WORKERS}; do
 done
 ```
 
-#### 3.6.2¡¢°Ñkube-controller-managerºÍkube-schedulerĞèÒªµÄkubeconfigÅäÖÃ·Ö·¢µ½master½Úµã
+#### 3.6.2ã€æŠŠkube-controller-managerå’Œkube-scheduleréœ€è¦çš„kubeconfigé…ç½®åˆ†å‘åˆ°masterèŠ‚ç‚¹
 
 ```bash
 $ MASTERS="emon emon2"
@@ -2791,19 +2621,19 @@ for instance in ${MASTERS}; do
 done
 ```
 
-## 4¡¢²¿ÊğETCD¼¯Èº£¨ËùÓĞ½Úµã£©
+## 4ã€éƒ¨ç½²ETCDé›†ç¾¤ï¼ˆæ‰€æœ‰èŠ‚ç‚¹ï¼‰
 
-Kubernetes×é¼şÊÇÎŞ×´Ì¬µÄ£¬²¢ÔÚetcdÖĞ´æ´¢¼¯Èº×´Ì¬¡£ ÔÚ±¾Ğ¡½ÚÖĞ£¬ÎÒÃÇ½«²¿ÊğÈı¸ö½ÚµãµÄetcdÈº¼¯£¬²¢¶ÔÆä½øĞĞÅäÖÃÒÔÊµÏÖ¸ß¿ÉÓÃĞÔºÍ°²È«µÄÔ¶³Ì·ÃÎÊ¡£
+Kubernetesç»„ä»¶æ˜¯æ— çŠ¶æ€çš„ï¼Œå¹¶åœ¨etcdä¸­å­˜å‚¨é›†ç¾¤çŠ¶æ€ã€‚ åœ¨æœ¬å°èŠ‚ä¸­ï¼Œæˆ‘ä»¬å°†éƒ¨ç½²ä¸‰ä¸ªèŠ‚ç‚¹çš„etcdç¾¤é›†ï¼Œå¹¶å¯¹å…¶è¿›è¡Œé…ç½®ä»¥å®ç°é«˜å¯ç”¨æ€§å’Œå®‰å…¨çš„è¿œç¨‹è®¿é—®ã€‚
 
-### 4.0¡¢ÇĞ»»Ä¿Â¼
+### 4.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 ```
 
-### 4.1¡¢ÅäÖÃetcd
+### 4.1ã€é…ç½®etcd
 
-- copy±ØÒªµÄÖ¤ÊéÎÄ¼ş
+- copyå¿…è¦çš„è¯ä¹¦æ–‡ä»¶
 
 ```bash
 $ mkdir -p /etc/etcd /var/lib/etcd
@@ -2811,12 +2641,12 @@ $ chmod 700 /var/lib/etcd
 $ cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
 ```
 
-- ÅäÖÃetcd.serviceÎÄ¼ş
+- é…ç½®etcd.serviceæ–‡ä»¶
 
 ```bash
 $ ETCD_NAME=$(hostname -s)
-$ ETCD_IP=192.168.32.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
-# etcdËùÓĞ½ÚµãµÄipµØÖ·
+$ ETCD_IP=192.168.32.116 # IPåœ°å€æ›¿æ¢ä¸ºå…·ä½“èŠ‚ç‚¹IPåœ°å€
+# etcdæ‰€æœ‰èŠ‚ç‚¹çš„ipåœ°å€
 $ ETCD_NAMES=(emon emon2 emon3)
 $ ETCD_IPS=(192.168.32.116 192.168.32.117 192.168.32.118)
 $ cat <<EOF > /etc/systemd/system/etcd.service
@@ -2852,16 +2682,16 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### 4.2¡¢Æô¶¯etcd¼¯Èº
+### 4.2ã€å¯åŠ¨etcdé›†ç¾¤
 
-ËùÓĞetcd½Úµã¶¼ÅäÖÃºÃetcd.serviceºó£¬Æô¶¯etcd¼¯Èº
+æ‰€æœ‰etcdèŠ‚ç‚¹éƒ½é…ç½®å¥½etcd.serviceåï¼Œå¯åŠ¨etcdé›†ç¾¤
 
 ```bash
-# ×¢Òâ£ºÅöµ½¿¨Ö÷²»ÒªÅÂ£¬ËùÓĞ½Úµã¶¼Ö´ĞĞÈçÏÂÃüÁîºó£¬¾ÍÁ¬Í¨ÁË£»¿¨ÊÇÎªÁËµÈ´ıÆäËû½Úµã¼ÓÈë
+# æ³¨æ„ï¼šç¢°åˆ°å¡ä¸»ä¸è¦æ€•ï¼Œæ‰€æœ‰èŠ‚ç‚¹éƒ½æ‰§è¡Œå¦‚ä¸‹å‘½ä»¤åï¼Œå°±è¿é€šäº†ï¼›å¡æ˜¯ä¸ºäº†ç­‰å¾…å…¶ä»–èŠ‚ç‚¹åŠ å…¥
 $ systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
 ```
 
-### 4.3¡¢ÑéÖ¤etcd¼¯Èº
+### 4.3ã€éªŒè¯etcdé›†ç¾¤
 
 ```bash
 $ ETCDCTL_API=3 etcdctl member list \
@@ -2869,7 +2699,7 @@ $ ETCDCTL_API=3 etcdctl member list \
   --cacert=/etc/etcd/ca.pem \
   --cert=/etc/etcd/kubernetes.pem \
   --key=/etc/etcd/kubernetes-key.pem
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 3bae6ef756268744, started, emon2, https://192.168.32.117:2380, https://192.168.32.117:2379, false
 48fd167b46c04497, started, emon3, https://192.168.32.118:2380, https://192.168.32.118:2379, false
 7d04ddf76c096e96, started, emon, https://192.168.32.116:2380, https://192.168.32.116:2379, false
@@ -2877,39 +2707,39 @@ $ ETCDCTL_API=3 etcdctl member list \
 
 
 
-## 5¡¢²¿Êğkubernetes¿ØÖÆÆ½Ãæ£¨ËùÓĞmaster½Úµã£©
+## 5ã€éƒ¨ç½²kubernetesæ§åˆ¶å¹³é¢ï¼ˆæ‰€æœ‰masterèŠ‚ç‚¹ï¼‰
 
-Õâ²¿·ÖÎÒÃÇ²¿ÊğkubernetesµÄ¿ØÖÆÆ½Ãæ£¬Ã¿¸ö×é¼şÓĞ¶à¸öµã±£Ö¤¸ß¿ÉÓÃ¡£ÊµÀıÖĞÎÒÃÇÔÚÁ½¸ö½ÚµãÉÏ²¿Êğ API Server¡¢Scheduler ºÍ Controller Manager¡£µ±È»ÄãÒ²¿ÉÒÔ°´ÕÕ½Ì³Ì²¿ÊğÈı¸ö½ÚµãµÄ¸ß¿ÉÓÃ£¬²Ù×÷¶¼ÊÇÒ»ÖÂµÄ¡£
+è¿™éƒ¨åˆ†æˆ‘ä»¬éƒ¨ç½²kubernetesçš„æ§åˆ¶å¹³é¢ï¼Œæ¯ä¸ªç»„ä»¶æœ‰å¤šä¸ªç‚¹ä¿è¯é«˜å¯ç”¨ã€‚å®ä¾‹ä¸­æˆ‘ä»¬åœ¨ä¸¤ä¸ªèŠ‚ç‚¹ä¸Šéƒ¨ç½² API Serverã€Scheduler å’Œ Controller Managerã€‚å½“ç„¶ä½ ä¹Ÿå¯ä»¥æŒ‰ç…§æ•™ç¨‹éƒ¨ç½²ä¸‰ä¸ªèŠ‚ç‚¹çš„é«˜å¯ç”¨ï¼Œæ“ä½œéƒ½æ˜¯ä¸€è‡´çš„ã€‚
 
-> ÏÂÃæµÄËùÓĞÃüÁî¶¼ÊÇÔËĞĞÔÚÃ¿¸ömaster½ÚµãµÄ£¬ÎÒÃÇµÄÊµÀıÖĞÊÇ emon ºÍ emon2
+> ä¸‹é¢çš„æ‰€æœ‰å‘½ä»¤éƒ½æ˜¯è¿è¡Œåœ¨æ¯ä¸ªmasterèŠ‚ç‚¹çš„ï¼Œæˆ‘ä»¬çš„å®ä¾‹ä¸­æ˜¯ emon å’Œ emon2
 
-ĞÔºÍ°²È«µÄÔ¶³Ì·ÃÎÊ¡£
+æ€§å’Œå®‰å…¨çš„è¿œç¨‹è®¿é—®ã€‚
 
-### 5.0¡¢ÇĞ»»Ä¿Â¼
+### 5.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 ```
 
-### 5.1¡¢ÅäÖÃAPI Server
+### 5.1ã€é…ç½®API Server
 
 ```bash
-# ´´½¨kubernetes±ØÒªÄ¿Â¼
+# åˆ›å»ºkuberneteså¿…è¦ç›®å½•
 $ mkdir -p /etc/kubernetes/ssl
-# ×¼±¸Ö¤ÊéÎÄ¼ş
+# å‡†å¤‡è¯ä¹¦æ–‡ä»¶
 $ cp ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem \
     service-account-key.pem service-account.pem \
     proxy-client.pem proxy-client-key.pem \
     /etc/kubernetes/ssl/
 
-# ÅäÖÃkube-apiserver.service
-# ±¾»úÄÚÍøip
-$ IP=192.168.32.116 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
-# apiserverÊµÀıÊı
+# é…ç½®kube-apiserver.service
+# æœ¬æœºå†…ç½‘ip
+$ IP=192.168.32.116 # IPåœ°å€æ›¿æ¢ä¸ºå…·ä½“èŠ‚ç‚¹IPåœ°å€
+# apiserverå®ä¾‹æ•°
 $ APISERVER_COUNT=2
-# etcd½Úµã
+# etcdèŠ‚ç‚¹
 $ ETCD_ENDPOINTS=(192.168.32.116 192.168.32.117 192.168.32.118)
-# ´´½¨ apiserver service
+# åˆ›å»º apiserver service
 $ cat <<EOF > /etc/systemd/system/kube-apiserver.service
 [Unit]
 Description=Kubernetes API Server
@@ -2963,13 +2793,13 @@ EOF
 
 
 
-### 5.2¡¢ÅäÖÃkube-controller-manager
+### 5.2ã€é…ç½®kube-controller-manager
 
 ```bash
-# ×¼±¸kubeconfigÅäÖÃÎÄ¼ş
+# å‡†å¤‡kubeconfigé…ç½®æ–‡ä»¶
 $ cp kube-controller-manager.kubeconfig /etc/kubernetes/
 
-# ´´½¨ kube-controller-manager.service
+# åˆ›å»º kube-controller-manager.service
 $ cat <<EOF > /etc/systemd/system/kube-controller-manager.service
 [Unit]
 Description=Kubernetes Controller Manager
@@ -2998,13 +2828,13 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### 5.3¡¢ÅäÖÃkube-scheduler
+### 5.3ã€é…ç½®kube-scheduler
 
 ```bash
-# ×¼±¸kubeconfigÅäÖÃÎÄ¼ş
+# å‡†å¤‡kubeconfigé…ç½®æ–‡ä»¶
 $ cp kube-scheduler.kubeconfig /etc/kubernetes/
 
-# ´´½¨ scheduler service ÎÄ¼ş
+# åˆ›å»º scheduler service æ–‡ä»¶
 $ cat <<EOF > /etc/systemd/system/kube-scheduler.service
 [Unit]
 Description=Kubernetes Scheduler
@@ -3027,19 +2857,19 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### 5.4¡¢Æô¶¯·şÎñ
+### 5.4ã€å¯åŠ¨æœåŠ¡
 
 ```bash
 $ systemctl daemon-reload && systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 $ systemctl restart kube-apiserver kube-controller-manager kube-scheduler
 ```
 
-### 5.5¡¢·şÎñÑéÖ¤
+### 5.5ã€æœåŠ¡éªŒè¯
 
-¶Ë¿ÚÑéÖ¤
+ç«¯å£éªŒè¯
 
 ```bash
-# ¸÷¸ö×é¼şµÄ¼àÌı¶Ë¿Ú
+# å„ä¸ªç»„ä»¶çš„ç›‘å¬ç«¯å£
 $ netstat -tnlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
@@ -3058,29 +2888,29 @@ tcp6       0      0 :::22                   :::*                    LISTEN      
 
 
 
-ÏµÍ³ÈÕÖ¾ÑéÖ¤
+ç³»ç»Ÿæ—¥å¿—éªŒè¯
 
 ```bash
-# ²é¿´ÏµÍ³ÈÕÖ¾ÊÇ·ñÓĞ×é¼şµÄ´íÎóÈÕÖ¾
+# æŸ¥çœ‹ç³»ç»Ÿæ—¥å¿—æ˜¯å¦æœ‰ç»„ä»¶çš„é”™è¯¯æ—¥å¿—
 $ journalctl -f
 ```
 
-### 5.6¡¢ÅäÖÃkubectl£¨emonÕâ¸ömaster½Úµã¼´¿É£©
+### 5.6ã€é…ç½®kubectlï¼ˆemonè¿™ä¸ªmasterèŠ‚ç‚¹å³å¯ï¼‰
 
-kubectlÊÇÓÃÀ´¹ÜÀíkubernetes¼¯ÈºµÄ¿Í»§¶Ë¹¤¾ß£¬Ç°ÃæÎÒÃÇÒÑ¾­ÏÂÔØµ½ÁËËùÓĞµÄmaster½Úµã¡£ÏÂÃæÎÒÃÇÀ´ÅäÖÃÕâ¸ö¹¤¾ß£¬ÈÃËü¿ÉÒÔÊ¹ÓÃ¡£
+kubectlæ˜¯ç”¨æ¥ç®¡ç†kubernetesé›†ç¾¤çš„å®¢æˆ·ç«¯å·¥å…·ï¼Œå‰é¢æˆ‘ä»¬å·²ç»ä¸‹è½½åˆ°äº†æ‰€æœ‰çš„masterèŠ‚ç‚¹ã€‚ä¸‹é¢æˆ‘ä»¬æ¥é…ç½®è¿™ä¸ªå·¥å…·ï¼Œè®©å®ƒå¯ä»¥ä½¿ç”¨ã€‚
 
 ```bash
-# ´´½¨kubectlµÄÅäÖÃÄ¿Â¼
+# åˆ›å»ºkubectlçš„é…ç½®ç›®å½•
 $ mkdir ~/.kube/
-# °Ñ¹ÜÀíÔ±µÄÅäÖÃÎÄ¼şÒÆ¶¯µ½kubectlµÄÄ¬ÈÏÄ¿Â¼
+# æŠŠç®¡ç†å‘˜çš„é…ç½®æ–‡ä»¶ç§»åŠ¨åˆ°kubectlçš„é»˜è®¤ç›®å½•
 $ cp ~/admin.kubeconfig ~/.kube/config
-# ²âÊÔ
+# æµ‹è¯•
 $ kubectl get nodes
-# ÃüÁîĞĞÊä³ö½á¹û£ºÄ¿Ç°£¬Õı³££¡
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœï¼šç›®å‰ï¼Œæ­£å¸¸ï¼
 No resources found
 ```
 
-ÔÚÖ´ĞĞ kubectl exec¡¢run¡¢logs µÈÃüÁîÊ±£¬apiserver »á×ª·¢µ½ kubelet¡£ÕâÀï¶¨Òå RBAC ¹æÔò£¬ÊÚÈ¨ apiserver µ÷ÓÃ kubelet API¡£
+åœ¨æ‰§è¡Œ kubectl execã€runã€logs ç­‰å‘½ä»¤æ—¶ï¼Œapiserver ä¼šè½¬å‘åˆ° kubeletã€‚è¿™é‡Œå®šä¹‰ RBAC è§„åˆ™ï¼Œæˆæƒ apiserver è°ƒç”¨ kubelet APIã€‚
 
 ```bash
 $ kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=system:kubelet-api-admin --user kubernetes
@@ -3088,24 +2918,24 @@ $ kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole=sy
 
 
 
-## 6¡¢²¿Êğkubernetes¹¤×÷½Úµã£¨ËùÓĞworker½Úµã£©
+## 6ã€éƒ¨ç½²kuberneteså·¥ä½œèŠ‚ç‚¹ï¼ˆæ‰€æœ‰workerèŠ‚ç‚¹ï¼‰
 
-Õâ²¿·ÖÎÒÃÇ²¿ÊğkubernetesµÄ¹¤×÷½Úµã¡£ÊµÀıÖĞÎÒÃÇÓĞÁ½¸ö¹¤×÷½Úµã£¬Ò»¸öÊÇ¶ÀÁ¢µÄ¹¤×÷½Úµã£¬Ò»¸öÊÇ¸úmasterÔÚÒ»ÆğµÄ½Úµã¡£
-ÔÚÃ¿¸ö½ÚµãÉÏÎÒÃÇ»á²¿Êğkubelet¡¢kube-proxy¡¢container runtime¡¢cni¡¢nginx-proxy
+è¿™éƒ¨åˆ†æˆ‘ä»¬éƒ¨ç½²kubernetesçš„å·¥ä½œèŠ‚ç‚¹ã€‚å®ä¾‹ä¸­æˆ‘ä»¬æœ‰ä¸¤ä¸ªå·¥ä½œèŠ‚ç‚¹ï¼Œä¸€ä¸ªæ˜¯ç‹¬ç«‹çš„å·¥ä½œèŠ‚ç‚¹ï¼Œä¸€ä¸ªæ˜¯è·Ÿmasteråœ¨ä¸€èµ·çš„èŠ‚ç‚¹ã€‚
+åœ¨æ¯ä¸ªèŠ‚ç‚¹ä¸Šæˆ‘ä»¬ä¼šéƒ¨ç½²kubeletã€kube-proxyã€container runtimeã€cniã€nginx-proxy
 
-### 6.0¡¢ÇĞ»»Ä¿Â¼£¨½öÖĞ×ª½Úµã£©
+### 6.0ã€åˆ‡æ¢ç›®å½•ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-### 6.1¡¢Container Runtime - Containerd
+### 6.1ã€Container Runtime - Containerd
 
-#### 6.1.1¡¢Èí¼ş°üÏÂÔØ£¨½öÖĞ×ª½Úµã£©
+#### 6.1.1ã€è½¯ä»¶åŒ…ä¸‹è½½ï¼ˆä»…ä¸­è½¬èŠ‚ç‚¹ï¼‰
 
 ```bash
-# Éè¶¨containerdµÄ°æ±¾ºÅ£¬·Ö·¢µ½Á½¸öwork½Úµã
+# è®¾å®šcontainerdçš„ç‰ˆæœ¬å·ï¼Œåˆ†å‘åˆ°ä¸¤ä¸ªworkèŠ‚ç‚¹
 $ VERSION=1.4.3
 WORKERS="emon2 emon3"
 for instance in ${WORKERS}; do
@@ -3113,58 +2943,58 @@ for instance in ${WORKERS}; do
 done
 ```
 
-#### 6.1.2¡¢ÕûÀíÑ¹ËõÎÄ¼ş
+#### 6.1.2ã€æ•´ç†å‹ç¼©æ–‡ä»¶
 
-ÏÂÔØºóµÄÎÄ¼şÊÇÒ»¸ötar.gz£¬ÊÇÒ»¸öallinoneµÄ°ü£¬°üÀ¨ÁËrunc¡¢circtl¡¢ctr¡¢containerdµÈÈİÆ÷ÔËĞĞÊ±ÒÔ¼°cniÏà¹ØµÄÎÄ¼ş£¬½âÑ¹Ëõµ½Ò»¸ö¶ÀÁ¢µÄÄ¿Â¼ÖĞ
+ä¸‹è½½åçš„æ–‡ä»¶æ˜¯ä¸€ä¸ªtar.gzï¼Œæ˜¯ä¸€ä¸ªallinoneçš„åŒ…ï¼ŒåŒ…æ‹¬äº†runcã€circtlã€ctrã€containerdç­‰å®¹å™¨è¿è¡Œæ—¶ä»¥åŠcniç›¸å…³çš„æ–‡ä»¶ï¼Œè§£å‹ç¼©åˆ°ä¸€ä¸ªç‹¬ç«‹çš„ç›®å½•ä¸­
 
 ```bash
 $ VERSION=1.4.3
-# ´´½¨½âÑ¹Ä¿Â¼
+# åˆ›å»ºè§£å‹ç›®å½•
 $ mkdir containerd
-# ½âÑ¹Ëõ
+# è§£å‹ç¼©
 $ tar -zxvf cri-containerd-cni-${VERSION}-linux-amd64.tar.gz -C containerd
-# ¸´ÖÆĞèÒªµÄÎÄ¼ş
+# å¤åˆ¶éœ€è¦çš„æ–‡ä»¶
 $ cp containerd/etc/crictl.yaml /etc/
 $ cp containerd/etc/systemd/system/containerd.service /etc/systemd/system/
 $ cp -r containerd/usr /
 ```
 
-#### 6.1.3¡¢containerdÅäÖÃÎÄ¼ş
+#### 6.1.3ã€containerdé…ç½®æ–‡ä»¶
 
 ```bash
 $ mkdir -p /etc/containerd
-# Ä¬ÈÏÅäÖÃÉú³ÉÅäÖÃÎÄ¼ş
+# é»˜è®¤é…ç½®ç”Ÿæˆé…ç½®æ–‡ä»¶
 $ containerd config default > /etc/containerd/config.toml
 
-# ¶¨ÖÆ»¯ÅäÖÃ£¨¿ÉÑ¡£©
-# ´´½¨¾µÏñÄ¿Â¼
+# å®šåˆ¶åŒ–é…ç½®ï¼ˆå¯é€‰ï¼‰
+# åˆ›å»ºé•œåƒç›®å½•
 $ mkdir /usr/local/lib/containerd
 $ vi /etc/containerd/config.toml
 ```
 
-ĞŞ¸ÄÄ¬ÈÏ¾µÏñÄ¿Â¼£¨·Ç±ØĞë£©¡¾ºöÂÔ¡¿
+ä¿®æ”¹é»˜è®¤é•œåƒç›®å½•ï¼ˆéå¿…é¡»ï¼‰ã€å¿½ç•¥ã€‘
 
 ```bash
-# µ÷Õûconfig.tomlÅäÖÃ
+# è°ƒæ•´config.tomlé…ç½®
 root = "/var/lib/containerd" ==> root = "/usr/local/lib/containerd"
 ```
 
-#### 6.1.4¡¢Æô¶¯containerd
+#### 6.1.4ã€å¯åŠ¨containerd
 
 ```bash
 $ systemctl enable containerd && systemctl restart containerd
-# ¼ì²é×´Ì¬
+# æ£€æŸ¥çŠ¶æ€
 $ systemctl status containerd
 ```
 
-#### 6.1.5¡¢ÅäÖÃ¾µÏñ¼ÓËÙÆ÷£¨ÒÑÑéÖ¤£©
+#### 6.1.5ã€é…ç½®é•œåƒåŠ é€Ÿå™¨ï¼ˆå·²éªŒè¯ï¼‰
 
 https://help.aliyun.com/document_detail/60750.html
 
 ```bash
-# ±¸·İÔ´ÎÄ¼ş 
+# å¤‡ä»½æºæ–‡ä»¶ 
 $ cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
-# ĞŞ¸ÄÅäÖÃÎÄ¼ş£ºËÑË÷ registry£¬µ÷ÕûÈçÏÂ
+# ä¿®æ”¹é…ç½®æ–‡ä»¶ï¼šæœç´¢ registryï¼Œè°ƒæ•´å¦‚ä¸‹
 $ vim /etc/containerd/config.toml
 ```
 
@@ -3184,7 +3014,7 @@ $ vim /etc/containerd/config.toml
           password = "Harbor12345"
 ```
 
-- ÖØÆôk8sÊ¹ÅäÖÃÉúĞ§
+- é‡å¯k8sä½¿é…ç½®ç”Ÿæ•ˆ
 
 ```bash
 systemctl restart containerd
@@ -3192,16 +3022,16 @@ systemctl restart containerd
 
 
 
-### 6.2¡¢ÅäÖÃkubelet
+### 6.2ã€é…ç½®kubelet
 
-#### ×¼±¸kubeletÅäÖÃ
+#### å‡†å¤‡kubeleté…ç½®
 
 ```bash
 $ mkdir -p /etc/kubernetes/ssl/
 $ cp ${HOSTNAME}-key.pem ${HOSTNAME}.pem ca.pem ca-key.pem /etc/kubernetes/ssl/
 $ cp ${HOSTNAME}.kubeconfig /etc/kubernetes/kubeconfig
-$ IP=192.168.32.117 # IPµØÖ·Ìæ»»Îª¾ßÌå½ÚµãIPµØÖ·
-# Ğ´ÈëkubeletÅäÖÃÎÄ¼ş
+$ IP=192.168.32.117 # IPåœ°å€æ›¿æ¢ä¸ºå…·ä½“èŠ‚ç‚¹IPåœ°å€
+# å†™å…¥kubeleté…ç½®æ–‡ä»¶
 $ cat <<EOF > /etc/kubernetes/kubelet-config.yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -3234,7 +3064,7 @@ tlsPrivateKeyFile: "/etc/kubernetes/ssl/${HOSTNAME}-key.pem"
 EOF
 ```
 
-#### ÅäÖÃkubelet·şÎñ
+#### é…ç½®kubeletæœåŠ¡
 
 ```bash
 $ cat <<EOF > /etc/systemd/system/kubelet.service
@@ -3265,19 +3095,19 @@ EOF
 
 
 
-### 6.3¡¢ÅäÖÃnginx-proxy£¨½öÔÚÃ»ÓĞapiserverµÄ½Úµã²¿Êğ£ºÕâÀïemon3£©
+### 6.3ã€é…ç½®nginx-proxyï¼ˆä»…åœ¨æ²¡æœ‰apiserverçš„èŠ‚ç‚¹éƒ¨ç½²ï¼šè¿™é‡Œemon3ï¼‰
 
-nginx-proxyÊÇÒ»¸öÓÃÓÚworker½Úµã·ÃÎÊapiserverµÄÒ»¸ö´úÀí£¬ÊÇapiserverÒ»¸öÓÅÑÅµÄ¸ß¿ÉÓÃ·½°¸£¬ËüÊ¹ÓÃkubeletµÄstaticpod·½Ê½Æô¶¯£¬ÈÃÃ¿¸ö½Úµã¶¼¿ÉÒÔ¾ùºâµÄ·ÃÎÊµ½Ã¿¸öapiserver·şÎñ£¬ÓÅÑÅµÄÌæ´úÁËÍ¨¹ıĞéÄâip·ÃÎÊapiserverµÄ·½Ê½¡£
+nginx-proxyæ˜¯ä¸€ä¸ªç”¨äºworkerèŠ‚ç‚¹è®¿é—®apiserverçš„ä¸€ä¸ªä»£ç†ï¼Œæ˜¯apiserverä¸€ä¸ªä¼˜é›…çš„é«˜å¯ç”¨æ–¹æ¡ˆï¼Œå®ƒä½¿ç”¨kubeletçš„staticpodæ–¹å¼å¯åŠ¨ï¼Œè®©æ¯ä¸ªèŠ‚ç‚¹éƒ½å¯ä»¥å‡è¡¡çš„è®¿é—®åˆ°æ¯ä¸ªapiserveræœåŠ¡ï¼Œä¼˜é›…çš„æ›¿ä»£äº†é€šè¿‡è™šæ‹Ÿipè®¿é—®apiserverçš„æ–¹å¼ã€‚
 
-> Tips: nginx-proxy Ö»ĞèÒªÔÚÃ»ÓĞ apiserver µÄ½Úµã²¿ÊğÅ¶~
+> Tips: nginx-proxy åªéœ€è¦åœ¨æ²¡æœ‰ apiserver çš„èŠ‚ç‚¹éƒ¨ç½²å“¦~
 
-#### 6.3.1¡¢nginxÅäÖÃÎÄ¼ş
+#### 6.3.1ã€nginxé…ç½®æ–‡ä»¶
 
 ```bash
 $ mkdir -p /etc/nginx
-# master ipÁĞ±í
+# master ipåˆ—è¡¨
 $ MASTER_IPS=(192.168.32.116 192.168.32.117)
-# Ö´ĞĞÇ°ÇëÏÈcopyÒ»·İ£¬²¢ĞŞ¸ÄºÃupstreamµÄ 'server' ²¿·ÖÅäÖÃ
+# æ‰§è¡Œå‰è¯·å…ˆcopyä¸€ä»½ï¼Œå¹¶ä¿®æ”¹å¥½upstreamçš„ 'server' éƒ¨åˆ†é…ç½®
 $ cat <<EOF > /etc/nginx/nginx.conf
 error_log stderr notice;
 
@@ -3294,7 +3124,7 @@ events {
 stream {
   upstream kube_apiserver {
     least_conn;
-    # Èç¹ûÓĞ¶à¸ömaster£¬ÒÀ´ÎÅäÖÃ¼´¿É
+    # å¦‚æœæœ‰å¤šä¸ªmasterï¼Œä¾æ¬¡é…ç½®å³å¯
     server ${MASTER_IPS[0]}:6443;
     server ${MASTER_IPS[1]}:6443;
   }
@@ -3334,10 +3164,10 @@ http {
 EOF
 ```
 
-#### 6.3.2¡¢nginx manifest
+#### 6.3.2ã€nginx manifest
 
 ```bash
-# ¡¾ÌØÊâ¡¿£º¸ÃÎÄ¼ş¼ĞÔÚemon2Ò²ĞèÒª´´½¨£¬nginx-proxy.yaml²»ĞèÒª
+# ã€ç‰¹æ®Šã€‘ï¼šè¯¥æ–‡ä»¶å¤¹åœ¨emon2ä¹Ÿéœ€è¦åˆ›å»ºï¼Œnginx-proxy.yamlä¸éœ€è¦
 $ mkdir -p /etc/kubernetes/manifests/
 $ cat <<EOF > /etc/kubernetes/manifests/nginx-proxy.yaml
 apiVersion: v1
@@ -3385,13 +3215,13 @@ EOF
 
 
 
-### 6.4¡¢ÅäÖÃkube-proxy
+### 6.4ã€é…ç½®kube-proxy
 
-#### 6.4.1¡¢ÅäÖÃÎÄ¼ş
+#### 6.4.1ã€é…ç½®æ–‡ä»¶
 
 ```bash
 $ mv kube-proxy.kubeconfig /etc/kubernetes/
-# ´´½¨ kube-proxy-config.yaml
+# åˆ›å»º kube-proxy-config.yaml
 $ cat <<EOF > /etc/kubernetes/kube-proxy-config.yaml
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
@@ -3403,7 +3233,7 @@ mode: ipvs
 EOF
 ```
 
-#### 6.4.2¡¢kube-proxy·şÎñÎÄ¼ş
+#### 6.4.2ã€kube-proxyæœåŠ¡æ–‡ä»¶
 
 ```bash
 $ cat <<EOF > /etc/systemd/system/kube-proxy.service
@@ -3422,13 +3252,13 @@ WantedBy=multi-user.target
 EOF
 ```
 
-### 6.5¡¢Æô¶¯·şÎñ
+### 6.5ã€å¯åŠ¨æœåŠ¡
 
 ```bash
-# ¡¾ÌØÊâ¡¿£ºemon2²»ĞèÒª£¬½öÔÚemon3½Úµã·Ç³£ÍÆ¼öÏÈpullÏÂnginx¾µÏñ£ºcrictl pull docker.io/library/nginx:1.19  ÔÙÆô¶¯
+# ã€ç‰¹æ®Šã€‘ï¼šemon2ä¸éœ€è¦ï¼Œä»…åœ¨emon3èŠ‚ç‚¹éå¸¸æ¨èå…ˆpullä¸‹nginxé•œåƒï¼šcrictl pull docker.io/library/nginx:1.19  å†å¯åŠ¨
 $ crictl pull docker.io/library/nginx:1.19
 
-# ÔÚemon2ºÍemon3½Úµã£¬·Ç³£ÍÆ¼öÏÈpullÏÂpause¾µÏñ£¬ÔÙÆô¶¯£»pause¾µÏñpull·½·¨²Î¼ûÏÂÃæ£¡£¡£¡
+# åœ¨emon2å’Œemon3èŠ‚ç‚¹ï¼Œéå¸¸æ¨èå…ˆpullä¸‹pauseé•œåƒï¼Œå†å¯åŠ¨ï¼›pauseé•œåƒpullæ–¹æ³•å‚è§ä¸‹é¢ï¼ï¼ï¼
 $ crictl pull registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pause:3.2
 $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pause:3.2 k8s.gcr.io/pause:3.2
 
@@ -3437,64 +3267,64 @@ $ systemctl restart kubelet kube-proxy
 $ journalctl -f -u kubelet
 $ journalctl -f -u kube-proxy
 
-# ½ØÖ¹Ä¿Ç°½á¹û£ºcrictl ps emon3½öÓĞnginxÆô¶¯£¬emon2²¢ÎŞÈİÆ÷Æô¶¯¡£
+# æˆªæ­¢ç›®å‰ç»“æœï¼šcrictl ps emon3ä»…æœ‰nginxå¯åŠ¨ï¼Œemon2å¹¶æ— å®¹å™¨å¯åŠ¨ã€‚
 ```
 
-> ÌØÊâËµÃ÷£ºÒÔÏÂÊÇ¸öÈË¼ÇÂ¼µÄÎÊÌâ£¬ºóÀ´ÓÅ»¯ÁË¾µÏñÀ­È¡ÌáÇ°£¬Æô¶¯ºó5ÃëÖ®ÄÚ¾ÍÕı³£ÁË£¬²»ÔÙÓĞÈçÏÂ2¸öÎÊÌâ£¡£¡£¡ÇĞ¼Ç£¡£¡£¡
+> ç‰¹æ®Šè¯´æ˜ï¼šä»¥ä¸‹æ˜¯ä¸ªäººè®°å½•çš„é—®é¢˜ï¼Œåæ¥ä¼˜åŒ–äº†é•œåƒæ‹‰å–æå‰ï¼Œå¯åŠ¨å5ç§’ä¹‹å†…å°±æ­£å¸¸äº†ï¼Œä¸å†æœ‰å¦‚ä¸‹2ä¸ªé—®é¢˜ï¼ï¼ï¼åˆ‡è®°ï¼ï¼ï¼
 >
 > 
 >
 > journalctl -f -u kubelet
 >
-> ÎÊÌâÒ»¡¢
+> é—®é¢˜ä¸€ã€
 >
-> emon2½Úµã±¨´í£º Unable to read config path "/etc/kubernetes/manifests"
+> emon2èŠ‚ç‚¹æŠ¥é”™ï¼š Unable to read config path "/etc/kubernetes/manifests"
 >
-> ´´½¨Ä¿Â¼¼´¿É£ºmkdir -p /etc/kubernetes/manifests/
+> åˆ›å»ºç›®å½•å³å¯ï¼šmkdir -p /etc/kubernetes/manifests/
 >
-> ÎÊÌâ2¡¢
+> é—®é¢˜2ã€
 >
-> emon3½Úµã±¨´í£ºkubelet.go:2243] node "emon3" not found
+> emon3èŠ‚ç‚¹æŠ¥é”™ï¼škubelet.go:2243] node "emon3" not found
 >
-> ÃüÁîcrictl images ·¢ÏÖ£¬ÓÉÓÚ¾µÏñ pause:3.2 ÉĞÎ´ÏÂÔØÆô¶¯£¬µÈ´ı¼´¿É£¡
+> å‘½ä»¤crictl images å‘ç°ï¼Œç”±äºé•œåƒ pause:3.2 å°šæœªä¸‹è½½å¯åŠ¨ï¼Œç­‰å¾…å³å¯ï¼
 >
-> ¾­ÑéÖ®Ì¸£¡£¡£¡
+> ç»éªŒä¹‹è°ˆï¼ï¼ï¼
 >
-> ÊÖ¹¤ÏÂÔØ£º
+> æ‰‹å·¥ä¸‹è½½ï¼š
 >
 > crictl pull docker.io/library/nginx:1.19
 >
-> ´ËÊ±ÔÚemon3½Úµã£¬¿´µ½µÄ»¹ÊÇ±¨´íĞÅÏ¢£¬²»×Å¼±£¬Èç¹ûÍøÂçÃ»ÎÊÌâ£¬µÈ´ı½Ó½ü10·ÖÖÓ£¬»á·¢ÏÖÈçÏÂ£º
+> æ­¤æ—¶åœ¨emon3èŠ‚ç‚¹ï¼Œçœ‹åˆ°çš„è¿˜æ˜¯æŠ¥é”™ä¿¡æ¯ï¼Œä¸ç€æ€¥ï¼Œå¦‚æœç½‘ç»œæ²¡é—®é¢˜ï¼Œç­‰å¾…æ¥è¿‘10åˆ†é’Ÿï¼Œä¼šå‘ç°å¦‚ä¸‹ï¼š
 >
 > ```tex
-> 4ÔÂ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.859842   60611 kubelet.go:2243] node "emon3" not found
-> 4ÔÂ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.959939   60611 kubelet.go:2243] node "emon3" not found
-> 4ÔÂ 01 17:27:57 emon3 kubelet[60611]: E0401 17:27:57.060894   60611 kubelet.go:2243] node "emon3" not found
-> 4ÔÂ 01 17:27:59 emon3 kubelet[60611]: I0401 17:27:59.174140   60611 setters.go:86] Using node IP: "192.168.32.118"
-> 4ÔÂ 01 17:28:00 emon3 kubelet[60611]: E0401 17:28:00.488025   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:05 emon3 kubelet[60611]: I0401 17:28:05.318879   60611 kubelet_getters.go:176] "Pod status updated" pod="kube-system/nginx-proxy-emon3" status=Running
-> 4ÔÂ 01 17:28:05 emon3 kubelet[60611]: E0401 17:28:05.489211   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:09 emon3 kubelet[60611]: I0401 17:28:09.178972   60611 setters.go:86] Using node IP: "192.168.32.118"
-> 4ÔÂ 01 17:28:10 emon3 kubelet[60611]: E0401 17:28:10.490192   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:15 emon3 kubelet[60611]: E0401 17:28:15.491678   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
-> 4ÔÂ 01 17:28:19 emon3 kubelet[60611]: I0401 17:28:19.182519   60611 setters.go:86] Using node IP: "192.168.32.118"
-> 4ÔÂ 01 17:28:20 emon3 kubelet[60611]: E0401 17:28:20.493213   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
+> 4æœˆ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.859842   60611 kubelet.go:2243] node "emon3" not found
+> 4æœˆ 01 17:27:56 emon3 kubelet[60611]: E0401 17:27:56.959939   60611 kubelet.go:2243] node "emon3" not found
+> 4æœˆ 01 17:27:57 emon3 kubelet[60611]: E0401 17:27:57.060894   60611 kubelet.go:2243] node "emon3" not found
+> 4æœˆ 01 17:27:59 emon3 kubelet[60611]: I0401 17:27:59.174140   60611 setters.go:86] Using node IP: "192.168.32.118"
+> 4æœˆ 01 17:28:00 emon3 kubelet[60611]: E0401 17:28:00.488025   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
+> 4æœˆ 01 17:28:05 emon3 kubelet[60611]: I0401 17:28:05.318879   60611 kubelet_getters.go:176] "Pod status updated" pod="kube-system/nginx-proxy-emon3" status=Running
+> 4æœˆ 01 17:28:05 emon3 kubelet[60611]: E0401 17:28:05.489211   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
+> 4æœˆ 01 17:28:09 emon3 kubelet[60611]: I0401 17:28:09.178972   60611 setters.go:86] Using node IP: "192.168.32.118"
+> 4æœˆ 01 17:28:10 emon3 kubelet[60611]: E0401 17:28:10.490192   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
+> 4æœˆ 01 17:28:15 emon3 kubelet[60611]: E0401 17:28:15.491678   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
+> 4æœˆ 01 17:28:19 emon3 kubelet[60611]: I0401 17:28:19.182519   60611 setters.go:86] Using node IP: "192.168.32.118"
+> 4æœˆ 01 17:28:20 emon3 kubelet[60611]: E0401 17:28:20.493213   60611 kubelet.go:2163] Container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: cni plugin not initialized
 > ```
 >
-> OKÁË£¬´ÓÍ·²¿ÊğÁË3±é£¬¶¼Åöµ½¸ÃÎÊÌâÁË£¬µÚÈı´Î·¢ÏÖÔÚÖ´ĞĞÁËÃüÁî£º`modprobe -r br_netfilter`ºó»òÕßÖØÆôÏµÍ³ÁË£¬¸ÃÄ£¿é¶¼²»»áÖØĞÂ¼ÓÔØ£¬µ¼ÖÂ£º
-> sysctl -p /etc/sysctl.d/kubernetes.conf Ê§°Ü¡£
+> OKäº†ï¼Œä»å¤´éƒ¨ç½²äº†3éï¼Œéƒ½ç¢°åˆ°è¯¥é—®é¢˜äº†ï¼Œç¬¬ä¸‰æ¬¡å‘ç°åœ¨æ‰§è¡Œäº†å‘½ä»¤ï¼š`modprobe -r br_netfilter`åæˆ–è€…é‡å¯ç³»ç»Ÿäº†ï¼Œè¯¥æ¨¡å—éƒ½ä¸ä¼šé‡æ–°åŠ è½½ï¼Œå¯¼è‡´ï¼š
+> sysctl -p /etc/sysctl.d/kubernetes.conf å¤±è´¥ã€‚
 >
-> ÔÚµÚÈı±éÊ±£¬½â¾öÁË¸ÃÎÊÌâ¡£²¿Êğµ½ÕâÒ»²½Ê±»¹ÊÇÌáÊ¾ node "emon3" not found£¬Ë²¼ä¾øÍû£¡£¡£¡
+> åœ¨ç¬¬ä¸‰éæ—¶ï¼Œè§£å†³äº†è¯¥é—®é¢˜ã€‚éƒ¨ç½²åˆ°è¿™ä¸€æ­¥æ—¶è¿˜æ˜¯æç¤º node "emon3" not foundï¼Œç¬é—´ç»æœ›ï¼ï¼ï¼
 >
-> ±§×ÅËãÁË£¬ÏÈ¼ÌĞøÍùÏÂ¿´ÊÓÆµ£¬¼ÌĞøÑ§Ï°µÄÏë·¨Ê±£¬¹ıÁËÔ¼Äª10·ÖÖÓ£¬·¢ÏÖOKÁË£¬È»ºó£º`crictl ps`¿´µ½Æô¶¯ÁËÒ»¸öÈİÆ÷£¬6443½Ó¿Ú±»¼àÌıÁË£¡£¡£¡
+> æŠ±ç€ç®—äº†ï¼Œå…ˆç»§ç»­å¾€ä¸‹çœ‹è§†é¢‘ï¼Œç»§ç»­å­¦ä¹ çš„æƒ³æ³•æ—¶ï¼Œè¿‡äº†çº¦è«10åˆ†é’Ÿï¼Œå‘ç°OKäº†ï¼Œç„¶åï¼š`crictl ps`çœ‹åˆ°å¯åŠ¨äº†ä¸€ä¸ªå®¹å™¨ï¼Œ6443æ¥å£è¢«ç›‘å¬äº†ï¼ï¼ï¼
 >
-> ÕæÕæÊÇ£¬°¦£¡
+> çœŸçœŸæ˜¯ï¼Œå”‰ï¼
 >
-> Ñ§Ï°£¬ĞèÒªÏ¸ĞÄ£¬Ò²ĞèÒªÄÍĞÄ£¡£¡£¡2022Äê04ÔÂ01ÈÕ£¬ÓŞÈË½Ú¿ìÀÖ£¡¸ãÁËÇ°ºó3Ìì£¬²ÅÅöÇÉ¸ã¶¨µÄÎÊÌâ£¬¼ÇÂ¼ÏÂ£¡£¡£¡
+> å­¦ä¹ ï¼Œéœ€è¦ç»†å¿ƒï¼Œä¹Ÿéœ€è¦è€å¿ƒï¼ï¼ï¼2022å¹´04æœˆ01æ—¥ï¼Œæ„šäººèŠ‚å¿«ä¹ï¼æäº†å‰å3å¤©ï¼Œæ‰ç¢°å·§æå®šçš„é—®é¢˜ï¼Œè®°å½•ä¸‹ï¼ï¼ï¼
 
-### 6.6¡¢ÊÖ¶¯ÏÂÔØ¾µÏñ£¨·şÎñÆ÷ÎŞ·¨·ÃÎÊÍâÍøÇé¿ö£©£¨±¾°²×°½Ì³ÌÒÑ¾­ÌáÇ°ÏÂÔØ¾µÏñ£©
+### 6.6ã€æ‰‹åŠ¨ä¸‹è½½é•œåƒï¼ˆæœåŠ¡å™¨æ— æ³•è®¿é—®å¤–ç½‘æƒ…å†µï¼‰ï¼ˆæœ¬å®‰è£…æ•™ç¨‹å·²ç»æå‰ä¸‹è½½é•œåƒï¼‰
 
-ÔÚÃ¿¸ö¹¤×÷½ÚµãÏÂÔØpause¾µÏñ£¬ÎªºóÃæ´ò»ù´¡£¡£¡£¡
+åœ¨æ¯ä¸ªå·¥ä½œèŠ‚ç‚¹ä¸‹è½½pauseé•œåƒï¼Œä¸ºåé¢æ‰“åŸºç¡€ï¼ï¼ï¼
 
 ```bash
 $ crictl pull registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pause:3.2
@@ -3503,42 +3333,42 @@ $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/kubernetes-kubespray/pa
 
 
 
-## 7¡¢ÍøÂç²å¼ş-Calico£¨ÔÚÖ÷½Úµãemon£©
+## 7ã€ç½‘ç»œæ’ä»¶-Calicoï¼ˆåœ¨ä¸»èŠ‚ç‚¹emonï¼‰
 
-### 7.0¡¢ÇĞ»»Ä¿Â¼
+### 7.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-Õâ²¿·ÖÎÒÃÇ²¿ÊğkubernetesµÄÍøÂç²é¼ş CNI¡£
+è¿™éƒ¨åˆ†æˆ‘ä»¬éƒ¨ç½²kubernetesçš„ç½‘ç»œæŸ¥ä»¶ CNIã€‚
 
-ÎÄµµµØÖ·£ºhttps://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
+æ–‡æ¡£åœ°å€ï¼šhttps://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
 
-### 7.1¡¢ÏÂÔØÎÄ¼şËµÃ÷
+### 7.1ã€ä¸‹è½½æ–‡ä»¶è¯´æ˜
 
-ÎÄµµÖĞÓĞÁ½¸öÅäÖÃ£¬50ÒÔÏÂ½ÚµãºÍ50ÒÔÉÏ½Úµã£¬ËüÃÇµÄÖ÷ÒªÇø±ğÔÚÓÚÕâ¸ö£ºtypha¡£
-µ±½ÚµãÊı±È½Ï¶àµÄÇé¿öÏÂ£¬Calico µÄ Felix×é¼ş¿ÉÍ¨¹ı Typha Ö±½ÓºÍ Etcd ½øĞĞÊı¾İ½»»¥£¬²»Í¨¹ı kube-apiserver£¬½µµÍkube-apiserverµÄÑ¹Á¦¡£´ó¼Ò¸ù¾İ×Ô¼ºµÄÊµ¼ÊÇé¿öÑ¡ÔñÏÂÔØ¡£
-ÏÂÔØºóµÄÎÄ¼şÊÇÒ»¸öall-in-oneµÄyamlÎÄ¼ş£¬ÎÒÃÇÖ»ĞèÒªÔÚ´Ë»ù´¡ÉÏ×öÉÙĞíĞŞ¸Ä¼´¿É¡£
+æ–‡æ¡£ä¸­æœ‰ä¸¤ä¸ªé…ç½®ï¼Œ50ä»¥ä¸‹èŠ‚ç‚¹å’Œ50ä»¥ä¸ŠèŠ‚ç‚¹ï¼Œå®ƒä»¬çš„ä¸»è¦åŒºåˆ«åœ¨äºè¿™ä¸ªï¼štyphaã€‚
+å½“èŠ‚ç‚¹æ•°æ¯”è¾ƒå¤šçš„æƒ…å†µä¸‹ï¼ŒCalico çš„ Felixç»„ä»¶å¯é€šè¿‡ Typha ç›´æ¥å’Œ Etcd è¿›è¡Œæ•°æ®äº¤äº’ï¼Œä¸é€šè¿‡ kube-apiserverï¼Œé™ä½kube-apiserverçš„å‹åŠ›ã€‚å¤§å®¶æ ¹æ®è‡ªå·±çš„å®é™…æƒ…å†µé€‰æ‹©ä¸‹è½½ã€‚
+ä¸‹è½½åçš„æ–‡ä»¶æ˜¯ä¸€ä¸ªall-in-oneçš„yamlæ–‡ä»¶ï¼Œæˆ‘ä»¬åªéœ€è¦åœ¨æ­¤åŸºç¡€ä¸Šåšå°‘è®¸ä¿®æ”¹å³å¯ã€‚
 
 ```bash
-# ÏÂÔØcalico.yamlÎÄ¼ş
+# ä¸‹è½½calico.yamlæ–‡ä»¶
 $ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
 ```
 
-### 7.2¡¢ĞŞ¸ÄIP×Ô¶¯·¢ÏÖ
+### 7.2ã€ä¿®æ”¹IPè‡ªåŠ¨å‘ç°
 
-> µ±kubeletµÄÆô¶¯²ÎÊıÖĞ´æÔÚ--node-ipµÄÊ±ºò£¬ÒÔhost-networkÄ£Ê½Æô¶¯µÄpodµÄstatus.hostIP×Ö¶Î¾Í»á×Ô¶¯ÌîÈëkubeletÖĞÖ¸¶¨µÄipµØÖ·¡£
+> å½“kubeletçš„å¯åŠ¨å‚æ•°ä¸­å­˜åœ¨--node-ipçš„æ—¶å€™ï¼Œä»¥host-networkæ¨¡å¼å¯åŠ¨çš„podçš„status.hostIPå­—æ®µå°±ä¼šè‡ªåŠ¨å¡«å…¥kubeletä¸­æŒ‡å®šçš„ipåœ°å€ã€‚
 
-ĞŞ¸ÄÇ°£º
+ä¿®æ”¹å‰ï¼š
 
 ```bash
 - name: IP
   value: "autodetect"
 ```
 
-ĞŞ¸Äºó£º
+ä¿®æ”¹åï¼š
 
 ```bash
 - name: IP
@@ -3547,38 +3377,38 @@ $ curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
       fieldPath: status.hostIP
 ```
 
-### 7.3¡¢ĞŞ¸ÄCIDR
+### 7.3ã€ä¿®æ”¹CIDR
 
-ĞŞ¸ÄÇ°£º
+ä¿®æ”¹å‰ï¼š
 
 ```bash
 # - name: CALICO_IPV4POOL_CIDR
 #   value: "192.168.0.0/16"
 ```
 
-ĞŞ¸Äºó£¨ĞŞ¸Ä³ÉÄã×Ô¼ºµÄvalue£¬ÎÒÕâÀïÊÇ10.200.0.0/16£©
+ä¿®æ”¹åï¼ˆä¿®æ”¹æˆä½ è‡ªå·±çš„valueï¼Œæˆ‘è¿™é‡Œæ˜¯10.200.0.0/16ï¼‰
 
 ```bash
 - name: CALICO_IPV4POOL_CIDR
   value: "10.200.0.0/16"
 ```
 
-### 7.4¡¢Ê¹Ö®ÉúĞ§
+### 7.4ã€ä½¿ä¹‹ç”Ÿæ•ˆ
 
 ```bash
-# ÉúĞ§Ö®Ç°²é¿´
+# ç”Ÿæ•ˆä¹‹å‰æŸ¥çœ‹
 $ kubectl get nodes
 NAME    STATUS     ROLES    AGE     VERSION
 emon2   NotReady   <none>   5m39s   v1.20.2
 emon3   NotReady   <none>   5m35s   v1.20.2
-# Ê¹Ö®ÉúĞ§
+# ä½¿ä¹‹ç”Ÿæ•ˆ
 $ kubectl apply -f calico.yaml
-# ²é¿´node
+# æŸ¥çœ‹node
 $ kubectl get nodes
 NAME    STATUS     ROLES    AGE     VERSION
 emon2   NotReady   <none>   4h52m   v1.20.2
 emon3   NotReady   <none>   4h44m   v1.20.2
-# ²é¿´podĞÅÏ¢
+# æŸ¥çœ‹podä¿¡æ¯
 $ kubectl get po -n kube-system
 NAME                                       READY   STATUS     RESTARTS   AGE
 calico-kube-controllers-858c9597c8-lm45b   0/1     Pending    0          42s
@@ -3586,14 +3416,14 @@ calico-node-cnt7b                          0/1     Init:0/3   0          42s
 calico-node-l7xgf                          0/1     Init:0/3   0          42s
 nginx-proxy-emon3                          1/1     Running    0          4h44m
 # ===================================================================================================
-# ¹ı¼¸·ÖÖÓÔÙ´Î²é¿´
+# è¿‡å‡ åˆ†é’Ÿå†æ¬¡æŸ¥çœ‹
 $ kubectl get po -n kube-system
 NAME                                       READY   STATUS    RESTARTS   AGE
 calico-kube-controllers-858c9597c8-lm45b   1/1     Running   0          3m32s
 calico-node-cnt7b                          1/1     Running   0          3m32s
 calico-node-l7xgf                          1/1     Running   0          3m32s
 nginx-proxy-emon3                          1/1     Running   0          4h47m
-# ÔÙ´Î²é¿´node
+# å†æ¬¡æŸ¥çœ‹node
 $ kubectl get nodes
 NAME    STATUS   ROLES    AGE     VERSION
 emon2   Ready    <none>   4h56m   v1.20.2
@@ -3602,59 +3432,59 @@ emon3   Ready    <none>   4h48m   v1.20.2
 
 
 
-## 8¡¢DNS²å¼ş-CoreDNS£¨ÔÚÖ÷½Úµãemon£©
+## 8ã€DNSæ’ä»¶-CoreDNSï¼ˆåœ¨ä¸»èŠ‚ç‚¹emonï¼‰
 
-Õâ²¿·ÖÎÒÃÇ²¿ÊğkubernetesµÄDNS²å¼ş - CoreDNS¡£
+è¿™éƒ¨åˆ†æˆ‘ä»¬éƒ¨ç½²kubernetesçš„DNSæ’ä»¶ - CoreDNSã€‚
 
-ÔÚÔçÆÚµÄ°æ±¾ÖĞdns×é¼şÒÔpodĞÎÊ½¶ÀÁ¢ÔËĞĞ£¬Îª¼¯ÈºÌá¹©dns·şÎñ£¬ËùÓĞµÄpod¶¼»áÇëÇóÍ¬Ò»¸ödns·şÎñ¡£
-´Ókubernetes 1.18°æ±¾¿ªÊ¼NodeLocal DnsCache¹¦ÄÜ½øÈëstable×´Ì¬¡£
-NodeLocal DNSCacheÍ¨¹ıdaemon-setµÄĞÎÊ½ÔËĞĞÔÚÃ¿¸ö¹¤×÷½Úµã£¬×÷Îª½ÚµãÉÏpodµÄdns»º´æ´úÀí£¬´Ó¶ø±ÜÃâÁËiptablesµÄDNAT¹æÔòºÍconnection tracking¡£¼«´óÌáÉıÁËdnsµÄĞÔÄÜ¡£
+åœ¨æ—©æœŸçš„ç‰ˆæœ¬ä¸­dnsç»„ä»¶ä»¥podå½¢å¼ç‹¬ç«‹è¿è¡Œï¼Œä¸ºé›†ç¾¤æä¾›dnsæœåŠ¡ï¼Œæ‰€æœ‰çš„podéƒ½ä¼šè¯·æ±‚åŒä¸€ä¸ªdnsæœåŠ¡ã€‚
+ä»kubernetes 1.18ç‰ˆæœ¬å¼€å§‹NodeLocal DnsCacheåŠŸèƒ½è¿›å…¥stableçŠ¶æ€ã€‚
+NodeLocal DNSCacheé€šè¿‡daemon-setçš„å½¢å¼è¿è¡Œåœ¨æ¯ä¸ªå·¥ä½œèŠ‚ç‚¹ï¼Œä½œä¸ºèŠ‚ç‚¹ä¸Špodçš„dnsç¼“å­˜ä»£ç†ï¼Œä»è€Œé¿å…äº†iptablesçš„DNATè§„åˆ™å’Œconnection trackingã€‚æå¤§æå‡äº†dnsçš„æ€§èƒ½ã€‚
 
-### 8.0¡¢ÇĞ»»Ä¿Â¼
+### 8.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-### 8.1¡¢²¿ÊğCoreDNS
+### 8.1ã€éƒ¨ç½²CoreDNS
 
 ```bash
-# ÉèÖÃ coredns µÄ cluster-ip
+# è®¾ç½® coredns çš„ cluster-ip
 $ COREDNS_CLUSTER_IP=10.233.0.10
-# ÏÂÔØcorednsÅäÖÃall-in-one£¨addons/coredns.yaml£©£º²Î¿¼ÏÂÃæµÄ coredns.yamlÎÄ¼ş
+# ä¸‹è½½corednsé…ç½®all-in-oneï¼ˆaddons/coredns.yamlï¼‰ï¼šå‚è€ƒä¸‹é¢çš„ coredns.yamlæ–‡ä»¶
 $ vim coredns.yaml
-# Ìæ»»cluster-ip
+# æ›¿æ¢cluster-ip
 $ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" coredns.yaml
-# ´´½¨ coredns
+# åˆ›å»º coredns
 $ kubectl apply -f coredns.yaml
-# ²é¿´pod
+# æŸ¥çœ‹pod
 $ kubectl get po -n kube-system
 ```
 
 
 
-### 8.2¡¢²¿ÊğNodeLocal DNSCache
+### 8.2ã€éƒ¨ç½²NodeLocal DNSCache
 
 ```bash
-# ÉèÖÃ coredns µÄ cluster-ip
+# è®¾ç½® coredns çš„ cluster-ip
 $ COREDNS_CLUSTER_IP=10.233.0.10
-# ÏÂÔØnodelocaldnsÅäÖÃall-in-one(addons/nodelocaldns.yaml)£º²Î¿¼ÏÂÃæµÄ nodelocaldns.yamlÎÄ¼ş
+# ä¸‹è½½nodelocaldnsé…ç½®all-in-one(addons/nodelocaldns.yaml)ï¼šå‚è€ƒä¸‹é¢çš„ nodelocaldns.yamlæ–‡ä»¶
 $ vim nodelocaldns.yaml
-# Ìæ»»cluster-ip
+# æ›¿æ¢cluster-ip
 $ sed -i "s/\${COREDNS_CLUSTER_IP}/${COREDNS_CLUSTER_IP}/g" nodelocaldns.yaml
-# ´´½¨ nodelocaldns
+# åˆ›å»º nodelocaldns
 $ kubectl apply -f nodelocaldns.yaml
-# ²é¿´pod
+# æŸ¥çœ‹pod
 $ kubectl get po -n kube-system
 ```
 
 
 
-### 8.3¡¢ÑéÖ¤
+### 8.3ã€éªŒè¯
 
 ```bash
-# ²é¿´podĞÅÏ¢
+# æŸ¥çœ‹podä¿¡æ¯
 $ kubectl get po -n kube-system
 NAME                                       READY   STATUS    RESTARTS   AGE
 calico-kube-controllers-858c9597c8-vdc7n   1/1     Running   0          6m57s
@@ -3666,13 +3496,13 @@ nginx-proxy-emon3                          1/1     Running   0          12m
 nodelocaldns-72nns                         1/1     Running   0          62s
 nodelocaldns-n6fqj                         1/1     Running   0          62s
 
-# ´ËÊ±£¬emon2Æô¶¯µÄÈİÆ÷ÈçÏÂ£º
+# æ­¤æ—¶ï¼Œemon2å¯åŠ¨çš„å®¹å™¨å¦‚ä¸‹ï¼š
 $ crictl ps
 CONTAINER           IMAGE               CREATED             STATE               NAME                ATTEMPT             POD ID
 c48922e60a868       90f9d984ec9a3       4 minutes ago       Running             node-cache          0                   5ed3cb8b8d249
 54c7c7c3ad922       67da37a9a360e       5 minutes ago       Running             coredns             0                   33d271c6a6f5b
 95f0d92df2c56       7a71aca7b60fc       9 minutes ago       Running             calico-node         0                   75a971d7d731d
-# ´ËÊ±£¬emon3Æô¶¯µÄÈİÆ÷ÈçÏÂ£º
+# æ­¤æ—¶ï¼Œemon3å¯åŠ¨çš„å®¹å™¨å¦‚ä¸‹ï¼š
 $ crictl ps
 CONTAINER           IMAGE               CREATED             STATE               NAME                      ATTEMPT             POD ID
 af46c12946807       90f9d984ec9a3       4 minutes ago       Running             node-cache                0                   a9de1d50e76d1
@@ -3682,10 +3512,10 @@ cd668919ab62b       c0c6672a66a59       9 minutes ago       Running             
 acb35f522c6d6       f0b8a9a541369       17 minutes ago      Running             nginx-proxy               0                   0c96cb3f33875
 ```
 
-- ÆäËûÑéÖ¤
+- å…¶ä»–éªŒè¯
 
 ```bash
-# ²é¿´pod·Ö²¼ÏêÇé
+# æŸ¥çœ‹podåˆ†å¸ƒè¯¦æƒ…
 $ kubectl get po -n kube-system -o wide
 NAME                                       READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
 calico-kube-controllers-858c9597c8-vdc7n   1/1     Running   0          16m   10.200.161.1      emon3   <none>           <none>
@@ -3702,10 +3532,10 @@ nodelocaldns-n6fqj                         1/1     Running   0          10m   19
 
 
 
-**¹Ù·½ÎÄµµµØÖ·**
+**å®˜æ–¹æ–‡æ¡£åœ°å€**
 
-**coredns¹Ù·½ÎÄµµ**£ºhttps://coredns.io/plugins/kubernetes/
-**NodeLocal DNSCache**£ºhttps://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/
+**corednså®˜æ–¹æ–‡æ¡£**ï¼šhttps://coredns.io/plugins/kubernetes/
+**NodeLocal DNSCache**ï¼šhttps://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/
 
 
 
@@ -4098,19 +3928,19 @@ metadata:
 
 
 
-## 9¡¢¼¯ÈºÃ°ÑÌ²âÊÔ£¨ÔÚÖ÷½Úµãemon²Ù×÷£©
+## 9ã€é›†ç¾¤å†’çƒŸæµ‹è¯•ï¼ˆåœ¨ä¸»èŠ‚ç‚¹emonæ“ä½œï¼‰
 
-### 9.0¡¢ÍøÂç»·¾³ÇĞ»»ºók8sÍøÂç²»Í¨Ğ¡ÃîÕĞ
+### 9.0ã€ç½‘ç»œç¯å¢ƒåˆ‡æ¢åk8sç½‘ç»œä¸é€šå°å¦™æ‹›
 
 ```bash
-# Èç¹û·¢ÏÖÃ°ÑÌ²âÊÔ²»Í¨£¬ÔÙ³¢ÊÔ
+# å¦‚æœå‘ç°å†’çƒŸæµ‹è¯•ä¸é€šï¼Œå†å°è¯•
 $ systemctl restart NetworkManager
 ```
 
-### 9.1¡¢´´½¨nginx ds
+### 9.1ã€åˆ›å»ºnginx ds
 
 ```bash
- # Ğ´ÈëÅäÖÃ
+ # å†™å…¥é…ç½®
 $ cat > nginx-ds.yml <<EOF
 apiVersion: v1
 kind: Service
@@ -4147,33 +3977,33 @@ spec:
         - containerPort: 80
 EOF
 
-# ´´½¨ds
+# åˆ›å»ºds
 $ kubectl apply -f nginx-ds.yml
 ```
 
-### 9.2¡¢¼ì²é¸÷ÖÖipÁ¬Í¨ĞÔ
+### 9.2ã€æ£€æŸ¥å„ç§ipè¿é€šæ€§
 
 ```bash
-# ¼ì²é¸÷ Node ÉÏµÄ Pod IP Á¬Í¨ĞÔ
+# æ£€æŸ¥å„ Node ä¸Šçš„ Pod IP è¿é€šæ€§
 $ kubectl get pods -o wide
 
-# ÔÚÃ¿¸öworker½ÚµãÉÏping pod ip
+# åœ¨æ¯ä¸ªworkerèŠ‚ç‚¹ä¸Šping pod ip
 $ ping <pod-ip>
 
-# ¼ì²éservice¿É´ïĞÔ
+# æ£€æŸ¥serviceå¯è¾¾æ€§
 $ kubectl get svc
 
-# ÔÚÃ¿¸öworker½ÚµãÉÏ·ÃÎÊ·şÎñ
+# åœ¨æ¯ä¸ªworkerèŠ‚ç‚¹ä¸Šè®¿é—®æœåŠ¡
 $ curl <service-ip>:<port>
 
-# ÔÚÃ¿¸ö½Úµã¼ì²énode-port¿ÉÓÃĞÔ
+# åœ¨æ¯ä¸ªèŠ‚ç‚¹æ£€æŸ¥node-portå¯ç”¨æ€§
 $ curl <node-ip>:<port>
 ```
 
-### 9.3¡¢¼ì²édns¿ÉÓÃĞÔ
+### 9.3ã€æ£€æŸ¥dnså¯ç”¨æ€§
 
 ```bash
-# ´´½¨Ò»¸önginx pod
+# åˆ›å»ºä¸€ä¸ªnginx pod
 $ cat > pod-nginx.yaml <<EOF
 apiVersion: v1
 kind: Pod
@@ -4187,219 +4017,71 @@ spec:
     - containerPort: 80
 EOF
 
-# ´´½¨pod
+# åˆ›å»ºpod
 $ kubectl apply -f pod-nginx.yaml
 
-# ½øÈëpod£¬²é¿´dns
+# è¿›å…¥podï¼ŒæŸ¥çœ‹dns
 $ kubectl exec nginx -it -- /bin/bash
 
-# ²é¿´dnsÅäÖÃ
+# æŸ¥çœ‹dnsé…ç½®
 root@nginx:/# cat /etc/resolv.conf
 
-# ²é¿´Ãû×ÖÊÇ·ñ¿ÉÒÔÕıÈ·½âÎö
+# æŸ¥çœ‹åå­—æ˜¯å¦å¯ä»¥æ­£ç¡®è§£æ
 root@nginx:/# curl nginx-ds
 
-# ÍË³ö²âÊÔ
+# é€€å‡ºæµ‹è¯•
 root@nginx:/# exit
 ```
 
-### 9.4¡¢ÈÕÖ¾¹¦ÄÜ
+### 9.4ã€æ—¥å¿—åŠŸèƒ½
 
-²âÊÔÊ¹ÓÃkubectl²é¿´podµÄÈİÆ÷ÈÕÖ¾
+æµ‹è¯•ä½¿ç”¨kubectlæŸ¥çœ‹podçš„å®¹å™¨æ—¥å¿—
 
 ```bash
 $ kubectl get pods
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 NAME             READY   STATUS    RESTARTS   AGE
 nginx            1/1     Running   0          54s
 nginx-ds-dkfjm   1/1     Running   0          2m54s
 nginx-ds-rx6mj   1/1     Running   0          2m54s
 
-# ²é¿´ÈÕÖ¾
+# æŸ¥çœ‹æ—¥å¿—
 $ kubectl logs <pod-name>
 ```
 
-### 9.5¡¢Exec¹¦ÄÜ
+### 9.5ã€ExecåŠŸèƒ½
 
-²âÊÔkubectlµÄexec¹¦ÄÜ
+æµ‹è¯•kubectlçš„execåŠŸèƒ½
 
 ```bash
-# ²éÑ¯Ö¸¶¨±êÇ©µÄpod
+# æŸ¥è¯¢æŒ‡å®šæ ‡ç­¾çš„pod
 $ kubectl get pods -l app=nginx-ds
 $ kubectl exec -it <nginx-pod-name> -- nginx -v
 ```
 
-### 9.6¡¢É¾³ıÅäÖÃµÄ²âÊÔ×ÊÔ´
+### 9.6ã€åˆ é™¤é…ç½®çš„æµ‹è¯•èµ„æº
 
 ```bash
 $ kubectl delete -f pod-nginx.yaml
 $ kubectl delete -f nginx-ds.yml
-# ²é¿´ÊÇ·ñÇåÀíÍê³É
+# æŸ¥çœ‹æ˜¯å¦æ¸…ç†å®Œæˆ
 $ kubectl get pods
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 No resources found in default namespace.
 ```
 
-# ËÄ¡¢³£ÓÃ³¡¾°
-
-## 1¡¢³£¹æÃüÁî²¿ÊğÒ»¸ötomcat
-
-```bash
-# ²¿ÊğÒ»¸ötomcat
-$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8
-# ±©Â¶nginx·ÃÎÊ£¬PodµÄ80Ó³ÉäÈİÆ÷µÄ8080£»service»á´úÀíPodµÄ80.
-$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort
-# À©Èİ£ºÀ©ÈİÁË¶à·İ£¬ËùÒÔÎŞÂÛ·ÃÎÊÄÄ¸önodeµÄÖ¸¶¨¶Ë¿Ú£¬¶¼¿ÉÒÔ·ÃÎÊµ½tomcat6
-$ kubectl scale --replicas=3 deployment tomcat6
-# É¾³ı
-$ kubectl get all
-$ kubectl delete deployment.apps/tomcat6 service/tomcat6
-```
-
-- ²é¿´²¿ÊğÒ»¸ötomcat¶ÔÓ¦µÄyamlĞÅÏ¢
-
-```bash
-$ kubectl create deployment tomcat6 --image=tomcat:6.0.53-jre8 --dry-run=client -o yaml > tomcat6.yml
-```
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
-    app: tomcat6
-  name: tomcat6
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: tomcat6
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: tomcat6
-    spec:
-      containers:
-      - image: tomcat:6.0.53-jre8
-        name: tomcat
-        resources: {}
-status: {}
-```
-
-```bash
-$ kubectl apply -f tomcat6.yml
-```
-
-- ²é¿´±©Â¶nginx·ÃÎÊ¶ÔÓ¦µÄyamlĞÅÏ¢
-
-```bash
-$ kubectl expose deployment tomcat6 --port=80 --target-port=8080 --type=NodePort --dry-run=client -o yaml > service.yml
-```
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    app: tomcat6
-  name: tomcat6
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app: tomcat6
-  type: NodePort
-status:
-  loadBalancer: {}
-```
-
-- ²é¿´±©Â¶pod¶ÔÓ¦µÄyamlĞÅÏ¢
-
-```bash
-$ kubectl get pods tomcat6-56fcc999cb-g8bs5 -o yaml > pod.yaml
-```
-
-## 2¡¢Í¨¹ıyaml²¿ÊğÒ»¸ötomcat
-
-- ×¼±¸Ò»¸ö²¿Êğ
-
-```bash
-$ vim tomcat6.yml
-```
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: tomcat6
-  name: tomcat6
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: tomcat6
-  template:
-    metadata:
-      labels:
-        app: tomcat6
-    spec:
-      containers:
-      - image: tomcat:6.0.53-jre8
-        name: tomcat
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: tomcat6
-  name: tomcat6
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app: tomcat6
-  type: NodePort
-```
-
-```bash
-$ kubectl apply -f tomcat6.yml
-```
 
 
+# äº”ã€Harboré•œåƒç§æœï¼ˆåœ¨emonä¸»æœºrootç”¨æˆ·å®‰è£…ï¼‰
 
-
-
-
-
-
-
-
-
-
-
-## 2¡¢Kubesphere
-
-https://github.com/kubesphere/kubesphere/blob/master/README_zh.md
-
-# Îå¡¢Harbor¾µÏñË½·ş£¨ÔÚemonÖ÷»úrootÓÃ»§°²×°£©
-
-0. ÇĞ»»Ä¿Â¼
+0. åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-1. ÏÂÔØµØÖ·
+1. ä¸‹è½½åœ°å€
 
 https://github.com/goharbor/harbor/releases
 
@@ -4407,64 +4089,64 @@ https://github.com/goharbor/harbor/releases
 $ wget https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
-2. ´´½¨½âÑ¹Ä¿Â¼
+2. åˆ›å»ºè§£å‹ç›®å½•
 
 ```bash
-# ´´½¨Harbor½âÑ¹Ä¿Â¼
+# åˆ›å»ºHarborè§£å‹ç›®å½•
 $ mkdir /usr/local/Harbor
-# ´´½¨HarborµÄvolumeÄ¿Â¼
+# åˆ›å»ºHarborçš„volumeç›®å½•
 $ mkdir -p /usr/local/dockerv/harbor_home
 ```
 
-3. ½âÑ¹
+3. è§£å‹
 
 ```bash
-# ÍÆ¼öv2.2.4°æ±¾£¬¸ü¸ß°æ±¾±ÈÈç2.3ºÍ2.4ÓĞdocker-compose down -v ==> down-compose up -dÊ±postgresql·şÎñÆô¶¯²»ÁËµÄbug£¬Êı¾İ¿âÖØÆôÊ§°Ü£¡
+# æ¨èv2.2.4ç‰ˆæœ¬ï¼Œæ›´é«˜ç‰ˆæœ¬æ¯”å¦‚2.3å’Œ2.4æœ‰docker-compose down -v ==> down-compose up -dæ—¶postgresqlæœåŠ¡å¯åŠ¨ä¸äº†çš„bugï¼Œæ•°æ®åº“é‡å¯å¤±è´¥ï¼
 $ tar -zxvf harbor-offline-installer-v2.2.4.tgz -C /usr/local/Harbor/
 $ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
-4. ´´½¨×ÔÇ©ÃûÖ¤Êé¡¾²Î¿¼ÊµÏÖ£¬½¨Òé×ßÕı¹æÇşµÀµÄCAÖ¤Êé¡¿¡¾È±ÉÙÖ¤ÊéÎŞ·¨ä¯ÀÀÆ÷µÇÂ¼¡¿
+4. åˆ›å»ºè‡ªç­¾åè¯ä¹¦ã€å‚è€ƒå®ç°ï¼Œå»ºè®®èµ°æ­£è§„æ¸ é“çš„CAè¯ä¹¦ã€‘ã€ç¼ºå°‘è¯ä¹¦æ— æ³•æµè§ˆå™¨ç™»å½•ã€‘
 
-- ´´½¨Ö¤Êé´æ·ÅÄ¿Â¼
+- åˆ›å»ºè¯ä¹¦å­˜æ”¾ç›®å½•
 
 ```bash
-# ÇĞ»»Ä¿Â¼
+# åˆ‡æ¢ç›®å½•
 $ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
 ```
 
-- ´´½¨CA¸ùÖ¤Êé
+- åˆ›å»ºCAæ ¹è¯ä¹¦
 
 ```bash
-# ÆäÖĞCÊÇCountry£¬STÊÇState£¬LÊÇlocal£¬OÊÇOriganization£¬OUÊÇOrganization Unit£¬CNÊÇcommon name(eg, your name or your server's hostname)
+# å…¶ä¸­Cæ˜¯Countryï¼ŒSTæ˜¯Stateï¼ŒLæ˜¯localï¼ŒOæ˜¯Origanizationï¼ŒOUæ˜¯Organization Unitï¼ŒCNæ˜¯common name(eg, your name or your server's hostname)
 $ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key
 ```
 
-- Éú³ÉÒ»¸öÖ¤ÊéÇ©Ãû£¬ÉèÖÃ·ÃÎÊÓòÃûÎª emon
+- ç”Ÿæˆä¸€ä¸ªè¯ä¹¦ç­¾åï¼Œè®¾ç½®è®¿é—®åŸŸåä¸º emon
 
 ```bash
 $ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key  emon.csr  emon.key
 ```
 
-- Éú³ÉÖ÷»úµÄÖ¤Êé
+- ç”Ÿæˆä¸»æœºçš„è¯ä¹¦
 
 ```bash
 $ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 $ ls
 ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
-5. ±à¼­ÅäÖÃ
+5. ç¼–è¾‘é…ç½®
 
 ```bash
 $ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
@@ -4472,38 +4154,38 @@ $ vim /usr/local/Harbor/harbor/harbor.yml
 ```
 
 ```yaml
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # hostname: reg.mydomain.com
 hostname: 192.168.32.116
-# ĞŞ¸Ä
+# ä¿®æ”¹
   # port: 80
   port: 5080
-# ĞŞ¸Ä
+# ä¿®æ”¹
 https:
   # https port for harbor, default is 443
   port: 5443
   # The path of cert and key files for nginx
   # certificate: /your/certificate/path
   # private_key: /your/private/key/path
-  # ĞŞ¸Ä£º×¢Òâ£¬ÕâÀï²»ÄÜÊ¹ÓÃÈíÁ¬½ÓÄ¿Â¼ /usr/loca/harborÌæ»»/usr/local/Harbor/harbor-2.2.4
-  # ·ñÔò»á·¢ÉúÖ¤ÊéÕÒ²»µ½´íÎó£ºFileNotFoundError: [Errno 2] No such file or directory: 
+  # ä¿®æ”¹ï¼šæ³¨æ„ï¼Œè¿™é‡Œä¸èƒ½ä½¿ç”¨è½¯è¿æ¥ç›®å½• /usr/loca/harboræ›¿æ¢/usr/local/Harbor/harbor-2.2.4
+  # å¦åˆ™ä¼šå‘ç”Ÿè¯ä¹¦æ‰¾ä¸åˆ°é”™è¯¯ï¼šFileNotFoundError: [Errno 2] No such file or directory: 
   certificate: /usr/local/Harbor/cert/emon.crt
   private_key: /usr/local/Harbor/cert/emon.key
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # data_volume: /data
 data_volume: /usr/local/dockerv/harbor_home
 ```
 
-6. °²×°
+6. å®‰è£…
 
 ```bash
-# °²×°Ê±£¬È·±£ /usr/bin/docker-compose ´æÔÚ£¬·ñÔò»á±¨´í£º? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+# å®‰è£…æ—¶ï¼Œç¡®ä¿ /usr/bin/docker-compose å­˜åœ¨ï¼Œå¦åˆ™ä¼šæŠ¥é”™ï¼š? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 $ /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
-# ÇĞ»»Ä¿Â¼
+# åˆ‡æ¢ç›®å½•
 $  cd /usr/local/Harbor/harbor/
-# ²é¿´·şÎñ×´Ì¬
+# æŸ¥çœ‹æœåŠ¡çŠ¶æ€
 $ docker-compose ps
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
       Name                     Command                  State                           Ports                     
 ------------------------------------------------------------------------------------------------------------------
 chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
@@ -4519,29 +4201,29 @@ registryctl         /home/harbor/start.sh            Up (healthy)
 trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 ```
 
-8. µÇÂ¼
+8. ç™»å½•
 
-·ÃÎÊ£ºhttp://192.168.32.116:5080 £¨»á±»Ìø×ªµ½http://192.168.32.116:5443£©
+è®¿é—®ï¼šhttp://192.168.32.116:5080 ï¼ˆä¼šè¢«è·³è½¬åˆ°http://192.168.32.116:5443ï¼‰
 
-ÓÃ»§ÃûÃÜÂë£º admin/Harbor12345
+ç”¨æˆ·åå¯†ç ï¼š admin/Harbor12345
 
-harborÊı¾İ¿âÃÜÂë£º root123
+harboræ•°æ®åº“å¯†ç ï¼š root123
 
-µÇÂ¼ºó´´½¨ÁËÓÃ»§£ºemon/Emon@123
+ç™»å½•ååˆ›å»ºäº†ç”¨æˆ·ï¼šemon/Emon@123
 
-9. ĞŞ¸ÄÅäÖÃÖØÆô
+9. ä¿®æ”¹é…ç½®é‡å¯
 
 ```bash
 $ cd /usr/local/Harbor/harbor/
 $ docker-compose down -v
-# Èç¹ûÅöµ½ postgresql ·şÎñ²»ÊÇUP×´Ì¬£¬µ¼ÖÂµÇÂ¼ÌáÊ¾£ººËĞÄ·şÎñ²»¿ÉÓÃ¡£ ÇëÖ´ĞĞÏÂÃæÃüÁî£¨¸ù¾İdata_volumeÅäÖÃµ÷ÕûÂ·¾¶£©£¬Õâ¸öÊÇ¸Ã°æ±¾µÄbug¡£Ä¿Ç°£¬v2.2.4°æ±¾¿ÉÒÔÕıÈ·ÖØÆô£¬ÎŞĞèÉ¾³ıpg13
+# å¦‚æœç¢°åˆ° postgresql æœåŠ¡ä¸æ˜¯UPçŠ¶æ€ï¼Œå¯¼è‡´ç™»å½•æç¤ºï¼šæ ¸å¿ƒæœåŠ¡ä¸å¯ç”¨ã€‚ è¯·æ‰§è¡Œä¸‹é¢å‘½ä»¤ï¼ˆæ ¹æ®data_volumeé…ç½®è°ƒæ•´è·¯å¾„ï¼‰ï¼Œè¿™ä¸ªæ˜¯è¯¥ç‰ˆæœ¬çš„bugã€‚ç›®å‰ï¼Œv2.2.4ç‰ˆæœ¬å¯ä»¥æ­£ç¡®é‡å¯ï¼Œæ— éœ€åˆ é™¤pg13
 # [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
 $ docker-compose up -d
 ```
 
-10. Ë½·ş°²È«¿ØÖÆ
+10. ç§æœå®‰å…¨æ§åˆ¶
 
-- ¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ£º
+- å¯¹æ–‡ä»¶ `/etc/docker/daemon.json` è¿½åŠ  `insecure-registries`å†…å®¹ï¼š
 
 ```bash
 $ vim /etc/docker/daemon.json
@@ -4556,46 +4238,46 @@ $ vim /etc/docker/daemon.json
 }
 ```
 
-- ¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º¡¾¿ÉÊ¡ÂÔ¡¿
+- å¯¹æ–‡ä»¶ `/lib/systemd/system/docker.service` è¿½åŠ `EnvironmentFile`ï¼šã€å¯çœç•¥ã€‘
 
 ```bash
 $ vim /lib/systemd/system/docker.service 
 ```
 
 ```bash
-# ÔÚExecStartºóÃæÒ»ĞĞ×·¼Ó£º¾­ÑéÖ¤daemon.jsonÅäÖÃÁËinsecure-registries¼´¿É£¬ÎŞĞèÕâÀïÔÙÅäÖÃ
+# åœ¨ExecStartåé¢ä¸€è¡Œè¿½åŠ ï¼šç»éªŒè¯daemon.jsoné…ç½®äº†insecure-registrieså³å¯ï¼Œæ— éœ€è¿™é‡Œå†é…ç½®
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
-ÖØÆôDocker·şÎñ£º
+é‡å¯DockeræœåŠ¡ï¼š
 
 ```bash
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart docker
 ```
 
-10. ÍÆËÍ¾µÏñ
+10. æ¨é€é•œåƒ
 
-µÇÂ¼harborºó£¬ÏÈ´´½¨devops-learningÏîÄ¿£¬²¢´´½¨emonÓÃ»§¡£
+ç™»å½•harboråï¼Œå…ˆåˆ›å»ºdevops-learningé¡¹ç›®ï¼Œå¹¶åˆ›å»ºemonç”¨æˆ·ã€‚
 
 ```bash
-# ÏÂÔØ
+# ä¸‹è½½
 $ docker pull openjdk:8-jre
-# ´ò±êÇ©
+# æ‰“æ ‡ç­¾
 $ docker tag openjdk:8-jre 192.168.32.116:5080/devops-learning/openjdk:8-jre
-# µÇÂ¼
+# ç™»å½•
 $ docker login -u emon -p Emon@123 192.168.32.116:5080
-# ÉÏ´«¾µÏñ
+# ä¸Šä¼ é•œåƒ
 $ docker push 192.168.32.116:5080/devops-learning/openjdk:8-jre
-# ÍË³öµÇÂ¼
+# é€€å‡ºç™»å½•
 $ docker logout 192.168.32.116:5080
 
-»úÆ÷ÈËÕË»§£º
-token£º  
+æœºå™¨äººè´¦æˆ·ï¼š
+tokenï¼š  
 XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
-# Áù¡¢KubernetesµÄ·şÎñ·¢ÏÖ
+# å…­ã€Kubernetesçš„æœåŠ¡å‘ç°
 
 ![image-20220403131408465](images/image-20220403131408465.png)
 
@@ -4605,44 +4287,44 @@ XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 
 
 
-## 0¡¢ÇĞ»»Ä¿Â¼
+## 0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
 $ mkdir -pv k8s_soft/k8s_v1.20.2 && cd k8s_soft/k8s_v1.20.2
 ```
 
-## 1¡¢°²×°ingress-nginx
+## 1ã€å®‰è£…ingress-nginx
 
-- °²×°²å¼ş£¨master½Úµã£©
+- å®‰è£…æ’ä»¶ï¼ˆmasterèŠ‚ç‚¹ï¼‰
 
 ```bash
-# ÓÉÓÚmandatory.yamlÌí¼ÓÁË nodeSelector£¬¶Ônode½øĞĞÁËlabelÑ¡Ôñ£¬ÕâÀï±ØĞëÌí¼Ó±êÇ©£¬·ñÔò£º
+# ç”±äºmandatory.yamlæ·»åŠ äº† nodeSelectorï¼Œå¯¹nodeè¿›è¡Œäº†labelé€‰æ‹©ï¼Œè¿™é‡Œå¿…é¡»æ·»åŠ æ ‡ç­¾ï¼Œå¦åˆ™ï¼š
 # Warning  FailedScheduling  6m19s  default-scheduler  0/2 nodes are available: 2 node(s) didn't match Pod's node affinity.
 $ kubectl label node emon3 app=ingress
 
-# ÅäÖÃ×ÊÔ´
+# é…ç½®èµ„æº
 $ kubectl apply -f mandatory.yaml
-# ²é¿´
+# æŸ¥çœ‹
 $ kubectl get all -n ingress-nginx
 ```
 
-- ¹ØÓÚ¾µÏñ£º½¨ÒéÏÈÏÂÔØ£¬ºóÖ´ĞĞÉÏÃæµÄÃüÁî£¨worker½Úµã£©
+- å…³äºé•œåƒï¼šå»ºè®®å…ˆä¸‹è½½ï¼Œåæ‰§è¡Œä¸Šé¢çš„å‘½ä»¤ï¼ˆworkerèŠ‚ç‚¹ï¼‰
 
 ```bash
-# ¾µÏñÏÂÔØÒ»Ö±ÊÇÀÏ´óÄÑÎÊÌâ£¬ÏÈÏÂÔØ°É
-# ²é¿´ËùĞè¾µÏñ
+# é•œåƒä¸‹è½½ä¸€ç›´æ˜¯è€å¤§éš¾é—®é¢˜ï¼Œå…ˆä¸‹è½½å§
+# æŸ¥çœ‹æ‰€éœ€é•œåƒ
 $ grep image mandatory.yaml
-# ÊÖ¹¤ÏÂÔØËùĞè¾µÏñ£º×¢ÒâµÚÒ»¸ö¾µÏñ±¾À´Ó¦¸ÃÊÇ k8s.gcr.io/defaultbackend-amd64:1.5
+# æ‰‹å·¥ä¸‹è½½æ‰€éœ€é•œåƒï¼šæ³¨æ„ç¬¬ä¸€ä¸ªé•œåƒæœ¬æ¥åº”è¯¥æ˜¯ k8s.gcr.io/defaultbackend-amd64:1.5
 $ crictl pull registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5
 $ crictl pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.19.0
-# ¶ÔµÚÒ»¸ö¾µÏñÖØĞÂ´ò±êÇ©²ÅÄÜÊ¹ÓÃ
+# å¯¹ç¬¬ä¸€ä¸ªé•œåƒé‡æ–°æ‰“æ ‡ç­¾æ‰èƒ½ä½¿ç”¨
 $ ctr -n k8s.io i tag registry.cn-hangzhou.aliyuncs.com/liuyi01/defaultbackend-amd64:1.5 k8s.gcr.io/defaultbackend-amd64:1.5
 ```
 
-## 2¡¢²âÊÔ·şÎñ
+## 2ã€æµ‹è¯•æœåŠ¡
 
-### 2.1¡¢ingress-demo.yamlÅäÖÃ
+### 2.1ã€ingress-demo.yamlé…ç½®
 
 ```yaml
 #deploy
@@ -4700,26 +4382,26 @@ spec:
               number: 80
 ```
 
-ÅäÖÃ×ÊÔ´ÉúĞ§£º
+é…ç½®èµ„æºç”Ÿæ•ˆï¼š
 
 ```bash
-# Ó¦ÓÃ×ÊÔ´£º½ö´´½¨²¢Ê¹ÓÃ£¬¿Éµ÷ÕûÎª create -> apply  ¾ßÓĞÊ¹ÓÃºÍ´´½¨²¢Ê¹ÓÃµÄĞ§¹û
+# åº”ç”¨èµ„æºï¼šä»…åˆ›å»ºå¹¶ä½¿ç”¨ï¼Œå¯è°ƒæ•´ä¸º create -> apply  å…·æœ‰ä½¿ç”¨å’Œåˆ›å»ºå¹¶ä½¿ç”¨çš„æ•ˆæœ
 $ kubectl create -f ingress-demo.yaml
-# ²é¿´·¢ÏÖingressÆô¶¯ÔÚemon3ÉÏ
+# æŸ¥çœ‹å‘ç°ingresså¯åŠ¨åœ¨emon3ä¸Š
 $ kubectl get po -n ingress-nginx -o wide
-# ²é¿´ingress-demoµÄpod×´Ì¬
+# æŸ¥çœ‹ingress-demoçš„podçŠ¶æ€
 $ kubectl get pod -o wide
 
-# ÅäÖÃ±¾µØDNS£º·ÃÎÊemon3µÄDNS
+# é…ç½®æœ¬åœ°DNSï¼šè®¿é—®emon3çš„DNS
 $ vim /etc/hosts
 192.168.32.118 tomcat.mooc.com
 192.168.32.118 api.mooc.com
 
-# ·ÃÎÊ
-http://tomcat.mooc.com # ¿´µ½Õı³£tomcat½çÃæ
-http://api.mooc.com # ¿´µ½ default backend - 404
+# è®¿é—®
+http://tomcat.mooc.com # çœ‹åˆ°æ­£å¸¸tomcatç•Œé¢
+http://api.mooc.com # çœ‹åˆ° default backend - 404
 
-# É¾³ı×ÊÔ´
+# åˆ é™¤èµ„æº
 $  kubectl delete -f ingress-demo.yaml
 ```
 
@@ -4727,9 +4409,9 @@ $  kubectl delete -f ingress-demo.yaml
 
 
 
-## 99¡¢ÅäÖÃ¸½¼ş
+## 99ã€é…ç½®é™„ä»¶
 
-### 99.1¡¢mandatory.yaml
+### 99.1ã€mandatory.yaml
 
 ```yaml
 apiVersion: v1
@@ -5065,18 +4747,18 @@ spec:
 ---
 ```
 
-# Æß¡¢Namespace
+# ä¸ƒã€Namespace
 
-## 0¡¢ÇĞ»»Ä¿Â¼
+## 0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/1-namespace
 $ cd /root/dockerdata/deep-in-kubernetes/1-namespace/
 ```
 
-## 1¡¢´´½¨ÃüÃû¿Õ¼ä
+## 1ã€åˆ›å»ºå‘½åç©ºé—´
 
-- ´´½¨yaml
+- åˆ›å»ºyaml
 
 ```bash
 vim namespace-dev.yaml
@@ -5089,17 +4771,17 @@ metadata:
   name: dev
 ```
 
-- Ó¦ÓÃyaml
+- åº”ç”¨yaml
 
 ```bash
 $ kubectl create -f namespace-dev.yaml
-# ²é¿´ÃüÃû¿Õ¼ä
+# æŸ¥çœ‹å‘½åç©ºé—´
 $ kubectl get namespaces
 ```
 
-## 2¡¢²¿Êğ·şÎñµ½ÃüÃû¿Õ¼ä
+## 2ã€éƒ¨ç½²æœåŠ¡åˆ°å‘½åç©ºé—´
 
-- ´´½¨yaml
+- åˆ›å»ºyaml
 
 ```bash
 $ vim web-dev.yaml
@@ -5164,26 +4846,26 @@ spec:
               number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-dev.emon.vip/hello?name=emon
 
 ```bash
 $ kubectl create -f web-dev.yaml
-# ²é¿´devÃüÃû¿Õ¼äÏÂÄÚÈİ
+# æŸ¥çœ‹devå‘½åç©ºé—´ä¸‹å†…å®¹
 $ kubectl get all -n dev
-# ²é¿´deployÏêÇé
+# æŸ¥çœ‹deployè¯¦æƒ…
 $ kubectl get deploy sbt-web-demo -o yaml -n dev
 ```
 
-## 3¡¢ÃüÃû¿Õ¼äÌØĞÔ
+## 3ã€å‘½åç©ºé—´ç‰¹æ€§
 
-### 3.1¡¢ÃüÃû¿Õ¼äÏÂÍ¨¹ı·şÎñÃûµÄ·ÃÎÊ¹æÔò
+### 3.1ã€å‘½åç©ºé—´ä¸‹é€šè¿‡æœåŠ¡åçš„è®¿é—®è§„åˆ™
 
-- Í¬Ò»¸öÃüÃû¿Õ¼äÏÂµÄpodÍ¨¹ı·şÎñÃû¿ÉÒÔ»¥Ïà·ÃÎÊ
-- ²»Í¬ÃüÃû¿Õ¼äÏÂµÄpodÍ¨¹ı·şÎñÃû²»¿ÉÒÔ»¥Ïà·ÃÎÊ
+- åŒä¸€ä¸ªå‘½åç©ºé—´ä¸‹çš„podé€šè¿‡æœåŠ¡åå¯ä»¥äº’ç›¸è®¿é—®
+- ä¸åŒå‘½åç©ºé—´ä¸‹çš„podé€šè¿‡æœåŠ¡åä¸å¯ä»¥äº’ç›¸è®¿é—®
 
 ```bash
 $ kubectl get pods -o wide
@@ -5195,7 +4877,7 @@ $ kubectl get pods -n dev
 NAME                            READY   STATUS    RESTARTS   AGE
 sbt-web-demo-756b64bb8b-qqp5x   1/1     Running   0          26m
 
-# ²é¿´½âÎö¹æÔò£ºÇë×¢Òâ search default.svc.cluster.local ºÍ search dev.svc.cluster.local µÄÇø±ğ
+# æŸ¥çœ‹è§£æè§„åˆ™ï¼šè¯·æ³¨æ„ search default.svc.cluster.local å’Œ search dev.svc.cluster.local çš„åŒºåˆ«
 $ kubectl exec -it k8s-springboot-web-demo-7689b896d-pz9mh -- cat /etc/resolv.conf
 search default.svc.cluster.local svc.cluster.local cluster.local
 nameserver 169.254.25.10
@@ -5206,9 +4888,9 @@ nameserver 169.254.25.10
 options ndots:5
 ```
 
-### 3.2¡¢ÃüÃû¿Õ¼äÏÂÍ¨¹ıIPµÄ·ÃÎÊ¹æÔò
+### 3.2ã€å‘½åç©ºé—´ä¸‹é€šè¿‡IPçš„è®¿é—®è§„åˆ™
 
-- ²»Í¬ÃüÃû¿Õ¼äÏÂµÄserviceºÍpodÍ¨¹ıIPÊÇ¿ÉÒÔ»¥Ïà·ÃÎÊ
+- ä¸åŒå‘½åç©ºé—´ä¸‹çš„serviceå’Œpodé€šè¿‡IPæ˜¯å¯ä»¥äº’ç›¸è®¿é—®
 
 ```bash
 $ kubectl get svc
@@ -5220,80 +4902,80 @@ $ kubectl get svc -n dev
 NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 sbt-web-demo   ClusterIP   10.233.175.91   <none>        80/TCP    29m
 
-# devÃüÃû¿Õ¼äÏÂpod¿ÉÒÔ·ÃÎÊdefaultÃüÃû¿Õ¼äÏÂµÄtomcat-demo·şÎñIPÊÇÍ¨µÄ
+# devå‘½åç©ºé—´ä¸‹podå¯ä»¥è®¿é—®defaultå‘½åç©ºé—´ä¸‹çš„tomcat-demoæœåŠ¡IPæ˜¯é€šçš„
 $ kubectl exec -it sbt-web-demo-756b64bb8b-qqp5x bash -n dev
-# devÃüÃû¿Õ¼äÏÂpod·ÃÎÊdefaultÃüÃû¿Õ¼äÏÂµÄtomcat-demoµÄpodsµÄIPÒ²Í¨
+# devå‘½åç©ºé—´ä¸‹podè®¿é—®defaultå‘½åç©ºé—´ä¸‹çš„tomcat-demoçš„podsçš„IPä¹Ÿé€š
 root@sbt-web-demo-756b64bb8b-qqp5x:/# wget 10.233.60.100
 root@sbt-web-demo-756b64bb8b-qqp5x:/# wget 10.200.161.18:8080
 ```
 
-## 4¡¢µ÷ÕûÓÃ»§µÄÄ¬ÈÏÃüÃû¿Õ¼ä
+## 4ã€è°ƒæ•´ç”¨æˆ·çš„é»˜è®¤å‘½åç©ºé—´
 
-- ±¸·İ`.kube/config`
+- å¤‡ä»½`.kube/config`
 
 ```bash
 $ cp .kube/config .kube/config.bak
 ```
 
-- µ÷ÕûadminÓÃ»§µÄÄ¬ÈÏÃüÃû¿Õ¼ä
+- è°ƒæ•´adminç”¨æˆ·çš„é»˜è®¤å‘½åç©ºé—´
 
 ```bash
-# ÉèÖÃÉÏÏÂÎÄ²ÎÊı£ºĞ´Èë²¢¸üĞÂÎÄ¼ş
+# è®¾ç½®ä¸Šä¸‹æ–‡å‚æ•°ï¼šå†™å…¥å¹¶æ›´æ–°æ–‡ä»¶
 $ kubectl config set-context ctx-dev \
   --cluster=kubernetes \
   --user=admin \
   --namespace=dev \
   --kubeconfig=/root/.kube/config
-# ÉèÖÃÄ¬ÈÏÉÏÏÂÎÄ
+# è®¾ç½®é»˜è®¤ä¸Šä¸‹æ–‡
 $ kubectl config use-context ctx-dev --kubeconfig=/root/.kube/config
 
-# ¸´Ô­
+# å¤åŸ
 $ cp .kube/config.bak .kube/config
 $ kubectl config use-context default --kubeconfig=/root/.kube/config
 
 
-# ²é¿´µ±Ç°Ä¬ÈÏÃüÃû¿Õ¼ä
+# æŸ¥çœ‹å½“å‰é»˜è®¤å‘½åç©ºé—´
 $ kubectl config get-contexts
 CURRENT   NAME      CLUSTER      AUTHINFO   NAMESPACE
 *         default   kubernetes   admin 
 ```
 
-## 5¡¢ÃüÃû¿Õ¼ä»®·Ö·½Ê½
+## 5ã€å‘½åç©ºé—´åˆ’åˆ†æ–¹å¼
 
-- °´»·¾³»®·Ö£ºdev¡¢test¡¢prod
-- °´ÍÅ¶Ó»®·Ö
-- ×Ô¶¨Òå¶à¼¶»®·Ö
-  - µÚÒ»¼¶£º»·¾³
-  - µÚ¶ş¼¶£ºÍÅ¶Ó
+- æŒ‰ç¯å¢ƒåˆ’åˆ†ï¼šdevã€testã€prod
+- æŒ‰å›¢é˜Ÿåˆ’åˆ†
+- è‡ªå®šä¹‰å¤šçº§åˆ’åˆ†
+  - ç¬¬ä¸€çº§ï¼šç¯å¢ƒ
+  - ç¬¬äºŒçº§ï¼šå›¢é˜Ÿ
 
-# °Ë¡¢Resources
+# å…«ã€Resources
 
-## 0¡¢ÇĞ»»Ä¿Â¼
+## 0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/2-resource
 $ cd /root/dockerdata/deep-in-kubernetes/2-resource
 ```
 
-## 1¡¢³õÊ¶
+## 1ã€åˆè¯†
 
 - CPU
 - GPU
-- ÄÚ´æ
-- ³Ö¾Ã»¯´æ´¢
+- å†…å­˜
+- æŒä¹…åŒ–å­˜å‚¨
 
 ![image-20220409111711111](images/image-20220409111711111.png)
 
 
 
-## 2¡¢ºËĞÄÉè¼Æ
+## 2ã€æ ¸å¿ƒè®¾è®¡
 
-- Requests£ºÇëÇóµÄ×ÊÔ´
-- Limits£ºÏŞÖÆµÄ×ÊÔ´
+- Requestsï¼šè¯·æ±‚çš„èµ„æº
+- Limitsï¼šé™åˆ¶çš„èµ„æº
 
-## 3¡¢²¿Êğ·şÎñ
+## 3ã€éƒ¨ç½²æœåŠ¡
 
-- ´´½¨Ò»¸ö²¿Êğ
+- åˆ›å»ºä¸€ä¸ªéƒ¨ç½²
 
 ```bash
 $ vim web-dev.yaml
@@ -5324,7 +5006,7 @@ spec:
         resources:
           requests:
             memory: 100Mi
-            # 1ºËĞÄµÄCPU=1000m
+            # 1æ ¸å¿ƒçš„CPU=1000m
             cpu: 100m
           limits:
             memory: 100Mi
@@ -5366,33 +5048,33 @@ spec:
               number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-dev.yaml
-# ²é¿´devÃüÃû¿Õ¼äÏÂÄÚÈİ
+# æŸ¥çœ‹devå‘½åç©ºé—´ä¸‹å†…å®¹
 $ kubectl get all -n dev
-# ²é¿´nodes
+# æŸ¥çœ‹nodes
 $ kubectl get nodes -n dev
-# ²é¿´½ÚµãÉÏ¿ÉÓÃ×ÊÔ´
+# æŸ¥çœ‹èŠ‚ç‚¹ä¸Šå¯ç”¨èµ„æº
 $ kubectl describe node emon2 -n dev
 ```
 
-## 4¡¢Requests&LimitsµÄÉèÖÃÓë°²È«µÈ¼¶
+## 4ã€Requests&Limitsçš„è®¾ç½®ä¸å®‰å…¨ç­‰çº§
 
-- Requests==Limits£º°²È«µÈ¼¶×î¸ß
-- ²»ÉèÖÃ£¨²»½¨Òé£©
-- Limits > Requests£º±È½Ï¿É¿¿
+- Requests==Limitsï¼šå®‰å…¨ç­‰çº§æœ€é«˜
+- ä¸è®¾ç½®ï¼ˆä¸å»ºè®®ï¼‰
+- Limits > Requestsï¼šæ¯”è¾ƒå¯é 
 
-### 4.0¡¢´´½¨testÃüÃû¿Õ¼äÓÃÓÚÑİÊ¾
+### 4.0ã€åˆ›å»ºtestå‘½åç©ºé—´ç”¨äºæ¼”ç¤º
 
 ```bash
 $ kubectl create ns test
 ```
 
-### 4.1¡¢´´½¨LimitRange£ºÏŞÖÆPodºÍContainerµÄÄÚ´æºÍCPU
+### 4.1ã€åˆ›å»ºLimitRangeï¼šé™åˆ¶Podå’ŒContainerçš„å†…å­˜å’ŒCPU
 
-- ´´½¨LimitRange
+- åˆ›å»ºLimitRange
 
 ```bash
 $ vim limits-test.yaml
@@ -5433,11 +5115,11 @@ spec:
       type: Container
 ```
 
-- Ó¦ÓÃLimitRange
+- åº”ç”¨LimitRange
 
 ```bash
 $ kubectl create -f limits-test.yaml -n test
-# ²é¿´testÃüÃû¿Õ¼äÏÂµÄlimits
+# æŸ¥çœ‹testå‘½åç©ºé—´ä¸‹çš„limits
 $ kubectl describe limits -n test
 Name:       test-limits
 Namespace:  test
@@ -5449,9 +5131,9 @@ Container   cpu       100m   2    200m             300m           5
 Container   memory    100Mi  1Gi  100Mi            200Mi          4
 ```
 
-### 4.2¡¢²âÊÔLimitRange
+### 4.2ã€æµ‹è¯•LimitRange
 
-- ´´½¨Ò»¸ö²¿Êğ
+- åˆ›å»ºä¸€ä¸ªéƒ¨ç½²
 
 ```bash
 $ vim web-test.yaml
@@ -5481,21 +5163,21 @@ spec:
         - containerPort: 8080
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-test.yaml
-# ²é¿´devÃüÃû¿Õ¼äÏÂÄÚÈİ
+# æŸ¥çœ‹devå‘½åç©ºé—´ä¸‹å†…å®¹
 $ kubectl get all -n test
-# ²é¿´²¿Êğ
+# æŸ¥çœ‹éƒ¨ç½²
 $ kubectl get deploy -n test
-# ²é¿´²¿ÊğÏêÇé
+# æŸ¥çœ‹éƒ¨ç½²è¯¦æƒ…
 $ kubectl get deploy -n test sbt-web-demo -o yaml
-# ²é¿´podsÏêÇé
+# æŸ¥çœ‹podsè¯¦æƒ…
 $ kubectl get pods -n test sbt-web-demo-756b64bb8b-pmvmd -o yaml
 ```
 
-- µ÷Õû²¿Êğ×ÊÔ´
+- è°ƒæ•´éƒ¨ç½²èµ„æº
 
 ```bash
 $ vim web-test.yaml
@@ -5523,40 +5205,40 @@ spec:
         image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
-        # LimitRange³¬¹ıÏŞ¶¨
+        # LimitRangeè¶…è¿‡é™å®š
         resources:
           requests:
             memory: 100Mi
-            # 1ºËĞÄµÄCPU=1000m
+            # 1æ ¸å¿ƒçš„CPU=1000m
             cpu: 100m
           limits:
             memory: 1000Mi
             cpu: 2000m
 ```
 
-- Ë¢ĞÂ²¿Êğ
+- åˆ·æ–°éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-test.yaml
-# ²é¿´devÃüÃû¿Õ¼äÏÂÄÚÈİ
+# æŸ¥çœ‹devå‘½åç©ºé—´ä¸‹å†…å®¹
 $ kubectl get all -n test
-# ²é¿´²¿Êğ
+# æŸ¥çœ‹éƒ¨ç½²
 $ kubectl get deploy -n test
-# ²é¿´²¿Êğ×´Ì¬
+# æŸ¥çœ‹éƒ¨ç½²çŠ¶æ€
 $ kubectl describe deploy -n test sbt-web-demo
-# ²é¿´²¿ÊğÏêÇé£º¿ÉÒÔ¿´µ½ message: 'pods "sbt-web-demo-dcc47d586-7wwbz" is forbidden: 
+# æŸ¥çœ‹éƒ¨ç½²è¯¦æƒ…ï¼šå¯ä»¥çœ‹åˆ° message: 'pods "sbt-web-demo-dcc47d586-7wwbz" is forbidden: 
 $ kubectl get deploy -n test sbt-web-demo -o yaml
-# ²é¿´podsÏêÇé
+# æŸ¥çœ‹podsè¯¦æƒ…
 $ kubectl get pods -n test sbt-web-demo-756b64bb8b-pmvmd -o yaml
 ```
 
 
 
-### 4.3¡¢´´½¨ResourceQuota£ºÏŞÖÆÆäËû×ÊÔ´×ÜÁ¿
+### 4.3ã€åˆ›å»ºResourceQuotaï¼šé™åˆ¶å…¶ä»–èµ„æºæ€»é‡
 
-#### 4.3.1¡¢´´½¨podÒÔ¼°CPUÓëÄÚ´æ×ÜÅä¶î
+#### 4.3.1ã€åˆ›å»ºpodä»¥åŠCPUä¸å†…å­˜æ€»é…é¢
 
-- ´´½¨podÒÔ¼°CPUÓëÄÚ´æ×ÜÅä¶î
+- åˆ›å»ºpodä»¥åŠCPUä¸å†…å­˜æ€»é…é¢
 
 ```bash
 $ vim compute-resource.yaml
@@ -5576,9 +5258,9 @@ spec:
     limits.memory: 8Gi
 ```
 
-#### 4.3.2¡¢´´½¨ÆäËû×ÊÔ´×ÜÅä¶î
+#### 4.3.2ã€åˆ›å»ºå…¶ä»–èµ„æºæ€»é…é¢
 
-- ´´½¨ÆäËû×ÊÔ´×ÜÅä¶î
+- åˆ›å»ºå…¶ä»–èµ„æºæ€»é…é¢
 
 ```bash
 $ vim object-count.yaml
@@ -5598,7 +5280,7 @@ spec:
     services: 10
 ```
 
-#### 4.3.3¡¢Ó¦ÓÃÓë²é¿´Åä¶î
+#### 4.3.3ã€åº”ç”¨ä¸æŸ¥çœ‹é…é¢
 
 ```bash
 $ kubectl apply -f compute-resource.yaml -n test
@@ -5610,9 +5292,9 @@ object-counts    77s   configmaps: 1/10, persistentvolumeclaims: 0/4, replicatio
 resource-quota   83s   pods: 1/4, requests.cpu: 1/2, requests.memory: 500Mi/4Gi                                                     limits.cpu: 2/4, limits.memory: 1000Mi/8Gi
 ```
 
-### 4.4¡¢²âÊÔResourceQuota
+### 4.4ã€æµ‹è¯•ResourceQuota
 
-- ´´½¨Ò»¸ö²¿Êğ
+- åˆ›å»ºä¸€ä¸ªéƒ¨ç½²
 
 ```bash
 $ vim web-test.yaml
@@ -5643,22 +5325,22 @@ spec:
         resources:
           requests:
             memory: 100Mi
-            # 1ºËĞÄµÄCPU=1000m
+            # 1æ ¸å¿ƒçš„CPU=1000m
             cpu: 100m
           limits:
             memory: 100Mi
             cpu: 200m
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-test.yaml
-# ²é¿´²¿Êğ
+# æŸ¥çœ‹éƒ¨ç½²
 $ kubectl get deploy -n test
-# ²é¿´²¿ÊğÏêÇé
+# æŸ¥çœ‹éƒ¨ç½²è¯¦æƒ…
 $ kubectl get deploy -n test sbt-web-demo -o yaml
-# ²é¿´quota
+# æŸ¥çœ‹quota
 $ kubectl describe quota resource-quota -n test
 Name:            resource-quota
 Namespace:       test
@@ -5671,38 +5353,38 @@ requests.cpu     1300m   2
 requests.memory  800Mi   4Gi
 ```
 
-## 4.5¡¢PodÇıÖğ - Eviction
+## 4.5ã€Podé©±é€ - Eviction
 
-### 4.5.1¡¢³£¼ûÇıÖğ²ßÂÔÅäÖÃ
+### 4.5.1ã€å¸¸è§é©±é€ç­–ç•¥é…ç½®
 
 ```bash
-# Èç¹ûÄÚ´æĞ¡ÓÚ1.5GiÇÒ³ÖĞø1m30sÒÔÉÏ
+# å¦‚æœå†…å­˜å°äº1.5Giä¸”æŒç»­1m30sä»¥ä¸Š
 --eviction-soft=memory.availabel<1.5Gi
 --eviction-soft-grace-period=memory.availabel=1m30s
-# Èç¹ûÄÚ´æĞ¡ÓÚ100Mi»òÕß´ÅÅÌĞ¡ÓÚ1Gi»òÕßinodes²»×ã5%£¬Á¢¼´ÇıÖğ
+# å¦‚æœå†…å­˜å°äº100Miæˆ–è€…ç£ç›˜å°äº1Giæˆ–è€…inodesä¸è¶³5%ï¼Œç«‹å³é©±é€
 --eviction-hard=memory.availabel<100Mi,nodefs.availabel<1Gi,nodefs.inodesFree<5%
 ```
 
-- ´ÅÅÌ½ôÈ±Ê±´¦ÀíÂß¼­
+- ç£ç›˜ç´§ç¼ºæ—¶å¤„ç†é€»è¾‘
 
-  - É¾³ıËÀµôµÄpod¡¢ÈİÆ÷
+  - åˆ é™¤æ­»æ‰çš„podã€å®¹å™¨
 
-  - É¾³ıÃ»ÓÃµÄ¾µÏñ
-  - °´ÓÅÏÈ¼¶¡¢×ÊÔ´Õ¼ÓÃÇé¿öÇıÖğpod
+  - åˆ é™¤æ²¡ç”¨çš„é•œåƒ
+  - æŒ‰ä¼˜å…ˆçº§ã€èµ„æºå ç”¨æƒ…å†µé©±é€pod
 
-- ÄÚ´æ½ôÈ±
+- å†…å­˜ç´§ç¼º
 
-  - ÇıÖğ²»¿É¿¿µÄpod
-  - ÇıÖğ»ù±¾¿É¿¿µÄpod
-  - ÇıÖğ¿É¿¿µÄpod
+  - é©±é€ä¸å¯é çš„pod
+  - é©±é€åŸºæœ¬å¯é çš„pod
+  - é©±é€å¯é çš„pod
 
-# ¾Å¡¢Label
+# ä¹ã€Label
 
 ![image-20220409152210334](images/image-20220409152210334.png)
 
 
 
-## 9.0¡¢ÇĞ»»Ä¿Â¼
+## 9.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/3-label
@@ -5711,9 +5393,9 @@ $ cd /root/dockerdata/deep-in-kubernetes/3-label
 
 
 
-## 9.1¡¢ÑİÊ¾±êÇ©µÄ×÷ÓÃ
+## 9.1ã€æ¼”ç¤ºæ ‡ç­¾çš„ä½œç”¨
 
-- ´´½¨Ò»¸ö²¿Êğ
+- åˆ›å»ºä¸€ä¸ªéƒ¨ç½²
 
 ```bash
 $ vim web-dev.yaml
@@ -5729,12 +5411,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      # ±¾ deployÖ»¸ºÔğ¾ßÓĞ±êÇ© app=sbt-web-demo ±êÇ©µÄpod
+      # æœ¬ deployåªè´Ÿè´£å…·æœ‰æ ‡ç­¾ app=sbt-web-demo æ ‡ç­¾çš„pod
       app: sbt-web-demo
     matchExpressions:
       - {key: group, operator: In, values: [dev, test]}
   replicas: 1
-  # ±¾ deploy ¸ù¾İÈçÏÂÅäÖÃ´´½¨pod
+  # æœ¬ deploy æ ¹æ®å¦‚ä¸‹é…ç½®åˆ›å»ºpod
   template:
     metadata:
       labels:
@@ -5746,7 +5428,7 @@ spec:
         image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
         ports:
         - containerPort: 8080
-      # Ñ¡ÔñÖ¸¶¨ node ²¿Êğ¸Ã pod
+      # é€‰æ‹©æŒ‡å®š node éƒ¨ç½²è¯¥ pod
       nodeSelector:
         disktype: ssd
 ---
@@ -5758,13 +5440,13 @@ metadata:
   namespace: dev
 spec:
   ports:
-  # service¶Ë¿Ú£¬¼´k8sÖĞ·şÎñÖ®¼äµÄ·ÃÎÊ¶Ë¿Ú
+  # serviceç«¯å£ï¼Œå³k8sä¸­æœåŠ¡ä¹‹é—´çš„è®¿é—®ç«¯å£
   - port: 80
     protocol: TCP
-    # pod £¨Ò²¾ÍÊÇÈİÆ÷£©¶Ë¿Ú
+    # pod ï¼ˆä¹Ÿå°±æ˜¯å®¹å™¨ï¼‰ç«¯å£
     targetPort: 8080
   selector:
-    # ·¢ÏÖ app=sbt-web-demo ±êÇ©µÄpod
+    # å‘ç° app=sbt-web-demo æ ‡ç­¾çš„pod
     app: sbt-web-demo
   type: ClusterIP
 
@@ -5781,7 +5463,7 @@ spec:
     http:
       paths:
       - path: /
-        # Æ¥ÅäÀàĞÍ£ºPrefix-Ç°×ºÆ¥Åä£¬»¹ÓĞExact-¾«È·Æ¥Åä
+        # åŒ¹é…ç±»å‹ï¼šPrefix-å‰ç¼€åŒ¹é…ï¼Œè¿˜æœ‰Exact-ç²¾ç¡®åŒ¹é…
         pathType: Prefix
         backend:
           service: 
@@ -5790,26 +5472,26 @@ spec:
               number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-dev.yaml
-# ¸ù¾İ±êÇ©¹ıÂËpod
+# æ ¹æ®æ ‡ç­¾è¿‡æ»¤pod
 $ kubectl get pods -l group=dev -n dev
 ```
 
-# Ê®¡¢½¡¿µ¼ì²é¡ª¡ª¸ß¿ÉÓÃµÄÊØ»¤Õß
+# åã€å¥åº·æ£€æŸ¥â€”â€”é«˜å¯ç”¨çš„å®ˆæŠ¤è€…
 
-## 10.0¡¢ÇĞ»»Ä¿Â¼
+## 10.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/4-health-check
 $ cd /root/dockerdata/deep-in-kubernetes/4-health-check
 ```
 
-## 10.1¡¢CMD·½Ê½¡¾SpringBoot²»ÊÊÓÃ¡¿
+## 10.1ã€CMDæ–¹å¼ã€SpringBootä¸é€‚ç”¨ã€‘
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-cmd.yaml
@@ -5837,30 +5519,30 @@ spec:
           image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
-          # ´æ»î×´Ì¬¼ì²é
+          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
           livenessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
                 - ps -ef|grep java|grep -v grep
-            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
             initialDelaySeconds: 10
-            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
             periodSeconds: 10
-            # ³¬Ê±Ê±¼ä3s
+            # è¶…æ—¶æ—¶é—´3s
             timeoutSeconds: 3
-            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
             successThreshold: 1
-            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
             failureThreshold: 5
 ```
 
 
 
-## 10.2¡¢HTTP·½Ê½
+## 10.2ã€HTTPæ–¹å¼
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-http.yaml
@@ -5888,23 +5570,23 @@ spec:
           image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
-          # ´æ»î×´Ì¬¼ì²é
+          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
               scheme: HTTP
-            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
             initialDelaySeconds: 10
-            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
             periodSeconds: 10
-            # ³¬Ê±Ê±¼ä3s
+            # è¶…æ—¶æ—¶é—´3s
             timeoutSeconds: 3
-            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
             successThreshold: 1
-            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
             failureThreshold: 5
-          # ¾ÍĞ÷×´Ì¬¼ì²é
+          # å°±ç»ªçŠ¶æ€æ£€æŸ¥
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -5915,19 +5597,19 @@ spec:
             timeoutSeconds: 3
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-dev-cmd.yaml
-# ²é¿´podsÁĞ±í
+# æŸ¥çœ‹podsåˆ—è¡¨
 $ kubectl get pods -o wide -n dev
-# ²é¿´podsÏêÇé£º¶àÁËLiveness ºÍ Readiness
+# æŸ¥çœ‹podsè¯¦æƒ…ï¼šå¤šäº†Liveness å’Œ Readiness
 $ kubectl describe pods sbt-web-demo-7cfcdddcc5-7ht6x -n dev
 ```
 
-## 10.3¡¢TCP·½Ê½¡¾SpringBoot²»ÊÊÓÃ¡¿
+## 10.3ã€TCPæ–¹å¼ã€SpringBootä¸é€‚ç”¨ã€‘
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-tcp.yaml
@@ -5955,36 +5637,36 @@ spec:
           image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
-          # ´æ»î×´Ì¬¼ì²é
+          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
           livenessProbe:
             tcpSocket:
               port: 8080
-            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
             initialDelaySeconds: 10
-            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
             periodSeconds: 10
-            # ³¬Ê±Ê±¼ä3s
+            # è¶…æ—¶æ—¶é—´3s
             timeoutSeconds: 3
-            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
             successThreshold: 1
-            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
             failureThreshold: 5
 ```
 
-# Ê®Ò»¡¢Scheduler
+# åä¸€ã€Scheduler
 
 ![image-20220410073524383](images/image-20220410073524383.png)
 
-## 11.0¡¢ÇĞ»»Ä¿Â¼
+## 11.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/5-scheduler
 $ cd /root/dockerdata/deep-in-kubernetes/5-scheduler
 ```
 
-## 11.1¡¢½Úµãµ÷¶È
+## 11.1ã€èŠ‚ç‚¹è°ƒåº¦
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-node.yaml
@@ -6011,11 +5693,11 @@ spec:
           image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
-      # Ç×ºÍĞÔ
+      # äº²å’Œæ€§
       affinity:
-        # ½ÚµãÇ×ºÍĞÔ
+        # èŠ‚ç‚¹äº²å’Œæ€§
         nodeAffinity:
-          # ±ØĞëÂú×ã
+          # å¿…é¡»æ»¡è¶³
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
@@ -6023,7 +5705,7 @@ spec:
                     operator: In
                     values:
                       - amd64
-          # ×îºÃÂú×ã
+          # æœ€å¥½æ»¡è¶³
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 1
               preference:
@@ -6034,26 +5716,26 @@ spec:
                       - ssd
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
-# ²é¿´½Úµã±êÇ©ÏêÇé£º·¢ÏÖemon2¾ßÓĞ disktype=ssd ±êÇ©
+# æŸ¥çœ‹èŠ‚ç‚¹æ ‡ç­¾è¯¦æƒ…ï¼šå‘ç°emon2å…·æœ‰ disktype=ssd æ ‡ç­¾
 $ kubectl get node --show-labels
 NAME    STATUS   ROLES    AGE     VERSION   LABELS
 emon2   Ready    <none>   4d19h   v1.20.2   app=ingress,beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=emon2,kubernetes.io/os=linux
 emon3   Ready    <none>   4d19h   v1.20.2   app=ingress,beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=emon3,kubernetes.io/os=linux
 
 $ kubectl apply -f web-dev-node.yaml
-# ²é¿´pod²¿Êğµ½µÄ½Úµã£º·¢ÏÖpod²¿Êğµ½ÁËemon3½Úµã
+# æŸ¥çœ‹podéƒ¨ç½²åˆ°çš„èŠ‚ç‚¹ï¼šå‘ç°podéƒ¨ç½²åˆ°äº†emon3èŠ‚ç‚¹
 $ kubectl get pods -o wide -n dev
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 NAME                                 READY   STATUS    RESTARTS   AGE     IP              NODE    NOMINATED NODE   READINESS GATES
 sbt-web-demo-node-74bdc75d4f-mhrfw   1/1     Running   0          1s      10.200.161.23   emon3   <none>           <none>
 ```
 
-## 11.2¡¢podµ÷¶È
+## 11.2ã€podè°ƒåº¦
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-pod.yaml
@@ -6080,11 +5762,11 @@ spec:
           image: 192.168.32.116:5080/devops-learning/k8s-springboot-web-demo:latest
           ports:
             - containerPort: 8080
-      # Ç×ºÍĞÔ
+      # äº²å’Œæ€§
       affinity:
-        # podÇ×ºÍĞÔ£ºpodAntiAffinity-·´Ç×ºÍĞÔ
+        # podäº²å’Œæ€§ï¼špodAntiAffinity-åäº²å’Œæ€§
         podAffinity:
-          # ±ØĞëÂú×ã£ºÕâ¸öpodºÍapp=sbt-web-demoµÄpodÔËĞĞÔÚÍ¬Ò»¸ö½ÚµãÉÏ
+          # å¿…é¡»æ»¡è¶³ï¼šè¿™ä¸ªpodå’Œapp=sbt-web-demoçš„podè¿è¡Œåœ¨åŒä¸€ä¸ªèŠ‚ç‚¹ä¸Š
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
@@ -6093,7 +5775,7 @@ spec:
                     values:
                       - sbt-web-demo
               topologyKey: kubernetes.io/hostname
-          # ×îºÃÂú×ã
+          # æœ€å¥½æ»¡è¶³
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               podAffinityTerm:
@@ -6106,22 +5788,22 @@ spec:
                 topologyKey: kubernetes.io/hostname
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f web-dev-pod.yaml
-# ²é¿´pod²¿Êğµ½µÄ½Úµã£º·¢ÏÖpod²¿Êğµ½ÁËemon2½Úµã£¬ÒòÎªsbt-web-demoÕâ¸öpodÒ²ÔÚemon2½Úµã
+# æŸ¥çœ‹podéƒ¨ç½²åˆ°çš„èŠ‚ç‚¹ï¼šå‘ç°podéƒ¨ç½²åˆ°äº†emon2èŠ‚ç‚¹ï¼Œå› ä¸ºsbt-web-demoè¿™ä¸ªpodä¹Ÿåœ¨emon2èŠ‚ç‚¹
 $ kubectl get pods -o wide -n dev
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 NAME                                 READY   STATUS    RESTARTS   AGE   IP              NODE    NOMINATED NODE   READINESS GATES
 sbt-web-demo-7cfcdddcc5-ll89j        1/1     Running   0          8h    10.200.108.73   emon2   <none>           <none>
 sbt-web-demo-node-74bdc75d4f-srf9f   1/1     Running   0          6m    10.200.161.24   emon3   <none>           <none>
 sbt-web-demo-pod-cd78fb5cf-sglbj     1/1     Running   0          3s    10.200.108.75   emon2   <none>           <none>
 ```
 
-## 11.3¡¢taintµ÷¶È£¨ÎÛµã£©
+## 11.3ã€taintè°ƒåº¦ï¼ˆæ±¡ç‚¹ï¼‰
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-dev-taint.yaml
@@ -6155,14 +5837,14 @@ spec:
           effect: "NoSchedule"
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
-# Ìí¼Ó½ÚµãµÄÎÛµã£ºNoSchedule-²»Òªµ÷¶È£»PreferNoSchedule-×îºÃ²»Òªµ÷¶È£»NoExecute-²»Òªµ÷¶È£¬²¢ÇıÖğ¸Ã½ÚµãÉÏµÄpod
+# æ·»åŠ èŠ‚ç‚¹çš„æ±¡ç‚¹ï¼šNoSchedule-ä¸è¦è°ƒåº¦ï¼›PreferNoSchedule-æœ€å¥½ä¸è¦è°ƒåº¦ï¼›NoExecute-ä¸è¦è°ƒåº¦ï¼Œå¹¶é©±é€è¯¥èŠ‚ç‚¹ä¸Šçš„pod
 $ kubectl taint nodes emon3 gpu=true:NoSchedule
 
 $ kubectl apply -f web-dev-taint.yaml
-# ²é¿´pod²¿Êğµ½µÄ½Úµã£ºËäÈ»emon3ÓĞÎÛµã£¬µ«¸±±¾2¸öpod£¬»¹ÊÇÉÏÁËemon3ÁË£¬¶ÔÆäÑ¡ÔñÁËÈİÈÌ
+# æŸ¥çœ‹podéƒ¨ç½²åˆ°çš„èŠ‚ç‚¹ï¼šè™½ç„¶emon3æœ‰æ±¡ç‚¹ï¼Œä½†å‰¯æœ¬2ä¸ªpodï¼Œè¿˜æ˜¯ä¸Šäº†emon3äº†ï¼Œå¯¹å…¶é€‰æ‹©äº†å®¹å¿
 $ kubectl get pods -o wide -n dev
 $  kubectl get pods -o wide -n dev
 NAME                                  READY   STATUS    RESTARTS   AGE     IP              NODE    NOMINATED NODE   READINESS GATES
@@ -6170,18 +5852,18 @@ sbt-web-demo-taint-7d69cf4fff-pq8pf   1/1     Running   0          5s      10.20
 sbt-web-demo-taint-7d69cf4fff-t95cx   1/1     Running   0          5s      10.200.161.33   emon3   <none>           <none>
 ```
 
-# Ê®¶ş¡¢²¿Êğ²ßÂÔÊµ¼ù
+# åäºŒã€éƒ¨ç½²ç­–ç•¥å®è·µ
 
-## 12.0¡¢ÇĞ»»Ä¿Â¼
+## 12.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/6-deployment
 $ cd /root/dockerdata/deep-in-kubernetes/6-deployment
 ```
 
-## 12.1¡¢¹ö¶¯²¿ÊğRollingUpdate£º¹ö¶¯¸üĞÂ¡¾Ä¬ÈÏ·½Ê½¡¿
+## 12.1ã€æ»šåŠ¨éƒ¨ç½²RollingUpdateï¼šæ»šåŠ¨æ›´æ–°ã€é»˜è®¤æ–¹å¼ã€‘
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-rollingupdate.yaml
@@ -6195,11 +5877,11 @@ metadata:
   name: sbt-web-rollingupdate
   namespace: dev
 spec:
-  strategy: # Ä¬ÈÏ²ßÂÔÊÇRollingUpdate£¬¹ö¶¯ÅäÖÃÊÇ maxSurge:25%ºÍ maxUnavailable:25%
+  strategy: # é»˜è®¤ç­–ç•¥æ˜¯RollingUpdateï¼Œæ»šåŠ¨é…ç½®æ˜¯ maxSurge:25%å’Œ maxUnavailable:25%
     rollingUpdate:
-      # ×î´ó³¬³ö·şÎñÊµÀıÊıµÄ°Ù·Ö±È£¬Èç¹ûÓĞ4¸ö·şÎñ£¬25%±íÊ¾×î¶àÖ»ÄÜ³¬³ö1¸öÊ¾Àı£»Ò²¿ÉÒÔÉèÉèÖÃÎªÊı×Ö£¬±ÈÈç1±íÊ¾×î¶à1¸ö³¬³ö
+      # æœ€å¤§è¶…å‡ºæœåŠ¡å®ä¾‹æ•°çš„ç™¾åˆ†æ¯”ï¼Œå¦‚æœæœ‰4ä¸ªæœåŠ¡ï¼Œ25%è¡¨ç¤ºæœ€å¤šåªèƒ½è¶…å‡º1ä¸ªç¤ºä¾‹ï¼›ä¹Ÿå¯ä»¥è®¾è®¾ç½®ä¸ºæ•°å­—ï¼Œæ¯”å¦‚1è¡¨ç¤ºæœ€å¤š1ä¸ªè¶…å‡º
       maxSurge: 25%
-      # ×î´ó²»¿ÉÓÃ·şÎñÊµÀıÊıµÄ°Ù·Ö±È£¬Èç¹ûÓĞ4¸ö·şÎñ£¬ÖÁÉÙÓĞ3¸öÊÇ¿ÉÓÃµÄ
+      # æœ€å¤§ä¸å¯ç”¨æœåŠ¡å®ä¾‹æ•°çš„ç™¾åˆ†æ¯”ï¼Œå¦‚æœæœ‰4ä¸ªæœåŠ¡ï¼Œè‡³å°‘æœ‰3ä¸ªæ˜¯å¯ç”¨çš„
       maxUnavailable: 25%
     type: RollingUpdate
   selector:
@@ -6279,26 +5961,26 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-web-rollingupdate.emon.vip/hello?name=emon
 ```bash
 $ kubectl apply -f web-rollingupdate.yaml
-# ²é¿´pods
+# æŸ¥çœ‹pods
 $ kubectl get pods -o wide -n dev
-# ÔİÍ£·¢²¼
+# æš‚åœå‘å¸ƒ
 $ kubectl rollout pause deploy sbt-web-rollingupdate -n dev
-# »Ö¸´·¢²¼
+# æ¢å¤å‘å¸ƒ
 $ kubectl rollout resume deploy sbt-web-rollingupdate -n dev
-# »Ø¹ö·¢²¼
+# å›æ»šå‘å¸ƒ
 $ kubectl rollout undo deploy sbt-web-rollingupdate -n dev
 ```
 
-## 12.2¡¢ÖØ½¨²¿ÊğRecreate¡¾Ê¹ÓÃ³¡¾°²»¶à¡¿
+## 12.2ã€é‡å»ºéƒ¨ç½²Recreateã€ä½¿ç”¨åœºæ™¯ä¸å¤šã€‘
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-recreate.yaml
@@ -6328,23 +6010,23 @@ spec:
           image: 192.168.32.116:5080/devops-learning/springboot-web-demo:latest
           ports:
             - containerPort: 8080
-          # ´æ»î×´Ì¬¼ì²é
+          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
               scheme: HTTP
-            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
             initialDelaySeconds: 10
-            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
             periodSeconds: 10
-            # ³¬Ê±Ê±¼ä3s
+            # è¶…æ—¶æ—¶é—´3s
             timeoutSeconds: 3
-            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
             successThreshold: 1
-            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
             failureThreshold: 5
-          # ¾ÍĞ÷×´Ì¬¼ì²é
+          # å°±ç»ªçŠ¶æ€æ£€æŸ¥
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -6391,23 +6073,23 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-web-recreate.emon.vip/hello?name=emon
 
 ```bash
 $ kubectl apply -f web-recreate.yaml
-# ²é¿´pods
+# æŸ¥çœ‹pods
 $ kubectl get pods -o wide -n dev
 ```
 
-## 12.3¡¢À¶ÂÌ²¿Êğ
+## 12.3ã€è“ç»¿éƒ¨ç½²
 
-### 12.3.1¡¢²¿ÊğV1°æ±¾
+### 12.3.1ã€éƒ¨ç½²V1ç‰ˆæœ¬
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim web-bluegreen.yaml
@@ -6468,7 +6150,7 @@ spec:
             timeoutSeconds: 5
 ```
 
-- ´´½¨serviceÎÄ¼ş
+- åˆ›å»ºserviceæ–‡ä»¶
 
 ```bash
 $ vim bluegreen-service.yaml
@@ -6514,9 +6196,9 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-web-bluegreen.emon.vip/hello?name=emon
 ```bash
@@ -6524,45 +6206,45 @@ $ kubectl apply -f web-bluegreen.yaml
 $ kubectl apply -f bluegreen-service.yaml
 ```
 
-### 12.3.2¡¢²¿ÊğV2°æ±¾
+### 12.3.2ã€éƒ¨ç½²V2ç‰ˆæœ¬
 
-- µ÷Õû²¿ÊğÎÄ¼ş
+- è°ƒæ•´éƒ¨ç½²æ–‡ä»¶
 
 ```bash
-# ĞŞ¸ÄV1°æ±¾¼¸´¦µØ·½
+# ä¿®æ”¹V1ç‰ˆæœ¬å‡ å¤„åœ°æ–¹
 $ vim web-bluegreen.yaml
 ```
 
 ```bash
-# µÚÒ»´¦£ºDeploymentÃû³Æ
+# ç¬¬ä¸€å¤„ï¼šDeploymentåç§°
 name: sbt-web-bluegreen-v1.0 
 ==> 
 name: sbt-web-bluegreen-v2.0
-# µÚ¶ş´Î£ºPod±êÇ©
+# ç¬¬äºŒæ¬¡ï¼šPodæ ‡ç­¾
 version: v2.0
-# µÚÈı´Î£º¾µÏñ°æ±¾
+# ç¬¬ä¸‰æ¬¡ï¼šé•œåƒç‰ˆæœ¬
 image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v1.0
 ==>
 image: 192.168.32.116:5080/devops-learning/springboot-web-demo:v2.0
 ```
 
-- µ÷ÕûserviceÎÄ¼ş
+- è°ƒæ•´serviceæ–‡ä»¶
 
 ```bash
-# ĞŞ¸ÄV1°æ±¾¼¸´¦µØ·½
+# ä¿®æ”¹V1ç‰ˆæœ¬å‡ å¤„åœ°æ–¹
 $ vim bluegreen-service.yaml
 ```
 
 ```bash
-# µÚÒ»´¦£ºÆ¥ÅäµÄpod°æ±¾
+# ç¬¬ä¸€å¤„ï¼šåŒ¹é…çš„podç‰ˆæœ¬
 version: v1.0
 ==>
 version: v2.0
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-web-bluegreen.emon.vip/hello?name=emon
 
@@ -6571,28 +6253,28 @@ $ kubectl apply -f web-bluegreen.yaml
 $ kubectl apply -f bluegreen-service.yaml
 ```
 
-## 12.4¡¢½ğË¿È¸
+## 12.4ã€é‡‘ä¸é›€
 
-ÔÚÀ¶ÂÌ²¿Êğ»ù´¡ÉÏ£¬µ÷ÕûserviceÎÄ¼ş£¬È¥µôversion: v2.0±êÇ©£¬ÖØĞÂ·¢²¼service£¬µÃµ½µÄ½á¹û¾ÍÊÇ½ğË¿È¸·¢²¼£¡£¡£¡
+åœ¨è“ç»¿éƒ¨ç½²åŸºç¡€ä¸Šï¼Œè°ƒæ•´serviceæ–‡ä»¶ï¼Œå»æ‰version: v2.0æ ‡ç­¾ï¼Œé‡æ–°å‘å¸ƒserviceï¼Œå¾—åˆ°çš„ç»“æœå°±æ˜¯é‡‘ä¸é›€å‘å¸ƒï¼ï¼ï¼
 
-# Ê®Èı¡¢ÉîÈëPod¡¾Î´Íê´ıĞø¡¿
+# åä¸‰ã€æ·±å…¥Podã€æœªå®Œå¾…ç»­ã€‘
 
-## 13.0¡¢ÇĞ»»Ä¿Â¼
+## 13.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/7-pod
 $ cd /root/dockerdata/deep-in-kubernetes/7-pod
 ```
 
-## 13.1¡¢Éè¼ÆË¼Ïë
+## 13.1ã€è®¾è®¡æ€æƒ³
 
-- PodÊÇ×îĞ¡µ÷¶Èµ¥Î»
-- ±¾ÖÊ»¹ÊÇÈİÆ÷µÄ¸ôÀë
-- PauseÈİÆ÷
+- Podæ˜¯æœ€å°è°ƒåº¦å•ä½
+- æœ¬è´¨è¿˜æ˜¯å®¹å™¨çš„éš”ç¦»
+- Pauseå®¹å™¨
 
-# 13.2¡¢network
+# 13.2ã€network
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim pod-network.yaml
@@ -6616,39 +6298,39 @@ spec:
         - containerPort: 8081
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f pod-network.yaml
 $ kubectl get pods -o wide
 ```
 
-# Ê®ËÄ¡¢ÉîÈëIngress-Nginx
+# åå››ã€æ·±å…¥Ingress-Nginx
 
-## 14.0¡¢ÇĞ»»Ä¿Â¼
+## 14.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress
 ```
 
-## 14.1¡¢ÖØĞÂ°²×°Ingress-Nginx£¨µ÷ÕûIngress-Nginx£©
+## 14.1ã€é‡æ–°å®‰è£…Ingress-Nginxï¼ˆè°ƒæ•´Ingress-Nginxï¼‰
 
-°²×°·½Ê½£ºDaemonSet
+å®‰è£…æ–¹å¼ï¼šDaemonSet
 
-°²×°°æ±¾£º0.23.0
+å®‰è£…ç‰ˆæœ¬ï¼š0.23.0
 
-- °²×°Ö®Ç°É¾³ı¾ÉµÄIngress-Nginx
+- å®‰è£…ä¹‹å‰åˆ é™¤æ—§çš„Ingress-Nginx
 
 ```bash
-# ¡¾ÖØµã¡¿ÇëÏÈÉ¾³ımandatory.yaml¶ÔÓ¦µÄ×ÊÔ´
+# ã€é‡ç‚¹ã€‘è¯·å…ˆåˆ é™¤mandatory.yamlå¯¹åº”çš„èµ„æº
 $ kubectl delete -f mandatory.yaml
 ```
 
-- µ÷Õûmandatory.yaml
+- è°ƒæ•´mandatory.yaml
 
 ```bash
-# È»ºó»ùÓÚµÚÁùÕÂ£¬µ÷Õû2´¦
+# ç„¶ååŸºäºç¬¬å…­ç« ï¼Œè°ƒæ•´2å¤„
 $ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
 ```
 
@@ -6904,7 +6586,7 @@ subjects:
 ---
 
 apiVersion: apps/v1
-# µÚÒ»´¦£ºµ÷Õû Deployment ==> DaemonSet
+# ç¬¬ä¸€å¤„ï¼šè°ƒæ•´ Deployment ==> DaemonSet
 kind: DaemonSet
 metadata:
   name: nginx-ingress-controller
@@ -6932,7 +6614,7 @@ spec:
         app: ingress
       containers:
         - name: nginx-ingress-controller
-          # µÚ¶ş´¦£ºµ÷Õû 0.19.0 ==> 0.23.0
+          # ç¬¬äºŒå¤„ï¼šè°ƒæ•´ 0.19.0 ==> 0.23.0
           image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
           args:
             - /nginx-ingress-controller
@@ -6987,33 +6669,33 @@ spec:
 ---
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $  kubectl apply -f mandatory.yaml
 
-# ²é¿´deployµÄ²¿ÊğĞÅÏ¢
+# æŸ¥çœ‹deployçš„éƒ¨ç½²ä¿¡æ¯
 $ kubectl get ds -n ingress-nginx
-# ²é¿´pods
+# æŸ¥çœ‹pods
 $ kubectl get pods -n ingress-nginx -o wide
-# »ñÈ¡ ConfigMap ÅäÖÃÁĞ±í
+# è·å– ConfigMap é…ç½®åˆ—è¡¨
 $ kubectl get cm -n ingress-nginx
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 NAME                              DATA   AGE
 ingress-controller-leader-nginx   0      3d21h
 kube-root-ca.crt                  1      3d21h
 nginx-configuration               0      3d21h
 tcp-services                      1      3d21h
 udp-services                      0      3d21h
-# »ñÈ¡ ConfigMap ÅäÖÃÊı¾İÇé¿ö
+# è·å– ConfigMap é…ç½®æ•°æ®æƒ…å†µ
 $ kubectl get cm -n ingress-nginx tcp-services
-# »ñÈ¡ ConfigMap ÅäÖÃÊı¾İÇé¿ö£¬yaml¸ñÊ½
+# è·å– ConfigMap é…ç½®æ•°æ®æƒ…å†µï¼Œyamlæ ¼å¼
 $ kubectl get cm -n ingress-nginx tcp-services -o yaml
 ```
 
-## 14.2¡¢ËÄ²ã´úÀí(¶ÔÓ¦cm=tcp-services£©
+## 14.2ã€å››å±‚ä»£ç†(å¯¹åº”cm=tcp-servicesï¼‰
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim tcp-config.yaml
@@ -7025,44 +6707,44 @@ kind: ConfigMap
 metadata:
   name: tcp-services
   namespace: ingress-nginx
-# ÅäÖÃÒª±©Â¶ËÄ²ã´úÀíµÄ·şÎñ  
+# é…ç½®è¦æš´éœ²å››å±‚ä»£ç†çš„æœåŠ¡  
 data:
   "30000": dev/sbt-web-demo:80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 http://sbt-web-bluegreen.emon.vip/hello?name=emon
 
 http://sbt-web-bluegreen.emon.vip:30000/hello?name=emon
 
 ```bash
-# =====ÔÚmaster½ÚµãËùÔÚ·şÎñÆ÷=====
+# =====åœ¨masterèŠ‚ç‚¹æ‰€åœ¨æœåŠ¡å™¨=====
 $ kubectl apply -f tcp-config.yaml
-# ²é¿´·şÎñµÄyamlÏêÇé
+# æŸ¥çœ‹æœåŠ¡çš„yamlè¯¦æƒ…
 $ kubectl get svc -n dev sbt-web-demo -o yaml
 
-# =====ÔÚ nginx-ingress-controller ½ÚµãËùÔÚ·şÎñÆ÷=====
-# ²é¿´ nginx-ingress-controller ËùÔÚ·şÎñÆ÷ÊÇ·ñÓĞ30000¶Ë¿Ú±©Â¶³öÀ´
+# =====åœ¨ nginx-ingress-controller èŠ‚ç‚¹æ‰€åœ¨æœåŠ¡å™¨=====
+# æŸ¥çœ‹ nginx-ingress-controller æ‰€åœ¨æœåŠ¡å™¨æ˜¯å¦æœ‰30000ç«¯å£æš´éœ²å‡ºæ¥
 $ netstat -tnlp|grep 30000
 
-# ²é¿´ nginx-ingress-controller ÈİÆ÷ID
+# æŸ¥çœ‹ nginx-ingress-controller å®¹å™¨ID
 $ crictl ps|grep nginx-ingress-controller 
-# ½øÈë nginx-ingress-controller ÈİÆ÷
+# è¿›å…¥ nginx-ingress-controller å®¹å™¨
 $ crictl exec -it <containerId> /bin/bash
-# ²é¿´ÔÚÈİÆ÷ÄÚnginxÊµ¼ÊÅäÖÃÎÄ¼şÎ»ÖÃÎª /etc/nginx/nginx.conf
+# æŸ¥çœ‹åœ¨å®¹å™¨å†…nginxå®é™…é…ç½®æ–‡ä»¶ä½ç½®ä¸º /etc/nginx/nginx.conf
 www-data@emon3:/etc/nginx$ more /etc/nginx/nginx.conf
 ```
 
-## 14.3¡¢Ingress-NginxÅäÖÃÎÄ¼ş
+## 14.3ã€Ingress-Nginxé…ç½®æ–‡ä»¶
 
-### 14.3.1¡¢»ù±¾×¨ÊôÅäÖÃÑİÊ¾
+### 14.3.1ã€åŸºæœ¬ä¸“å±é…ç½®æ¼”ç¤º
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
-dataµÄ¿ÉÅäÖÃÏÂ²Î¿¼£ºhttps://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+dataçš„å¯é…ç½®ä¸‹å‚è€ƒï¼šhttps://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
 
 ```bash
 $ vim nginx-config.yaml
@@ -7082,16 +6764,16 @@ data:
   proxy-send-timeout: "180"
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
-# ÅäÖÃºó¿ÉÔÚ nginx-ingress-controller ÈİÆ÷ÖĞ¶ÔÓ¦µÄnginxÅäÖÃÎÄ¼ş²é¿´µ½
+# é…ç½®åå¯åœ¨ nginx-ingress-controller å®¹å™¨ä¸­å¯¹åº”çš„nginxé…ç½®æ–‡ä»¶æŸ¥çœ‹åˆ°
 $ kubectl apply -f nginx-config.yaml
 ```
 
-### 14.3.2¡¢È«¾ÖÅäÖÃ
+### 14.3.2ã€å…¨å±€é…ç½®
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim custom-header-global.yaml
@@ -7101,7 +6783,7 @@ $ vim custom-header-global.yaml
 apiVersion: v1
 kind: ConfigMap
 data:
-  # ingress-nginx/custom-headers:±íÊ¾°Ñ ingress-nginx ÏÂÃæµÄÃû×ÖÎª custom-headers µÄÅäÖÃÄÚÈİÒıÈë×÷ÎªheaderÉèÖÃ
+  # ingress-nginx/custom-headers:è¡¨ç¤ºæŠŠ ingress-nginx ä¸‹é¢çš„åå­—ä¸º custom-headers çš„é…ç½®å†…å®¹å¼•å…¥ä½œä¸ºheaderè®¾ç½®
   proxy-set-headers: "ingress-nginx/custom-headers"
 metadata:
   name: nginx-configuration
@@ -7121,15 +6803,15 @@ metadata:
   namespace: ingress-nginx
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f custom-header-global.yaml
 ```
 
-### 14.3.3¡¢×¨ÊôÅäÖÃ
+### 14.3.3ã€ä¸“å±é…ç½®
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim custom-header-spec-ingress.yaml
@@ -7145,7 +6827,7 @@ metadata:
       more_set_headers "Request-Id: $req_id";
   name: sbt-web-demo
   namespace: dev
-# ¸ÃÅäÖÃ½öÔÚ sbt-dev.emon.vip ÏÂÉúĞ§
+# è¯¥é…ç½®ä»…åœ¨ sbt-dev.emon.vip ä¸‹ç”Ÿæ•ˆ
 spec:
   rules:
     - host: sbt-dev.emon.vip
@@ -7160,20 +6842,20 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
 $ kubectl apply -f custom-header-spec-ingress.yaml
 ```
 
-### 14.3.4¡¢×Ô¶¨ÒåNginxÄ£°å£¨µ÷ÕûIngress-Nginx£©
+### 14.3.4ã€è‡ªå®šä¹‰Nginxæ¨¡æ¿ï¼ˆè°ƒæ•´Ingress-Nginxï¼‰
 
-²Î¿¼£ºhttps://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/custom-template/
+å‚è€ƒï¼šhttps://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/custom-template/
 
-- µ÷Õûmandatory.yaml
+- è°ƒæ•´mandatory.yaml
 
 ```bash
-# È»ºó»ùÓÚ 14.1 £¬µ÷Õû2´¦
+# ç„¶ååŸºäº 14.1 ï¼Œè°ƒæ•´2å¤„
 $ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
 ```
 
@@ -7454,7 +7136,7 @@ spec:
       hostNetwork: true
       nodeSelector:
         app: ingress
-	  # µÚÒ»´¦£ºµ÷Õû Deployment ==> DaemonSet
+	  # ç¬¬ä¸€å¤„ï¼šè°ƒæ•´ Deployment ==> DaemonSet
       volumes:
         - name: nginx-template-volume
           configMap:
@@ -7465,7 +7147,7 @@ spec:
       containers:
         - name: nginx-ingress-controller
           image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.23.0
-          # µÚ¶ş´¦£ºÔö¼Ó volumeMounts
+          # ç¬¬äºŒå¤„ï¼šå¢åŠ  volumeMounts
           volumeMounts:
             - mountPath: /etc/nginx/template
               name: nginx-template-volume
@@ -7523,91 +7205,91 @@ spec:
 ---
 ```
 
-- ²¿ÊğÖ®Ç°ÏÈ´´½¨ConfigMap
+- éƒ¨ç½²ä¹‹å‰å…ˆåˆ›å»ºConfigMap
 
 ```bash
-# ²é¿´ nginx-ingress-controller µÄpods
+# æŸ¥çœ‹ nginx-ingress-controller çš„pods
 $ kubectl get pods -n ingress-nginx|grep nginx-ingress-controller
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 nginx-ingress-controller-68tms          1/1     Running   0          49m
 
-# ´ÓÈİÆ÷ÖĞ¿½±´³ö»òÏòÈİÆ÷¿½±´ÈëÎÄ¼ş
+# ä»å®¹å™¨ä¸­æ‹·è´å‡ºæˆ–å‘å®¹å™¨æ‹·è´å…¥æ–‡ä»¶
 $ kubectl cp nginx-ingress-controller-68tms:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
 
-# ´´½¨ConfigMap
+# åˆ›å»ºConfigMap
 $ kubectl create cm nginx-template --from-file nginx.tmpl -n ingress-nginx
-# ²é¿´ConfigMap
+# æŸ¥çœ‹ConfigMap
 $ kubectl get cm -n ingress-nginx nginx-template
-# ²é¿´ConfigMapµÄyamlÃèÊö
+# æŸ¥çœ‹ConfigMapçš„yamlæè¿°
 $ kubectl get cm -n ingress-nginx nginx-template -o yaml
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
 ```bash
-# Ê¹µ÷ÕûÉúĞ§
+# ä½¿è°ƒæ•´ç”Ÿæ•ˆ
 $ kubectl apply -f mandatory.yaml
-# ²é¿´deployµÄ²¿ÊğĞÅÏ¢
+# æŸ¥çœ‹deployçš„éƒ¨ç½²ä¿¡æ¯
 $ kubectl get ds -n ingress-nginx
-# ²é¿´pods
+# æŸ¥çœ‹pods
 $ kubectl get pods -n ingress-nginx -o wide
 
-# ĞŞ¸Ä ConfigMap ÅäÖÃ
+# ä¿®æ”¹ ConfigMap é…ç½®
 $ kubectl edit cm -n ingress-nginx nginx-template
-# ËÑË÷²¢µ÷Õû types_hash_max_size µÄÖµÎª 4096
+# æœç´¢å¹¶è°ƒæ•´ types_hash_max_size çš„å€¼ä¸º 4096
 
-# ²éÕÒ nginx-ingress-controller Õâ¸öpods£¬²¢½øÈë¸ÃÈİÆ÷
+# æŸ¥æ‰¾ nginx-ingress-controller è¿™ä¸ªpodsï¼Œå¹¶è¿›å…¥è¯¥å®¹å™¨
 $ kubectl get pods -n ingress-nginx -o wide|grep nginx-ingress-controller
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 nginx-ingress-controller-mswq2          1/1     Running   0          96s
 
-# ½øÈëÈİÆ÷²é¿´
+# è¿›å…¥å®¹å™¨æŸ¥çœ‹
 $ kubectl exec -it nginx-ingress-controller-mswq2 -n ingress-nginx -- bash
-# ÔÚÈİÆ÷ÄÚ²é¿´ types_hash_max_size µÄÖµÊÇ·ñÕıÈ·£ºÑéÖ¤µÃµ½4096£¬µ«ËŞÖ÷»úµÄnginx.tmpl²»±ä£¬ÇĞ¼Ç£¡Çø·Ö£¡
+# åœ¨å®¹å™¨å†…æŸ¥çœ‹ types_hash_max_size çš„å€¼æ˜¯å¦æ­£ç¡®ï¼šéªŒè¯å¾—åˆ°4096ï¼Œä½†å®¿ä¸»æœºçš„nginx.tmplä¸å˜ï¼Œåˆ‡è®°ï¼åŒºåˆ†ï¼
 www-data@emon3:/etc/nginx$ more /etc/nginx/template/nginx.tmpl 
 ```
 
-## 14.4¡¢HttpsÖ¤Êé£ºÅäÖÃtls£¨µ÷ÕûIngress-Nginx£©
+## 14.4ã€Httpsè¯ä¹¦ï¼šé…ç½®tlsï¼ˆè°ƒæ•´Ingress-Nginxï¼‰
 
-### 14.4.0¡¢ÇĞ»»Ä¿Â¼
+### 14.4.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/tls
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/tls
 ```
 
-### 14.4.1¡¢ÅäÖÃtlsÓëÑéÖ¤
+### 14.4.1ã€é…ç½®tlsä¸éªŒè¯
 
-- Éú³ÉÖ¤Êé
+- ç”Ÿæˆè¯ä¹¦
 
 ```bash
 $ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout emon.key -out emon.crt \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip"
 ```
 
-- ´´½¨secret
+- åˆ›å»ºsecret
 
 ```bash
 $ kubectl create secret tls emon-tls --key emon.key --cert emon.crt -n dev
-# ²é¿´secret
+# æŸ¥çœ‹secret
 $ kubectl get secret emon-tls -n dev
 $ kubectl get secret emon-tls -o yaml -n dev
 ```
 
-- ÅäÖÃÖ¤Êé£¬µ÷Õûmandatory.yaml
+- é…ç½®è¯ä¹¦ï¼Œè°ƒæ•´mandatory.yaml
 
 ```bash
-# È»ºó»ùÓÚ 14.3.4 £¬µ÷Õû1´¦
+# ç„¶ååŸºäº 14.3.4 ï¼Œè°ƒæ•´1å¤„
 $ vim /root/dockerdata/deep-in-kubernetes/8-ingress/mandatory.yaml
 ```
 
 ```yaml
-# µÚÒ»´¦µ÷Õû½á¹û£ºÖ¸¶¨Ö¤Êé
+# ç¬¬ä¸€å¤„è°ƒæ•´ç»“æœï¼šæŒ‡å®šè¯ä¹¦
             - --annotations-prefix=nginx.ingress.kubernetes.io
             - --default-ssl-certificate=dev/emon-tls
 ```
 
-- ÅäÖÃIngress
+- é…ç½®Ingress
 
 ```bash
 $ vim web-ingress.yaml
@@ -7639,37 +7321,37 @@ spec:
       secretName: emon-tls
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 https://sbt-dev.emon.vip/hello?name=emon
 
 ```bash
-# ÅäÖÃIngress
+# é…ç½®Ingress
 $ kubectl apply -f web-ingress.yaml
 $ kubectl apply -f ../nginx-ingress-controller.yaml
 
-# ²é¿´deployµÄ²¿ÊğĞÅÏ¢
+# æŸ¥çœ‹deployçš„éƒ¨ç½²ä¿¡æ¯
 $ kubectl get ds -n ingress-nginx
-# ²é¿´pods
+# æŸ¥çœ‹pods
 $ kubectl get pods -n ingress-nginx -o wide
 ```
 
-## 14.5¡¢Session±£³Ö
+## 14.5ã€Sessionä¿æŒ
 
-### 14.5.0¡¢ÇĞ»»Ä¿Â¼
+### 14.5.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/session
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/session
 ```
 
-### 14.5.1¡¢¶à°æ±¾»·¾³×¼±¸
+### 14.5.1ã€å¤šç‰ˆæœ¬ç¯å¢ƒå‡†å¤‡
 
-Ä¿±ê£ºÒ»¸öÓòÃû·ÃÎÊµÄpodsÓĞ¶àÖÖ£¬µÃµ½µÄ½á¹ûÒ²ÓĞ¶àÖÖ£¡£¡£¡
+ç›®æ ‡ï¼šä¸€ä¸ªåŸŸåè®¿é—®çš„podsæœ‰å¤šç§ï¼Œå¾—åˆ°çš„ç»“æœä¹Ÿæœ‰å¤šç§ï¼ï¼ï¼
 
-- ´´½¨yaml
+- åˆ›å»ºyaml
 
 ```bash
 $ vim web-dev.yaml
@@ -7761,28 +7443,28 @@ spec:
       secretName: emon-tls
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-Èç¹û²¿Êğ³É¹¦£¬¿É·ÃÎÊ£º
+å¦‚æœéƒ¨ç½²æˆåŠŸï¼Œå¯è®¿é—®ï¼š
 
 https://sbt-dev.emon.vip/hello?name=emon
 
 ```bash
 $ kubectl apply -f web-dev.yaml
-# ²é¿´devÃüÃû¿Õ¼äÏÂÄÚÈİ
+# æŸ¥çœ‹devå‘½åç©ºé—´ä¸‹å†…å®¹
 $ kubectl get all -n dev
-# ²é¿´deployÏêÇé
+# æŸ¥çœ‹deployè¯¦æƒ…
 $ kubectl get deploy sbt-web-demo -o yaml -n dev
 ```
 
-- ËµÃ÷
+- è¯´æ˜
 
-ÓÉÓÚÁ½Ì¨·şÎñ°æ±¾²»Ò»ÖÂ£¬·ÃÎÊÊ±»á·´¸´³öÏÖ²»Í¬µÄÄÚÈİ£º
+ç”±äºä¸¤å°æœåŠ¡ç‰ˆæœ¬ä¸ä¸€è‡´ï¼Œè®¿é—®æ—¶ä¼šåå¤å‡ºç°ä¸åŒçš„å†…å®¹ï¼š
 https://sbt-dev.emon.vip/hello?name=emon
 
-### 14.5.2¡¢ÈçºÎÈÃsession±£³Ö£¿
+### 14.5.2ã€å¦‚ä½•è®©sessionä¿æŒï¼Ÿ
 
-- ´´½¨IngressÎÄ¼ş
+- åˆ›å»ºIngressæ–‡ä»¶
 
 ```bash
 $ vim ingress-session.yaml
@@ -7794,7 +7476,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    # ÆôÓÃ»á»°±£³Ö
+    # å¯ç”¨ä¼šè¯ä¿æŒ
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/session-cookie-hash: sha1
     nginx.ingress.kubernetes.io/session-cookie-name: route
@@ -7818,9 +7500,9 @@ spec:
       secretName: emon-tls
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-²¿Êğ³É¹¦ºó£¬ÔÙ´Î·ÃÎÊ·¢ÏÖ²»ÔÙ·´¸´ÁË£¬ÒòÎªÇëÇóÀïÃæ´øÓĞÃû³ÆÎªrouteµÄcookie±£³ÖÁËSession£¡£¡£¡
+éƒ¨ç½²æˆåŠŸåï¼Œå†æ¬¡è®¿é—®å‘ç°ä¸å†åå¤äº†ï¼Œå› ä¸ºè¯·æ±‚é‡Œé¢å¸¦æœ‰åç§°ä¸ºrouteçš„cookieä¿æŒäº†Sessionï¼ï¼ï¼
 
 https://sbt-dev.emon.vip/hello?name=emon
 
@@ -7828,24 +7510,24 @@ https://sbt-dev.emon.vip/hello?name=emon
 $ kubectl apply -f ingress-session.yaml
 ```
 
-## 14.6¡¢Á÷Á¿¿ØÖÆ
+## 14.6ã€æµé‡æ§åˆ¶
 
-### 14.6.0¡¢ÇĞ»»Ä¿Â¼
+### 14.6.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 $ cd /root/dockerdata/deep-in-kubernetes/8-ingress/canary
 ```
 
-### 14.6.1¡¢ÏŞÁ÷»·¾³×¼±¸
+### 14.6.1ã€é™æµç¯å¢ƒå‡†å¤‡
 
-- ´´½¨canaryÃüÃû¿Õ¼ä
+- åˆ›å»ºcanaryå‘½åç©ºé—´
 
 ```bash
 $ kubectl create ns canary
 ```
 
-- ´´½¨²¿ÊğÎÄ¼şA
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶A
 
 ```bash
 $ vim web-canary-a.yaml
@@ -7913,13 +7595,13 @@ spec:
   type: ClusterIP
 ```
 
-- ²¿ÊğA
+- éƒ¨ç½²A
 
 ```bash
 $ kubectl apply -f web-canary-a.yaml
 ```
 
-- ´´½¨²¿ÊğÎÄ¼şB
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶B
 
 ```bash
 $ vim web-canary-b.yaml
@@ -7987,15 +7669,15 @@ spec:
   type: ClusterIP
 ```
 
-- ²¿ÊğB
+- éƒ¨ç½²B
 
 ```yaml
 $ kubectl apply -f web-canary-b.yaml
 ```
 
-### 14.6.2¡¢ingress-common.yaml
+### 14.6.2ã€ingress-common.yaml
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim ingress-common.yaml
@@ -8023,9 +7705,9 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-²¿Êğ³É¹¦ºó£¬·ÃÎÊ£ºÈ«²¿ÊÇv1.0°æ±¾µÄÓ¦´ğ
+éƒ¨ç½²æˆåŠŸåï¼Œè®¿é—®ï¼šå…¨éƒ¨æ˜¯v1.0ç‰ˆæœ¬çš„åº”ç­”
 
 https://sbt-dev.emon.vip/hello?name=emon
 
@@ -8033,9 +7715,9 @@ https://sbt-dev.emon.vip/hello?name=emon
 $ kubectl apply -f ingress-common.yaml
 ```
 
-### 14.6.3¡¢·ÖÁ÷Ingress£ºingress-weight.yaml
+### 14.6.3ã€åˆ†æµIngressï¼šingress-weight.yaml
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim ingress-common.yaml
@@ -8066,9 +7748,9 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-²¿Êğ³É¹¦ºó£¬·ÃÎÊ£º·¢ÏÖÓĞ´ó¸ÅÂÊÊÇv2.0°æ±¾µÄÓ¦´ğ
+éƒ¨ç½²æˆåŠŸåï¼Œè®¿é—®ï¼šå‘ç°æœ‰å¤§æ¦‚ç‡æ˜¯v2.0ç‰ˆæœ¬çš„åº”ç­”
 
 https://sbt-dev.emon.vip/hello?name=emon
 
@@ -8076,9 +7758,9 @@ https://sbt-dev.emon.vip/hello?name=emon
 $ kubectl apply -f ingress-common.yaml
 ```
 
-### 14.6.4¡¢¶¨ÏòÁ÷Á¿¿ØÖÆ£ºingress-cookie.yaml
+### 14.6.4ã€å®šå‘æµé‡æ§åˆ¶ï¼šingress-cookie.yaml
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim ingress-cookie.yaml
@@ -8109,9 +7791,9 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-²¿Êğ³É¹¦ºó£¬·ÃÎÊ£ºÎ´ÉèÖÃcookiesÊ±Ó¦´ğv1.0£¬ÉèÖÃcookieĞÅÏ¢web-canary=alwaysºó£¬Ó¦´ğv2.0
+éƒ¨ç½²æˆåŠŸåï¼Œè®¿é—®ï¼šæœªè®¾ç½®cookiesæ—¶åº”ç­”v1.0ï¼Œè®¾ç½®cookieä¿¡æ¯web-canary=alwaysåï¼Œåº”ç­”v2.0
 
 https://sbt-dev.emon.vip/hello?name=emon
 
@@ -8119,9 +7801,9 @@ https://sbt-dev.emon.vip/hello?name=emon
 $ kubectl apply -f ingress-cookie.yaml
 ```
 
-### 14.6.5¡¢¶¨ÏòÁ÷Á¿¿ØÖÆ£ºingress-header.yaml
+### 14.6.5ã€å®šå‘æµé‡æ§åˆ¶ï¼šingress-header.yaml
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim ingress-header.yaml
@@ -8153,9 +7835,9 @@ spec:
 
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-²¿Êğ³É¹¦ºó£¬·ÃÎÊ£ºÎ´ÉèÖÃcookiesÊ±Ó¦´ğv1.0£¬ÉèÖÃheaderĞÅÏ¢web-canary=alwaysºó£¬Ó¦´ğv2.0
+éƒ¨ç½²æˆåŠŸåï¼Œè®¿é—®ï¼šæœªè®¾ç½®cookiesæ—¶åº”ç­”v1.0ï¼Œè®¾ç½®headerä¿¡æ¯web-canary=alwaysåï¼Œåº”ç­”v2.0
 
 `curl -H 'web-canary:always' http://canary.emon.vip/hello?name=emon`
 
@@ -8163,9 +7845,9 @@ spec:
 $ kubectl apply -f ingress-header.yaml
 ```
 
-### 14.6.6¡¢¶¨ÏòÁ÷Á¿¿ØÖÆ£ºingress-compose.yaml
+### 14.6.6ã€å®šå‘æµé‡æ§åˆ¶ï¼šingress-compose.yaml
 
-- ´´½¨²¿ÊğÎÄ¼ş
+- åˆ›å»ºéƒ¨ç½²æ–‡ä»¶
 
 ```bash
 $ vim  ingress-compose.yaml
@@ -8198,45 +7880,45 @@ spec:
                   number: 80
 ```
 
-- ²¿Êğ
+- éƒ¨ç½²
 
-¿ØÖÆÓÅÏÈ¼¶£ºheader>cookie>È¨ÖØ
+æ§åˆ¶ä¼˜å…ˆçº§ï¼šheader>cookie>æƒé‡
 
 ```bash
 $ kubectl apply -f ingress-compose.yaml
 ```
 
-# Ê®Îå¡¢¹²Ïí´æ´¢¡¾Î´Íê´ıĞø¡¿
+# åäº”ã€å…±äº«å­˜å‚¨ã€æœªå®Œå¾…ç»­ã€‘
 
-# Ê®Áù¡¢StatefulSet¡¾Î´Íê´ıĞø¡¿
+# åå…­ã€StatefulSetã€æœªå®Œå¾…ç»­ã€‘
 
-# Ê®Æß¡¢K8SÖĞµÄÈÕÖ¾´¦Àí
+# åä¸ƒã€K8Sä¸­çš„æ—¥å¿—å¤„ç†
 
-ÔÚ²¿ÊğÍê³Éºó ËäÈ»ÎÒÃÇÄÜÕı³£µÄÔËĞĞÎÒÃÇµÄ·şÎñÁË ¡£ µ«ÊÇÎÒÃÇ²é¿´ÈÕÖ¾È´ÊÇÒ»¸öºÜÂé·³µÄÊÂÇé £¬ ÎÒÃÇÖ»ÄÜÈ¥ÈİÆ÷µ±ÖĞ²é¿´ÒÑ¾­´òÓ¡ºÃµÄÈÕÖ¾ ¡£ÕâºÜÃ÷ÏÔ·Ç³£µÄ²»ÓÑºÃ £¬ ¶øÇÒÈİÆ÷ÖĞµÄÈÕÖ¾¿Ï¶¨Òª¶¨Ê±É¾³ıµÄ ¡£ ²»ÀûÓÚÎÒÃÇÈÕºóÈ¥²éÕÒ¶ÔÓ¦µÄÈÕÖ¾¡£
+åœ¨éƒ¨ç½²å®Œæˆå è™½ç„¶æˆ‘ä»¬èƒ½æ­£å¸¸çš„è¿è¡Œæˆ‘ä»¬çš„æœåŠ¡äº† ã€‚ ä½†æ˜¯æˆ‘ä»¬æŸ¥çœ‹æ—¥å¿—å´æ˜¯ä¸€ä¸ªå¾ˆéº»çƒ¦çš„äº‹æƒ… ï¼Œ æˆ‘ä»¬åªèƒ½å»å®¹å™¨å½“ä¸­æŸ¥çœ‹å·²ç»æ‰“å°å¥½çš„æ—¥å¿— ã€‚è¿™å¾ˆæ˜æ˜¾éå¸¸çš„ä¸å‹å¥½ ï¼Œ è€Œä¸”å®¹å™¨ä¸­çš„æ—¥å¿—è‚¯å®šè¦å®šæ—¶åˆ é™¤çš„ ã€‚ ä¸åˆ©äºæˆ‘ä»¬æ—¥åå»æŸ¥æ‰¾å¯¹åº”çš„æ—¥å¿—ã€‚
 
-Ä¿Ç°ºÜÖ÷Á÷µÄÊÇelkµÄ½â¾ö·½°¸ £¬ µ«ÊÇ l È´ÓĞºÜ¶à²»Í¬ ÕâÀïÎÒÊ¹ÓÃµÄÊÇ aliyunµÄ log-pilot
+ç›®å‰å¾ˆä¸»æµçš„æ˜¯elkçš„è§£å†³æ–¹æ¡ˆ ï¼Œ ä½†æ˜¯ l å´æœ‰å¾ˆå¤šä¸åŒ è¿™é‡Œæˆ‘ä½¿ç”¨çš„æ˜¯ aliyunçš„ log-pilot
 
-[log-pilot ¹Ù·½ÎÄµµ](https://github.com/AliyunContainerService/log-pilot) ÕâÉÏÃæÓĞºÜÏêÏ¸µÄ½âÊÍ ÒÔ¼° log-pilot µÄÓÅµã¡£
+[log-pilot å®˜æ–¹æ–‡æ¡£](https://github.com/AliyunContainerService/log-pilot) è¿™ä¸Šé¢æœ‰å¾ˆè¯¦ç»†çš„è§£é‡Š ä»¥åŠ log-pilot çš„ä¼˜ç‚¹ã€‚
 
-[log-pilot°¢ÀïÔÆ°ïÖúÖĞĞÄ](https://help.aliyun.com/document_detail/208235.html?spm=5176.21213303.J_6704733920.7.312153c9dHMU2p&scm=20140722.S_help%40%40%E6%96%87%E6%A1%A3%40%40208235.S_0%2Bos.ID_208235-RL_logDASpilot-LOC_helpmain-OR_ser-V_2-P0_0)
+[log-piloté˜¿é‡Œäº‘å¸®åŠ©ä¸­å¿ƒ](https://help.aliyun.com/document_detail/208235.html?spm=5176.21213303.J_6704733920.7.312153c9dHMU2p&scm=20140722.S_help%40%40%E6%96%87%E6%A1%A3%40%40208235.S_0%2Bos.ID_208235-RL_logDASpilot-LOC_helpmain-OR_ser-V_2-P0_0)
 
-## 17.0¡¢ÇĞ»»Ä¿Â¼
+## 17.0ã€åˆ‡æ¢ç›®å½•
 
 ```bash
 $ mkdir -pv /root/k8s_soft/k8s_v1.20.15
 $ cd/root/k8s_soft/k8s_v1.20.15
 ```
 
-## 17.1¡¢´´½¨ÃüÃû¿Õ¼ä
+## 17.1ã€åˆ›å»ºå‘½åç©ºé—´
 
 ```bash
-# ´´½¨ drill ÃüÃû¿Õ¼ä£¬±íÊ¾ÑµÁ·µÄ¿Õ¼ä
+# åˆ›å»º drill å‘½åç©ºé—´ï¼Œè¡¨ç¤ºè®­ç»ƒçš„ç©ºé—´
 $ kubectl create ns drill
 ```
 
-## 17.2¡¢´´½¨Íâ²¿ES·şÎñ¡¾ºöÂÔ¡¿
+## 17.2ã€åˆ›å»ºå¤–éƒ¨ESæœåŠ¡ã€å¿½ç•¥ã€‘
 
-ÌØÊâËµÃ÷£ºÈç¹û¼¯ÈºÍøÂçµ½ES·şÎñÆ÷¿ÉÖ±´ï£¬¸Ã·şÎñ¿ÉÊ¡ÂÔ£¡£¡£¡
+ç‰¹æ®Šè¯´æ˜ï¼šå¦‚æœé›†ç¾¤ç½‘ç»œåˆ°ESæœåŠ¡å™¨å¯ç›´è¾¾ï¼Œè¯¥æœåŠ¡å¯çœç•¥ï¼ï¼ï¼
 
 ```bash
 $ vim external-es.yaml
@@ -8255,37 +7937,37 @@ spec:
 apiVersion: v1
 kind: Endpoints
 metadata:
-  # ºÍ svc ÏàÍ¬µÄÃû³Æ
+  # å’Œ svc ç›¸åŒçš„åç§°
   name: external-es
   namespace: drill
 subsets:
   - addresses:
-    # es ¶Ë¿Ú
+    # es ç«¯å£
     - ip: 192.168.1.66
-    # »¹ÒªÖ¸¶¨¶Ë¿ÚºÅ
+    # è¿˜è¦æŒ‡å®šç«¯å£å·
     ports:
     - port: 9200
 ```
 
 ```bash
 $ kubectl apply -f external-es.yaml
-# ²é¿´
+# æŸ¥çœ‹
 $ kubectl get all -n drill
 ```
 
-## 17.3¡¢´´½¨log-pilot
+## 17.3ã€åˆ›å»ºlog-pilot
 
-¹Ù·½²»Ö§³ÖES7°æ±¾£¬Ê¹ÓÃÕâ¸öÖØĞÂ¹¹Ôì¾µÏñÊ¹ÓÃ¡£
+å®˜æ–¹ä¸æ”¯æŒES7ç‰ˆæœ¬ï¼Œä½¿ç”¨è¿™ä¸ªé‡æ–°æ„é€ é•œåƒä½¿ç”¨ã€‚
 
 https://gitee.com/Rushing0711/log-pilot
 
-»òÕß£º
+æˆ–è€…ï¼š
 
-https://github.com/40kuai/log-pilot/tree/filebeat7.x ¡¾ÍÆ¼ö¡¿
+https://github.com/40kuai/log-pilot/tree/filebeat7.x ã€æ¨èã€‘
 
-¶ÔÓ¦¾µÏñ£ºdockerhub£ºheleicool/log-pilot:7.x-filebeat
+å¯¹åº”é•œåƒï¼šdockerhubï¼šheleicool/log-pilot:7.x-filebeat
 
-¸öÈË±¸·İ£ºdockerhub£ºrushing/log-pilot:7.x-filebeat
+ä¸ªäººå¤‡ä»½ï¼šdockerhubï¼šrushing/log-pilot:7.x-filebeat
 
 ```bash
 $ vim log-pilot.yaml
@@ -8298,7 +7980,7 @@ metadata:
   name: log-pilot
   labels:
     app: log-pilot
-  # ÉèÖÃÆÚÍû²¿ÊğµÄnamespace
+  # è®¾ç½®æœŸæœ›éƒ¨ç½²çš„namespace
   namespace: kube-system
 spec:
   selector:
@@ -8313,13 +7995,13 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      # ÊÇ·ñÔÊĞí²¿Êğµ½Master½ÚµãÉÏ
+      # æ˜¯å¦å…è®¸éƒ¨ç½²åˆ°MasterèŠ‚ç‚¹ä¸Š
       tolerations:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       containers:
       - name: log-pilot
-        # °æ±¾Çë²Î¿¼https://github.com/AliyunContainerService/log-pilot/releases
+        # ç‰ˆæœ¬è¯·å‚è€ƒhttps://github.com/AliyunContainerService/log-pilot/releases
         # image: registry.cn-hangzhou.aliyuncs.com/acs/log-pilot:0.9.7-filebeat
         # image: 192.168.32.116:5080/devops-learning/log-pilot:0.9.7-filebeat-7.6.1
         # image: heleicool/log-pilot:7.x-filebeat
@@ -8337,10 +8019,10 @@ spec:
                 fieldPath: spec.nodeName
           - name: "LOGGING_OUTPUT"
             value: "elasticsearch"
-          # ÇëÈ·±£¼¯Èºµ½ESÍøÂç¿É´ï
+          # è¯·ç¡®ä¿é›†ç¾¤åˆ°ESç½‘ç»œå¯è¾¾
           - name: "ELASTICSEARCH_HOSTS"
             value: "192.168.1.66:9200"
-          # ÅäÖÃES·ÃÎÊÈ¨ÏŞ
+          # é…ç½®ESè®¿é—®æƒé™
           #- name: "ELASTICSEARCH_USER"
           #  value: "{es_username}"
           #- name: "ELASTICSEARCH_PASSWORD"
@@ -8394,17 +8076,17 @@ spec:
 
 ```bash
 $ kubectl apply -f log-pilot.yaml
-# ²é¿´
+# æŸ¥çœ‹
 $ kubectl get po -n kube-system
 
-# ²é¿´ÈÕÖ¾È·ÈÏÊÇ·ñ²¿ÊğÍê³ÉÉúĞ§
+# æŸ¥çœ‹æ—¥å¿—ç¡®è®¤æ˜¯å¦éƒ¨ç½²å®Œæˆç”Ÿæ•ˆ
 $ kubectl logs -f log-pilot-27p5w -n kube-system
-# ÃüÁîĞĞÊä³ö½á¹û
-......Ê¡ÂÔ......
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
+......çœç•¥......
 time="2022-04-13T13:57:53+08:00" level=debug msg="9c4e8aa84be485d59706f4dc84951324ba0500bd16d253fea8f7cc2d749ffbf9 has not log config, skip" 
 ```
 
-## 17.4¡¢²¿Êğ·şÎñ²é¿´ÈÕÖ¾
+## 17.4ã€éƒ¨ç½²æœåŠ¡æŸ¥çœ‹æ—¥å¿—
 
 ```bash
 $ vim web-drill.yaml
@@ -8433,15 +8115,15 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            # 1¡¢stdoutÎªÔ¼¶¨¹Ø¼ü×Ö£¬±íÊ¾²É¼¯±ê×¼Êä³öÈÕÖ¾
-            # 2¡¢ÅäÖÃ±ê×¼Êä³öÈÕÖ¾²É¼¯µ½ESµÄcatalinaË÷ÒıÏÂ
+            # 1ã€stdoutä¸ºçº¦å®šå…³é”®å­—ï¼Œè¡¨ç¤ºé‡‡é›†æ ‡å‡†è¾“å‡ºæ—¥å¿—
+            # 2ã€é…ç½®æ ‡å‡†è¾“å‡ºæ—¥å¿—é‡‡é›†åˆ°ESçš„catalinaç´¢å¼•ä¸‹
             - name: aliyun_logs_catalina
               value: "stdout"
-            # 1¡¢ÅäÖÃ²É¼¯ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾£¬Ö§³ÖÍ¨Åä·û
-            # 2¡¢ÅäÖÃ¸ÃÈÕÖ¾²É¼¯µ½ESµÄaccessË÷ÒıÏÂ
+            # 1ã€é…ç½®é‡‡é›†å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—ï¼Œæ”¯æŒé€šé…ç¬¦
+            # 2ã€é…ç½®è¯¥æ—¥å¿—é‡‡é›†åˆ°ESçš„accessç´¢å¼•ä¸‹
             - name: aliyun_logs_access
               value: "/home/saas/devops/k8s-demo/logs/*.log"
-          # ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾Â·¾¶ĞèÒªÅäÖÃemptyDir
+          # å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—è·¯å¾„éœ€è¦é…ç½®emptyDir
           volumeMounts:
             - name: log-volume
               mountPath: /home/saas/devops/k8s-demo/logs
@@ -8487,33 +8169,33 @@ spec:
 
 ```bash
 $ kubectl apply -f web-drill.yaml
-# ²é¿´
+# æŸ¥çœ‹
 $ kubectl get po -n drill
 ```
 
-## 17.5¡¢Kibana
+## 17.5ã€Kibana
 
-- Í¨¹ıcerebro²å¼ş²é¿´ESË÷Òı£ºµØÖ·ĞèÒªÌæ»»cerebroµØÖ·ºÍESµØÖ·
+- é€šè¿‡cerebroæ’ä»¶æŸ¥çœ‹ESç´¢å¼•ï¼šåœ°å€éœ€è¦æ›¿æ¢cerebroåœ°å€å’ŒESåœ°å€
 
 http://192.168.1.66:9000/#/overview?host=http:%2F%2F192.168.1.66:9200
 
-- ÔÚKibana´´½¨Ë÷Òı
+- åœ¨Kibanaåˆ›å»ºç´¢å¼•
 
-¡¾Management¡¿==>¡¾Kibana¡¿==>¡¾Index Patterns¡¿==>access-*
+ã€Managementã€‘==>ã€Kibanaã€‘==>ã€Index Patternsã€‘==>access-*
 
-¡¾Management¡¿==>¡¾Kibana¡¿==>¡¾Index Patterns¡¿==>catalina-*
+ã€Managementã€‘==>ã€Kibanaã€‘==>ã€Index Patternsã€‘==>catalina-*
 
-- ÔÚKibana²é¿´
+- åœ¨KibanaæŸ¥çœ‹
 
-¡¾Discover¡¿==>¡¾Ñ¡Ôñ¸Õ´´½¨µÄIndex Patterns¡¿²é¿´
+ã€Discoverã€‘==>ã€é€‰æ‹©åˆšåˆ›å»ºçš„Index Patternsã€‘æŸ¥çœ‹
 
-# Ê®°Ë¡¢K8SÖĞµÄ¼à¿Økubectl top
+# åå…«ã€K8Sä¸­çš„ç›‘æ§kubectl top
 
-kubectl top ÊÇ»ù´¡ÃüÁî£¬µ«ÊÇĞèÒª²¿ÊğÅäÌ×µÄ×é¼ş²ÅÄÜ»ñÈ¡µ½¼à¿ØÖµ¡£
+kubectl top æ˜¯åŸºç¡€å‘½ä»¤ï¼Œä½†æ˜¯éœ€è¦éƒ¨ç½²é…å¥—çš„ç»„ä»¶æ‰èƒ½è·å–åˆ°ç›‘æ§å€¼ã€‚
 
-- 1.8ÒÔÉÏ£º²¿Êğ [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
+- 1.8ä»¥ä¸Šï¼šéƒ¨ç½² [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 
-0£ºÇĞ»»Ä¿Â¼
+0ï¼šåˆ‡æ¢ç›®å½•
 
 ```bash
 $ cd
@@ -8522,39 +8204,39 @@ $ mkdir -pv /root/k8s_soft/k8s_v1.20.15 && cd /root/k8s_soft/k8s_v1.20.15
 
 
 
-1£ºÏÂÔØ
+1ï¼šä¸‹è½½
 
 ```bash
 $ wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.1/components.yaml -O metrics-server-v0.6.1.yaml
 
 $ vim metrics-server-v0.6.1.yaml
-# ÅäÖÃmetrics-server-v0.6.1.yaml£¬Ìø¹ıÖ¤Êé
-# ÕÒµ½ - --metric-resolution=15s ÔÚÆäºóÌí¼Ó
+# é…ç½®metrics-server-v0.6.1.yamlï¼Œè·³è¿‡è¯ä¹¦
+# æ‰¾åˆ° - --metric-resolution=15s åœ¨å…¶åæ·»åŠ 
 - --kubelet-insecure-tls
 ```
 
-2£º°²×°
+2ï¼šå®‰è£…
 
 ```bash
-# ===== Èç¹ûÊÇcontainerdÈİÆ÷ =====
+# ===== å¦‚æœæ˜¯containerdå®¹å™¨ =====
 $ crictl pull registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1
 $ ctr -n k8s.io i tag  registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
 
-# ===== Èç¹ûÊÇdockerÈİÆ÷ =====
+# ===== å¦‚æœæ˜¯dockerå®¹å™¨ =====
 $ docker pull registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
 $ docker tag registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1 k8s.gcr.io/metrics-server/metrics-server:v0.6.1
 
 $ kubectl apply -f metrics-server-v0.6.1.yaml
 ```
 
-3£º²âÊÔ
+3ï¼šæµ‹è¯•
 
 ```bash
-# ²é¿´½ÚµãµÄÊ¹ÓÃÇé¿ö
+# æŸ¥çœ‹èŠ‚ç‚¹çš„ä½¿ç”¨æƒ…å†µ
 $ kubectl top node
-# ²é¿´podµÄÊ¹ÓÃÇé¿ö
+# æŸ¥çœ‹podçš„ä½¿ç”¨æƒ…å†µ
 $ kubectl top pod
-# ²é¿´¾ßÌåpodÊ¹ÓÃÇé¿ö£¬--containers¿ÉÒÔÏÔÊ¾podÄÚËùÓĞµÄcontainer
+# æŸ¥çœ‹å…·ä½“podä½¿ç”¨æƒ…å†µï¼Œ--containerså¯ä»¥æ˜¾ç¤ºpodå†…æ‰€æœ‰çš„container
 $ kubectl top pod nginx --containers
 ```
 
@@ -8562,61 +8244,61 @@ $ kubectl top pod nginx --containers
 
 
 
-# ¾ÅÊ®¡¢ContainerdÈ«ÃæÉÏÊÖÊµ¼ù
+# ä¹åã€Containerdå…¨é¢ä¸Šæ‰‹å®è·µ
 
-## 90.1¡¢ctrÃüÁî½²½â
+## 90.1ã€ctrå‘½ä»¤è®²è§£
 
-containerdÌá¹©µÄ¹¤¾ß
+containerdæä¾›çš„å·¥å…·
 
 ```bash
-# ²é¿´ctrÃüÁî°ïÖú
+# æŸ¥çœ‹ctrå‘½ä»¤å¸®åŠ©
 $ ctr -h
-# ²é¿´¾µÏñ²Ù×÷°ïÖú
+# æŸ¥çœ‹é•œåƒæ“ä½œå¸®åŠ©
 $ ctr i -h
-# ²é¿´¾µÏñÁĞ±í
+# æŸ¥çœ‹é•œåƒåˆ—è¡¨
 $ ctr i ls
-# ²é¿´Ö¸¶¨ÃüÁî¿Õ¼äÏÂ¾µÏñÁĞ±í
+# æŸ¥çœ‹æŒ‡å®šå‘½ä»¤ç©ºé—´ä¸‹é•œåƒåˆ—è¡¨
 $ ctr -n default i ls
-# ÏÂÔØ¾µÏñ
+# ä¸‹è½½é•œåƒ
 $ ctr i pull docker.io/library/redis:alpine
-# ²é¿´ÃüÃû¿Õ¼ä°ïÖú
+# æŸ¥çœ‹å‘½åç©ºé—´å¸®åŠ©
 $ ctr ns -h
-# ²é¿´ÃüÃû¿Õ¼ä
+# æŸ¥çœ‹å‘½åç©ºé—´
 $ ctr ns ls
-# Æô¶¯ÈİÆ÷£¬Ö¸¶¨ÈİÆ÷ID
+# å¯åŠ¨å®¹å™¨ï¼ŒæŒ‡å®šå®¹å™¨ID
 $ ctr run -t -d docker.io/library/redis:alpine redis
-# ²é¿´ÈİÆ÷ÁĞ±í
+# æŸ¥çœ‹å®¹å™¨åˆ—è¡¨
 $ ctr c ls
-# ²é¿´ÈİÆ÷ÈÎÎñÁĞ±í
+# æŸ¥çœ‹å®¹å™¨ä»»åŠ¡åˆ—è¡¨
 $ ctr t ls
-# Í£µôÈİÆ÷ÈÎÎñ
+# åœæ‰å®¹å™¨ä»»åŠ¡
 $ ctr t kill redis
-# É¾³ıÈİÆ÷ÈÎÎñ£¨²»ÊÇÈİÆ÷£©
+# åˆ é™¤å®¹å™¨ä»»åŠ¡ï¼ˆä¸æ˜¯å®¹å™¨ï¼‰
 $ ctr t rm redis
-# É¾³ıÈİÆ÷
+# åˆ é™¤å®¹å™¨
 $ ctr c rm redis
 ```
 
-## 90.2¡¢crictl
+## 90.2ã€crictl
 
-k8sÌá¹©µÄ¹¤¾ß
+k8sæä¾›çš„å·¥å…·
 
 ```bash
-# ²é¿´crictlÃüÁî°ïÖú
+# æŸ¥çœ‹crictlå‘½ä»¤å¸®åŠ©
 $ crictl -h
-# ²é¿´¾µÏñ
+# æŸ¥çœ‹é•œåƒ
 $ crictl images
-# ²é¿´pod
+# æŸ¥çœ‹pod
 $ crictl pods
 ```
 
-## 90.3¡¢kubectl
+## 90.3ã€kubectl
 
 https://kubernetes.io/zh-cn/docs/reference/kubectl/introduction/
 
-### 90.3.1¡¢×ÊÔ´ÀàĞÍ
+### 90.3.1ã€èµ„æºç±»å‹
 
-| ×ÊÔ´        | ¼òĞ´    | ÊÇ·ñĞèÖ¸¶¨ÃüÃû¿Õ¼ä |
+| èµ„æº        | ç®€å†™    | æ˜¯å¦éœ€æŒ‡å®šå‘½åç©ºé—´ |
 | ----------- | ------- | ------------------ |
 | namespaces  | ns      | false              |
 | nodes       | node/no | false              |
@@ -8626,197 +8308,199 @@ https://kubernetes.io/zh-cn/docs/reference/kubectl/introduction/
 
 
 
-- °æ±¾
+- ç‰ˆæœ¬
 
 ```bash
-# ²é¿´¿Í»§¶ËºÍ·şÎñÆ÷²à°æ±¾ĞÅÏ¢
+# æŸ¥çœ‹å®¢æˆ·ç«¯å’ŒæœåŠ¡å™¨ä¾§ç‰ˆæœ¬ä¿¡æ¯
 $ kubectl version
-# ÒÔgroup/versionµÄ¸ñÊ½ÏÔÊ¾·şÎñÆ÷²àËùÖ§³ÖµÄAPI°æ±¾
+# ä»¥group/versionçš„æ ¼å¼æ˜¾ç¤ºæœåŠ¡å™¨ä¾§æ‰€æ”¯æŒçš„APIç‰ˆæœ¬
 $ kubectl api-versions
 ```
 
-- ÏÔÊ¾×ÊÔ´ÎÄµµĞÅÏ¢
+- æ˜¾ç¤ºèµ„æºæ–‡æ¡£ä¿¡æ¯
 
 ```bash
 $ kubectl explain svc
 ```
 
-- ²é¿´¶ÔÏóĞÅÏ¢
+- æŸ¥çœ‹å¯¹è±¡ä¿¡æ¯
 
 ```bash
-# ÏÔÊ¾nodeµÄĞÅÏ¢
+# æ˜¾ç¤ºnodeçš„ä¿¡æ¯
 $ kubectl get nodes
-# ÏÔÊ¾serviceµÄĞÅÏ¢
+# æ˜¾ç¤ºserviceçš„ä¿¡æ¯
 $ kubectl get service
 $ kubectl get svc
-# ÏÔÊ¾deploymentĞÅÏ¢
+# æ˜¾ç¤ºdeploymentä¿¡æ¯
 $ kubectl get deployment
 $ kubectl get deploy
-# ²é¿´ÃüÃû¿Õ¼ä
+# æŸ¥çœ‹å‘½åç©ºé—´
 $ kubectl get namespaces
 $ kubectl get ns
 ```
 
-- ²é¿´nodeÏêÏ¸ĞÅÏ¢
+- æŸ¥çœ‹nodeè¯¦ç»†ä¿¡æ¯
 
 ```bash
-# »ñÈ¡node¶ÔÓ¦yamlÏêÇé
+# è·å–nodeå¯¹åº”yamlè¯¦æƒ…
 $ kubectl get node emon2 -o yaml
 ```
 
-- È¡µÃÈ·¶¨¶ÔÏóµÄÏêÏ¸ĞÅÏ¢
+- å–å¾—ç¡®å®šå¯¹è±¡çš„è¯¦ç»†ä¿¡æ¯
 
 ```bash
-# ÃèÊönodeÏêÏ¸ĞÅÏ¢
+# æè¿°nodeè¯¦ç»†ä¿¡æ¯
 $ kubectl describe node emon2
-# ÁĞ³öÄ³Ò»¸öpodÏêÏ¸ĞÅÏ¢£º-nÖ¸¶¨ÃüÃû¿Õ¼ä
+# åˆ—å‡ºæŸä¸€ä¸ªpodè¯¦ç»†ä¿¡æ¯ï¼š-næŒ‡å®šå‘½åç©ºé—´
 $ kubectl describe pod ingress-nginx-admission-patch-kpnds -n ingress-nginx
-# ÁĞ³öÄ³Ò»¸ödeploymentÏêÏ¸ĞÅÏ¢
+# åˆ—å‡ºæŸä¸€ä¸ªdeploymentè¯¦ç»†ä¿¡æ¯
 $ kubectl describe deployment ingress-nginx-controller -n ingress-nginx
+```
+
+- æ ‡ç­¾
+
+```bash
+# ç»™èŠ‚ç‚¹æ‰“æ ‡ç­¾
+$ kubectl label nodes emon2 disktype=ssd
+# æŸ¥çœ‹èŠ‚ç‚¹ä¸Šçš„æ ‡ç­¾
+$ kubectl get nodes emon2 --show-labels
+# æŸ¥çœ‹æ‰€æœ‰èŠ‚ç‚¹ä¸Šçš„æ ‡ç­¾åˆ—è¡¨ï¼ŒæŒ‰æ ‡ç­¾åˆ†ç»„
+$ kubectl get nodes --show-labels
+# åˆ é™¤æ ‡ç­¾ï¼šæ³¨æ„æ ‡ç­¾ååé¢è·Ÿä¸Š - è¡¨ç¤ºåˆ é™¤
+$ kubectl label node emon2 disktype-
+```
+
+- æ—¥å¿—
+
+```bash
+# å–å¾—podä¸­å®¹å™¨çš„logä¿¡æ¯
+$ kubectl logs nginx-ds-tbtkz
+```
+
+- æ±¡ç‚¹
+
+```bash
+# æ·»åŠ èŠ‚ç‚¹çš„æ±¡ç‚¹ï¼šNoSchedule-ä¸è¦è°ƒåº¦ï¼›PreferNoSchedule-æœ€å¥½ä¸è¦è°ƒåº¦ï¼›NoExecute-ä¸è¦è°ƒåº¦ï¼Œå¹¶é©±é€è¯¥èŠ‚ç‚¹ä¸Šçš„pod
+$ kubectl taint nodes emon3 gpu=true:NoSchedule
+# æŸ¥çœ‹æ±¡ç‚¹
+$ kubectl describe nodes emon3
+# åˆ é™¤æ±¡ç‚¹
+$ kubectl taint nodes emon3 gpu=true:NoSchedule-
 ```
 
 
 
-
-
-
-
-
-
-
-
-
-
 ```bash
-# È¡µÃpodÖĞÈİÆ÷µÄlogĞÅÏ¢
-$ kubectl logs < xxx >
-$ kubectl logs nginx-ds-tbtkz
-
-# ÔÚÈİÆ÷ÖĞÖ´ĞĞÒ»ÌõÃüÁî
+# åœ¨å®¹å™¨ä¸­æ‰§è¡Œä¸€æ¡å‘½ä»¤
 $ kubectl exec < xxx >
-# ½øÈëpods
+# è¿›å…¥pods
 $ kubectl exec -it nginx-ingress-controller-82mlt -n ingress-nginx -- bash
-# ²»½øÈëÖ±½ÓÖ´ĞĞÃüÁî
+# ä¸è¿›å…¥ç›´æ¥æ‰§è¡Œå‘½ä»¤
 $ kubectl exec -it nginx-ds-tbtkz -- nginx -v
 
-# ´ÓÈİÆ÷ÖĞ¿½±´³ö»òÏòÈİÆ÷¿½±´ÈëÎÄ¼ş
+# ä»å®¹å™¨ä¸­æ‹·è´å‡ºæˆ–å‘å®¹å™¨æ‹·è´å…¥æ–‡ä»¶
 $ kubectl cp nginx-ingress-controller-82mlt:/etc/nginx/template/nginx.tmpl -n ingress-nginx nginx.tmpl
-# Attachµ½Ò»¸öÔËĞĞÖĞµÄÈİÆ÷ÉÏ
+# Attachåˆ°ä¸€ä¸ªè¿è¡Œä¸­çš„å®¹å™¨ä¸Š
 $ kubectl attach
 
-# ²é¿´Ä³¸öÃüÃû¿Õ¼äËùÓĞĞÅÏ¢
+# æŸ¥çœ‹æŸä¸ªå‘½åç©ºé—´æ‰€æœ‰ä¿¡æ¯
 $ kubectl get all -n ingress-nginx
-# ²é¿´Ä³¸öÃüÃû¿Õ¼äÏÂÖ¸¶¨ÀàĞÍĞÅÏ¢
+# æŸ¥çœ‹æŸä¸ªå‘½åç©ºé—´ä¸‹æŒ‡å®šç±»å‹ä¿¡æ¯
 $ kubectl get po,svc -n kube-system -o wide
-# ÅäÖÃ×ÊÔ´
+# é…ç½®èµ„æº
 $ kubectl apply -f < xxx.yaml >
-# É¾³ı×ÊÔ´
+# åˆ é™¤èµ„æº
 $ kubectl delete -f < xxx.yaml >
-# ¸ø½Úµã´ò±êÇ©
-$ kubectl label nodes emon2 disktype=ssd
-# ²é¿´½ÚµãÉÏµÄ±êÇ©
-$ kubectl get nodes emon2 --show-labels
-# ²é¿´ËùÓĞ½ÚµãÉÏµÄ±êÇ©ÁĞ±í£¬°´±êÇ©·Ö×é
-$ kubectl get nodes --show-labels
-# É¾³ı±êÇ©£º×¢Òâ±êÇ©ÃûºóÃæ¸úÉÏ - ±íÊ¾É¾³ı
-$ kubectl label node emon2 disktype-
 
-# ²é¿´Ä¬ÈÏÃüÃû¿Õ¼äÏÂËùÓĞ×ÊÔ´
+# æŸ¥çœ‹é»˜è®¤å‘½åç©ºé—´ä¸‹æ‰€æœ‰èµ„æº
 $ kubectl get all
-# ²é¿´Ö¸¶¨ÃüÃû¿Õ¼äÏÂËùÓĞ×ÊÔ´
+# æŸ¥çœ‹æŒ‡å®šå‘½åç©ºé—´ä¸‹æ‰€æœ‰èµ„æº
 $ kubectl get all -n kube-system
-# ²é¿´¼¯ÈºÃØÔ¿
+# æŸ¥çœ‹é›†ç¾¤ç§˜é’¥
 $ kubectl get secret -n default
-# ´´½¨ÃØÔ¿£º×¢Òâemon.keyºÍemon.crtÒª´æÔÚ
+# åˆ›å»ºç§˜é’¥ï¼šæ³¨æ„emon.keyå’Œemon.crtè¦å­˜åœ¨
 $ kubectl create secret tls emon-tls --key emon.key --cert emon.crt -n default
-# É¾³ıÃØÔ¿
+# åˆ é™¤ç§˜é’¥
 $ kubectl delete secret emon-tls -n default
-# ²é¿´deploy¶ÔÓ¦yamlÏêÇé
+# æŸ¥çœ‹deployå¯¹åº”yamlè¯¦æƒ…
 $ kubectl get deploy k8s-springboot-web-demo -o yaml
-# ±à¼­deploy
+# ç¼–è¾‘deploy
 $ kubectl edit deploy sbt-web-demo -n dev
-# ²é¿´quotaÁĞ±í
+# æŸ¥çœ‹quotaåˆ—è¡¨
 $ kubectl get quota -n test
-# ²é¿´quota
+# æŸ¥çœ‹quota
 $ kubectl describe quota resource-quota -n test
-# ¸ù¾İ±êÇ©¹ıÂËpod
+# æ ¹æ®æ ‡ç­¾è¿‡æ»¤pod
 $ kubectl get pods -l group=dev -n dev
 $ kubectl get pods -l 'group in (dev,test)' -n dev
-# ²éÑ¯ËùÓĞÃüÃû¿Õ¼äÖĞµÄpods
+# æŸ¥è¯¢æ‰€æœ‰å‘½åç©ºé—´ä¸­çš„pods
 $ kubectl get pods -A
 $ kubectl get pods --all-namespaces
-# ²éÑ¯ËùÓĞÃüÃû¿Õ¼äÖĞµÄsvc
+# æŸ¥è¯¢æ‰€æœ‰å‘½åç©ºé—´ä¸­çš„svc
 $ kubectl get svc -A
-# ²éÑ¯ËùÓĞÃüÃû¿Õ¼äÖĞµÄdeploy
+# æŸ¥è¯¢æ‰€æœ‰å‘½åç©ºé—´ä¸­çš„deploy
 $ kubectl get deploy -A
-# ²é¿´µ±Ç°Ä¬ÈÏÃüÃû¿Õ¼ä
+# æŸ¥çœ‹å½“å‰é»˜è®¤å‘½åç©ºé—´
 $ kubectl config get-contexts
 
-# Ìí¼Ó½ÚµãµÄÎÛµã£ºNoSchedule-²»Òªµ÷¶È£»PreferNoSchedule-×îºÃ²»Òªµ÷¶È£»NoExecute-²»Òªµ÷¶È£¬²¢ÇıÖğ¸Ã½ÚµãÉÏµÄpod
-$ kubectl taint nodes emon3 gpu=true:NoSchedule
-# ²é¿´ÎÛµã
-$ kubectl describe nodes emon3
-# É¾³ıÎÛµã
-$ kubectl taint nodes emon3 gpu=true:NoSchedule-
-
-# ÖØĞÂ²¿Êğ
+# é‡æ–°éƒ¨ç½²
 $ kubectl replace --force -f course-service.yaml
 
-# ²é¿´ DaemonSet ²¿ÊğÁĞ±í
+# æŸ¥çœ‹ DaemonSet éƒ¨ç½²åˆ—è¡¨
 $ kubectl get ds -n ingress-nginx
-# µ¼³ö nginx-ingress-controller µÄyamlÃèÊöÎÄ¼ş
+# å¯¼å‡º nginx-ingress-controller çš„yamlæè¿°æ–‡ä»¶
 $ kubectl get ds -n ingress-nginx nginx-ingress-controller -o yaml > nginx-ingress-controller.yaml
 
-# »ñÈ¡ ConfigMap ÅäÖÃÁĞ±í
+# è·å– ConfigMap é…ç½®åˆ—è¡¨
 $ kubectl get cm -n ingress-nginx
-# »ñÈ¡ ConfigMap ÅäÖÃÊı¾İÇé¿ö
+# è·å– ConfigMap é…ç½®æ•°æ®æƒ…å†µ
 $ kubectl get cm -n ingress-nginx tcp-services
-# »ñÈ¡ ConfigMap ÅäÖÃÊı¾İÇé¿ö£¬yaml¸ñÊ½
+# è·å– ConfigMap é…ç½®æ•°æ®æƒ…å†µï¼Œyamlæ ¼å¼
 $ kubectl get cm -n ingress-nginx tcp-services -o yaml
-# ĞŞ¸Ä ConfigMap ÅäÖÃ
+# ä¿®æ”¹ ConfigMap é…ç½®
 $ kubectl edit cm -n ingress-nginx nginx-template
 
-# ²é¿´ËùÓĞµÄapi-versions
+# æŸ¥çœ‹æ‰€æœ‰çš„api-versions
 $ kubectl api-versions
 
-# ²é¿´¼¯Èº×´Ì¬
-kubectl version --short=true ²é¿´¿Í»§¶Ë¼°·şÎñ¶Ë³ÌĞò°æ±¾ĞÅÏ¢
-kubectl cluster-info ²é¿´¼¯ÈºĞÅÏ¢
+# æŸ¥çœ‹é›†ç¾¤çŠ¶æ€
+kubectl version --short=true æŸ¥çœ‹å®¢æˆ·ç«¯åŠæœåŠ¡ç«¯ç¨‹åºç‰ˆæœ¬ä¿¡æ¯
+kubectl cluster-info æŸ¥çœ‹é›†ç¾¤ä¿¡æ¯
 
-# ´´½¨×ÊÔ´¶ÔÏó
-kubectl run name --image=(¾µÏñÃû) --replicas=(±¸·İÊı) --port=(ÈİÆ÷Òª±©Â¶µÄ¶Ë¿Ú) --labels=(Éè¶¨×Ô¶¨Òå±êÇ©)
-kubectl create -f **.yaml  ³ÂÊöÊ½¶ÔÏóÅäÖÃ¹ÜÀí·½Ê½
-kubectl apply -f **.yaml  ÉùÃ÷Ê½¶ÔÏóÅäÖÃ¹ÜÀí·½Ê½£¨Ò²ÊÊÓÃÓÚ¸üĞÂµÈ£©
+# åˆ›å»ºèµ„æºå¯¹è±¡
+kubectl run name --image=(é•œåƒå) --replicas=(å¤‡ä»½æ•°) --port=(å®¹å™¨è¦æš´éœ²çš„ç«¯å£) --labels=(è®¾å®šè‡ªå®šä¹‰æ ‡ç­¾)
+kubectl create -f **.yaml  é™ˆè¿°å¼å¯¹è±¡é…ç½®ç®¡ç†æ–¹å¼
+kubectl apply -f **.yaml  å£°æ˜å¼å¯¹è±¡é…ç½®ç®¡ç†æ–¹å¼ï¼ˆä¹Ÿé€‚ç”¨äºæ›´æ–°ç­‰ï¼‰
 
-# É¾³ı×ÊÔ´¶ÔÏó
-kubectl delete [pods/services/deployments/...] name É¾³ıÖ¸¶¨×ÊÔ´¶ÔÏó
-kubectl delete [pods/services/deployments/...] -l key=value -n kube-system  É¾³ıkube-systemÏÂÖ¸¶¨±êÇ©µÄ×ÊÔ´¶ÔÏó
-kubectl delete [pods/services/deployments/...] --all -n kube-system É¾³ıkube-systemÏÂËùÓĞ×ÊÔ´¶ÔÏó
-kubectl delete [pods/services/deployments/...] source_name --force --grace-period=0 -n kube-system Ç¿ÖÆÉ¾³ıTerminatingµÄ×ÊÔ´¶ÔÏó
+# åˆ é™¤èµ„æºå¯¹è±¡
+kubectl delete [pods/services/deployments/...] name åˆ é™¤æŒ‡å®šèµ„æºå¯¹è±¡
+kubectl delete [pods/services/deployments/...] -l key=value -n kube-system  åˆ é™¤kube-systemä¸‹æŒ‡å®šæ ‡ç­¾çš„èµ„æºå¯¹è±¡
+kubectl delete [pods/services/deployments/...] --all -n kube-system åˆ é™¤kube-systemä¸‹æ‰€æœ‰èµ„æºå¯¹è±¡
+kubectl delete [pods/services/deployments/...] source_name --force --grace-period=0 -n kube-system å¼ºåˆ¶åˆ é™¤Terminatingçš„èµ„æºå¯¹è±¡
 kubectl delete -f xx.yaml
-kubectl apply -f xx.yaml --prune -l <labels>(Ò»°ã²»ÓÃÕâÖÖ·½Ê½É¾³ı)
-kubectl delete rs rs_name --cascade=fale(Ä¬ÈÏÉ¾³ı¿ØÖÆÆ÷»áÍ¬Ê±É¾³ıÆä¹Ü¿ØµÄËùÓĞPod¶ÔÏó£¬¼ÓÉÏcascade=false¾ÍÖ»É¾³ırs)
+kubectl apply -f xx.yaml --prune -l <labels>(ä¸€èˆ¬ä¸ç”¨è¿™ç§æ–¹å¼åˆ é™¤)
+kubectl delete rs rs_name --cascade=fale(é»˜è®¤åˆ é™¤æ§åˆ¶å™¨ä¼šåŒæ—¶åˆ é™¤å…¶ç®¡æ§çš„æ‰€æœ‰Podå¯¹è±¡ï¼ŒåŠ ä¸Šcascade=falseå°±åªåˆ é™¤rs)
 
-# ²é¿´ingressÅäÖÃ
+# æŸ¥çœ‹ingressé…ç½®
 $ kubectl get ing -n lishi-recruitment
 
-# kubctlÈçºÎ°ÑÎÄ¼ş¿½±´³öÀ´£¿
-#Óï·¨£º kubectl cp <some-namespace>/<some-pod>:/path /local/path
-# ¼ÙÈçÃüÃû¿Õ¼äÊÇ nbms£¬ÈİÆ÷Ãû³ÆÊÇ nbms-admin
+# kubctlå¦‚ä½•æŠŠæ–‡ä»¶æ‹·è´å‡ºæ¥ï¼Ÿ
+#è¯­æ³•ï¼š kubectl cp <some-namespace>/<some-pod>:/path /local/path
+# å‡å¦‚å‘½åç©ºé—´æ˜¯ nbmsï¼Œå®¹å™¨åç§°æ˜¯ nbms-admin
 $ kubectl cp nbms/nbms-admin-xxxxx:/home/app/logs -c nbms-admin .
 ```
 
 - iptables
 
 ```bash
-# ¿ÉÒÔÍ¨¹ı iptables-save ÃüÁî´òÓ¡³öµ±Ç°½ÚµãµÄ iptables ¹æÔò
+# å¯ä»¥é€šè¿‡ iptables-save å‘½ä»¤æ‰“å°å‡ºå½“å‰èŠ‚ç‚¹çš„ iptables è§„åˆ™
 $ iptables-save
 ```
 
-## 90.4¡¢kubeadmÈçºÎ¼ÓÈë½Úµã
+## 90.4ã€kubeadmå¦‚ä½•åŠ å…¥èŠ‚ç‚¹
 
 ```bash
-# 1. ÖØĞÂÉú³ÉĞÂµÄtoken:
+# 1. é‡æ–°ç”Ÿæˆæ–°çš„token:
 [root@host1 flannel]# kubeadm  token create
 W0514 10:44:17.973722   26813 configset.go:202] WARNING: kubeadm cannot validate component configs for API groups [kubelet.config.k8s.io kubeproxy.config.k8s.io]
 38lqh5.w6csafdt0cqkxz4e
@@ -8824,25 +8508,25 @@ W0514 10:44:17.973722   26813 configset.go:202] WARNING: kubeadm cannot validate
 TOKEN                     TTL         EXPIRES                     USAGES                   DESCRIPTION                                                EXTRA GROUPS
 38lqh5.w6csafdt0cqkxz4e   23h         2021-05-15T10:44:17+08:00   authentication,signing   <none>                                                     system:bootstrappers:kubeadm:default-node-token
 
-# 2. »ñÈ¡caÖ¤Êésha256±àÂëhashÖµ:
+# 2. è·å–caè¯ä¹¦sha256ç¼–ç hashå€¼:
 [root@host1 flannel]# openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
 84b0d7e02994966eb529731e85809f451f81efbb802a8d2f113ac8ce42770a5d
 
 
-# 3. ½Úµã¼ÓÈë¼¯Èº:
+# 3. èŠ‚ç‚¹åŠ å…¥é›†ç¾¤:
   kubeadm join 10.0.0.17:6443 --token 38lqh5.w6csafdt0cqkxz4e --discovery-token-ca-cert-hash sha256:84b0d7e02994966eb529731e85809f451f81efbb802a8d2f113ac8ce42770a5d
-# ¼¸ÃëÖÓºó£¬ÄúÓ¦¸Ã×¢Òâµ½kubectl get nodesÔÚÖ÷·şÎñÆ÷ÉÏÔËĞĞÊ±Êä³öÖĞµÄ´Ë½Úµã¡£
+# å‡ ç§’é’Ÿåï¼Œæ‚¨åº”è¯¥æ³¨æ„åˆ°kubectl get nodesåœ¨ä¸»æœåŠ¡å™¨ä¸Šè¿è¡Œæ—¶è¾“å‡ºä¸­çš„æ­¤èŠ‚ç‚¹ã€‚
 
 
-# ÉÏÃæµÄ·½·¨±È½Ï·±Ëö£¬Ò»²½µ½Î»£º
+# ä¸Šé¢çš„æ–¹æ³•æ¯”è¾ƒç¹çï¼Œä¸€æ­¥åˆ°ä½ï¼š
 kubeadm token create --print-join-command
 
-# µÚ¶şÖÖ·½·¨£º
+# ç¬¬äºŒç§æ–¹æ³•ï¼š
 token=$(kubeadm token generate)
-kubeadm token create $token --print-join-command --ttl=0	#--ttl=0,±íÊ¾ÓÀ²»Ê§Ğ§
+kubeadm token create $token --print-join-command --ttl=0	#--ttl=0,è¡¨ç¤ºæ°¸ä¸å¤±æ•ˆ
 ```
 
-## 90.5¡¢kubeadmÈçºÎÉ¾³ı½Úµã
+## 90.5ã€kubeadmå¦‚ä½•åˆ é™¤èŠ‚ç‚¹
 
 ```bash
 kubeadm reset -f
@@ -8861,7 +8545,7 @@ yum clean all
 yum remove kube*
 ```
 
-## 90.6¡¢²é¿´kubeadm´î½¨¼¯ÈºµÄÖ¤Êé¹ıÆÚÊ±¼ä
+## 90.6ã€æŸ¥çœ‹kubeadmæ­å»ºé›†ç¾¤çš„è¯ä¹¦è¿‡æœŸæ—¶é—´
 
 ```bash
 cd /etc/kubernetes/pki/ && for i in $(ls *.crt); do echo "===== $i ====="; openssl x509 -in $i -text -noout | grep -A 3 'Validity' ; done
@@ -8869,39 +8553,39 @@ cd /etc/kubernetes/pki/ && for i in $(ls *.crt); do echo "===== $i ====="; opens
 
 
 
-# ¾ÅÊ®Ò»¡¢¿ÆÑ§ÉÏÍø
+# ä¹åä¸€ã€ç§‘å­¦ä¸Šç½‘
 
-## 91.1¡¢¹ºÂòÔÚÈË¼ä
+## 91.1ã€è´­ä¹°åœ¨äººé—´
 
 https://dashboard.zrj222.xyz/#/register?code=WQuqlN4W
 
-µÇÂ¼ºó¹ºÂò£¬²¢»ñÈ¡SSĞ­Òé£º
+ç™»å½•åè´­ä¹°ï¼Œå¹¶è·å–SSåè®®ï¼š
 
-µÇÂ¼¡±ÔÚÈË¼ä¡°ÍøÕ¾ -> ×ó²à²Ëµ¥Ê÷µã»÷¡±Ê¹ÓÃÎÄµµ¡° -> ³£¼ûÎÊÌâÖĞ¡°µ¥¶À»ñÈ¡Ä³¸ö½ÚµãµÄSS/V2µÄĞ­ÒéÁ¬½Ó¡± -> ¸´ÖÆ¡°SSĞ­Òé¡±ÏÂµÄÁ´½ÓµØÖ·£¬²¢ÔÚä¯ÀÀÆ÷ÖĞ´ò¿ª£¬»áÏÔÊ¾³öËùÓĞµÄµØÖ·£¬Ëæ±ã¸´ÖÆÒ»¸ö¡£
+ç™»å½•â€åœ¨äººé—´â€œç½‘ç«™ -> å·¦ä¾§èœå•æ ‘ç‚¹å‡»â€ä½¿ç”¨æ–‡æ¡£â€œ -> å¸¸è§é—®é¢˜ä¸­â€œå•ç‹¬è·å–æŸä¸ªèŠ‚ç‚¹çš„SS/V2çš„åè®®è¿æ¥â€ -> å¤åˆ¶â€œSSåè®®â€ä¸‹çš„é“¾æ¥åœ°å€ï¼Œå¹¶åœ¨æµè§ˆå™¨ä¸­æ‰“å¼€ï¼Œä¼šæ˜¾ç¤ºå‡ºæ‰€æœ‰çš„åœ°å€ï¼Œéšä¾¿å¤åˆ¶ä¸€ä¸ªã€‚
 
-> ±ÈÈçÎÒµÄ£º
+> æ¯”å¦‚æˆ‘çš„ï¼š
 > ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpiZmU5NmVlNS0xZWU5LTRhN2EtYmEyZS1kZWQwZmM3OTgxNDg@ngzyd-1.lovefromgelifen.xyz:30001#%F0%9F%87%AD%F0%9F%87%B0%20%E9%A6%99%E6%B8%AF-2%20%7C%20SS%20%7C%20%E5%B9%BF%E7%A7%BB
 >
-> ÆäÖĞ£º ssĞ­ÒéµÄ¸ñÊ½ÊÇ£º`ss://method:password@server:port`
+> å…¶ä¸­ï¼š ssåè®®çš„æ ¼å¼æ˜¯ï¼š`ss://method:password@server:port`
 >
-> ¶Ô `method:password`²¿·Ö½øĞĞ½âÎö£º
+> å¯¹ `method:password`éƒ¨åˆ†è¿›è¡Œè§£æï¼š
 >
 > Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpiZmU5NmVlNS0xZWU5LTRhN2EtYmEyZS1kZWQwZmM3OTgxNDg
 >
-> base64½âÂëµÃµ½£º
+> base64è§£ç å¾—åˆ°ï¼š
 >
 > chacha20-ietf-poly1305:bfe96ee5-1ee9-4a7a-ba2e-ded0fc798148
 >
-> ĞÅÏ¢½â¶Á£º
+> ä¿¡æ¯è§£è¯»ï¼š
 >
-> ×ÛÉÏ£¬¿ÉÒÔµÃµ½ÎÒµÄss·şÎñĞÅÏ¢£º
+> ç»¼ä¸Šï¼Œå¯ä»¥å¾—åˆ°æˆ‘çš„ssæœåŠ¡ä¿¡æ¯ï¼š
 >
 > server: ngzyd-1.lovefromgelifen.xyz
 > server_port: 30001
 > password: bfe96ee5-1ee9-4a7a-ba2e-ded0fc798148 
 > method: chacha20-ietf-poly1305
 
-## 91.2¡¢¸ã¶¨shadowsocks¿Í»§¶Ë
+## 91.2ã€æå®šshadowsockså®¢æˆ·ç«¯
 
 ```bash
 $ yum install -y libsodium  autoconf  python36
@@ -8923,63 +8607,65 @@ $ vim /etc/shadowsocks.json
 ```
 
 ```bash
-# Æô¶¯¿Í»§¶Ë
+# å¯åŠ¨å®¢æˆ·ç«¯
 $ nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &
 
-# ÑéÖ¤¿Í»§¶Ë
+# éªŒè¯å®¢æˆ·ç«¯
 $ curl --socks5 127.0.0.1:8118 http://httpbin.org/ip
-# ²âÊÔ³É¹¦£º
+# æµ‹è¯•æˆåŠŸï¼š
 {
   "origin": "203.175.12.131"
 }
 ```
 
-## 91.3¡¢¸ã¶¨±¾µØhttp´úÀí
+## 91.3ã€æå®šæœ¬åœ°httpä»£ç†
 
-ÉÏÒ»²½ÓĞÁËsocks5·şÎñ£¬²¢²»ÊÇÖ±½ÓÊ¹ÓÃ£¬ÒòÎªÎÒÃÇĞèÒªµÄÊÇhttp¡¢https´úÀí£¬ËùÒÔ»¹ĞèÒª²¿ÊğÒ»¸ö´úÀí·şÎñ£¬Ò»Í·Á¬½Ósocks5·şÎñ£¬Ò»¶ËÌá¹©http¡¢https´úÀí
+ä¸Šä¸€æ­¥æœ‰äº†socks5æœåŠ¡ï¼Œå¹¶ä¸æ˜¯ç›´æ¥ä½¿ç”¨ï¼Œå› ä¸ºæˆ‘ä»¬éœ€è¦çš„æ˜¯httpã€httpsä»£ç†ï¼Œæ‰€ä»¥è¿˜éœ€è¦éƒ¨ç½²ä¸€ä¸ªä»£ç†æœåŠ¡ï¼Œä¸€å¤´è¿æ¥socks5æœåŠ¡ï¼Œä¸€ç«¯æä¾›httpã€httpsä»£ç†
 
 ```bash
-# ÏÈÏÂÔØprivoxy
-# Á´½Ó: https://pan.baidu.com/s/1OoM-uVpf1jyyb8dRjNDfvg?pwd=aqtf ÌáÈ¡Âë: aqtf 
+# å…ˆä¸‹è½½privoxy
+# é“¾æ¥: https://pan.baidu.com/s/1OoM-uVpf1jyyb8dRjNDfvg?pwd=aqtf æå–ç : aqtf 
 
 $ tar -zxvf privoxy-3.0.26-stable-src.tar.gz
 $ cd privoxy-3.0.26-stable
-# Privoxy Ç¿ÁÒ²»½¨ÒéÊ¹ÓÃ root ÓÃ»§ÔËĞĞ£¬ËùÒÔÎÒÃÇÊ¹ÓÃ useradd privoxy ĞÂ½¨Ò»¸öÓÃ»§.
+# Privoxy å¼ºçƒˆä¸å»ºè®®ä½¿ç”¨ root ç”¨æˆ·è¿è¡Œï¼Œæ‰€ä»¥æˆ‘ä»¬ä½¿ç”¨ useradd privoxy æ–°å»ºä¸€ä¸ªç”¨æˆ·.
 $ useradd privoxy
 $ autoheader && autoconf
 $ ./configure
 $ make && make install
 
-# ÅäÖÃ
+# é…ç½®
 $ vi /usr/local/etc/privoxy/config
-listen-address 0.0.0.0:8118   # 8118 ÊÇÄ¬ÈÏ¶Ë¿Ú£¬²»ÓÃ¸Ä£¬ÏÂÃæ»áÓÃµ½
-forward-socks5t / 127.0.0.1:8118 . # ÕâÀïµÄ¶Ë¿ÚĞ´ shadowsocks µÄ±¾µØ¶Ë¿Ú£¨×¢Òâ×îºóÄÇ¸ö . ²»ÒªÂ©ÁË
+listen-address 0.0.0.0:8118   # 8118 æ˜¯é»˜è®¤ç«¯å£ï¼Œä¸ç”¨æ”¹ï¼Œä¸‹é¢ä¼šç”¨åˆ°
+forward-socks5t / 127.0.0.1:8118 . # è¿™é‡Œçš„ç«¯å£å†™ shadowsocks çš„æœ¬åœ°ç«¯å£ï¼ˆæ³¨æ„æœ€åé‚£ä¸ª . ä¸è¦æ¼äº†
 
-# Æô¶¯
+# å¯åŠ¨
 $ privoxy --user privoxy /usr/local/etc/privoxy/config
 ```
 
-## 91.4¡¢Óä¿ìµÄÓÃÆğÀ´
+## 91.4ã€æ„‰å¿«çš„ç”¨èµ·æ¥
 
-¾­¹ıÉÏÃæµÄ×ª»»£¬ÎÒÃÇ¾ÍÔÚ×Ô¼ºµÄ·şÎñÆ÷ÉÏÓĞÁËÒ»¸ö¿ÉÒÔÌá¹©http/https´úÀíµÄ·şÎñ£¬ÆäËû·şÎñÆ÷ÏëÒª·ÃÎÊÍâÍø¾Í·Ç³£¼òµ¥ÁË£¬Ö±½ÓÉèÖÃÁ½¸ö»·¾³±äÁ¿¾ÍºÃ£º
+ç»è¿‡ä¸Šé¢çš„è½¬æ¢ï¼Œæˆ‘ä»¬å°±åœ¨è‡ªå·±çš„æœåŠ¡å™¨ä¸Šæœ‰äº†ä¸€ä¸ªå¯ä»¥æä¾›http/httpsä»£ç†çš„æœåŠ¡ï¼Œå…¶ä»–æœåŠ¡å™¨æƒ³è¦è®¿é—®å¤–ç½‘å°±éå¸¸ç®€å•äº†ï¼Œç›´æ¥è®¾ç½®ä¸¤ä¸ªç¯å¢ƒå˜é‡å°±å¥½ï¼š
 
 ```bash
 $ export http_proxy=http://192.168.32.1:8118
 $ export https_proxy=http://192.168.32.1:8118
-# ²âÊÔ
+# æµ‹è¯•
 $ curl www.google.com
 ```
 
-# ¾ÅÊ®¶ş¡¢±È¿ÆÑ§ÉÏÍø¸ü¿ÆÑ§µÄÉÏÍø
+# ä¹åäºŒã€æ¯”ç§‘å­¦ä¸Šç½‘æ›´ç§‘å­¦çš„ä¸Šç½‘
 
 https://www.kchuhai.com/report/view-6052.html
 
-¹È¸èÔÆ£ºhttps://console.cloud.google.com
+è°·æ­Œäº‘ï¼šhttps://console.cloud.google.com
 
-- ÈçºÎÏÂÔØÒ»¸ö k8s ¾µÏñ£¿
+é˜¿é‡Œäº‘ï¼šhttps://cr.console.aliyun.com/cn-hangzhou/instance/dashboard
+
+- å¦‚ä½•ä¸‹è½½ä¸€ä¸ª k8s é•œåƒï¼Ÿ
 
 ```bash
-# Ç°ÌáÊÇä¯ÀÀÆ÷ÄÜ¿ÆÑ§ÉÏÍø£¬µÇÂ¼¹È¸èÔÆ£¬²¢¼¤»î cloud shell£¬È»ºóÔÚcloud shellÏÂ²Ù×÷
+# å‰ææ˜¯æµè§ˆå™¨èƒ½ç§‘å­¦ä¸Šç½‘ï¼Œç™»å½•è°·æ­Œäº‘ï¼Œå¹¶æ¿€æ´» cloud shellï¼Œç„¶ååœ¨cloud shellä¸‹æ“ä½œ
 $ docker pull k8s.gcr.io/metrics-server/metrics-server:v0.6.1
 $ docker login --username=18767188240 --password aliyunk8s123 registry.cn-hangzhou.aliyuncs.com
 $ docker tag k8s.gcr.io/metrics-server/metrics-server:v0.6.1 registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
@@ -8990,61 +8676,61 @@ $ docker push registry.cn-hangzhou.aliyuncs.com/emon-k8s/metrics-server:v0.6.1
 
 
 
-# ¾ÅÊ®Îå¡¢°²×°ÆäËûÒÀÀµ»·¾³
+# ä¹åäº”ã€å®‰è£…å…¶ä»–ä¾èµ–ç¯å¢ƒ
 
-## 1¡¢°²×°Git
+## 1ã€å®‰è£…Git
 
-1. ¼ì²é°²×°Çé¿ö
+1. æ£€æŸ¥å®‰è£…æƒ…å†µ
 
 ```bash
 $ yum list git|tail -n 2
-¿É°²×°µÄÈí¼ş°ü
+å¯å®‰è£…çš„è½¯ä»¶åŒ…
 git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 ```
 
-2. ÏÂÔØ
+2. ä¸‹è½½
 
-ÏÂÔØµØÖ·£º  https://www.kernel.org/pub/software/scm/git/
+ä¸‹è½½åœ°å€ï¼š  https://www.kernel.org/pub/software/scm/git/
 
 ```bash
 $ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.gz
 ```
 
-3. ÒÀÀµ¼ì²éÓë°²×°
+3. ä¾èµ–æ£€æŸ¥ä¸å®‰è£…
 
 ```bash
 $ yum list gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
 $ yum install -y gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
 ```
 
-4. ´´½¨½âÑ¹Ä¿Â¼
+4. åˆ›å»ºè§£å‹ç›®å½•
 
 ```bash
 $ mkdir /usr/local/Git
 ```
 
-5. ½âÑ¹
+5. è§£å‹
 
 ```bash
 $ tar -zxvf /usr/local/src/git-2.42.0.tar.gz -C /usr/local/Git/
 ```
 
-6. Ö´ĞĞÅäÖÃ½Å±¾£¬²¢±àÒë°²×°
+6. æ‰§è¡Œé…ç½®è„šæœ¬ï¼Œå¹¶ç¼–è¯‘å®‰è£…
 
-- ÇĞ»»Ä¿Â¼²¢Ö´ĞĞ½Å±¾
+- åˆ‡æ¢ç›®å½•å¹¶æ‰§è¡Œè„šæœ¬
 
 ```bash
 $ cd /usr/local/Git/git-2.42.0/
 $ ./configure --prefix=/usr/local/Git/git2.42.0
 ```
 
-- ±àÒë
+- ç¼–è¯‘
 
 ```bash
 $ make
 ```
 
-- °²×°
+- å®‰è£…
 
 ```bash
 $ make install
@@ -9053,13 +8739,13 @@ $ ls /usr/local/Git/git2.42.0/
 bin  libexec  share
 ```
 
-7. ´´½¨ÈíÁ¬½Ó
+7. åˆ›å»ºè½¯è¿æ¥
 
 ```bash
 $ ln -snf /usr/local/Git/git2.42.0/ /usr/local/git
 ```
 
-8. ÅäÖÃ»·¾³±äÁ¿
+8. é…ç½®ç¯å¢ƒå˜é‡
 
 ```bash
 $ vim /etc/profile.d/git.sh
@@ -9071,36 +8757,36 @@ export GIT_EDITOR=vim
 export PATH=$GIT_HOME/bin:$PATH
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```bash
 $ source /etc/profile
 ```
 
-9. ÉèÖÃÕË»§ĞÅÏ¢
+9. è®¾ç½®è´¦æˆ·ä¿¡æ¯
 
 ```bash
 $ git config --global user.name "emon"
-$ git config --global user.email "[ÓÊÏä]"
+$ git config --global user.email "[é‚®ç®±]"
 ```
 
-10. ÅäÖÃSSHĞÅÏ¢
+10. é…ç½®SSHä¿¡æ¯
 
-- ¼ì²éSSH keysÊÇ·ñ´æÔÚ£º
+- æ£€æŸ¥SSH keysæ˜¯å¦å­˜åœ¨ï¼š
 
 ```bas
 $ ls -a ~/.ssh/
 .  ..  known_hosts
 ```
 
-- Èç¹û²»´æÔÚ£¬Éú³ÉSSH keys£º
+- å¦‚æœä¸å­˜åœ¨ï¼Œç”ŸæˆSSH keysï¼š
 
 ```bash
-$ ssh-keygen -t rsa -b 4096 -C "[ÓÊÏä]"
+$ ssh-keygen -t rsa -b 4096 -C "[é‚®ç®±]"
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/emon/.ssh/id_rsa): `[Ä¬ÈÏ]`
-Enter passphrase (empty for no passphrase): `[ÊäÈë¿ÚÁî£¬ÆäËûÓÃ»§ÇĞ»»µ½emon»áÌáÊ¾ÊäÈë]`
-Enter same passphrase again: `[È·ÈÏ¿ÚÁî]`
+Enter file in which to save the key (/home/emon/.ssh/id_rsa): `[é»˜è®¤]`
+Enter passphrase (empty for no passphrase): `[è¾“å…¥å£ä»¤ï¼Œå…¶ä»–ç”¨æˆ·åˆ‡æ¢åˆ°emonä¼šæç¤ºè¾“å…¥]`
+Enter same passphrase again: `[ç¡®è®¤å£ä»¤]`
 Your identification has been saved in /home/emon/.ssh/id_rsa.
 Your public key has been saved in /home/emon/.ssh/id_rsa.pub.
 The key fingerprint is:
@@ -9119,21 +8805,21 @@ The key's randomart image is:
 +----[SHA256]-----+
 ```
 
-- ¿½±´¹«Ô¿µ½GitHubÉÏ¡¾ĞèÒªÓĞGitHubÕË»§²Å¿ÉÒÔÅäÖÃ¡¿
+- æ‹·è´å…¬é’¥åˆ°GitHubä¸Šã€éœ€è¦æœ‰GitHubè´¦æˆ·æ‰å¯ä»¥é…ç½®ã€‘
 
 ```bash
 $ cat ~/.ssh/id_rsa.pub
 ```
 
-¿½±´ÁË¹«Ô¿£¬´ò¿ªGitHubÅäÖÃSSH keysµÄÒ³Ãæ£º https://github.com/settings/keys ¡¾Settings->SSH and GPG keys->New SSH key->Ğ´ÈëTitle£¬Õ³ÌùKey¡¿
+æ‹·è´äº†å…¬é’¥ï¼Œæ‰“å¼€GitHubé…ç½®SSH keysçš„é¡µé¢ï¼š https://github.com/settings/keys ã€Settings->SSH and GPG keys->New SSH key->å†™å…¥Titleï¼Œç²˜è´´Keyã€‘
 
 | Title           | Key                |
 | --------------- | ------------------ |
-| centos-emon-rsa | ¡¾¸Õ²Å¿½±´µÄ¹«Ô¿¡¿ |
+| centos-emon-rsa | ã€åˆšæ‰æ‹·è´çš„å…¬é’¥ã€‘ |
 
-µã»÷Add SSH key£¬È·¶¨Ìí¼Ó¡£
+ç‚¹å‡»Add SSH keyï¼Œç¡®å®šæ·»åŠ ã€‚
 
-- ÑéÖ¤SSHÁ¬½Ó
+- éªŒè¯SSHè¿æ¥
 
 ```bash
 $ ssh -T git@github.com
@@ -9142,58 +8828,58 @@ RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
 RSA key fingerprint is MD5:16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
 Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added 'github.com,13.250.177.223' (RSA) to the list of known hosts.
-Enter passphrase for key '/home/emon/.ssh/id_rsa': `[Éú³ÉSSH keysÊ±ÉèÖÃµÄ¿ÚÁî]`
+Enter passphrase for key '/home/emon/.ssh/id_rsa': `[ç”ŸæˆSSH keysæ—¶è®¾ç½®çš„å£ä»¤]`
 Hi Rushing0711! You've successfully authenticated, but GitHub does not provide shell access.
 $ ls -a ~/.ssh/
 .  ..  id_rsa  id_rsa.pub  known_hosts
 ```
 
-11. Ğ£Ñé
+11. æ ¡éªŒ
 
 ```bash
 $ git --version
 git version 2.42.0
 ```
 
-## 2¡¢°²×°JDK
+## 2ã€å®‰è£…JDK
 
-1. ¼ì²éÊÇ·ñÒÑ°²×°
+1. æ£€æŸ¥æ˜¯å¦å·²å®‰è£…
 
 ```bash
 $ rpm -qa|grep jdk
 ```
 
-2. ÏÂÔØ
+2. ä¸‹è½½
 
-ÏÂÃæµÄÏÂÔØµØÖ·£¬¿ÉÒÔÍ¨¹ıORACLE¹ÙÍøÏÂÔØÒ³£¬µÇÂ¼ºó»ñÈ¡£º
+ä¸‹é¢çš„ä¸‹è½½åœ°å€ï¼Œå¯ä»¥é€šè¿‡ORACLEå®˜ç½‘ä¸‹è½½é¡µï¼Œç™»å½•åè·å–ï¼š
 
-¹ÙÍøÏÂÔØÒ³µØÖ·£º http://www.oracle.com/technetwork/java/javase/downloads/index.html
+å®˜ç½‘ä¸‹è½½é¡µåœ°å€ï¼š http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ```bash
 $ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u251-linux-x64.tar.gz
 ```
 
-3. ´´½¨°²×°Ä¿Â¼
+3. åˆ›å»ºå®‰è£…ç›®å½•
 
 ```bash
 $ mkdir /usr/local/Java
 ```
 
-4. ½âÑ¹°²×°
+4. è§£å‹å®‰è£…
 
 ```bash
 $ tar -zxvf /usr/local/src/jdk-8u251-linux-x64.tar.gz -C /usr/local/Java/
 ```
 
-5. ´´½¨ÈíÁ¬½Ó
+5. åˆ›å»ºè½¯è¿æ¥
 
 ```bash
 $ ln -snf /usr/local/Java/jdk1.8.0_251/ /usr/local/java
 ```
 
-6. ÅäÖÃ»·¾³±äÁ¿
+6. é…ç½®ç¯å¢ƒå˜é‡
 
-ÔÚ`/etc/profile.d`Ä¿Â¼´´½¨`jdk.sh`ÎÄ¼ş£º
+åœ¨`/etc/profile.d`ç›®å½•åˆ›å»º`jdk.sh`æ–‡ä»¶ï¼š
 
 ```bash
 $ vim /etc/profile.d/jdk.sh
@@ -9205,13 +8891,13 @@ export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/li
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```bash
 $ source /etc/profile
 ```
 
-7. Ğ£Ñé
+7. æ ¡éªŒ
 
 ```bash
 $ java -version
@@ -9220,37 +8906,37 @@ Java(TM) SE Runtime Environment (build 1.8.0_171-b11)
 Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)
 ```
 
-## 3¡¢°²×°Maven
+## 3ã€å®‰è£…Maven
 
-1. ÏÂÔØ
+1. ä¸‹è½½
 
-ÏÂÔØµØÖ·»ñÈ¡Ò³Ãæ£º https://maven.apache.org/download.cgi
+ä¸‹è½½åœ°å€è·å–é¡µé¢ï¼š https://maven.apache.org/download.cgi
 
 ```bash
 $ wget -cP /usr/local/src/ https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
 ```
 
-2. ´´½¨°²×°Ä¿Â¼
+2. åˆ›å»ºå®‰è£…ç›®å½•
 
 ```bash
 $ mkdir /usr/local/Maven
 ```
 
-3. ½âÑ¹°²×°
+3. è§£å‹å®‰è£…
 
 ```bash
 $ tar -zxvf /usr/local/src/apache-maven-3.8.6-bin.tar.gz -C /usr/local/Maven/
 ```
 
-4. ´´½¨ÈíÁ¬½Ó
+4. åˆ›å»ºè½¯è¿æ¥
 
 ```bash
 $ ln -snf /usr/local/Maven/apache-maven-3.8.6/ /usr/local/maven
 ```
 
-5. ÅäÖÃ»·¾³±äÁ¿
+5. é…ç½®ç¯å¢ƒå˜é‡
 
-ÔÚ`/etc/profile.d`Ä¿Â¼´´½¨`mvn.sh`ÎÄ¼ş£º
+åœ¨`/etc/profile.d`ç›®å½•åˆ›å»º`mvn.sh`æ–‡ä»¶ï¼š
 
 ```bash
 $ vim /etc/profile.d/mvn.sh
@@ -9261,33 +8947,33 @@ export M2_HOME=/usr/local/maven
 export PATH=$M2_HOME/bin:$PATH
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```bash
 $ source /etc/profile
 ```
 
-6. Ğ£Ñé
+6. æ ¡éªŒ
 
 ```bash
 $ mvn -v
 ```
 
-7. ÅäÖÃ
+7. é…ç½®
 
-- ´´½¨repo´æ·ÅÄ¿Â¼
+- åˆ›å»ºrepoå­˜æ”¾ç›®å½•
 
 ```bash
 $ mkdir /usr/local/maven/repository
 ```
 
-- ÅäÖÃ´æ·Årepo
+- é…ç½®å­˜æ”¾repo
 
   ```bash
   $ vim /usr/local/maven/conf/settings.xml 
   ```
 
-  - ÅäÖÃ`localRepository`¡¾¶àÓÃ»§·ÃÎÊ²»½¨ÒéÅäÖÃ¡¿
+  - é…ç½®`localRepository`ã€å¤šç”¨æˆ·è®¿é—®ä¸å»ºè®®é…ç½®ã€‘
 
   ```xml
     <!-- localRepository
@@ -9299,11 +8985,11 @@ $ mkdir /usr/local/maven/repository
     <localRepository>/usr/local/maven/repository</localRepository>
   ```
 
-  **ËµÃ÷£º**ĞèÒªĞŞ¸Ä`/usr/local/maven/repository`Îª`jenkins`ÓÃ»§È¨ÏŞ¡£
+  **è¯´æ˜ï¼š**éœ€è¦ä¿®æ”¹`/usr/local/maven/repository`ä¸º`jenkins`ç”¨æˆ·æƒé™ã€‚
 
   > $ sudo chown jenkins.jenkins /usr/local/maven/repository
   
-  - ÅäÖÃ`mirror`
+  - é…ç½®`mirror`
   
   ```xml
     <mirrors>
@@ -9329,39 +9015,39 @@ $ mkdir /usr/local/maven/repository
     </mirrors>
   ```
 
-## 4¡¢Zookeeperµ¥½Úµã£¨Apache°æ£©
+## 4ã€Zookeeperå•èŠ‚ç‚¹ï¼ˆApacheç‰ˆï¼‰
 
-1. ÏÂÔØ
+1. ä¸‹è½½
 
-¹ÙÍøµØÖ·£º https://zookeeper.apache.org/index.html
+å®˜ç½‘åœ°å€ï¼š https://zookeeper.apache.org/index.html
 
-ÏÂÔØµØÖ·£º https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
+ä¸‹è½½åœ°å€ï¼š https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/
 
 ```bash
 $ wget -cP /usr/local/src/ https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.9/apache-zookeeper-3.5.9-bin.tar.gz --no-check-certificate
 ```
 
-2. ´´½¨°²×°Ä¿Â¼
+2. åˆ›å»ºå®‰è£…ç›®å½•
 
 ```bash
 $ mkdir /usr/local/ZooKeeper
 ```
 
-3. ½âÑ¹°²×°
+3. è§£å‹å®‰è£…
 
 ```bash
 $ tar -zxvf /usr/local/src/apache-zookeeper-3.5.9-bin.tar.gz -C /usr/local/ZooKeeper/
 ```
 
-4. ´´½¨ÈíÁ¬½Ó
+4. åˆ›å»ºè½¯è¿æ¥
 
 ```bash
 $ ln -snf /usr/local/ZooKeeper/apache-zookeeper-3.5.9-bin/ /usr/local/zoo
 ```
 
-5. ÅäÖÃ»·¾³±äÁ¿
+5. é…ç½®ç¯å¢ƒå˜é‡
 
-ÔÚ`/etc/profile.d`Ä¿Â¼´´½¨`zoo.sh`ÎÄ¼ş£º
+åœ¨`/etc/profile.d`ç›®å½•åˆ›å»º`zoo.sh`æ–‡ä»¶ï¼š
 
 ```bash
 $ sudo vim /etc/profile.d/zoo.sh
@@ -9372,133 +9058,133 @@ export ZK_HOME=/usr/local/zoo
 export PATH=$ZK_HOME/bin:$PATH
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```bash
 $ source /etc/profile
 ```
 
-6. ÅäÖÃÎÄ¼ş
+6. é…ç½®æ–‡ä»¶
 
-- ¸´ÖÆ`zoo_sample.cfg`µ½`zoo.cfg`
+- å¤åˆ¶`zoo_sample.cfg`åˆ°`zoo.cfg`
 
 ```bash
 $ cp /usr/local/zoo/conf/zoo_sample.cfg /usr/local/zoo/conf/zoo.cfg
 ```
 
-- ±à¼­`zoo.cfg`ÎÄ¼ş
+- ç¼–è¾‘`zoo.cfg`æ–‡ä»¶
 
 ```bash
 $ vim /usr/local/zoo/conf/zoo.cfg
 ```
 
 ```bash
-# [ĞŞ¸Ä]
+# [ä¿®æ”¹]
 dataDir=/tmp/zookeeper => dataDir=/usr/local/zoo/data
 ```
 
-7. Æô¶¯ÓëÍ£Ö¹
+7. å¯åŠ¨ä¸åœæ­¢
 
-- Æô¶¯£¨¶Ë¿ÚºÅ2181£©
+- å¯åŠ¨ï¼ˆç«¯å£å·2181ï¼‰
 
 ```bash
 $ zkServer.sh start
 ```
 
-- Ğ£Ñé
+- æ ¡éªŒ
 
 ```bash
 $ jps
 44611 QuorumPeerMain
 ```
 
-- Í£Ö¹
+- åœæ­¢
 
 ```bash
 $ zkServer.sh stop
 ```
 
-- ×´Ì¬
+- çŠ¶æ€
 
 ```bash
 $ zkServer.sh status
 ```
 
-8. Á¬½Ó
+8. è¿æ¥
 
-- Ô¶³ÌÁ´½Ó
+- è¿œç¨‹é“¾æ¥
 
 ```bash
 $ zkCli.sh -server emon:2181
 ```
 
-- ±¾µØÁ¬½Ó
+- æœ¬åœ°è¿æ¥
 
 ```bash
 $ zkCli.sh
 ```
 
-- ÍË³ö£¨Á¬½Ó³É¹¦ºó£¬Ê¹ÓÃÃüÁîquitÍË³ö£©
+- é€€å‡ºï¼ˆè¿æ¥æˆåŠŸåï¼Œä½¿ç”¨å‘½ä»¤quité€€å‡ºï¼‰
 
 ```bash
 [zk: localhost:2181(CONNECTED) 0] quit
 ```
 
-- ²é¿´¸ù½ÚµãÏÂÄÚÈİ
+- æŸ¥çœ‹æ ¹èŠ‚ç‚¹ä¸‹å†…å®¹
 
 ```bash
 [zk: localhost:2181(CONNECTED) 1] ls /
 ```
 
-- ´´½¨½Úµãtest²¢´æ´¢Êı¾İhello
+- åˆ›å»ºèŠ‚ç‚¹testå¹¶å­˜å‚¨æ•°æ®hello
 
 ```bash
 [zk: localhost:2181(CONNECTED) 2] create /test hello
 ```
 
-- ²é¿´½ÚµãtestÄÚÈİ
+- æŸ¥çœ‹èŠ‚ç‚¹testå†…å®¹
 
 ```bash
 [zk: localhost:2181(CONNECTED) 6] get /test
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 hello
 ```
 
-- É¾³ı½Úµã
+- åˆ é™¤èŠ‚ç‚¹
 
 ```bash
-# µİ¹éÉ¾³ı
+# é€’å½’åˆ é™¤
 [zk: localhost:2181(CONNECTED) 7] deleteall /test
-# ÆÕÍ¨É¾³ı
+# æ™®é€šåˆ é™¤
 [zk: localhost:2181(CONNECTED) 7] delete /test
 ```
 
-## 5¡¢Maven²Ö¿âÔ¤ÁôÎ»ÖÃ
+## 5ã€Mavenä»“åº“é¢„ç•™ä½ç½®
 
 
 
-## 6¡¢´î½¨Jenkins
+## 6ã€æ­å»ºJenkins
 
-### 6.1¡¢°²×°
+### 6.1ã€å®‰è£…
 
-#### 6.1.1¡¢Ê¹ÓÃDocker
+#### 6.1.1ã€ä½¿ç”¨Docker
 
-×¢Òâ£¬ÔÚhub.docker.comÉÏËÑË÷jenkinsÊ±£¬µã»÷¹Ù·½°æ±¾ºó¿´µ½ÌáÊ¾£º
+æ³¨æ„ï¼Œåœ¨hub.docker.comä¸Šæœç´¢jenkinsæ—¶ï¼Œç‚¹å‡»å®˜æ–¹ç‰ˆæœ¬åçœ‹åˆ°æç¤ºï¼š
 
 DEPRECATED; use "jenkins/jenkins:lts" instead
 
 ```bash
-# ´´½¨ËŞÖ÷»ú¹ÒÔØµã
+# åˆ›å»ºå®¿ä¸»æœºæŒ‚è½½ç‚¹
 $ mkdir /usr/local/dockerv/jenkins_home
-# µ÷Õûjenkins_homeÄ¿Â¼µÄÊôÖ÷£¬±ÜÃâÎÊÌâ£º
+# è°ƒæ•´jenkins_homeç›®å½•çš„å±ä¸»ï¼Œé¿å…é—®é¢˜ï¼š
 # touch: cannot touch '/var/jenkins_home/copy_reference_file.log': Permission denied
 # Can not write to /var/jenkins_home/copy_reference_file.log. Wrong volume permissions?
 # $ chown -R 1000:1000 /usr/local/dockerv/jenkins_home/
-# -v /usr/local/dockerv/jenkins_home:/var/jenkins_home Ö¸¶¨ËŞÖ÷»úÄ¿Â¼ÎªJenkins¹¤×÷Ä¿Â¼
-# -v /etc/localtime:/etc/localtime ÈÃÈİÆ÷Ê¹ÓÃºÍ·şÎñÆ÷Í¬ÑùµÄÊ±¼äÉèÖÃ
-# -v /usr/local/maven:/usr/local/maven Ó³ÉäËŞÖ÷»úµÄmaven
-# -v /usr/local/java:/usr/local/java Ó³ÉäËŞÖ÷»úµÄjava
-# Ò²¿ÉÒÔÊ¹ÓÃ jenkins/jenkins:lts-centos7-jdk8 ¾µÏñ
+# -v /usr/local/dockerv/jenkins_home:/var/jenkins_home æŒ‡å®šå®¿ä¸»æœºç›®å½•ä¸ºJenkinså·¥ä½œç›®å½•
+# -v /etc/localtime:/etc/localtime è®©å®¹å™¨ä½¿ç”¨å’ŒæœåŠ¡å™¨åŒæ ·çš„æ—¶é—´è®¾ç½®
+# -v /usr/local/maven:/usr/local/maven æ˜ å°„å®¿ä¸»æœºçš„maven
+# -v /usr/local/java:/usr/local/java æ˜ å°„å®¿ä¸»æœºçš„java
+# ä¹Ÿå¯ä»¥ä½¿ç”¨ jenkins/jenkins:lts-centos7-jdk8 é•œåƒ
 $ docker run --name jenkins --user=root \
 -d -p 8080:8080 -p 50000:50000 \
 -v /usr/local/dockerv/jenkins_home:/var/jenkins_home \
@@ -9511,12 +9197,12 @@ $ docker run --name jenkins --user=root \
 jenkins/jenkins:lts
 ```
 
-#### 6.1.2¡¢Ê¹ÓÃdocker-compose
+#### 6.1.2ã€ä½¿ç”¨docker-compose
 
 ```bash
-# ´´½¨ËŞÖ÷»ú¹ÒÔØµã
+# åˆ›å»ºå®¿ä¸»æœºæŒ‚è½½ç‚¹
 $ mkdir /usr/local/dockerv/jenkins_home
-# ´´½¨docker-composeÄ¿Â¼
+# åˆ›å»ºdocker-composeç›®å½•
 $ mkdir /usr/local/Jenkins
 $ vim /usr/local/Jenkins/docker-compose.yml
 ```
@@ -9545,55 +9231,55 @@ services:
 ```
 
 ```bash
-# ºóÌ¨Æô¶¯
+# åå°å¯åŠ¨
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml up -d
-# Í£Ö¹
+# åœæ­¢
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml down -v
-# ÖØÆô£º½¨Òé×ßdown -vÔÙup -d£¬¶ø²»ÊÇrestart
+# é‡å¯ï¼šå»ºè®®èµ°down -vå†up -dï¼Œè€Œä¸æ˜¯restart
 $ docker-compose -f /usr/local/Jenkins/docker-compose.yml restart
 ```
 
-- ²é¿´ÃÜÂë
+- æŸ¥çœ‹å¯†ç 
 
 ```bash
 $ docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 b273ae2aadaf491e834d1fce52b90e65
 ```
 
-- ½â¾öjenkinsÈİÆ÷·ÃÎÊËŞÖ÷»údocker±¨´í
+- è§£å†³jenkinså®¹å™¨è®¿é—®å®¿ä¸»æœºdockeræŠ¥é”™
 
-> ´íÎó£ºdocker: error while loading shared libraries: libltdl.so.7: cannot open shared object file: No such file or directory
+> é”™è¯¯ï¼šdocker: error while loading shared libraries: libltdl.so.7: cannot open shared object file: No such file or directory
 >
-> ½â¾ö£º
+> è§£å†³ï¼š
 >
 > $ docker exec -it jenkins /bin/bash
 >
-> ÔÚ´ò¿ªµÄÃüÁîĞĞÖĞ£¬Ö´ĞĞÃüÁî°²×°£º
+> åœ¨æ‰“å¼€çš„å‘½ä»¤è¡Œä¸­ï¼Œæ‰§è¡Œå‘½ä»¤å®‰è£…ï¼š
 >
 > root@eab33185950a:/# apt-get update && apt-get install -y libltdl7
 >
-> Ë³±ãÖ´ĞĞÏÂharborµÇÂ¼£¬±ÜÃâ½Å±¾ÖĞµÇÂ¼£º
+> é¡ºä¾¿æ‰§è¡Œä¸‹harborç™»å½•ï¼Œé¿å…è„šæœ¬ä¸­ç™»å½•ï¼š
 >
 > root@eab33185950a:/# docker login -u emon -p Emon@123 192.168.32.116:5080
 
 
 
-#### 6.1.3¡¢war°²×°¡¾ÍÆ¼ö¡¿
+#### 6.1.3ã€warå®‰è£…ã€æ¨èã€‘
 
-¹ÙÍøµØÖ·£ºhttps://www.jenkins.io/
+å®˜ç½‘åœ°å€ï¼šhttps://www.jenkins.io/
 
-¿ìËÙ°²×°£º
+å¿«é€Ÿå®‰è£…ï¼š
 
-1. ÏÂÔØwar
+1. ä¸‹è½½war
 
 ```bash
-# ´´½¨jenkins°²×°Ä¿Â¼
+# åˆ›å»ºjenkinså®‰è£…ç›®å½•
 $ mkdir /usr/local/Jenkins/
 $ wget https://get.jenkins.io/war-stable/2.332.2/jenkins.war -O /usr/local/Jenkins/jenkins-2.332.2.war
 ```
 
-2. ±àĞ´Æô¶¯½Å±¾
+2. ç¼–å†™å¯åŠ¨è„šæœ¬
 
 - jenkins.sh
 
@@ -9632,7 +9318,7 @@ fi
 $ chmod u+x /usr/local/Jenkins/jenkins.sh
 ```
 
-- ´´½¨systemdµÄservice·şÎñÎÄ¼ş
+- åˆ›å»ºsystemdçš„serviceæœåŠ¡æ–‡ä»¶
 
 ```bash
 $ vim /usr/lib/systemd/system/jenkins.service
@@ -9656,72 +9342,72 @@ Group=root
 WantedBy=multi-user.target
 ```
 
-- ¼ÓÔØ·şÎñ²¢ÉèÖÃ¿ª»úÆô¶¯
+- åŠ è½½æœåŠ¡å¹¶è®¾ç½®å¼€æœºå¯åŠ¨
 
 ```bash
 $ systemctl daemon-reload && systemctl enable jenkins && systemctl start jenkins
 ```
 
-- ²é¿´³õÊ¼ÃÜÂë
+- æŸ¥çœ‹åˆå§‹å¯†ç 
 
 ```bash
 $ cat /root/.jenkins/secrets/initialAdminPassword
 dd56c6ccb54a48c285f3f40546726bfb
 ```
 
-#### 6.1.4¡¢°²×°ÍÆ¼ö²å¼ş
+#### 6.1.4ã€å®‰è£…æ¨èæ’ä»¶
 
-·ÃÎÊ£ºhttp://emon:8080
+è®¿é—®ï¼šhttp://emon:8080
 
-Êä³ö³õÊ¼ÃÜÂë²¢°²×°ÍÆ¼ö²å¼ş£¡
+è¾“å‡ºåˆå§‹å¯†ç å¹¶å®‰è£…æ¨èæ’ä»¶ï¼
 
 ![image-20220407163042485](images/image-20220407163042485.png)
 
-- ´´½¨ÓÃ»§
+- åˆ›å»ºç”¨æˆ·
 
-·ÃÎÊ£ºhttp://emon:8080
+è®¿é—®ï¼šhttp://emon:8080
 
-°²×°ÍÆ¼öµÄ²å¼ş==>´´½¨ÓÃ»§£ºjenkins/jenkins123
+å®‰è£…æ¨èçš„æ’ä»¶==>åˆ›å»ºç”¨æˆ·ï¼šjenkins/jenkins123
 
-- ÖØÆôJenkins
+- é‡å¯Jenkins
 
 http://emon:8080/restart
 
 
 
-### 6.2¡¢»·¾³ÅäÖÃ
+### 6.2ã€ç¯å¢ƒé…ç½®
 
-#### 6.2.1¡¢³£ÓÃ²å¼ş°²×°
+#### 6.2.1ã€å¸¸ç”¨æ’ä»¶å®‰è£…
 
 - Git Parameter
 
-°²×°Íê³Éºó£¬µã»÷¡¾°²×°Íê³ÉºóÖØÆôJenkins¡¿£¬´¥·¢ÖØÆô²Ù×÷¡£
+å®‰è£…å®Œæˆåï¼Œç‚¹å‡»ã€å®‰è£…å®Œæˆåé‡å¯Jenkinsã€‘ï¼Œè§¦å‘é‡å¯æ“ä½œã€‚
 
-#### 6.2.2¡¢»·¾³ÅäÖÃ
+#### 6.2.2ã€ç¯å¢ƒé…ç½®
 
-##### Global Tool Configuration£¨È«¾Ö¹¤¾ßÅäÖÃ£©¡¾war°²×°¿ÉºöÂÔ¡¿
+##### Global Tool Configurationï¼ˆå…¨å±€å·¥å…·é…ç½®ï¼‰ã€warå®‰è£…å¯å¿½ç•¥ã€‘
 
-- ÅäÖÃJDK
+- é…ç½®JDK
 
-ÅäÖÃÂ·¾¶£ºManage Jenkins==>Global Tool Configuration==>JDK==>¹´µô×Ô¶¯°²×°==>
+é…ç½®è·¯å¾„ï¼šManage Jenkins==>Global Tool Configuration==>JDK==>å‹¾æ‰è‡ªåŠ¨å®‰è£…==>
 
-JDK±ğÃû=java1.8
+JDKåˆ«å=java1.8
 
 JAVA_HOME=/usr/local/java
 
-- ÅäÖÃMaven
+- é…ç½®Maven
 
-ÅäÖÃÂ·¾¶£ºManage Jenkins==>Global Tool Configuration==>Maven==>¹´µô×Ô¶¯°²×°==>
+é…ç½®è·¯å¾„ï¼šManage Jenkins==>Global Tool Configuration==>Maven==>å‹¾æ‰è‡ªåŠ¨å®‰è£…==>
 
-JDK±ğÃû=maven3.6.3
+JDKåˆ«å=maven3.6.3
 
 MAVEN_HOME=/usr/local/maven
 
-##### Configure System£¨ÏµÍ³ÅäÖÃ£©
+##### Configure Systemï¼ˆç³»ç»Ÿé…ç½®ï¼‰
 
-- È«¾ÖÊôĞÔ==>»·¾³±äÁ¿
+- å…¨å±€å±æ€§==>ç¯å¢ƒå˜é‡
 
-ÅäÖÃÂ·¾¶£ºManage Jenkins==>Configure System==>È«¾ÖÊôĞÔ==>¹´Ñ¡»·¾³±äÁ¿==>Ìí¼Ó¼üÖµ¶ÔÁĞ±í==>
+é…ç½®è·¯å¾„ï¼šManage Jenkins==>Configure System==>å…¨å±€å±æ€§==>å‹¾é€‰ç¯å¢ƒå˜é‡==>æ·»åŠ é”®å€¼å¯¹åˆ—è¡¨==>
 
 JAVA_HOME=/usr/local/java
 
@@ -9729,31 +9415,31 @@ M2_HOME=/usr/local/maven
 
 PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin
 
-×¢Òâ£º
+æ³¨æ„ï¼š
 
-1£ºM2_HOME »·¾³±äÁ¿Ãû×ÖÊÇ¹Ì¶¨µÄ£¬²»ÔÊĞíĞ´ÆäËûµÄ±äÁ¿Ãû; ±êÊ¶MavenÔÚÏµÍ³ÄÚµÄ¼ÒÄ¿Â¼£»
+1ï¼šM2_HOME ç¯å¢ƒå˜é‡åå­—æ˜¯å›ºå®šçš„ï¼Œä¸å…è®¸å†™å…¶ä»–çš„å˜é‡å; æ ‡è¯†Mavenåœ¨ç³»ç»Ÿå†…çš„å®¶ç›®å½•ï¼›
 
-2£ºPATH+EXTRA ÒıÓÃÉÏÃæMaven¼ÒÄ¿Â¼£¬±äÁ¿Ãû¹Ì¶¨£¬²»ÄÜ¸ü¸Ä¡£
+2ï¼šPATH+EXTRA å¼•ç”¨ä¸Šé¢Mavenå®¶ç›®å½•ï¼Œå˜é‡åå›ºå®šï¼Œä¸èƒ½æ›´æ”¹ã€‚
 
-3£ºÈç¹ûĞèÒªÆäËû±äÁ¿£¬±ÈÈçnpm£¬¿ÉÒÔÈçÏÂ£º
+3ï¼šå¦‚æœéœ€è¦å…¶ä»–å˜é‡ï¼Œæ¯”å¦‚npmï¼Œå¯ä»¥å¦‚ä¸‹ï¼š
 
 PATH+EXTRA=$M2_HOME/bin:$JAVA_HOME/bin:/root/.nvm/versions/node/v12.22.12/bin
 
-ÆäËûµÄÀàËÆÅäÖÃ¡£
+å…¶ä»–çš„ç±»ä¼¼é…ç½®ã€‚
 
 
 
-### 6.3¡¢PipelineÈÎÎñÑİÊ¾
+### 6.3ã€Pipelineä»»åŠ¡æ¼”ç¤º
 
-- ´´½¨½Å±¾Ä¿Â¼
+- åˆ›å»ºè„šæœ¬ç›®å½•
 
 ```bash
 $ mkdir -pv /root/jenkins/script
 ```
 
-#### 6.3.1¡¢´´½¨env¼ì²é½Å±¾
+#### 6.3.1ã€åˆ›å»ºenvæ£€æŸ¥è„šæœ¬
 
-- ´´½¨½Å±¾ÎÄ¼ş
+- åˆ›å»ºè„šæœ¬æ–‡ä»¶
 
 ```bash
 $ vim /root/jenkins/script/check-env.sh
@@ -9762,7 +9448,7 @@ $ vim /root/jenkins/script/check-env.sh
 ```bash
 #!/bin/bash
 
-# Ğ£ÑéÒÀÀµµÄPipeline»·¾³±äÁ¿ÊÇ·ñÒÑ¶¨Òå
+# æ ¡éªŒä¾èµ–çš„Pipelineç¯å¢ƒå˜é‡æ˜¯å¦å·²å®šä¹‰
 BUILD_TYPE_SCOPE=(
 "mvn"
 "npm"
@@ -9774,16 +9460,16 @@ elif [[ ! "${BUILD_TYPE_SCOPE[@]}" =~ "${BUILD_TYPE}" ]];then
     echo "env 'BUILD_TYPE' must in mvn or npm"
     exit 1
 fi
-# È·¶¨ÖÆ×÷¾µÏñµÄ¹¤×÷Ä¿Â¼
+# ç¡®å®šåˆ¶ä½œé•œåƒçš„å·¥ä½œç›®å½•
 if [ "${BUILD_BASE_DIR}" == "" ];then
     echo "env 'BUILD_BASE_DIR' is not set"
     exit 1
 fi
-# ¸²¸ÇÄ¬ÈÏµÄ${JOB_NAME}¡¾¿ÉÑ¡¡¿
+# è¦†ç›–é»˜è®¤çš„${JOB_NAME}ã€å¯é€‰ã€‘
 if [ "${BUILD_JOB_NAME}" == "" ];then
     echo "env 'BUILD_JOB_NAME' is not set, use default value '${JOB_NAME}'"
 fi
-# ¾µÏñµÄ×ÊÔ´Ä¿Â¼£¬Èç¹û²»´æÔÚ£¬ÔòÊ¹ÓÃÏîÄ¿¸ùÄ¿Â¼ÏÂµÄk8sÄ¿Â¼Ìæ´ú¡¾¿ÉÑ¡¡¿
+# é•œåƒçš„èµ„æºç›®å½•ï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œåˆ™ä½¿ç”¨é¡¹ç›®æ ¹ç›®å½•ä¸‹çš„k8sç›®å½•æ›¿ä»£ã€å¯é€‰ã€‘
 if [ "${K8S_DIR}" == "" ];then
     if [ "${MODULE}" == "" ];then
         K8S_DIR=${WORKSPACE}/k8s
@@ -9793,33 +9479,33 @@ if [ "${K8S_DIR}" == "" ];then
     echo "env 'K8S_DIR' is not set, use default value '$K8S_DIR'"
 fi
 
-# Èç¹ûÊÇmvnÀàĞÍ£¬±ØĞëÖ¸¶¨MODULE
+# å¦‚æœæ˜¯mvnç±»å‹ï¼Œå¿…é¡»æŒ‡å®šMODULE
 if [ "${BUILD_TYPE}" == "mvn" ];then
-    # ´ò°ü¾µÏñÊ±Ê¹ÓÃµÄÄ£¿é
+    # æ‰“åŒ…é•œåƒæ—¶ä½¿ç”¨çš„æ¨¡å—
     if [ "${MODULE}" == "" ];then
         echo "env 'MODULE' is not set"
         exit 1
     fi
 fi
-# ¾µÏñ²Ö¿âµØÖ·
+# é•œåƒä»“åº“åœ°å€
 if [ "${IMAGE_REPO}" == "" ];then
     echo "env 'IMAGE_REPO' is not set"
     exit 1
 fi
 
 
-# ·şÎñ·¢²¼ºó£¬±©Â¶³öÀ´µÄÓòÃû
+# æœåŠ¡å‘å¸ƒåï¼Œæš´éœ²å‡ºæ¥çš„åŸŸå
 if [ "${HOST}" == "" ];then
     echo "env 'HOST' is not set, if you need it, please set!"
 fi
 echo "env.HOST=$HOST"
-# ·şÎñ·¢²¼Ê¹ÓÃµÄÃüÃû¿Õ¼ä default/drill/dev/test/prod µÈµÈ
+# æœåŠ¡å‘å¸ƒä½¿ç”¨çš„å‘½åç©ºé—´ default/drill/dev/test/prod ç­‰ç­‰
 if [ "${NS}" == "" ];then
     NS="default"
     echo "env 'NS' is not set, use default"
 fi
 echo "env.NS=$NS"
-# Èç¹û²»Ö¸¶¨£¬Ä¬ÈÏÊ¹ÓÃ web.yaml ·ñÔòÊ¹ÓÃÖ¸¶¨µÄÅäÖÃÎÄ¼ş·¢²¼k8s·şÎñ
+# å¦‚æœä¸æŒ‡å®šï¼Œé»˜è®¤ä½¿ç”¨ web.yaml å¦åˆ™ä½¿ç”¨æŒ‡å®šçš„é…ç½®æ–‡ä»¶å‘å¸ƒk8sæœåŠ¡
 if [ "${DEPLOY_YAML}" == "" ];then
     DEPLOY_YAML="web.yaml"
     echo "env 'DEPLOY_YAML' is not set, use web.yaml"
@@ -9827,8 +9513,8 @@ fi
 echo "env.DEPLOY_YAML=$DEPLOY_YAML"
 
 
-# ³õÊ¼»¯²ÎÊı
-# ×¼±¸¾µÏñÖÆ×÷ÎÄ¼ş£¬¾µÏñµÄ×ÊÔ´Ä¿Â¼£¬Èç¹û²»´æÔÚ£¬ÔòÊ¹ÓÃÏîÄ¿¸ùÄ¿Â¼ÏÂµÄk8sÄ¿Â¼Ìæ´ú£»Èç¹ûÒ²²»´æÔÚ£¬ÔòÍË³ö£¡
+# åˆå§‹åŒ–å‚æ•°
+# å‡†å¤‡é•œåƒåˆ¶ä½œæ–‡ä»¶ï¼Œé•œåƒçš„èµ„æºç›®å½•ï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œåˆ™ä½¿ç”¨é¡¹ç›®æ ¹ç›®å½•ä¸‹çš„k8sç›®å½•æ›¿ä»£ï¼›å¦‚æœä¹Ÿä¸å­˜åœ¨ï¼Œåˆ™é€€å‡ºï¼
 if [ ! -d ${K8S_DIR} ];then
     echo "env 'K8S_DIR' is not exists, please ensure k8s dir in your project"
     exit 1
@@ -9847,9 +9533,9 @@ if [ -f "${K8S_DIR}/job_name_copy_to_build_dist" ];then
     fi
 fi
 
-# È·¶¨ÖÆ×÷¾µÏñµÄ¹¤×÷Ä¿Â¼
+# ç¡®å®šåˆ¶ä½œé•œåƒçš„å·¥ä½œç›®å½•
 DOCKER_DIR=${BUILD_BASE_DIR}/${JOB_NAME}
-# ¸²¸ÇÄ¬ÈÏµÄ${JOB_NAME}
+# è¦†ç›–é»˜è®¤çš„${JOB_NAME}
 if [ -n "${BUILD_JOB_NAME}" ];then
     DOCKER_DIR=${BUILD_BASE_DIR}/${BUILD_JOB_NAME}
 fi
@@ -9858,21 +9544,21 @@ if [ ! -d ${DOCKER_DIR} ];then
 fi
 echo "docker workspace: ${DOCKER_DIR}"
 
-# ´æ·ÅÏîÄ¿±àÒë½á¹ûµÄÄ¿Â¼£¬Ä¬ÈÏÔÚ¹¹½¨¾µÏñËùÔÚµÄÄ¿Â¼
+# å­˜æ”¾é¡¹ç›®ç¼–è¯‘ç»“æœçš„ç›®å½•ï¼Œé»˜è®¤åœ¨æ„å»ºé•œåƒæ‰€åœ¨çš„ç›®å½•
 WEB_ROOT=$DOCKER_DIR
 if [ -n "${BUILD_DIST}" ];then
     WEB_ROOT=$DOCKER_DIR/$BUILD_DIST
 fi
 echo "web root in the image will be:"$WEB_ROOT
 
-# È·¶¨JenkinsÖĞÄ£¿éµÄÎ»ÖÃ
+# ç¡®å®šJenkinsä¸­æ¨¡å—çš„ä½ç½®
 JENKINS_DIR=${WORKSPACE}/${MODULE}
 echo "jenkins workspace: ${JENKINS_DIR}"
 ```
 
-#### 6.3.2¡¢´´½¨×ÊÔ´ÊÕ¼¯½Å±¾
+#### 6.3.2ã€åˆ›å»ºèµ„æºæ”¶é›†è„šæœ¬
 
-- ´´½¨½Å±¾ÎÄ¼ş
+- åˆ›å»ºè„šæœ¬æ–‡ä»¶
 
 ```bash
 $ vim /root/jenkins/script/collect-resource.sh
@@ -9884,18 +9570,18 @@ $ vim /root/jenkins/script/collect-resource.sh
 ENTRY_PATH=$(pwd)
 ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
 SCRIPT_BASE_PATH=$(dirname "$0")
-echo "==========¿ªÊ¼Ö´ĞĞcollect-resource.sh½Å±¾£ºENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+echo "==========å¼€å§‹æ‰§è¡Œcollect-resource.shè„šæœ¬ï¼šENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
 source $SCRIPT_BASE_PATH/check-env.sh
 
-# Ğ£Ñé×ÊÔ´ÊÇ·ñ´æÔÚ
+# æ ¡éªŒèµ„æºæ˜¯å¦å­˜åœ¨
 if [ "${BUILD_TYPE}" == "mvn" ];then
-    # ÅĞ¶ÏÄ¿±êjarÊÇ·ñ´æÔÚ
+    # åˆ¤æ–­ç›®æ ‡jaræ˜¯å¦å­˜åœ¨
     if [ ! -f ${JENKINS_DIR}/target/*.jar ];then
         echo "target jar file not found ${JENKINS_DIR}/target/*.jar"
         exit 1
     fi
 elif [ "${BUILD_TYPE}" == "npm" ];then    
-    # ÅĞ¶ÏÄ¿±êdistÄ¿Â¼ÊÇ·ñ°üº¬ÄÚÈİ
+    # åˆ¤æ–­ç›®æ ‡distç›®å½•æ˜¯å¦åŒ…å«å†…å®¹
     if [ ! "$(ls -A ${JENKINS_DIR}dist)" ];then
         echo "content is empty in dir ${JENKINS_DIR}dist"
         exit 1
@@ -9903,8 +9589,8 @@ elif [ "${BUILD_TYPE}" == "npm" ];then
 fi
 
 
-# ÇåÀíÖÆ×÷¾µÏñµÄ¹¤×÷Ä¿Â¼
-echo "==========ÇĞ»»Ä¿Â¼µ½£º${DOCKER_DIR}=========="
+# æ¸…ç†åˆ¶ä½œé•œåƒçš„å·¥ä½œç›®å½•
+echo "==========åˆ‡æ¢ç›®å½•åˆ°ï¼š${DOCKER_DIR}=========="
 cd ${DOCKER_DIR}
 
 echo "copy k8s resource from $K8S_DIR to $DOCKER_DIR"
@@ -9938,13 +9624,13 @@ elif [ "${BUILD_TYPE}" == "npm" ];then
     fi
 fi
 
-# ±£´æ±¾´ÎÖ´ĞĞ½ø¶È
+# ä¿å­˜æœ¬æ¬¡æ‰§è¡Œè¿›åº¦
 echo "collect-resource" > ${DOCKER_DIR}/PROGRESS
 ```
 
-#### 6.3.3¡¢´´½¨¾µÏñ¹¹Ôì½Å±¾
+#### 6.3.3ã€åˆ›å»ºé•œåƒæ„é€ è„šæœ¬
 
-- ´´½¨½Å±¾ÎÄ¼ş
+- åˆ›å»ºè„šæœ¬æ–‡ä»¶
 
 ```bash
 $ vim /root/jenkins/script/build-image.sh
@@ -9956,13 +9642,13 @@ $ vim /root/jenkins/script/build-image.sh
 ENTRY_PATH=$(pwd)
 ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
 SCRIPT_BASE_PATH=$(dirname "$0")
-echo "==========¿ªÊ¼Ö´ĞĞbuild-image.sh½Å±¾£ºENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+echo "==========å¼€å§‹æ‰§è¡Œbuild-image.shè„šæœ¬ï¼šENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
 source $SCRIPT_BASE_PATH/check-env.sh
 
-echo "==========ÇĞ»»Ä¿Â¼µ½£º${DOCKER_DIR}=========="
+echo "==========åˆ‡æ¢ç›®å½•åˆ°ï¼š${DOCKER_DIR}=========="
 cd ${DOCKER_DIR}
 
-# ¿ªÊ¼ÖÆ×÷²¢ÉÏ´«¾µÏñÎÄ¼ş
+# å¼€å§‹åˆ¶ä½œå¹¶ä¸Šä¼ é•œåƒæ–‡ä»¶
 VERSION=`date +%Y%m%d%H%M%S`
 #IMAGE_NAME=192.168.32.116:5080/devops-learning/${JOB_NAME}:${VERSION}
 IMAGE_NAME=${IMAGE_REPO}/${JOB_NAME}:${VERSION}
@@ -9973,19 +9659,19 @@ docker build -t ${IMAGE_NAME} .
 
 docker push ${IMAGE_NAME}
 
-# ÉÏ´«ºóÉ¾³ı±¾µØ¾µÏñ
+# ä¸Šä¼ ååˆ é™¤æœ¬åœ°é•œåƒ
 docker rmi ${IMAGE_NAME}
 
-# ±£´æ±¾´Î¾µÏñÃû³Æ
+# ä¿å­˜æœ¬æ¬¡é•œåƒåç§°
 echo "${IMAGE_NAME}" > ${DOCKER_DIR}/IMAGE
 
-# ±£´æ±¾´ÎÖ´ĞĞ½ø¶È
+# ä¿å­˜æœ¬æ¬¡æ‰§è¡Œè¿›åº¦
 echo "build-image" > ${DOCKER_DIR}/PROGRESS
 ```
 
-#### 6.3.4¡¢´´½¨k8sÄ£°å½Å±¾
+#### 6.3.4ã€åˆ›å»ºk8sæ¨¡æ¿è„šæœ¬
 
-- ¼òµ¥Ä£°å
+- ç®€å•æ¨¡æ¿
 
 ```bash
 $ mkdir -pv /root/jenkins/script/template
@@ -10052,10 +9738,10 @@ spec:
               number: 80
 ```
 
-- SpringBootÄ£°å¡¾¸ÃÄ£°å·Åµ½ÏîÄ¿ÖĞ¸ùÄ¿Â¼µÄk8sÄ¿Â¼ÏÂÊ¹ÓÃ£¬ÕâÀï½ö½öÊÇ±£´æÒ»ÏÂ¡¿
+- SpringBootæ¨¡æ¿ã€è¯¥æ¨¡æ¿æ”¾åˆ°é¡¹ç›®ä¸­æ ¹ç›®å½•çš„k8sç›®å½•ä¸‹ä½¿ç”¨ï¼Œè¿™é‡Œä»…ä»…æ˜¯ä¿å­˜ä¸€ä¸‹ã€‘
 
 ```yaml
-# web-custom.yaml »òÕß k8s-deploy-drill.yaml »òÆäËûÃû×Ö
+# web-custom.yaml æˆ–è€… k8s-deploy-drill.yaml æˆ–å…¶ä»–åå­—
 #deploy
 apiVersion: apps/v1
 kind: Deployment
@@ -10080,28 +9766,28 @@ spec:
           resources:
             requests:
               memory: 768Mi
-              # 1ºËĞÄµÄCPU=1000m
+              # 1æ ¸å¿ƒçš„CPU=1000m
               cpu: 700m
             limits:
               memory: 1024Mi
               cpu: 1000m
-          # ´æ»î×´Ì¬¼ì²é
+          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 38751
               scheme: HTTP
-            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
             initialDelaySeconds: 50
-            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
             periodSeconds: 10
-            # ³¬Ê±Ê±¼ä3s
+            # è¶…æ—¶æ—¶é—´3s
             timeoutSeconds: 3
-            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
             successThreshold: 1
-            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
             failureThreshold: 5
-          # ¾ÍĞ÷×´Ì¬¼ì²é
+          # å°±ç»ªçŠ¶æ€æ£€æŸ¥
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -10113,15 +9799,15 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Xmx768m -Xms768m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYkLpulv58S2mFmXzmyJMXoaxZTDK7 -Dspring.profiles.active=uat"
-            # 1¡¢stdoutÎªÔ¼¶¨¹Ø¼ü×Ö£¬±íÊ¾²É¼¯±ê×¼Êä³öÈÕÖ¾
-            # 2¡¢ÅäÖÃ±ê×¼Êä³öÈÕÖ¾²É¼¯µ½ESµÄcatalinaË÷ÒıÏÂ
+            # 1ã€stdoutä¸ºçº¦å®šå…³é”®å­—ï¼Œè¡¨ç¤ºé‡‡é›†æ ‡å‡†è¾“å‡ºæ—¥å¿—
+            # 2ã€é…ç½®æ ‡å‡†è¾“å‡ºæ—¥å¿—é‡‡é›†åˆ°ESçš„catalinaç´¢å¼•ä¸‹
             - name: aliyun_logs_catalina
               value: "stdout"
-            # 1¡¢ÅäÖÃ²É¼¯ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾£¬Ö§³ÖÍ¨Åä·û
-            # 2¡¢ÅäÖÃ¸ÃÈÕÖ¾²É¼¯µ½ESµÄaccessË÷ÒıÏÂ
+            # 1ã€é…ç½®é‡‡é›†å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—ï¼Œæ”¯æŒé€šé…ç¬¦
+            # 2ã€é…ç½®è¯¥æ—¥å¿—é‡‡é›†åˆ°ESçš„accessç´¢å¼•ä¸‹
             - name: aliyun_logs_access
               value: "/home/saas/huiba/gaia/huiba-gaia-admin/logs/*.log"
-          # ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾Â·¾¶ĞèÒªÅäÖÃemptyDir
+          # å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—è·¯å¾„éœ€è¦é…ç½®emptyDir
           volumeMounts:
             - name: log-volume
               mountPath: /home/saas/huiba/gaia/huiba-gaia-admin/logs
@@ -10165,7 +9851,7 @@ spec:
 
 
 
-#### 6.3.5¡¢´´½¨k8s²¿Êğ½Å±¾
+#### 6.3.5ã€åˆ›å»ºk8séƒ¨ç½²è„šæœ¬
 
 ```bash
 $ vim /root/jenkins/script/deploy.sh
@@ -10177,14 +9863,14 @@ $ vim /root/jenkins/script/deploy.sh
 ENTRY_PATH=$(pwd)
 ENTRY_BASE_PATH=$(dirname "$WORKSPACE")
 SCRIPT_BASE_PATH=$(dirname "$0")
-echo "==========¿ªÊ¼Ö´ĞĞdeploy.sh½Å±¾£ºENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
+echo "==========å¼€å§‹æ‰§è¡Œdeploy.shè„šæœ¬ï¼šENTRY_PATH=$ENTRY_PATH, WORKSPACE=$WORKSPACE, ENTRY_BASE_PATH=$ENTRY_BASE_PATH, SCRIPT_BASE_PATH=$SCRIPT_BASE_PATH=========="
 source $SCRIPT_BASE_PATH/check-env.sh
 
-# ´òÓ¡³öBASH_DIRÂ·¾¶
+# æ‰“å°å‡ºBASH_DIRè·¯å¾„
 BASH_DIR=$(dirname "${BASH_SOURCE[0]}")
 echo "BASH_DIR=${BASH_DIR}"
 
-# ÎªÄ£°å½Å±¾×¼±¸±äÁ¿
+# ä¸ºæ¨¡æ¿è„šæœ¬å‡†å¤‡å˜é‡
 name=${DEPLOY_NAME}
 image=$(cat ${DOCKER_DIR}/IMAGE)
 host=${HOST}
@@ -10192,7 +9878,7 @@ ns=${NS}
 
 echo "deploying ... name: ${name}, image: ${image}, host: ${host}, ns: ${ns}, deploy_yaml: ${DEPLOY_YAML}"
 
-# Èç¹ûÊÇÄ¬ÈÏÄ£°å£¬´ÓÄ£°å¿â¿½±´£»·ñÔòÈÏÎªÊÇÏîÄ¿Ìá¹©ÁË£¬ÔÚÏîÄ¿µÄk8sÄ¿Â¼ÏÂ£¬ÒÑ´æÔÚ
+# å¦‚æœæ˜¯é»˜è®¤æ¨¡æ¿ï¼Œä»æ¨¡æ¿åº“æ‹·è´ï¼›å¦åˆ™è®¤ä¸ºæ˜¯é¡¹ç›®æä¾›äº†ï¼Œåœ¨é¡¹ç›®çš„k8sç›®å½•ä¸‹ï¼Œå·²å­˜åœ¨
 if [ "${DEPLOY_YAML}" == "web.yaml" ];then
     rm -f ${DOCKER_DIR}/${DEPLOY_YAML}
     cp ${BASH_DIR}/template/web.yaml ${DOCKER_DIR}
@@ -10206,11 +9892,11 @@ sed -i "s,{{ns}},${ns},g" ${DOCKER_DIR}/${DEPLOY_YAML}
 echo "kubectl apply -f ${DOCKER_DIR}/${DEPLOY_YAML}"
 kubectl apply -f ${DOCKER_DIR}/${DEPLOY_YAML}
 
-# ´òÓ¡±¾´Î²¿ÊğµÄweb.yamlÄÚÈİ
+# æ‰“å°æœ¬æ¬¡éƒ¨ç½²çš„web.yamlå†…å®¹
 echo "web.yaml content as follows:"
 cat ${DOCKER_DIR}/${DEPLOY_YAML}
 
-# ½¡¿µ¼ì²é
+# å¥åº·æ£€æŸ¥
 echo "begin health check..."
 success=0
 count=60
@@ -10235,38 +9921,38 @@ if [ ${success} -ne 1 ];then
     exit 1
 fi
 
-# ±£´æ±¾´ÎÖ´ĞĞ½ø¶È
+# ä¿å­˜æœ¬æ¬¡æ‰§è¡Œè¿›åº¦
 echo "deploy" > ${DOCKER_DIR}/PROGRESS
 ```
 
 
 
-#### 6.3.3¡¢´´½¨Pipeline scriptÈÎÎñ
+#### 6.3.3ã€åˆ›å»ºPipeline scriptä»»åŠ¡
 
-JenkinsµÇÂ¼==>ĞÂ½¨ÈÎÎñ==>ÊäÈëÃû³Æ k8s-springboot-web-demo È»ºóÑ¡Ôñ¡°Á÷Ë®Ïß¡±ÀàĞÍ==>µã»÷È·¶¨´´½¨³É¹¦£¡
+Jenkinsç™»å½•==>æ–°å»ºä»»åŠ¡==>è¾“å…¥åç§° k8s-springboot-web-demo ç„¶åé€‰æ‹©â€œæµæ°´çº¿â€ç±»å‹==>ç‚¹å‡»ç¡®å®šåˆ›å»ºæˆåŠŸï¼
 
-- Git·ÖÖ§ÅäÖÃ£ºÈç¹ûÏÂÃæÊ¹ÓÃµ½${params.BRANCH}£¬ÕâÀïĞèÒªÅäÖÃ£¬·ñÔò²»ĞèÒª¡¾·Ç±ØĞë¡¿
+- Gitåˆ†æ”¯é…ç½®ï¼šå¦‚æœä¸‹é¢ä½¿ç”¨åˆ°${params.BRANCH}ï¼Œè¿™é‡Œéœ€è¦é…ç½®ï¼Œå¦åˆ™ä¸éœ€è¦ã€éå¿…é¡»ã€‘
 
 ![image-20220408230030796](images/image-20220408230030796.png)
 
-- Pipeline script¡¾SpringBootÏîÄ¿Ê¾Àı¡¿
+- Pipeline scriptã€SpringBooté¡¹ç›®ç¤ºä¾‹ã€‘
 
 ```bash
 node {
     env.BUILD_TYPE="mvn"
-    // È·¶¨ÖÆ×÷¾µÏñµÄ¹¤×÷Ä¿Â¼
+    // ç¡®å®šåˆ¶ä½œé•œåƒçš„å·¥ä½œç›®å½•
     env.BUILD_BASE_DIR = "/root/jenkins/build_workspace"
     
-    // ´ò°ü¾µÏñÊ±Ê¹ÓÃµÄÄ£¿é
+    // æ‰“åŒ…é•œåƒæ—¶ä½¿ç”¨çš„æ¨¡å—
     env.MODULE = "huiba-gaia-admin/huiba-gaia-admin-server"
-    // ¾µÏñ²Ö¿âµØÖ·
+    // é•œåƒä»“åº“åœ°å€
     env.IMAGE_REPO = "gaia-e2-01-registry.cn-shanghai.cr.aliyuncs.com/lishi"
     
-	// ·şÎñ·¢²¼ºó£¬±©Â¶³öÀ´µÄÓòÃû
+	// æœåŠ¡å‘å¸ƒåï¼Œæš´éœ²å‡ºæ¥çš„åŸŸå
     env.HOST = "gyls.gaiaworks.cn"
-    // ·şÎñ·¢²¼Ê¹ÓÃµÄÃüÃû¿Õ¼ä default/drill/dev/test/prod µÈµÈ
+    // æœåŠ¡å‘å¸ƒä½¿ç”¨çš„å‘½åç©ºé—´ default/drill/dev/test/prod ç­‰ç­‰
     env.NS = "lishi-recruitment"
-    // Èç¹û²»Ö¸¶¨£¬Ä¬ÈÏÊ¹ÓÃ web.yaml ·ñÔòÊ¹ÓÃÖ¸¶¨µÄÅäÖÃÎÄ¼ş·¢²¼k8s·şÎñ
+    // å¦‚æœä¸æŒ‡å®šï¼Œé»˜è®¤ä½¿ç”¨ web.yaml å¦åˆ™ä½¿ç”¨æŒ‡å®šçš„é…ç½®æ–‡ä»¶å‘å¸ƒk8sæœåŠ¡
     env.DEPLOY_YAML = "k8s-deploy-uat.yaml"
     
     stage('Preparation') {
@@ -10294,27 +9980,27 @@ node {
 }
 ```
 
-- Pipeline script¡¾VueÏîÄ¿Ê¾Àı¡¿
+- Pipeline scriptã€Vueé¡¹ç›®ç¤ºä¾‹ã€‘
 
 ```bash
-// ³£¹æµ¥ÏîÄ¿£¬¿ÉÑ¡Ïî¶¼²»±ØÌîĞ´£»Èç¹ûĞèÒª¶à¸öÏîÄ¿µÄ±àÒë½á¹û´òÈëÍ¬Ò»¸ö¾µÏñ£¬¿ÉÑ¡ÏîµÄÅäÖÃ¿ÉÒÔ×öµ½ÕâÒ»µã£»Ê¾Àı´úÂë¼´ÊÇÕâÖÖ¸´ÔÓÇé¿ö£¡
+// å¸¸è§„å•é¡¹ç›®ï¼Œå¯é€‰é¡¹éƒ½ä¸å¿…å¡«å†™ï¼›å¦‚æœéœ€è¦å¤šä¸ªé¡¹ç›®çš„ç¼–è¯‘ç»“æœæ‰“å…¥åŒä¸€ä¸ªé•œåƒï¼Œå¯é€‰é¡¹çš„é…ç½®å¯ä»¥åšåˆ°è¿™ä¸€ç‚¹ï¼›ç¤ºä¾‹ä»£ç å³æ˜¯è¿™ç§å¤æ‚æƒ…å†µï¼
 node {
     env.BUILD_TYPE="npm"
-    // È·¶¨ÖÆ×÷¾µÏñµÄ¹¤×÷Ä¿Â¼
+    // ç¡®å®šåˆ¶ä½œé•œåƒçš„å·¥ä½œç›®å½•
     env.BUILD_BASE_DIR = "/root/jenkins/build_workspace"
-    // ¾µÏñµÄ×ÊÔ´Ä¿Â¼£¬Èç¹û²»´æÔÚ£¬ÔòÊ¹ÓÃÏîÄ¿¸ùÄ¿Â¼ÏÂµÄk8sÄ¿Â¼Ìæ´ú¡¾¿ÉÑ¡¡¿
+    // é•œåƒçš„èµ„æºç›®å½•ï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œåˆ™ä½¿ç”¨é¡¹ç›®æ ¹ç›®å½•ä¸‹çš„k8sç›®å½•æ›¿ä»£ã€å¯é€‰ã€‘
     env.K8S_DIR = "/root/jenkins/k8s/gaia-web"
     
-    // ´ò°ü¾µÏñÊ±Ê¹ÓÃµÄÄ£¿é
+    // æ‰“åŒ…é•œåƒæ—¶ä½¿ç”¨çš„æ¨¡å—
     env.MODULE = ""
-    // ¾µÏñ²Ö¿âµØÖ·
+    // é•œåƒä»“åº“åœ°å€
     env.IMAGE_REPO = "gaia-e2-01-registry.cn-shanghai.cr.aliyuncs.com/lishi"
     
-	// ·şÎñ·¢²¼ºó£¬±©Â¶³öÀ´µÄÓòÃû
+	// æœåŠ¡å‘å¸ƒåï¼Œæš´éœ²å‡ºæ¥çš„åŸŸå
     env.HOST = "gyls.gaiaworks.cn"
-    // ·şÎñ·¢²¼Ê¹ÓÃµÄÃüÃû¿Õ¼ä default/drill/dev/test/prod µÈµÈ
+    // æœåŠ¡å‘å¸ƒä½¿ç”¨çš„å‘½åç©ºé—´ default/drill/dev/test/prod ç­‰ç­‰
     env.NS = "lishi-recruitment"
-    // Èç¹û²»Ö¸¶¨£¬Ä¬ÈÏÊ¹ÓÃ web.yaml ·ñÔòÊ¹ÓÃÖ¸¶¨µÄÅäÖÃÎÄ¼ş·¢²¼k8s·şÎñ
+    // å¦‚æœä¸æŒ‡å®šï¼Œé»˜è®¤ä½¿ç”¨ web.yaml å¦åˆ™ä½¿ç”¨æŒ‡å®šçš„é…ç½®æ–‡ä»¶å‘å¸ƒk8sæœåŠ¡
     env.DEPLOY_YAML = "k8s-deploy-uat.yaml"
     
     stage('Preparation') {
@@ -10348,31 +10034,31 @@ node {
 
 
 
-#### 6.3.4¡¢´´½¨Pipeline script from SCMÈÎÎñ
+#### 6.3.4ã€åˆ›å»ºPipeline script from SCMä»»åŠ¡
 
 
 
-### 6.3.5¡¢¶àÏîÄ¿¹²Ïí¾µÏñµÄÅäÖÃ
+### 6.3.5ã€å¤šé¡¹ç›®å…±äº«é•œåƒçš„é…ç½®
 
-ÔÚ²¿ÊğK8S·şÎñÊ±£¬Ç°¶ËÏîÄ¿ÓĞ¶à¸ö£¬ÎÒÕâÀïÊÇ¹ÜÀíÌ¨¶ËºÍÊÖ»ú¶Ë£¬ÕâÁ½¸öĞèÒª²¿Êğµ½Í¬Ò»¸öÓòÃûÏÂ£¬ËùÒÔĞèÒª´ò°üµ½Í¬Ò»¸ö¾µÏñÏÂ¡£
+åœ¨éƒ¨ç½²K8SæœåŠ¡æ—¶ï¼Œå‰ç«¯é¡¹ç›®æœ‰å¤šä¸ªï¼Œæˆ‘è¿™é‡Œæ˜¯ç®¡ç†å°ç«¯å’Œæ‰‹æœºç«¯ï¼Œè¿™ä¸¤ä¸ªéœ€è¦éƒ¨ç½²åˆ°åŒä¸€ä¸ªåŸŸåä¸‹ï¼Œæ‰€ä»¥éœ€è¦æ‰“åŒ…åˆ°åŒä¸€ä¸ªé•œåƒä¸‹ã€‚
 
-¹ÜÀíÌ¨ÏîÄ¿£ºhuiba-scrm-web
+ç®¡ç†å°é¡¹ç›®ï¼šhuiba-scrm-web
 
-ÊÖ»ú¶ËÏîÄ¿£ºhuiba-scrm-h5
+æ‰‹æœºç«¯é¡¹ç›®ï¼šhuiba-scrm-h5
 
-- ´´½¨¹²ÏíÏîÄ¿ÅäÖÃµÄÎÄ¼ş¼Ğ
+- åˆ›å»ºå…±äº«é¡¹ç›®é…ç½®çš„æ–‡ä»¶å¤¹
 
 ```bash
 $ mkdir -pv /root/jenkins/k8s
 ```
 
-- ´´½¨huiba-scrm-webºÍhuiba-scrm-h5µÄÎÄ¼ş¼Ğ
+- åˆ›å»ºhuiba-scrm-webå’Œhuiba-scrm-h5çš„æ–‡ä»¶å¤¹
 
 ```bash
 $ mkdir -pv /root/jenkins/k8s/gaia-web
 ```
 
-- ´´½¨Dockerfile
+- åˆ›å»ºDockerfile
 
 ```bash
 $ vim /root/jenkins/k8s/gaia-web/Dockerfile
@@ -10381,21 +10067,21 @@ $ vim /root/jenkins/k8s/gaia-web/Dockerfile
 ```dockerfile
 # FROM 192.168.32.116:5080/devops-learning/nginx:1.21
 FROM nginx:1.21
-MAINTAINER ÎÊÇï liming2011071@163.com
+MAINTAINER é—®ç§‹ liming2011071@163.com
 
 COPY mgr/ /usr/share/nginx/html/mgr
 COPY h5/ /usr/share/nginx/html/h5
 COPY dockerfiles/default.conf /etc/nginx/conf.d/default.conf
 ```
 
-- ´´½¨k8s-deploy-uat.yaml
+- åˆ›å»ºk8s-deploy-uat.yaml
 
 ```bash
 $ vim /root/jenkins/k8s/gaia-web/k8s-deploy-uat.yaml
 ```
 
 ```yaml
-# web-custom.yaml »òÕß k8s-deploy-drill.yaml »òÆäËûÃû×Ö
+# web-custom.yaml æˆ–è€… k8s-deploy-drill.yaml æˆ–å…¶ä»–åå­—
 #deploy
 apiVersion: apps/v1
 kind: Deployment
@@ -10420,28 +10106,28 @@ spec:
           resources:
             requests:
               memory: 100Mi
-              # 1ºËĞÄµÄCPU=1000m
+              # 1æ ¸å¿ƒçš„CPU=1000m
               cpu: 100m
             limits:
               memory: 300Mi
               cpu: 300m
-#          # ´æ»î×´Ì¬¼ì²é
+#          # å­˜æ´»çŠ¶æ€æ£€æŸ¥
 #          livenessProbe:
 #            httpGet:
 #              path: /actuator/health/liveness
 #              port: 8808
 #              scheme: HTTP
-#            # pod ´´½¨10sºóÆô¶¯µÚÒ»´ÎÌ½²â
+#            # pod åˆ›å»º10såå¯åŠ¨ç¬¬ä¸€æ¬¡æ¢æµ‹
 #            initialDelaySeconds: 35
-#            # Ã¿¸ô10sÆô¶¯Ò»´ÎÌ½²â
+#            # æ¯éš”10så¯åŠ¨ä¸€æ¬¡æ¢æµ‹
 #            periodSeconds: 10
-#            # ³¬Ê±Ê±¼ä3s
+#            # è¶…æ—¶æ—¶é—´3s
 #            timeoutSeconds: 3
-#            # ³É¹¦1´Î¼´±íÊ¾ÈİÆ÷½¡¿µ
+#            # æˆåŠŸ1æ¬¡å³è¡¨ç¤ºå®¹å™¨å¥åº·
 #            successThreshold: 1
-#            # Á¬Ğø5´ÎÊ§°Ü£¬ÔòÅĞ¶¨ÈİÆ÷²»½¡¿µ£¬Ä¬ÈÏ3´Î
+#            # è¿ç»­5æ¬¡å¤±è´¥ï¼Œåˆ™åˆ¤å®šå®¹å™¨ä¸å¥åº·ï¼Œé»˜è®¤3æ¬¡
 #            failureThreshold: 5
-#          # ¾ÍĞ÷×´Ì¬¼ì²é
+#          # å°±ç»ªçŠ¶æ€æ£€æŸ¥
 #          readinessProbe:
 #            httpGet:
 #              path: /actuator/health/readiness
@@ -10453,15 +10139,15 @@ spec:
 #          env:
 #            - name: JAVA_TOOL_OPTIONS
 #              value: "-Xmx512m -Xms512m -Xmn256m -Xss228k -XX:MetaspaceSize=256m -Djasypt.encryptor.password=EbfYkLpulv58S2mFmXzmyJMXoaxZTDK7 -Dspring.profiles.active=uat"
-#            # 1¡¢stdoutÎªÔ¼¶¨¹Ø¼ü×Ö£¬±íÊ¾²É¼¯±ê×¼Êä³öÈÕÖ¾
-#            # 2¡¢ÅäÖÃ±ê×¼Êä³öÈÕÖ¾²É¼¯µ½ESµÄcatalinaË÷ÒıÏÂ
+#            # 1ã€stdoutä¸ºçº¦å®šå…³é”®å­—ï¼Œè¡¨ç¤ºé‡‡é›†æ ‡å‡†è¾“å‡ºæ—¥å¿—
+#            # 2ã€é…ç½®æ ‡å‡†è¾“å‡ºæ—¥å¿—é‡‡é›†åˆ°ESçš„catalinaç´¢å¼•ä¸‹
 #            - name: aliyun_logs_catalina
 #              value: "stdout"
-#            # 1¡¢ÅäÖÃ²É¼¯ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾£¬Ö§³ÖÍ¨Åä·û
-#            # 2¡¢ÅäÖÃ¸ÃÈÕÖ¾²É¼¯µ½ESµÄaccessË÷ÒıÏÂ
+#            # 1ã€é…ç½®é‡‡é›†å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—ï¼Œæ”¯æŒé€šé…ç¬¦
+#            # 2ã€é…ç½®è¯¥æ—¥å¿—é‡‡é›†åˆ°ESçš„accessç´¢å¼•ä¸‹
 #            - name: aliyun_logs_access
 #              value: "/home/saas/huiba/gaia/huiba-gaia-admin/logs/*.log"
-#          # ÈİÆ÷ÄÚÎÄ¼şÈÕÖ¾Â·¾¶ĞèÒªÅäÖÃemptyDir
+#          # å®¹å™¨å†…æ–‡ä»¶æ—¥å¿—è·¯å¾„éœ€è¦é…ç½®emptyDir
 #          volumeMounts:
 #            - name: log-volume
 #              mountPath: /home/saas/huiba/gaia/huiba-gaia-admin/logs
@@ -10504,17 +10190,17 @@ spec:
               servicePort: 80
 ```
 
-- ´´½¨job_name_copy_to_build_dist
+- åˆ›å»ºjob_name_copy_to_build_dist
 
-**Ä¬ÈÏµÄÁĞ·Ö¸ô·ûÊÇ`\001`£¬ÔÚlinuxÊäÈëÊÇCtrl+VºÍCtrl+AµÈĞ§ÓÚ`\001`£¬¸Ã·Ö¸ô·ûÏÔÊ¾Îª^A**
+**é»˜è®¤çš„åˆ—åˆ†éš”ç¬¦æ˜¯`\001`ï¼Œåœ¨linuxè¾“å…¥æ˜¯Ctrl+Vå’ŒCtrl+Aç­‰æ•ˆäº`\001`ï¼Œè¯¥åˆ†éš”ç¬¦æ˜¾ç¤ºä¸º^A**
 
-¸ÃÎÄ¼ş¶ÔÓÚ¶à¸öÏîÄ¿´ò°üÒ»¸ö¾µÏñÊ±£¬ÊÕ¼¯×ÊÔ´µÄ×Ô¶¨ÒåÅäÖÃ¡£ÈçÏÂÄÚÈİ±íÊ¾£º
+è¯¥æ–‡ä»¶å¯¹äºå¤šä¸ªé¡¹ç›®æ‰“åŒ…ä¸€ä¸ªé•œåƒæ—¶ï¼Œæ”¶é›†èµ„æºçš„è‡ªå®šä¹‰é…ç½®ã€‚å¦‚ä¸‹å†…å®¹è¡¨ç¤ºï¼š
 
-huiba-gaia-webÏîÄ¿µÄÊä³ö½á¹û£¬ÊÕ¼¯µ½gaia-web/mgrÄ¿Â¼£»
+huiba-gaia-webé¡¹ç›®çš„è¾“å‡ºç»“æœï¼Œæ”¶é›†åˆ°gaia-web/mgrç›®å½•ï¼›
 
-huiba-gaia-h5ÏîÄ¿µÄÊä³ö½á¹û£¬ÊÕ¼¯µ½gaia-web/h5Ä¿Â¼£»
+huiba-gaia-h5é¡¹ç›®çš„è¾“å‡ºç»“æœï¼Œæ”¶é›†åˆ°gaia-web/h5ç›®å½•ï¼›
 
-**mgrºÍh5Ä¿Â¼±ØĞë´æÔÚ**
+**mgrå’Œh5ç›®å½•å¿…é¡»å­˜åœ¨**
 
 ```bash
 $ vim /root/jenkins/k8s/gaia-web/job_name_copy_to_build_dist
@@ -10525,7 +10211,7 @@ huiba-gaia-web^Amgr
 huiba-gaia-h5^Ah5
 ```
 
-- ´´½¨dockerfilesÎÄ¼ş¼°ÆäÄÚÈİ
+- åˆ›å»ºdockerfilesæ–‡ä»¶åŠå…¶å†…å®¹
 
 ```bash
 $ mkdir -pv /root/jenkins/k8s/gaia-web/dockerfiles
