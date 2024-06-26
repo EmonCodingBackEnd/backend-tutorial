@@ -653,7 +653,7 @@ $ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
 
 ```bash
 [keyfile]
-unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*
+unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*;interface-name:tun*
 ```
 
 - 重启NetworkManager
@@ -1510,83 +1510,107 @@ $ kubectl apply -f tomcat8.yaml
 
 Github：https://github.com/kubesphere/kubesphere/blob/master/README_zh.md  可以查看与k8s版本关系
 
-v3.4.1安装文档：https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/introduction/overview/
+v3.4.1安装文档：
 
-### 准备
+[在Kubernetes上最小化安装KubeSphere](https://kubesphere.io/zh/docs/v3.4/quick-start/minimal-kubesphere-on-k8s/)
 
-<span style="color:green;font-weight:bold;">3台3G的服务器，安装后emon剩余1.2G/emon2剩余1.8G/emon3剩余1.8G。</span>
+[在Kubernetes上安装KubeSphere3.4.1](https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/)
 
-若直接按照官网安装，会报错：“Default StorageClass was not found”，原因是K8S没有默认的存储，需要安装storageclass和persistentVolumeClaim。
+[启用可插拔组件](https://kubesphere.io/zh/docs/v3.4/pluggable-components/)
 
-- 创建文件 storageclass.yaml
+[从Kubenetes上卸载KubeSphere](https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/uninstall-kubesphere-from-k8s/)
 
-```yaml
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: local-storage
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
-```
+### 9.1、在Linux上以All-in-One模式安装
 
-- 创建文件 persistentVolumeClaim.yaml
+https://kubesphere.io/zh/docs/v3.4/quick-start/all-in-one-on-linux/
 
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: local-pve
-spec:
-  accessModes:
-     - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-  storageClassName: local-storage
-```
+- 容器运行时
 
-### 下载kubersphere安装文件
+| 支持的容器运行时              | 版本     |
+| :---------------------------- | :------- |
+| Docker                        | 19.3.8 + |
+| containerd                    | 最新版   |
+| CRI-O（试验版，未经充分测试） | 最新版   |
+| iSula（试验版，未经充分测试） | 最新版   |
+
+- 检测依赖项要求
 
 ```bash
-$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/kubesphere-installer.yaml
-$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/cluster-configuration.yaml
+$ yum install -y socat conntrack-tools ebtables ipset
 ```
 
-### 执行安装
+KubeKey 可以将 Kubernetes 和 KubeSphere 一同安装。针对不同的 Kubernetes 版本，需要安装的依赖项可能有所不同。您可以参考以下列表，查看是否需要提前在节点上安装相关的依赖项。
 
-- 安装存储
+| 依赖项      | Kubernetes 版本 ≥ 1.18 | Kubernetes 版本 < 1.18 |
+| :---------- | :--------------------- | :--------------------- |
+| `socat`     | 必须                   | 可选但建议             |
+| `conntrack` | 必须                   | 可选但建议             |
+| `ebtables`  | 可选但建议             | 可选但建议             |
+| `ipset`     | 可选但建议             | 可选但建议             |
 
-```bash
-$ kubectl apply -f storageclass.yaml
-$ kubectl apply -f persistentVolumeClaim.yaml
+- 下载 KubeKey
+
+先执行以下命令以确保您从正确的区域下载 KubeKey。
+
+```
+$ export KKZONE=cn
 ```
 
-- 将sc设置为默认存储
-
 ```bash
-$ kubectl patch sc local-storage -p '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "true"}}}'
+$ curl -sfL https://get-kk.kubesphere.io | VERSION=v3.0.13 sh -
 ```
 
-- 安装kubesphere
+- 开始安装
 
 ```bash
-$ kubectl apply -f kubesphere-installer.yaml   
-$ kubectl apply -f cluster-configuration.yaml
+$ ./kk create cluster --with-kubernetes v.1.23.17 --with-kubesphere v3.4.1
 ```
 
-### 查看安装日志，确认安装成功
+```bash
+#####################################################
+###              Welcome to KubeSphere!           ###
+#####################################################
+
+Console: http://192.168.32.116:30880
+Account: admin
+Password: P@88w0rd
+NOTES：
+  1. After you log into the console, please check the
+     monitoring status of service components in
+     "Cluster Management". If any service is not
+     ready, please wait patiently until all components 
+     are up and running.
+  2. Please change the default password after login.
+
+#####################################################
+https://kubesphere.io             2024-06-26 16:46:46
+#####################################################
+16:46:48 CST success: [emon]
+16:46:48 CST Pipeline[CreateClusterPipeline] execute successfully
+Installation is complete.
+
+Please check the result using the command:
+
+	kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l 'app in (ks-install, ks-installer)' -o jsonpath='{.items[0].metadata.name}') -f
+```
+
+- 查看kubesphere安装日志，验证安装结果
 
 ```bash
-$ kubectl logs -n kubesphere-system $(kubectl get po -n kubesphere-system|grep 'ks-installer'|awk '{print $1}') -f
-# 或者
 $ kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l 'app in (ks-install, ks-installer)' -o jsonpath='{.items[0].metadata.name}') -f
 ```
 
 ```bash
+PLAY RECAP *********************************************************************
+localhost                  : ok=30   changed=22   unreachable=0    failed=0    skipped=17   rescued=0    ignored=0   
+Start installing monitoring
+Start installing multicluster
+Start installing openpitrix
+Start installing network
 **************************************************
 Waiting for all tasks to be completed ...
-task openpitrix status is successful  (1/4)
-task network status is successful  (2/4)
+task network status is successful  (1/4)
+task openpitrix status is successful  (2/4)
 task multicluster status is successful  (3/4)
 task monitoring status is successful  (4/4)
 **************************************************
@@ -1607,11 +1631,138 @@ NOTES：
   2. Please change the default password after login.
 
 #####################################################
-https://kubesphere.io             2024-06-23 23:43:35
+https://kubesphere.io             2024-06-26 16:46:46
 #####################################################
 ```
 
-### 登录
+- 登录
+
+http://192.168.32.116:30880
+
+修改密码为： admin/Ks@12345
+
+### 9.2、在Kubernetes上最小化安装KubeSphere
+
+#### 准备
+
+<span style="color:green;font-weight:bold;">3台3G的服务器，安装后emon剩余1.2G/emon2剩余1.8G/emon3剩余1.8G。</span>
+
+若直接按照官网安装，会报错：“Default StorageClass was not found”，原因是K8S没有默认的存储，需要安装storageclass和persistentVolumeClaim。
+
+- 检查集群中是否有**默认** StorageClass（准备默认 StorageClass 是安装 KubeSphere 的前提条件）
+
+```bash
+$ kubectl get sc
+```
+
+- 创建文件 default-storage-class.yaml
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+```
+
+- 创建文件 persistentVolumeClaim.yaml
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pve
+  namespace: kubesphere-monitoring-system
+spec:
+  accessModes:
+     - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: local
+```
+
+- 剔除master节点的污点Taint，避免prometheus-k8s-0无法安装
+
+```bash
+# 确认master节点是否有Taint
+$ kubectl describe node emon|grep Taint
+Taints:             node-role.kubernetes.io/master:NoSchedule
+# 去掉master节点的Taint
+$ kubectl taint node emon node-role.kubernetes.io/master:NoSchedule-
+node/emon untainted
+```
+
+#### 下载kubersphere安装文件
+
+```bash
+$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/kubesphere-installer.yaml
+$ wget https://github.com/kubesphere/ks-installer/releases/download/v3.4.1/cluster-configuration.yaml
+```
+
+#### 执行安装
+
+- 安装存储
+
+```bash
+$ kubectl apply -f default-storage-class.yaml
+$ kubectl apply -f persistentVolumeClaim.yaml
+```
+
+- 安装kubesphere
+
+```bash
+$ kubectl apply -f kubesphere-installer.yaml   
+$ kubectl apply -f cluster-configuration.yaml
+```
+
+#### 查看安装日志，确认安装成功
+
+```bash
+$ kubectl logs -n kubesphere-system $(kubectl get po -n kubesphere-system|grep 'ks-installer'|awk '{print $1}') -f
+# 或者
+$ kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l 'app in (ks-install, ks-installer)' -o jsonpath='{.items[0].metadata.name}') -f
+```
+
+```bash
+PLAY RECAP *********************************************************************
+localhost                  : ok=30   changed=22   unreachable=0    failed=0    skipped=17   rescued=0    ignored=0   
+Start installing monitoring
+Start installing multicluster
+Start installing openpitrix
+Start installing network
+**************************************************
+Waiting for all tasks to be completed ...
+task network status is successful  (1/4)
+task openpitrix status is successful  (2/4)
+task multicluster status is successful  (3/4)
+task monitoring status is successful  (4/4)
+**************************************************
+Collecting installation results ...
+#####################################################
+###              Welcome to KubeSphere!           ###
+#####################################################
+
+Console: http://192.168.32.116:30880
+Account: admin
+Password: P@88w0rd
+NOTES：
+  1. After you log into the console, please check the
+     monitoring status of service components in
+     "Cluster Management". If any service is not
+     ready, please wait patiently until all components 
+     are up and running.
+  2. Please change the default password after login.
+
+#####################################################
+https://kubesphere.io             2024-06-25 23:10:14
+#####################################################
+```
+
+#### 登录
 
 http://192.168.32.116:30880
 
