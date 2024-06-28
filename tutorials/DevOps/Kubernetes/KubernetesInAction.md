@@ -315,7 +315,9 @@ gpgcheck=0
 repo_gpgcheck=0 
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg 
 EOF
+# 可以更新/缓存，也可以忽略
 $ yum update
+$ yum makecache
 ```
 
 2. 可以查看所有仓库中所有k8s版本，并选择安装特定的版本
@@ -1520,6 +1522,24 @@ v3.4.1安装文档：
 
 [从Kubenetes上卸载KubeSphere](https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/uninstall-kubesphere-from-k8s/)
 
+### 9.0、环境准备
+
+#### 设置k8s元
+
+<span style="color:red;font-weight:bold;">设置k8s源，确保“启用可插拔组件“时的依赖服务，比如`ks-minio`安装成功。</span>
+
+```bash
+$ cat > /etc/yum.repos.d/kubernetes.repo << EOF
+[kubernetes] 
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64 
+enabled=1 
+gpgcheck=0 
+repo_gpgcheck=0 
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg 
+EOF
+```
+
 ### 9.1、在Linux上以All-in-One模式安装
 
 https://kubesphere.io/zh/docs/v3.4/quick-start/all-in-one-on-linux/
@@ -1640,6 +1660,33 @@ https://kubesphere.io             2024-06-26 16:46:46
 http://192.168.32.116:30880
 
 修改密码为： admin/Ks@12345
+
+![image-20240626181417862](images/image-20240626181417862.png)
+
+- 虚拟机挂起并恢复后k8s网络问题
+
+  - 查看设备状态
+
+  ```bash
+  $ nmcli device status
+  ```
+
+  - 永久unmanaged
+
+  ```bash
+  $ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
+  ```
+
+  ```bash
+  [keyfile]
+  unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*;interface-name:tun*
+  ```
+
+  - 重启NetworkManager
+
+  ```bash
+  $ systemctl restart NetworkManager
+  ```
 
 ### 9.2、在Kubernetes上最小化安装KubeSphere
 
@@ -1767,6 +1814,16 @@ https://kubesphere.io             2024-06-25 23:10:14
 http://192.168.32.116:30880
 
 修改密码为： admin/Ks@12345
+
+## 9.3、用户	
+
+| 用户名          | 角色 | 作用                                                    |
+| --------------- | ---- | ------------------------------------------------------- |
+| admin           |      | 创建用户、角色                                          |
+| ws-manager      |      | 创建工作空间	设置 ws-admin  为空间管理员             |
+| ws-admin        |      | 给工作空间选择成员                                      |
+| project-admin   |      | 创建项目，并通过项目设置邀请  -- project-regular 到项目 |
+| project-regular |      | 管理项目中除用户和角色之外的资源。                      |
 
 
 
