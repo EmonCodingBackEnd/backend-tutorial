@@ -1524,23 +1524,16 @@ v3.4.1安装文档：
 
 ### 9.0、环境准备
 
-#### 设置k8s元
+## 0、Kubesphere是什么？
 
-<span style="color:red;font-weight:bold;">设置k8s源，确保“启用可插拔组件“时的依赖服务，比如`ks-minio`安装成功。</span>
+KubeSphere就是Java编程界的Spring。
 
-```bash
-$ cat > /etc/yum.repos.d/kubernetes.repo << EOF
-[kubernetes] 
-name=Kubernetes
-baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64 
-enabled=1 
-gpgcheck=0 
-repo_gpgcheck=0 
-gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg 
-EOF
-```
+KubeSphere，这是国内唯一一个开源的Kubernetes（k8s）发行版，它的开源不涉及任何商业意图，它不属于青云而属于社区，它极大地降低了使用Kubernetes的门槛，它的出现将加速中国企业向云原生迈进的步伐。
+“发行版”的说法常用于Linux操作系统。比如，虽有Linux内核，而Ubuntu、CentOS等等叫做Linux发行版，对应的，Kubernetes就相当于内核，KubeSphere就是Kubernetes的发行版，正常人类是很难使用Linux内核和Kubenetes的，为了让大家用起来，要基于Linux内核和Kubernetes做很多周边配套，Linux和Kubenetes就好像一台光秃秃的汽车发动机，为了把它当车开，你起码得有车架子、轮胎、方向盘、刹车、……等等。
+所以，开源KubeSphere的青云就像一个汽车厂，负责KubeSphere牌汽车各个组件的组装搭配，不过，这个汽车不需要花钱就能获取到，这就是青云开源KubeSphere的实质。它的意义在于加快了大家使用k8s发动机的进程，让大家都能开上KubeSphere牌汽车。
+云原生能帮助企业做数字化转型，帮助企业用数字化转型获取竞争力。而KubeSphere可以让企业更快地上原生，开上汽车。
 
-### 9.1、在Linux上以All-in-One模式安装
+## 1、在Linux上以All-in-One模式安装
 
 https://kubesphere.io/zh/docs/v3.4/quick-start/all-in-one-on-linux/
 
@@ -1661,7 +1654,9 @@ http://192.168.32.116:30880
 
 修改密码为： admin/Ks@12345
 
-![image-20240626181417862](images/image-20240626181417862.png)
+- 安装后资源概况
+
+![image-20240701091015180](images/image-20240701091015180.png)
 
 - 虚拟机挂起并恢复后k8s网络问题
 
@@ -1813,19 +1808,107 @@ https://kubesphere.io             2024-06-25 23:10:14
 
 http://192.168.32.116:30880
 
-修改密码为： admin/Ks@12345
+- 安装后资源概况
 
-## 9.3、用户	
+![image-20240701091015180](images/image-20240701091015180.png)
 
-| 用户名          | 角色 | 作用                                                    |
-| --------------- | ---- | ------------------------------------------------------- |
-| admin           |      | 创建用户、角色                                          |
-| ws-manager      |      | 创建工作空间	设置 ws-admin  为空间管理员             |
-| ws-admin        |      | 给工作空间选择成员                                      |
-| project-admin   |      | 创建项目，并通过项目设置邀请  -- project-regular 到项目 |
-| project-regular |      | 管理项目中除用户和角色之外的资源。                      |
+## 3、启用可插拔组件
 
+### DevOps组件
 
+- 安装后资源概况
+
+![image-20240701110557073](images/image-20240701110557073.png)
+
+## 4、用户-企业空间-项目
+
+- 登录 admin 创建如下用户
+
+| 用户名          | 密码     | 角色                      | 作用                                                         |
+| --------------- | -------- | ------------------------- | ------------------------------------------------------------ |
+| admin           | Ks@12345 | platform-admin            | 平台管理员，可以管理平台内的所有资源。                       |
+| ws-manager      | Ws@12345 | platform-self-provisioner | 创建企业空间并成为所创建企业空间的管理员。                   |
+| ws-admin        | Ws@12345 | platform-regular          | 平台普通用户，在被邀请加入企业空间或集群之前没有任何资源操作权限。 |
+| project-admin   | Ws@12345 | platform-regular          | 平台普通用户，在被邀请加入企业空间或集群之前没有任何资源操作权限。 |
+| project-regular | Ws@12345 | platform-regular          | 平台普通用户，在被邀请加入企业空间或集群之前没有任何资源操作权限。 |
+
+- <span style="color:green;font-weight:bold;">登录 ws-manager 创建企业空间</span>
+
+企业空间： demo-workspace 邀请管理员 ws-admin
+
+- 登录 ws-admin 邀请 project-admin/project-regular 进入企业空间，分别授予 demo-workspace-self-provisioner 和 demo-workspace-viewer 角色。<span style="color:red;font-weight:bold;">可编辑项目配额、默认容器配额</span>
+
+> 备注：
+>
+> 实际角色名称的格式：`<workspace name>-<role name>`。例如，在名为 demo-workspace 的企业空间中，角色viewer的实际角色名称为 demo-workspace-viewer 
+
+| 用户名          | 角色             | 企业空间角色                    |                                                              |
+| --------------- | ---------------- | ------------------------------- | ------------------------------------------------------------ |
+| ws-admin        | platform-regular | demo-workspace-admin            | 管理指定企业空间中的所有资源（在此示例中，此用户用于邀请新成员加入企业空间）。 |
+| project-admin   | platform-regular | demo-workspace-self-provisioner | 创建和管理项目以及 DevOps 项目，并邀请新成员加入项目。       |
+| project-regular | platform-regular | demo-workspace-viewer           | `project-regular` 将由 `project-admin` 邀请至项目或 DevOps 项目。该用户将用于在指定项目中创建工作负载、流水线和其他资源。 |
+
+- <span style="color:green;font-weight:bold;">登录 project-admin  创建项目 demo-project</span>，邀请 project-regular 进入项目，并授权 operator 角色。<span style="color:red;font-weight:bold;">可编辑项目配额（仅1次）、默认容器配额</span>
+
+| 用户名          | 角色             | 企业空间角色                    | 项目角色 |
+| --------------- | ---------------- | ------------------------------- | -------- |
+| project-admin   | platform-regular | demo-workspace-self-provisioner | admin    |
+| project-regular | platform-regular | demo-workspace-viewer           | operator |
+
+- <span style="color:green;font-weight:bold;">登录 project-admin  创建项目 demo-devops</span>，邀请 project-regular 进入项目，并授权 operator 角色。<span style="color:red;font-weight:bold;">可编辑项目配额（仅1次）、默认容器配额</span>
+
+| 用户名          | 角色             | 企业空间角色                    | 项目角色 |
+| --------------- | ---------------- | ------------------------------- | -------- |
+| project-admin   | platform-regular | demo-workspace-self-provisioner | admin    |
+| project-regular | platform-regular | demo-workspace-viewer           | operator |
+
+![image-20240628180327978](images/cicd-tools-fullsize.jpeg)
+
+## 5、DevOps项目部署
+
+#### 准备工作
+
+您需要[启用 KubeSphere DevOps 系统](https://www.kubesphere.io/zh/docs/v3.3/pluggable-components/devops/)。
+
+注意：若内存不是很大，建议开启 devops 时内存可以限制为2G。
+
+#### [将 SonarQube 集成到流水线](https://kubesphere.io/zh/docs/v3.4/devops-user-guide/how-to-integrate/sonarqube/)
+
+要将 SonarQube 集成到您的流水线，必须先安装 SonarQube 服务器。
+
+- 登录
+
+http://192.168.32.116:30712
+
+默认用户名密码：admin/admin
+
+修改密码为： admin/Sq@12345
+
+- 安装后资源概况
+
+![image-20240630105708229](images/image-20240630105708229.png)
+
+## 9、FAQ
+
+### FAQ1：如何充值用户密码
+
+https://www.kubesphere.io/zh/docs/v3.4/faq/access-control/forgot-password/
+
+### FAQ2：玩转kubesphere之cni网络插件异常问题
+
+问题描述：Failed to create pod sandbox: rpc error: code = Unknown desc = [ ......getting ClusterInformation: connection is unauthorized: Unauthorized
+
+问题解决：https://blog.csdn.net/weixin_40807433/article/details/135240300
+
+简述：删除异常节点的容器组 calico-node，让它拉起重新同步数据即可修复。
+
+### FAQ3：KubeSphere 镜像构建器（S2I）服务证书过期(x509)问题
+
+问题描述：Internal error occurred: failed calling webhook "s2ibuilder.kb.io": failed to call webhook......x509: certificate has expired or is not yet valid
+
+问题解决：https://ask.kubesphere.io/forum/d/23239-kubesphere-jing-xiang-gou-jian-qi-s2ifu-wu-zheng-shu-guo-qi-x509wen-ti
+
+简述：这个是由于之前 DevOps S2I 内置的证书过期时间是 2024.02.14 ，现在只需要更新证书就可以了；
 
 # 三、使用Kubespray部署Kubernetes生产集群
 
