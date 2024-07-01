@@ -1345,7 +1345,7 @@ token：
 XsttKM4zpuFWcchUmEhJErmiRRRfBu0A
 ```
 
-# 二、演练与理解
+# 补充、演练与理解
 
 ## 1、常规命令部署一个tomcat
 
@@ -1506,9 +1506,11 @@ spec:
 $ kubectl apply -f tomcat8.yaml
 ```
 
-## 9、Kubesphere
+# 二、Kubesphere
 
 官网：https://kubesphere.com.cn/
+
+文档官网：https://kubesphere.com.cn/
 
 Github：https://github.com/kubesphere/kubesphere/blob/master/README_zh.md  可以查看与k8s版本关系
 
@@ -1522,7 +1524,7 @@ v3.4.1安装文档：
 
 [从Kubenetes上卸载KubeSphere](https://kubesphere.io/zh/docs/v3.4/installing-on-kubernetes/uninstall-kubesphere-from-k8s/)
 
-### 9.0、环境准备
+[KubeSphere 开源社区](https://ask.kubesphere.io/forum/)
 
 ## 0、Kubesphere是什么？
 
@@ -1683,7 +1685,7 @@ http://192.168.32.116:30880
   $ systemctl restart NetworkManager
   ```
 
-### 9.2、在Kubernetes上最小化安装KubeSphere
+## 2、在Kubernetes上最小化安装KubeSphere
 
 #### 准备
 
