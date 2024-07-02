@@ -2038,12 +2038,14 @@ $ systemctl daemon-reload && systemctl restart docker
 
 ### 5.4、[使用 Jenkinsfile 创建流水线涉及的凭证](https://kubesphere.io/zh/docs/v3.4/devops-user-guide/how-to-use/pipelines/create-a-pipeline-using-jenkinsfile/)
 
-| 凭证ID          | 类型                                     | 用途 |
-| --------------- | ---------------------------------------- | ---- |
-| harbor-id       | 用户名和密码（密码填写Harbor机器人令牌） |      |
-| github-id       | 用户名和密码（密码填写PAT令牌）          |      |
-| demo-kubeconfig | kubeconfig                               |      |
-| github-token    | 访问令牌                                 |      |
+| 凭证ID          | 类型                                     |
+| --------------- | ---------------------------------------- |
+| harbor-id       | 用户名和密码（密码填写Harbor机器人令牌） |
+| github-id       | 用户名和密码（密码填写PAT令牌）          |
+| demo-kubeconfig | kubeconfig                               |
+| github-token    | 访问令牌                                 |
+| gitee-id        | 用户名和密码（密码填写私人令牌）         |
+| gitee-token     | 访问令牌                                 |
 
 其中，github-id的创建方式：
 
