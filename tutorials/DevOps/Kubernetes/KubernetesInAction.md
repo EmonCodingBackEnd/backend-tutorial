@@ -267,6 +267,7 @@ $ vim /etc/systemd/system/docker.service.d/proxy.conf
 [Service]
 Environment="HTTP_PROXY=http://192.168.32.1:29290"
 Environment="HTTPS_PROXY=http://192.168.32.1:29290"
+Environment="NO_PROXY=127.0.0.1,localhost,192.168.32.116"
 ```
 
 - 重启Docker并查看代理配置情况
@@ -1816,11 +1817,19 @@ http://192.168.32.116:30880
 
 ## 3、启用可插拔组件
 
-### DevOps组件
+### 3.1、DevOps组件
 
 - 安装后资源概况
 
 ![image-20240701110557073](images/image-20240701110557073.png)
+
+### 3.2、应用商店组件
+
+- 安装后资源概况
+
+![image-20240702093849655](images/image-20240702093849655.png)
+
+  
 
 ## 4、用户-企业空间-项目
 
@@ -1868,13 +1877,13 @@ http://192.168.32.116:30880
 
 ## 5、DevOps项目部署
 
-#### 准备工作
+### 5.1、准备工作
 
 您需要[启用 KubeSphere DevOps 系统](https://www.kubesphere.io/zh/docs/v3.3/pluggable-components/devops/)。
 
 注意：若内存不是很大，建议开启 devops 时内存可以限制为2G。
 
-#### [将 SonarQube 集成到流水线](https://kubesphere.io/zh/docs/v3.4/devops-user-guide/how-to-integrate/sonarqube/)
+### 5.2、[将 SonarQube 集成到流水线](https://kubesphere.io/zh/docs/v3.4/devops-user-guide/how-to-integrate/sonarqube/)
 
 要将 SonarQube 集成到您的流水线，必须先安装 SonarQube 服务器。
 
@@ -1889,6 +1898,158 @@ http://192.168.32.116:30712
 - 安装后资源概况
 
 ![image-20240630105708229](images/image-20240630105708229.png)
+
+### 5.3、将 Harbor 集成到流水线
+
+在应用商店安装Harbor
+
+- 创建企业空间
+
+<span style="color:green;font-weight:bold;">登录 admin 创建企业空间</span>
+
+企业空间： harbor 邀请管理员 admin
+
+- 创建项目
+
+<span style="color:green;font-weight:bold;">登录 admin 在企业空间创建项目</span>
+
+企业空间：harbor 创建项目 harbor
+
+- 安装
+
+在项目中，点击【应用负载】=>【应用】=>【创建】=>【从应用商店】=>搜索“Harbor”并安装。
+
+> 如果不想使用ingress网关访问Harbor，则需要进行以下设置，然后点击**安装**
+>
+> 请按照如下指示的”修改x”进行修改（不是复制粘贴）
+
+```yaml
+expose:
+  type: nodePort # 修改1：ingress => nodePort
+  tls:
+    enabled: false # 修改2：true=>false
+      commonName: "192.168.32.116" # 修改3：""=>将commonName更改成你自己的值
+externalURL: http://192.168.32.116:30002 # 修改4：使用自己的ipi
+```
+
+更改了应用设置后，点击安装即可！等待项目harbor下【应用负载】变成 running 后服务即可使用。
+
+- 登录
+
+http://192.168.32.116:30002
+
+admin/Harbor12345
+
+- 获取Harbor凭证
+
+1. 安装 Harbor 后，请访问 `<NodeIP>:30002` 并使用默认帐户和密码 (`admin/Harbor12345`) 登录控制台。在左侧导航栏中点击**项目**并在**项目**页面点击**新建项目**。
+2. 在弹出的对话框中，设置项目名称  ks-devops-harbor  并点击**确定**。
+3. 点击刚刚创建的项目，在**机器人帐户**选项卡下点击**添加机器人帐户**。
+4. 在弹出的对话框中，为机器人帐户设置名称  robot-test 以及设置永不过期，并点击**添加**。请确保在**权限**中勾选推送制品的权限选框。
+5. 在弹出的对话框中，点击**导出到文件中**，保存该令牌。
+
+- 启用 Insecure Registry
+
+您需要配置 Docker，使其忽略您 Harbor 仓库的安全性。
+
+1. 在您的主机上运行 `vim /etc/docker/daemon.json` 命令以编辑 `daemon.json` 文件，输入以下内容并保存更改。
+
+```json
+{
+  "insecure-registries" : ["192.168.32.116:30002"]
+}
+```
+
+2. 运行以下命令重启 Docker，使更改生效。
+
+```bash
+# 执行重启后，会影响到k8s环境，需要等待一会才可以继续访问k8s
+$ systemctl daemon-reload && systemctl restart docker
+```
+
+- 安装后资源概况
+
+![image-20240702135052980](images/image-20240702135052980.png)
+
+- 测试
+
+  - 创建凭证
+
+  1. 以 `project-regular` 身份登录 KubeSphere 控制台，转到您的 DevOps 项目，在 **DevOps 项目设置**下的**凭证**页面为 Harbor 创建凭证。
+  2. 在**创建凭证**页面，设置凭证 ID (`robot-test`)，**类型**选择**用户名和密码**。**用户名**字段必须和您刚刚下载的 JSON 文件中 `name` 的值相同，并在**密码/令牌**中输入该文件中 `token` 的值。
+  3. 点击**确定**以保存。
+
+  - 创建流水
+
+  1. 转到**流水线**页面，点击**创建**。在**基本信息**选项卡，输入名称 (`demo-pipeline`)，然后点击**下一步**。
+  2. **高级设置**中使用默认值，点击**创建**。
+
+  - 编辑Jenkinsfile
+
+  1. 点击该流水线进入其详情页面，然后点击**编辑 Jenkinsfile**。
+  2. 将以下内容复制粘贴至 Jenkinsfile。请注意，您必须将 `REGISTRY`、`HARBOR_NAMESPACE`、`APP_NAME` 和 `HARBOR_CREDENTIAL` 替换为您自己的值。
+
+  ```yaml
+  pipeline {  
+    agent {
+      node {
+        label 'maven'
+      }
+    }
+  
+    environment {
+      // 您 Harbor 仓库的地址。
+      REGISTRY = '192.168.32.116:30002'
+      // 项目名称。
+      // 请确保您的机器人帐户具有足够的项目访问权限。
+      HARBOR_NAMESPACE = 'ks-devops-harbor'
+      // Docker 镜像名称。
+      APP_NAME = 'docker-example'
+      // ‘robot-test’是您在 KubeSphere 控制台上创建的凭证 ID。
+      HARBOR_CREDENTIAL = credentials('robot-test')
+    }
+  
+    stages {
+      stage('docker login') {
+        steps{
+          container ('maven') {
+            // 请替换 -u 后面的 Docker Hub 用户名，不要忘记加上 ''。您也可以使用 Docker Hub 令牌。
+            sh '''echo $HARBOR_CREDENTIAL_PSW | docker login $REGISTRY -u 'robot$robot-test' --password-stdin'''
+          }
+        }  
+      }
+  
+      stage('build & push') {
+        steps {
+          container ('maven') {
+            sh 'git clone https://github.com/kstaken/dockerfile-examples.git'
+            sh 'cd dockerfile-examples/rethinkdb && docker build -t $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:devops-test .'
+            sh 'docker push  $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:devops-test'
+          }
+        }
+      }
+    }
+  }
+  ```
+  
+  - 运行流水线
+  
+  保存该 Jenkinsfile，KubeSphere 会自动在图形编辑面板上创建所有阶段和步骤。点击**运行**来运行该流水线。如果一切运行正常，Jenkins 将推送镜像至您的 Harbor 仓库。
+
+### 5.4、[使用 Jenkinsfile 创建流水线涉及的凭证](https://kubesphere.io/zh/docs/v3.4/devops-user-guide/how-to-use/pipelines/create-a-pipeline-using-jenkinsfile/)
+
+| 凭证ID          | 类型                                     | 用途 |
+| --------------- | ---------------------------------------- | ---- |
+| harbor-id       | 用户名和密码（密码填写Harbor机器人令牌） |      |
+| github-id       | 用户名和密码（密码填写PAT令牌）          |      |
+| demo-kubeconfig | kubeconfig                               |      |
+| github-token    | 访问令牌                                 |      |
+
+其中，github-id的创建方式：
+
+![image-20240702175121985](images/image-20240702175121985.png)
+
+![image-20240702175016014](images/image-20240702175016014.png)
 
 ## 9、FAQ
 
