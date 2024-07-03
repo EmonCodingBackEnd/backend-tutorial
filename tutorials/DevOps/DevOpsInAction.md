@@ -1620,7 +1620,7 @@ $ systemctl restart docker
 ### 1.1、单机
 
 ```bash
-# /usr/local/dockerv/mysql_home 目录会自动创建
+# /usr/local/dockerv/mysql 目录会自动创建
 $ docker run --name=mysql \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql/log:/var/log/mysql \
@@ -1642,7 +1642,7 @@ $ docker exec -it mysql mysql -uroot -proot123
 1：启动
 
 ```bash
-# /usr/local/dockerv/mysql_home 目录会自动创建
+# /usr/local/dockerv/mysql-master 目录会自动创建
 $ docker run --name=mysql-master \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql-master/log:/var/log/mysql \
@@ -1658,33 +1658,43 @@ $ vim /usr/local/dockerv/mysql-master/conf/my.cnf
 ```
 
 ```bash
+[client]
+default-character-set='utf8'
+
+[mysql]
+default-character-set='utf8'
+
 [mysqld]
+init_connect='SET collation_connectioin=utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+skip-character-set-client-handshake
+skip-name-resolve
 #========主从复制设置========
+#设置server_id，同一局域网中需要唯一
+server_id=1
 #开启二进制日志功能
 log-bin=mysql-bin
+# 在主服务器上允许写入数据，仅对普通用户生效，若限制root请使用super_read_only
+read_only=0
 #设置使用的二进制日志格式（mixed,statement,row）
 binlog_format=row
 # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
-binlog_row_image = minimal
-#设置server_id，同一局域网中需要唯一
-server_id=1
+binlog_row_image=minimal
 
 #二进制日志过期清理时间。默认值为0，表示不自动清理。
 expire_logs_days=7
 # 每个日志文件大小
-max_binlog_size = 100m
+max_binlog_size=100m
 # binlog缓存大小
-binlog_cache_size = 4m
+binlog_cache_size=4m
 # 最大binlog缓存大小
-max_binlog_cache_size = 512m
+max_binlog_cache_size=512m
 
-# 在主服务器上允许写入数据，仅对普通用户生效，若限制root请使用super_read_only
-read_only=0
 #指定不需要同步的数据库名称
-binlog_ignore_db = information_schema
-binlog_ignore_db = mysql
-binlog_ignore_db = performance_schema
-binlog_ignore_db = sys
+binlog_ignore_db=information_schema
+binlog_ignore_db=mysql
+binlog_ignore_db=performance_schema
+binlog_ignore_db=sys
 ```
 
 33：重启
@@ -1705,7 +1715,7 @@ $ docker exec -it mysql-master /bin/bash
 bash-4.2# mysql -uroot -proot123
 mysql> create user 'repl'@'%' identified by 'repl123';
 mysql> grant replication slave on *.* to 'repl'@'%';
-show master status;
+mysql> show master status;
 +------------------+----------+--------------+-------------------------------------------------+-------------------+
 | File             | Position | Binlog_Do_DB | Binlog_Ignore_DB                                | Executed_Gtid_Set |
 +------------------+----------+--------------+-------------------------------------------------+-------------------+
@@ -1719,13 +1729,13 @@ show master status;
 1：启动
 
 ```bash
-# /usr/local/dockerv/mysql_home 目录会自动创建
+# /usr/local/dockerv/mysql-slave 目录会自动创建
 $ docker run --name=mysql-slave \
 -e MYSQL_ROOT_HOST=%.%.%.% -e MYSQL_ROOT_PASSWORD=root123 \
 -v /usr/local/dockerv/mysql-slave/log:/var/log/mysql \
 -v /usr/local/dockerv/mysql-slave/data:/var/lib/mysql \
 -v /usr/local/dockerv/mysql-slave/conf:/etc/mysql \
--p 3308:3306 -d mysql/mysql-server:5.7
+-p 3317:3306 -d mysql/mysql-server:5.7
 ```
 
 2：配置
@@ -1735,40 +1745,50 @@ $ vim /usr/local/dockerv/mysql-slave/conf/my.cnf
 ```
 
 ```bash
+[client]
+default-character-set='utf8'
+
+[mysql]
+default-character-set='utf8'
+
 [mysqld]
+init_connect='SET collation_connectioin=utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+skip-character-set-client-handshake
+skip-name-resolve
+
 #========主从复制设置========
+#设置server_id，同一局域网中需要唯一
+server_id=2
 #开启二进制日志功能
 log-bin=mysql-bin
+# 在从服务器上禁止任何用户写入任何数据，仅对普通用户生效，若限制root请使用super_read_only
+read_only = 1
 #设置使用的二进制日志格式（mixed,statement,row）
 binlog_format=row
 # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
 binlog_row_image = minimal
-#设置server_id，同一局域网中需要唯一
-server_id=2
 
 #二进制日志过期清理时间。默认值为0，表示不自动清理。
 expire_logs_days=7
 # 每个日志文件大小
-max_binlog_size = 100m
+max_binlog_size=100m
 # binlog缓存大小
-binlog_cache_size = 4m
+binlog_cache_size=4m
 # 最大binlog缓存大小
-max_binlog_cache_size = 512m
-
-# 在从服务器上禁止任何用户写入任何数据，仅对普通用户生效，若限制root请使用super_read_only
-read_only = 1
+max_binlog_cache_size=512m
 
 #指定不需要同步的数据库名称
-replicate_ignore_db = information_schema
-replicate_ignore_db = mysql
-replicate_ignore_db = performance_schema
-replicate_ignore_db = sys
-relay_log = mysql-relay-bin
+replicate_ignore_db=information_schema
+replicate_ignore_db=mysql
+replicate_ignore_db=performance_schema
+replicate_ignore_db=sys
+relay_log=mysql-relay-bin
 # 作为从库时生效，想进行级联复制，则需要此参数
-log_slave_updates = on
+log_slave_updates=on
 #这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
-master_info_repository = TABLE
-relay_log_info_repository = TABLE
+master_info_repository=TABLE
+relay_log_info_repository=TABLE
 ```
 
 3：重启

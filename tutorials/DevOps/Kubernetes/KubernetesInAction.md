@@ -2055,7 +2055,7 @@ $ systemctl daemon-reload && systemctl restart docker
 
 ## 9、FAQ
 
-### FAQ1：如何充值用户密码
+### FAQ1：如何重置用户密码
 
 https://www.kubesphere.io/zh/docs/v3.4/faq/access-control/forgot-password/
 
