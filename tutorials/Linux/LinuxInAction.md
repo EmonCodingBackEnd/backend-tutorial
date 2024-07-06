@@ -4484,6 +4484,18 @@ sentinel auth-pass mymaster `[密码]`
 logfile "/usr/local/redis/redis_rdb/sentinel.log"
 ```
 
+> # sentinel.conf
+> sentinel monitor mymaster 127.0.0.1 6379 2
+> sentinel down-after-milliseconds mymaster 30000
+> sentinel parallel-syncs mymaster 1
+> sentinel failover-timeout mymaster 180000
+>
+> - `sentinel monitor mymaster`: 监控的主服务器，其中 `mymaster` 是主服务器的名字，后面跟主服务器的IP和端口以及最少需要的投票数（在这个例子中是2，即至少需要3个哨兵同意才能进行故障转移）
+>
+> - `sentinel down-after-milliseconds`: 如果一个服务器在指定的毫秒数内没有响应，则认为它是主观下线。
+> - `sentinel parallel-syncs`: 在故障转移期间，可以有几个从服务器同时进行同步。
+> - `sentinel failover-timeout`: 故障转移超时时间。
+
 2. 配置启动
 
 ```bash

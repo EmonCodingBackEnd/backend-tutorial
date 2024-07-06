@@ -1857,6 +1857,8 @@ mysql> select * from db0.user;
 
 ## 2、Redis
 
+### 2.1、单机
+
 - redis配置文件下载地址：https://redis.io/docs/manual/config/
 
 ```bash
@@ -1904,6 +1906,137 @@ redis-server /etc/redis/redis.conf
 ```bash
 $ docker exec -it redis redis-cli
 ```
+
+### 2.2、集群
+
+3主3从方式，从为了同步备份，主进行slot数据分片。
+
+![image-20240706090715349](images/image-20240706090715349.png)
+
+- 循环部署6台独立节点
+
+```bash
+for port in $(seq 7001 7006); \
+do \
+mkdir -p /usr/local/dockerv/redis-cluster/node-${port}/conf
+touch /usr/local/dockerv/redis-cluster/node-${port}/conf/redis.conf
+cat << EOF > /usr/local/dockerv/redis-cluster/node-${port}/conf/redis.conf
+port ${port}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 192.168.32.116
+cluster-announce-port ${port}
+cluster-announce-bus-port 1${port}
+appendonly yes
+EOF
+docker run --name redis-${port} \
+	-v /usr/local/dockerv/redis-cluster/node-${port}/data:/data \
+	-v /usr/local/dockerv/redis-cluster/node-${port}/conf/redis.conf:/etc/redis/redis.conf \
+	-p ${port}:${port} -p 1${port}:1${port} \
+	-d redis:5.0 redis-server /etc/redis/redis.conf; \
+done
+```
+
+- 建立集群
+
+```bash
+$ docker exec -it redis-7001 bash
+> redis-cli --cluster create 192.168.32.116:7001 192.168.32.116:7002 192.168.32.116:7003 192.168.32.116:7004 192.168.32.116:7005 192.168.32.116:7006 --cluster-replicas 1
+```
+
+```bash
+>>> Performing hash slots allocation on 6 nodes...
+Master[0] -> Slots 0 - 5460
+Master[1] -> Slots 5461 - 10922
+Master[2] -> Slots 10923 - 16383
+Adding replica 192.168.32.116:7005 to 192.168.32.116:7001
+Adding replica 192.168.32.116:7006 to 192.168.32.116:7002
+Adding replica 192.168.32.116:7004 to 192.168.32.116:7003
+>>> Trying to optimize slaves allocation for anti-affinity
+[WARNING] Some slaves are in the same host as their master
+M: 5cc060783e11574e2c44b243f5d33174fe0e879c 192.168.32.116:7001
+   slots:[0-5460] (5461 slots) master
+M: 01a1caeccf76439faf00cf74d89df3188cbaf30c 192.168.32.116:7002
+   slots:[5461-10922] (5462 slots) master
+M: 4337f26afac8aa9be53136514bac6d9f2ea37510 192.168.32.116:7003
+   slots:[10923-16383] (5461 slots) master
+S: b025f171d9252fa70bb4ec5fce19ab02bec0b75b 192.168.32.116:7004
+   replicates 4337f26afac8aa9be53136514bac6d9f2ea37510
+S: 96d41a5b6d1cf50161be14a546c605af3343dddb 192.168.32.116:7005
+   replicates 5cc060783e11574e2c44b243f5d33174fe0e879c
+S: d86604e17be98ab35d3075dd76eda71ba4bcb770 192.168.32.116:7006
+   replicates 01a1caeccf76439faf00cf74d89df3188cbaf30c
+Can I set the above configuration? (type 'yes' to accept): yes
+>>> Nodes configuration updated
+>>> Assign a different config epoch to each node
+>>> Sending CLUSTER MEET messages to join the cluster
+Waiting for the cluster to join
+.
+>>> Performing Cluster Check (using node 192.168.32.116:7001)
+M: 5cc060783e11574e2c44b243f5d33174fe0e879c 192.168.32.116:7001
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+M: 4337f26afac8aa9be53136514bac6d9f2ea37510 192.168.32.116:7003
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+S: b025f171d9252fa70bb4ec5fce19ab02bec0b75b 192.168.32.116:7004
+   slots: (0 slots) slave
+   replicates 4337f26afac8aa9be53136514bac6d9f2ea37510
+M: 01a1caeccf76439faf00cf74d89df3188cbaf30c 192.168.32.116:7002
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+S: 96d41a5b6d1cf50161be14a546c605af3343dddb 192.168.32.116:7005
+   slots: (0 slots) slave
+   replicates 5cc060783e11574e2c44b243f5d33174fe0e879c
+S: d86604e17be98ab35d3075dd76eda71ba4bcb770 192.168.32.116:7006
+   slots: (0 slots) slave
+   replicates 01a1caeccf76439faf00cf74d89df3188cbaf30c
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+```
+
+- 访问集群
+
+```bash
+# 注意：参数 -c 表示集群访问
+$ root@4137abdfcbff:/data# redis-cli -c -h 192.168.32.116 -p 7001
+192.168.32.116:7001> cluster info
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:6
+cluster_size:3
+cluster_current_epoch:6
+cluster_my_epoch:2
+cluster_stats_messages_ping_sent:1414
+cluster_stats_messages_pong_sent:1425
+cluster_stats_messages_meet_sent:1
+cluster_stats_messages_sent:2840
+cluster_stats_messages_ping_received:1425
+cluster_stats_messages_pong_received:1415
+cluster_stats_messages_received:2840
+192.168.32.116:7001> cluster nodes
+4337f26afac8aa9be53136514bac6d9f2ea37510 192.168.32.116:7003@17003 master - 0 1720231197053 3 connected 10923-16383
+b025f171d9252fa70bb4ec5fce19ab02bec0b75b 192.168.32.116:7004@17004 slave 4337f26afac8aa9be53136514bac6d9f2ea37510 0 1720231196046 4 connected
+01a1caeccf76439faf00cf74d89df3188cbaf30c 192.168.32.116:7002@17002 master - 0 1720231197000 2 connected 5461-10922
+5cc060783e11574e2c44b243f5d33174fe0e879c 192.168.32.116:7001@17001 myself,master - 0 1720231197000 1 connected 0-5460
+96d41a5b6d1cf50161be14a546c605af3343dddb 192.168.32.116:7005@17005 slave 5cc060783e11574e2c44b243f5d33174fe0e879c 0 1720231196548 5 connected
+d86604e17be98ab35d3075dd76eda71ba4bcb770 192.168.32.116:7006@17006 slave 01a1caeccf76439faf00cf74d89df3188cbaf30c 0 1720231198057 6 connected
+```
+
+- 停止删除
+
+```bash
+$ docker stop $(docker ps -a|grep redis-700|awk '{print $1}')
+$ docker rm -v $(docker ps -a|grep redis-700|awk '{print $1}')
+```
+
+
 
 ## 3、Zookeeper
 
@@ -2065,10 +2198,9 @@ $ chmod -R 777 /usr/local/dockerv/es
 # 表示es可以被任何外部机器访问到
 $ echo "http.host: 0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
 $ echo "network.host: 0.0.0.0">>/usr/local/dockerv/es/config/elasticsearch.yml
+# ES启动时会去更新地图的一些数据库，这里直接禁掉即可
 $ echo "ingest.geoip.downloader.enabled: false">>/usr/local/dockerv/es/config/elasticsearch.yml
 ```
-
-
 
 - 创建网络（同一网络的services互相连接）
 
@@ -2220,7 +2352,7 @@ $ docker run --name kibana \
 
 http://192.168.32.116:5601/
 
-### 6.2.1、当虚拟机或者物理机异常关闭后导致kibana异常
+### 6.3、当虚拟机或者物理机异常关闭后导致kibana异常
 
 问题描述：访问kibana得到“Kibana server is not ready yet”。
 
@@ -2256,6 +2388,136 @@ $ curl -X DELETE http://localhost:9200/.kibana*
 ```
 
 3. 启动kibana
+
+### 6.4、Elasticsearch集群
+
+![image-20240706142850608](images/image-20240706142850608.png)
+
+- 配置
+
+避免：
+
+```bash
+$ vim /etc/sysctl.conf
+```
+
+```bash
+vm.max_map_count = 262144
+```
+
+- 创建网络
+
+```bash
+$ docker network create --driver bridge --subnet=172.19.12.0/16 --gateway=172.19.1.1 escluster
+```
+
+- 创建master节点
+
+```bash
+for port in $(seq 1 3); \
+do \
+mkdir -p /usr/local/dockerv/es-cluster/master-${port}/{config,data}
+chmod -R 777 /usr/local/dockerv/es-cluster/master-${port}
+cat << EOF > /usr/local/dockerv/es-cluster/master-${port}/config/elasticsearch.yml
+cluster.name: es-cluster # 集群的名称，同一个集群该值必须设置成相同的
+node.name: es-master-${port} # 该节点的名称
+node.master: true # 该节点有机会成为master节点
+node.data: false # 该节点是否可以存储数据
+network.host: 0.0.0.0
+http.host: 0.0.0.0 # 所有http均可访问
+http.port: 920${port}
+transport.tcp.port: 930${port}
+# ES启动时会去更新地图的一些数据库，这里直接禁掉即可
+ingest.geoip.downloader.enabled: false
+# discovery.zen.minimum_master_nodes: 2 # 设置这个参数来保证集群中的节点可以知道其它N个有master资格的节点。官方推荐(N/2)+1，其中N是候选节点数量。
+discovery.zen.ping_timeout: 10s # 设置集群中自动发现其他节点时ping连接的超时时间
+discovery.seed_hosts: ["172.19.12.21:9301","172.19.12.22:9302","172.19.12.23:9303"] # 设置集群中的Master节点的初始列表，可以通过这些节点来自动发现其他新加入集群的节点，ES7的新增配置
+cluster.initial_master_nodes: ["172.19.12.21"] # 新集群初始时的候选主节点的name或者ip，ES7的新增配置
+EOF
+docker run --name es-node-${port} \
+--network=escluster --ip 172.19.12.2${port} \
+-e "ES_JAVA_OPTS=-Xms300m -Xmx300m" \
+-v /usr/local/dockerv/es-cluster/master-${port}/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /usr/local/dockerv/es-cluster/master-${port}/data:/usr/share/elasticsearch/data \
+-v /usr/local/dockerv/es-cluster/master-${port}/plugins:/usr/share/elasticsearch/plugins \
+-v /usr/local/dockerv/es-cluster/master-${port}/software:/usr/share/elasticsearch/software \
+-p 920${port}:920${port} -p 930${port}:930${port} \
+-d elasticsearch:7.17.18
+done
+```
+
+- 创建Node节点
+
+```bash
+for port in $(seq 4 6); \
+do \
+mkdir -p /usr/local/dockerv/es-cluster/node-${port}/{config,data}
+chmod -R 777 /usr/local/dockerv/es-cluster/node-${port}
+cat << EOF > /usr/local/dockerv/es-cluster/node-${port}/config/elasticsearch.yml
+cluster.name: es-cluster # 集群的名称，同一个集群该值必须设置成相同的
+node.name: es-node-${port} # 该节点的名称
+node.master: false # 该节点有机会成为master节点
+node.data: true # 该节点是否可以存储数据
+network.host: 0.0.0.0
+# network.publish_host: 192.168.32.116 # 互相通信ip，要设置为本机可被外界访问的ip，否则无法通信
+http.host: 0.0.0.0 # 所有http均可访问
+http.port: 920${port}
+transport.tcp.port: 930${port}
+# ES启动时会去更新地图的一些数据库，这里直接禁掉即可
+ingest.geoip.downloader.enabled: false
+# discovery.zen.minimum_master_nodes: 2 # 设置这个参数来保证集群中的节点可以知道其它N个有master资格的节点。官方推荐(N/2)+1，其中N是候选节点数量。
+discovery.zen.ping_timeout: 10s # 设置集群中自动发现其他节点时ping连接的超时时间
+discovery.seed_hosts: ["172.19.12.21:9301","172.19.12.22:9302","172.19.12.23:9303"] # 设置集群中的Master节点的初始列表，可以通过这些节点来自动发现其他新加入集群的节点，ES7的新增配置
+cluster.initial_master_nodes: ["172.19.12.21"] # 新集群初始时的候选主节点的name或者ip，ES7的新增配置
+EOF
+docker run --name es-node-${port} \
+--network=escluster --ip 172.19.12.2${port} \
+-e "ES_JAVA_OPTS=-Xms300m -Xmx300m" \
+-v /usr/local/dockerv/es-cluster/node-${port}/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /usr/local/dockerv/es-cluster/node-${port}/data:/usr/share/elasticsearch/data \
+-v /usr/local/dockerv/es-cluster/node-${port}/plugins:/usr/share/elasticsearch/plugins \
+-v /usr/local/dockerv/es-cluster/node-${port}/software:/usr/share/elasticsearch/software \
+-p 920${port}:920${port} -p 930${port}:930${port} \
+-d elasticsearch:7.17.18
+done
+```
+
+- 查看集群节点
+
+```bash
+$ curl http://192.168.32.116:9201/_cat/nodes
+172.19.12.23 49 97 5 1.65 2.29 1.55 ilmr       - es-master-3
+172.19.12.21 65 97 5 1.65 2.29 1.55 ilmr       * es-master-1
+172.19.12.24 68 97 5 1.65 2.29 1.55 cdfhilrstw - es-node-4
+172.19.12.25 49 97 5 1.65 2.29 1.55 cdfhilrstw - es-node-5
+172.19.12.22 27 97 5 1.65 2.29 1.55 ilmr       - es-master-2
+172.19.12.26 47 97 5 1.65 2.29 1.55 cdfhilrstw - es-node-6
+$ curl http://192.168.32.116:9201/_cluster/health
+{
+"cluster_name": "es-cluster",
+"status": "green",
+"timed_out": false,
+"number_of_nodes": 6,
+"number_of_data_nodes": 3,
+"active_primary_shards": 2,
+"active_shards": 4,
+"relocating_shards": 0,
+"initializing_shards": 0,
+"unassigned_shards": 0,
+"delayed_unassigned_shards": 0,
+"number_of_pending_tasks": 0,
+"number_of_in_flight_fetch": 0,
+"task_max_waiting_in_queue_millis": 0,
+"active_shards_percent_as_number": 100
+}
+```
+
+- 停止删除
+
+```bash
+$ docker stop $(docker ps -a|grep es-node-|awk '{print $1}')
+$ docker rm -v $(docker ps -a|grep es-node-|awk '{print $1}')
+```
 
 ## 7、MongoDB
 
@@ -2329,6 +2591,8 @@ Base URL：http://repo.emon.vip
 
 ## 9、RabbitMQ
 
+### 9.1、单机
+
 - 启动
 
   - 5671/5672 - AMQP端口
@@ -2359,7 +2623,106 @@ $ docker exec -it rabbitmq /bin/bash
 
 http://192.168.32.116:15672/
 
-## 10、minio
+### 9.2、集群
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/rabbitmq/{rabbitmq01,rabbitmq02,rabbitmq03}
+```
+
+- 启动
+
+  - 节点1
+
+  ```bash
+  $ docker run --name rabbitmq01 \
+  --hostname rabbitmq01 \
+  -e RABBITMQ_ERLANG_COOKIE='fsmall' \
+  -v /usr/local/dockerv/rabbitmq/rabbitmq01:/var/lib/rabbitmq \
+  -p 5673:5672 -p 15673:15672 \
+  -d rabbitmq:3.13.1-management
+  ```
+
+  - 节点2
+
+  ```bash
+  $ docker run --name rabbitmq02 \
+  --hostname rabbitmq02 \
+  -e RABBITMQ_ERLANG_COOKIE='fsmall' \
+  --link rabbitmq01:rabbitmq01 \
+  -v /usr/local/dockerv/rabbitmq/rabbitmq01:/var/lib/rabbitmq \
+  -p 5674:5672 -p 15674:15672 \
+  -d rabbitmq:3.13.1-management
+  ```
+  
+  - 节点3
+  
+  ```bash
+  $ docker run --name rabbitmq03 \
+  --hostname rabbitmq03 \
+  -e RABBITMQ_ERLANG_COOKIE='fsmall' \
+  --link rabbitmq01:rabbitmq01 \
+  --link rabbitmq02:rabbitmq02 \
+  -v /usr/local/dockerv/rabbitmq/rabbitmq01:/var/lib/rabbitmq \
+  -p 5675:5672 -p 15675:15672 \
+  -d rabbitmq:3.13.1-management
+  ```
+
+- 登录
+
+http://192.168.31.116:15673
+
+guest/guest
+
+- 节点加入集群
+
+  - 节点1
+
+  ```bash
+  $ docker exec -it rabbitmq01 /bin/bash
+  root@rabbitmq01:/# rabbitmqctl stop_app
+  root@rabbitmq01:/# rabbitmqctl reset
+  root@rabbitmq01:/# rabbitmqctl start_app
+  ```
+
+  - 节点2
+
+  ```bash
+  $ docker exec -it rabbitmq02 /bin/bash
+  root@rabbitmq02:/# rabbitmqctl stop_app
+  root@rabbitmq02:/# rabbitmqctl reset
+  root@rabbitmq02:/# rabbitmqctl join_cluster --ram rabbit@rabbitmq01
+  root@rabbitmq02:/# rabbitmqctl start_app
+  ```
+
+  - 节点3
+
+  ```bash
+  $ docker exec -it rabbitmq03 /bin/bash
+  root@rabbitmq03:/# rabbitmqctl stop_app
+  root@rabbitmq03:/# rabbitmqctl reset
+  root@rabbitmq03:/# rabbitmqctl join_cluster --ram rabbit@rabbitmq01
+  root@rabbitmq03:/# rabbitmqctl start_app
+  ```
+
+- 实现镜像集群
+
+```bash
+$ docker exec -it rabbitmq01 /bin/bash
+root@rabbitmq01:/# rabbitmqctl set_policy -p / ha "^" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+# 控制台输出如下提示：
+Setting policy "ha" for pattern "^" to "{"ha-mode":"all","ha-sync-mode":"automatic"}" with priority "0" for vhost "/" ...
+```
+
+> 在 cluster中任意节点启用策略，策略会自动同步到集群节点，包括新增节点。
+>
+> 可以使用  `rabbitmqctl list_policies -p /;`  查看 vhost / 下面的所有policy
+>
+> -p / ha "^"  解释：为虚拟主机 / 增加一个策略，名称为 ha， "^"表示匹配所有队列"，"^hello"表示匹配以hello开头的队列
+
+
+## 10、minio【未完成】
 
 https://github.com/minio/minio
 
@@ -2591,6 +2954,74 @@ $ docker run --name zipkin \
 - 访问
 
 http://192.168.32.116:9411/zipkin
+
+## 15、Apache ShardingSphere-Proxy
+
+<span style="color:red;font-weight:bold;">官方5.5.0镜像依赖docker20版</span>
+
+获取 master 分支最新镜像：https://github.com/apache/shardingsphere/pkgs/container/shardingsphere-proxy
+
+[ShardingSphere-Proxy官网](https://shardingsphere.apache.org/document/current/cn/user-manual/shardingsphere-proxy/startup/docker/)
+
+[下载地址](https://archive.apache.org/dist/shardingsphere/)
+
+- 创建目录
+
+```bash
+$ mkdir -pv /usr/local/dockerv/ssproxy
+```
+
+- 启动一个临时shardingsphere-proxy实例，并从中复制出配置文件
+
+```bash
+$ docker run --name ssproxy --entrypoint=bash -d apache/shardingsphere-proxy:5.5.0
+# 从容器中复制出来
+$ docker cp ssproxy:/opt/shardingsphere-proxy/conf /usr/local/dockerv/ssproxy/conf
+# 删除临时容器实例
+$ docker stop ssproxy;docker rm -v ssproxy
+```
+
+- 调整配置
+
+```bash
+$ vim global.yaml
+authority:
+  users:
+    - user: root@%
+      password: root
+    - user: sharding
+      password: sharding
+  privilege:
+    type: ALL_PERMITTED
+```
+
+- 下载数据库驱动
+
+```bash
+$ wget -cP /usr/local/dockerv/ssproxy/ext-lib/ https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.11/mysql-connector-java-8.0.11.jar
+```
+
+- 启动
+
+ShardingSphere-Proxy 默认端口 `3307`，可以通过环境变量 `-e PORT` 指定
+
+```bash
+$ docker run --name ssproxy \
+    -v /usr/local/dockerv/ssproxy/conf:/opt/shardingsphere-proxy/conf \
+    -v /usr/local/dockerv/ssproxy/ext-lib:/opt/shardingsphere-proxy/ext-lib \
+    -e PORT=3308 -p13308:3308 \
+    -d apache/shardingsphere-proxy:5.5.0 && docker logs -f ssproxy
+```
+
+
+
+
+
+
+
+
+
+
 
 
 

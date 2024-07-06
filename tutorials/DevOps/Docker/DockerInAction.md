@@ -335,7 +335,7 @@ net start LxssManager
 
 [查看官方CentOS安装Docker教程](https://docs.docker.com/engine/install/centos/)
 
-## 1.0、删除旧版Docker
+### 1.0、删除旧版Docker
 
 ```bash
 sudo yum remove docker \
@@ -538,6 +538,7 @@ $ vim /etc/systemd/system/docker.service.d/proxy.conf
 [Service]
 Environment="HTTP_PROXY=http://192.168.32.1:29290"
 Environment="HTTPS_PROXY=http://192.168.32.1:29290"
+Environment="NO_PROXY=127.0.0.1,localhost,192.168.32.116"
 ```
 
 - 重启Docker并查看代理配置情况
@@ -669,6 +670,49 @@ Server:
   OS/Arch:          linux/amd64
   Experimental:     false
 ```
+
+## 4、升级Docker
+
+### 4.1、卸载低版本Docker
+
+- 查看Docker版本
+
+```bash
+$ rpm -qa|grep docker
+docker-ce-18.06.3.ce-3.el7.x86_64
+```
+
+- 查看已安装镜像
+
+```bash
+$ docker images
+```
+
+- 查看镜像存放路径
+
+```bash
+$ docker inspect <image_name>|grep HostsPath
+```
+
+> Linux系统下，Docker默认存储路径是`/var/lib/docker`
+
+- 删除Docker
+
+```bash
+$ yum list docker*
+$ yum remove docker*
+```
+
+> 注：不删除`/var/lib/docker`目录就不会删除已安装的镜像和容器。
+
+### 4.2、安装高版本Docker
+
+```bash
+$ yum install -y docker-ce-20.10.24
+$ systemctl enable docker && systemctl start docker
+```
+
+
 
 
 
