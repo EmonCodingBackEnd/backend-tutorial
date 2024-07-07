@@ -10974,3 +10974,350 @@ server {
 
 
 
+## 99.1、准备
+
+- <span style="color:green;font-weight:bold;">登录 ws-manager 创建企业空间</span>
+
+企业空间： fsmall-workspace 邀请管理员 ws-admin
+
+- 登录 ws-admin 邀请 project-admin/project-regular 进入企业空间，分别授予 fsmall-workspace-self-provisioner 和 fsmall-workspace-viewer 角色。<span style="color:red;font-weight:bold;">可编辑项目配额、默认容器配额</span>
+
+> 备注：
+>
+> 实际角色名称的格式：`<workspace name>-<role name>`。例如，在名为 fsmall-workspace 的企业空间中，角色viewer的实际角色名称为 fsmall-workspace-viewer 
+
+| 用户名          | 角色             | 企业空间角色                      |                                                              |
+| --------------- | ---------------- | --------------------------------- | ------------------------------------------------------------ |
+| ws-admin        | platform-regular | fsmall-workspace-admin            | 管理指定企业空间中的所有资源（在此示例中，此用户用于邀请新成员加入企业空间）。 |
+| project-admin   | platform-regular | fsmall-workspace-self-provisioner | 创建和管理项目以及 DevOps 项目，并邀请新成员加入项目。       |
+| project-regular | platform-regular | fsmall-workspace-viewer           | `project-regular` 将由 `project-admin` 邀请至项目或 DevOps 项目。该用户将用于在指定项目中创建工作负载、流水线和其他资源。 |
+
+- <span style="color:green;font-weight:bold;">登录 project-admin  创建项目 fsmall-project</span>，邀请 project-regular 进入项目，并授权 operator 角色。<span style="color:red;font-weight:bold;">可编辑项目配额（仅1次）、默认容器配额</span>
+
+| 用户名          | 角色             | 企业空间角色                      | 项目角色 |
+| --------------- | ---------------- | --------------------------------- | -------- |
+| project-admin   | platform-regular | fsmall-workspace-self-provisioner | admin    |
+| project-regular | platform-regular | fsmall-workspace-viewer           | operator |
+
+- <span style="color:green;font-weight:bold;">登录 project-admin  创建项目 fsmall-devops</span>，邀请 project-regular 进入项目，并授权 operator 角色。<span style="color:red;font-weight:bold;">可编辑项目配额（仅1次）、默认容器配额</span>
+
+| 用户名          | 角色             | 企业空间角色                      | 项目角色 |
+| --------------- | ---------------- | --------------------------------- | -------- |
+| project-admin   | platform-regular | fsmall-workspace-self-provisioner | admin    |
+| project-regular | platform-regular | fsmall-workspace-viewer           | operator |
+
+- Docker容器下各组件资源占用情况
+
+![image-20240707070420203](images/image-20240707070420203.png)
+
+## 99.2、MySQL
+
+### 1、创建MySQL秘钥
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**配置**。在**保密字典**中，点击右侧的**创建**。
+2. 在**基本信息**页面，名称为 ：`mysql-secret`，别名为：`MySQL秘钥`；点击下一步进入**数据设置**页面，选择类型为**Opaque（默认）**，然后点击添加数据来添加键值对。输入键（Key）`MYSQL_ROOT_PASSWORD`和值（Value）`root123`，点击右下角的**√** 进行确认。完成后，点击**创建**按钮以继续。
+
+### 2、创建MySQL主配置文件
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**配置**。在**配置字典**中，点击右侧的**创建**。
+
+2. 在**基本信息**页面，名称为：`mysql-master-cnf` ，别名为：`master配置`；点击下一步进入**数据设置**页面，添加数据，
+
+   - 键（Key）
+
+   ```bash
+   my.cnf
+   ```
+
+   - 值（Value）是：
+
+   ```properties
+   [client]
+   default-character-set='utf8'
+   
+   [mysql]
+   default-character-set='utf8'
+   
+   [mysqld]
+   init_connect='SET collation_connectioin=utf8_unicode_ci'
+   init_connect='SET NAMES utf8'
+   skip-character-set-client-handshake
+   skip-name-resolve
+   #========主从复制设置========
+   #设置server_id，同一局域网中需要唯一
+   server_id=1
+   #开启二进制日志功能
+   log-bin=mysql-bin
+   # 在主服务器上允许写入数据，仅对普通用户生效，若限制root请使用super_read_only
+   read_only=0
+   #设置使用的二进制日志格式（mixed,statement,row）
+   binlog_format=row
+   # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
+   binlog_row_image=minimal
+   
+   #二进制日志过期清理时间。默认值为0，表示不自动清理。
+   expire_logs_days=7
+   # 每个日志文件大小
+   max_binlog_size=100m
+   # binlog缓存大小
+   binlog_cache_size=4m
+   # 最大binlog缓存大小
+   max_binlog_cache_size=512m
+   
+   #指定不需要同步的数据库名称
+   binlog_ignore_db=information_schema
+   binlog_ignore_db=mysql
+   binlog_ignore_db=performance_schema
+   binlog_ignore_db=sys
+   ```
+
+点击右下角的**√** 进行确认。完成后，点击**创建**按钮以继续。
+
+### 3、创建MySQL主存储
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**存储**。在**持久卷声明**中，点击右侧的**创建**。
+2. 在**基本信息**页面，名称为：`mysql-master-pvc` ，别名为：`master存储`；点击下一步进入**存储设置**页面，添加数据：
+   - 创建方式：通过存储类创建
+   - 存储类：local
+   - 访问模式：ReadWriteOnce
+   - 卷容量：10G
+3. 点击下一步**高级设置**，默认；点击**创建**完成。
+
+### 4、创建MySQL主服务
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**应用负载**。在**服务**中，点击右侧的**创建**。
+
+2. 在**创建服务**窗口中，选择**有状态服务**，打开**创建有状态服务**窗口。
+
+3. 在**基本信息**页面，名称为：`mysql-master`，别名为：`MySQL主节点`；点击下一步进入**容器组设置**页面，
+
+   - 容器组副本数量： 1
+   - 添加容器： mysql/mysql-server:5.7
+   - 容器资源限制：
+
+   | CPU安置 | CPU值 | 内存预留 | 内存上限 |
+   | ------- | ----- | -------- | -------- |
+   | 0.01    | 0.5   | 200Mi    | 500Mi    |
+
+   - 端口设置：
+
+   | 协议 | 名称     | 容器 | 服务端口 |
+   | ---- | -------- | ---- | -------- |
+   | TCP  | tcp-3306 | 3306 | 3306     |
+
+   - 环境变量
+
+   | 来源         | 键                  | 资源         | 资源中的键          |
+   | ------------ | ------------------- | ------------ | ------------------- |
+   | 来自保密字典 | MYSQL_ROOT_PASSWORD | mysql-secret | MYSQL_ROOT_PASSWORD |
+
+   点击右下角的**√** 进行确认。完成后，点击**下一步**按钮进入**存储设置**页面。
+
+4. 点击**挂载配置字典或保密字典**并选择`mysql-master-cnf`配置；配置挂载信息：
+
+- 挂载模式： 只读
+- 挂载路径： /etc/mysql
+- 选择特定键：
+  - 键： my.cnf
+  - 路径： my.cnf
+
+点击右下角的**√** 进行确认。
+
+5. 点击**挂载卷**并选择`mysql-master-pvc`配置；配置挂载信息：
+
+- 挂载模式： 读写
+- 挂载路径： /var/lib/mysql
+
+点击右下角的**√** 进行确认。
+
+6. 点击下一步进入**高级设置**页面，使用默认配置，直接点击**创建**完成。
+
+### 5、创建MySQL副本配置文件
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**配置**。在**配置字典**中，点击右侧的**创建**。
+
+2. 在**基本信息**页面，名称为：`mysql-slave-cnf` ，别名为：`slave配置`；点击下一步进入**数据设置**页面，添加数据，
+
+   - 键（Key）
+
+   ```bash
+   my.cnf
+   ```
+
+   - 值（Value）是：
+
+   ```properties
+   [client]
+   default-character-set='utf8'
+   
+   [mysql]
+   default-character-set='utf8'
+   
+   [mysqld]
+   init_connect='SET collation_connectioin=utf8_unicode_ci'
+   init_connect='SET NAMES utf8'
+   skip-character-set-client-handshake
+   skip-name-resolve
+   
+   #========主从复制设置========
+   #设置server_id，同一局域网中需要唯一
+   server_id=2
+   #开启二进制日志功能
+   log-bin=mysql-bin
+   # 在从服务器上禁止任何用户写入任何数据，仅对普通用户生效，若限制root请使用super_read_only
+   read_only = 1
+   #设置使用的二进制日志格式（mixed,statement,row）
+   binlog_format=row
+   # 对于binlog_format = ROW模式时，减少记录日志的内容，只记录受影响的列
+   binlog_row_image = minimal
+   
+   #二进制日志过期清理时间。默认值为0，表示不自动清理。
+   expire_logs_days=7
+   # 每个日志文件大小
+   max_binlog_size=100m
+   # binlog缓存大小
+   binlog_cache_size=4m
+   # 最大binlog缓存大小
+   max_binlog_cache_size=512m
+   
+   #指定不需要同步的数据库名称
+   replicate_ignore_db=information_schema
+   replicate_ignore_db=mysql
+   replicate_ignore_db=performance_schema
+   replicate_ignore_db=sys
+   relay_log=mysql-relay-bin
+   # 作为从库时生效，想进行级联复制，则需要此参数
+   log_slave_updates=on
+   #这两个参数会将master.info和relay.info保存在表中，默认是Myisam引擎
+   master_info_repository=TABLE
+   relay_log_info_repository=TABLE
+   ```
+
+点击右下角的**√** 进行确认。完成后，点击**创建**按钮以继续。
+
+### 6、创建MySQL副本存储
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**存储**。在**持久卷声明**中，点击右侧的**创建**。
+2. 在**基本信息**页面，名称为：`mysql-slave-pvc` ，别名为：`slave存储`；点击下一步进入**存储设置**页面，添加数据：
+   - 创建方式：通过存储类创建
+   - 存储类：local
+   - 访问模式：ReadWriteOnce
+   - 卷容量：10G
+3. 点击下一步**高级设置**，默认；点击**创建**完成。
+
+
+### 7、创建MySQL副本服务
+
+1. 使用 `project-regular` 帐户登录 KubeSphere 控制台，访问 `fsmall-project` 的详情页并导航到**应用负载**。在**服务**中，点击右侧的**创建**。
+
+2. 在**创建服务**窗口中，选择**有状态服务**，打开**创建有状态服务**窗口。
+
+3. 在**基本信息**页面，名称为：`mysql-slave`，别名为：`MySQL从节点`；点击下一步进入**容器组设置**页面，
+
+   - 容器组副本数量： 1
+   - 添加容器： mysql/mysql-server:5.7
+   - 容器资源限制：
+
+   | CPU安置 | CPU值 | 内存预留 | 内存上限 |
+   | ------- | ----- | -------- | -------- |
+   | 0.01    | 0.5   | 200Mi    | 500Mi    |
+
+   - 端口设置：
+
+   | 协议 | 名称     | 容器 | 服务端口 |
+   | ---- | -------- | ---- | -------- |
+   | TCP  | tcp-3306 | 3306 | 3306     |
+
+   - 环境变量
+
+   | 来源         | 键                  | 资源         | 资源中的键          |
+   | ------------ | ------------------- | ------------ | ------------------- |
+   | 来自保密字典 | MYSQL_ROOT_PASSWORD | mysql-secret | MYSQL_ROOT_PASSWORD |
+
+   点击右下角的**√** 进行确认。完成后，点击**下一步**按钮进入**存储设置**页面。
+
+4. 点击**挂载配置字典或保密字典**并选择`mysql-slave-cnf`配置；配置挂载信息：
+
+- 挂载模式： 只读
+- 挂载路径： /etc/mysql
+- 选择特定键：
+  - 键： my.cnf
+  - 路径： my.cnf
+
+点击右下角的**√** 进行确认。
+
+5. 点击**挂载卷**并选择`mysql-slave-pvc`配置；配置挂载信息：
+
+- 挂载模式： 读写
+- 挂载路径： /var/lib/mysql
+
+点击右下角的**√** 进行确认。
+
+6. 点击下一步进入**高级设置**页面，使用默认配置，直接点击**创建**完成。
+
+### 8、配置主从关系
+
+- 进入master容器（通过容器组，进入终端）
+
+```bash
+sh-4.2# mysql -uroot -proot123
+mysql> create user 'repl'@'%' identified by 'repl123';
+mysql> grant replication slave on *.* to 'repl'@'%';
+mysql> show master status;
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB                                | Executed_Gtid_Set |
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+| mysql-bin.000003 |      595 |              | information_schema,mysql,performance_schema,sys |                   |
++------------------+----------+--------------+-------------------------------------------------+-------------------+
+1 row in set (0.00 sec)
+```
+
+- 进入slave容器（通过容器组，进入终端）
+
+```bash
+# 注意：MASTER_LOG_FILE和MASTER_LOG_POS是在主库通过 show master status 得到的
+sh-4.2# mysql -uroot -proot123
+mysql> change master to \
+master_host='mysql-master.fsmall-project', \
+master_port=3306, \
+master_user='repl', \
+master_password='repl123', \
+MASTER_LOG_FILE='mysql-bin.000003', \
+MASTER_LOG_POS=595; \
+mysql> start slave;
+mysql> show slave status \G
+```
+
+> mysql-master.fsmall-project 是MySQL主节点的DNS，点击进入应用负载=>mysql-master即可查看服务DNS
+
+### 9、验证
+
+- 登录主容器
+
+```bash
+sh-4.2# mysql -uroot -proot123
+mysql> create database db0;
+mysql> use db0;
+mysql> create table user(id int,name varchar(20),age tinyint);
+mysql> insert into user values(1,'emon',28);
+mysql> select * from user;
++------+------+------+
+| id   | name | age  |
++------+------+------+
+|    1 | emon |   28 |
++------+------+------+
+1 row in set (0.00 sec)
+```
+
+- 登录从库
+
+```bash
+sh-4.2# mysql -uroot -proot123
+mysql> select * from db0.user;
++------+------+------+
+| id   | name | age  |
++------+------+------+
+|    1 | emon |   28 |
++------+------+------+
+1 row in set (0.00 sec)
+```
