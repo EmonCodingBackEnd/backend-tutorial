@@ -2951,6 +2951,10 @@ $ docker run --name zipkin \
 -d openzipkin/zipkin:3.1.0
 ```
 
+> 指定存储到ES：
+>
+> --env STORAGE_TYPE=elasticsearch --env ES_HOSTS=192.168.32.116:9200
+
 - 访问
 
 http://192.168.32.116:9411/zipkin
