@@ -1268,7 +1268,7 @@ $ git submodule add git@github.com:EmonCodingFrontEnd/vue3-admin-template.git vu
 
 前提：
 
-1、假设你限制，在github上新创建了一个git地址A（里面已经有项目内容）
+1、假设你现在，在github上新创建了一个git地址A（里面已经有项目内容）
 
 ```bash
 $ git@github.com:EmonCodingBackEnd/springcloud-config-repo.git

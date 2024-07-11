@@ -1989,7 +1989,7 @@ $ systemctl daemon-reload && systemctl restart docker
   1. 点击该流水线进入其详情页面，然后点击**编辑 Jenkinsfile**。
   2. 将以下内容复制粘贴至 Jenkinsfile。请注意，您必须将 `REGISTRY`、`HARBOR_NAMESPACE`、`APP_NAME` 和 `HARBOR_CREDENTIAL` 替换为您自己的值。
 
-  ```yaml
+  ```groovy
   pipeline {  
     agent {
       node {
@@ -9740,6 +9740,10 @@ hello
 
 ## 6、搭建Jenkins
 
+[Jenkins Pipeline文档](https://www.jenkins.io/doc/book/pipeline/)
+
+[Jenkins Pipeline#parameters语法](https://www.jenkins.io/doc/book/pipeline/syntax/#parameters)
+
 ### 6.1、安装
 
 #### 6.1.1、使用Docker
@@ -11107,7 +11111,15 @@ server {
 
    - 环境变量
 
-   | 来源         | 键                  | 资源         | 资源中的键          |
+   | 来源   | 键              | 值      |
+   | ------ | --------------- | ------- |
+   | 自定义 | MYSQL_ROOT_HOST | %.%.%.% |
+
+   > 若没有配置MYSQL_ROOT_HOST，在新增了无状态服务暴露NodePort情况下，还是无法外部链接。
+   >
+   > 可以 `grant all privileges on *.* to 'root'@'%' identified by 'root123';` 增加授权用户
+
+   | 来源         | 键                  | 资源/值      | 资源中的键          |
    | ------------ | ------------------- | ------------ | ------------------- |
    | 来自保密字典 | MYSQL_ROOT_PASSWORD | mysql-secret | MYSQL_ROOT_PASSWORD |
 
