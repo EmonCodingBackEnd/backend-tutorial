@@ -11604,16 +11604,23 @@ project-regular账户fsmall-project项目
       > - 61613,61614 - STOMP协议端口
       > - 1883,8883 - MQTT协议端口
       > - 默认的用户名密码：guest/guest
+      
+    - 环境变量
 
+    | 来源   | 键                    | 值        |
+    | ------ | --------------------- | --------- |
+    | 自定义 | RABBITMQ_DEFAULT_USER | rabbit    |
+    | 自定义 | RABBITMQ_DEFAULT_PASS | rabbit123 |
+  
   - 挂载存储
 
     - 挂载卷
-
-      - 持久卷：redis-pvc
-
+  
+      - 持久卷：rabbitmq-pvc
+  
       - 读写模式：读写
       - 挂载路径：/var/lib/rabbitmq
-
+  
   - 高级设置：默认
 
 ## 99.7、Nacos单机
@@ -11655,27 +11662,30 @@ project-regular账户fsmall-project项目
 
       - 端口设置：
 
-      | 协议 | 名称     | 容器端口 | 服务端口 |
-      | ---- | -------- | -------- | -------- |
-      | TCP  | tcp-8848 | 8848     | 8848     |
-
+      | 协议 | 名称     | 容器端口 | 服务端口 | 作用        |
+      | ---- | -------- | -------- | -------- | ----------- |
+      | TCP  | tcp-7848 | 7848     | 7848     | asyn-raft   |
+      | TCP  | tcp-8848 | 8848     | 8848     | client-port |
+      | TCP  | tcp-9848 | 9848     | 9848     | client-rpc  |
+      | TCP  | tcp-9849 | 9849     | 9849     | raft-rpc    |
+  
       - 环境变量：
-
+  
       | 来源   | 键      | 值         |
       | ------ | ------- | ---------- |
       | 自定义 | MODE    | standalone |
       | 自定义 | JVM_XMS | 256m       |
       | 自定义 | JVM_XMX | 512m       |
-
+  
   - 挂载存储
-
+  
     - 挂载卷
-
+  
       - 持久卷：nacos-pvc
 
       - 读写模式：读写
       - 挂载路径：/home/nacos/data
-
+  
   - 高级设置：默认
 
 ### 如何开放Nacos外部访问？
@@ -11686,7 +11696,7 @@ project-regular账户fsmall-project项目
 
 2. 创建自定义服务**指定工作负载**，
 
-   - 基本信息：名称：nacos；
+   - 基本信息：名称：nacos-nodeport；
 
    - 服务设置
 
@@ -11696,10 +11706,46 @@ project-regular账户fsmall-project项目
 
      | 协议 | 名称      | 容器端口 | 服务端口 |
      | ---- | --------- | -------- | -------- |
+     | HTTP | http-7848 | 7848     | 7848     |
      | HTTP | http-8848 | 8848     | 8848     |
-
+     | HTTP | http-9848 | 9848     | 9848     |
+     | HTTP | http-9849 | 9849     | 9849     |
+   
+     > 记一次nacos部署到K8S，通过nodeport访问的坑：https://blog.csdn.net/qq_39006905/article/details/135936887
+     >
+     > 注意：指定NodePort时，Nacos要手动指定4个NodePort端口，且有规律，否则虽然浏览器可以方式，但项目内无法使用，报错：com.alibaba.nacos.api.exception.NacosException: Client not connected, current status:STARTING
+   
+     ![img](images/51d5792fcdaf4ab7a04fbd70cd6f8b3a.png)
+   
+     部署后，调整服务NodePort即可：
+   
+     ```yaml
+     spec:
+       ports:
+         - name: http-7848
+           protocol: TCP
+           port: 7848
+           targetPort: 7848
+           nodePort: 30748
+         - name: http-8848
+           protocol: TCP
+           port: 8848
+           targetPort: 8848
+           nodePort: 31748
+         - name: http-9848
+           protocol: TCP
+           port: 9848
+           targetPort: 9848
+           nodePort: 32748
+         - name: http-9849
+           protocol: TCP
+           port: 9849
+           targetPort: 9849
+           nodePort: 32749
+     ```
+   
    - 高级设置：
-
+   
      - 外部访问：勾选
        - 访问模式：NodePort
 
@@ -11707,7 +11753,7 @@ project-regular账户fsmall-project项目
 
 http://192.168.32.116:32119/nacos
 
-### 如何开放Nacos内部访问？【非必须】
+### 如何开放Nacos内部访问？
 
 对于有状态服务，可以如下操作：
 
@@ -11715,7 +11761,7 @@ http://192.168.32.116:32119/nacos
 
 2. 创建自定义服务**指定工作负载**，
 
-   - 基本信息：名称：nacos-service;
+   - 基本信息：名称：nacos;
 
    - 服务设置
 
@@ -11725,8 +11771,11 @@ http://192.168.32.116:32119/nacos
 
      | 协议 | 名称      | 容器端口 | 服务端口 |
      | ---- | --------- | -------- | -------- |
+     | HTTP | http-7848 | 7848     | 7848     |
      | HTTP | http-8848 | 8848     | 8848     |
-
+     | HTTP | http-9848 | 9848     | 9848     |
+     | HTTP | http-9849 | 9849     | 9849     |
+   
    - 高级设置：无
 
 
