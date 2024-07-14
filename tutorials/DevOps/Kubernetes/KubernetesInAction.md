@@ -2053,6 +2053,44 @@ $ systemctl daemon-reload && systemctl restart docker
 
 ![image-20240702175016014](images/image-20240702175016014.png)
 
+### 5.5、为 KubeSphere 中的 Jenkins 安装插件
+
+- 获取Jenkins地址
+
+1. 运行以下命令获取 Jenkins 的地址。
+
+```bash
+export NODE_PORT=$(kubectl get --namespace kubesphere-devops-system -o jsonpath="{.spec.ports[0].nodePort}" services devops-jenkins)
+export NODE_IP=$(kubectl get nodes --namespace kubesphere-devops-system -o jsonpath="{.items[0].status.addresses[0].address}")
+echo http://$NODE_IP:$NODE_PORT
+```
+
+2. 您会得到类似如下的输出。您可以通过输出的地址使用自己的 KubeSphere 用户和密码（例如 `admin/P@88w0rd`）访问 Jenkins 面板。
+
+http://192.168.32.116:30180
+
+- 在Jenkins面板上安装插件
+
+1. 登录 Jenkins 面板，点击**系统管理**。
+
+2. 在**系统管理**页面，下滑到**插件管理**并点击。
+
+3. 点击**可选插件**选项卡，您必须使用搜索框来搜索所需插件。例如，您可以在搜索框中输入 `git`，勾选所需插件旁边的复选框，然后按需点击**直接安装**或**下载待重启后安装**。
+
+   备注
+
+   Jenkins 的插件相互依赖。安装插件时，您可能还需要安装其依赖项。
+
+4. 如果已预先下载 HPI 文件，您也可以点击**高级**选项卡，上传该 HPI 文件作为插件进行安装。
+
+5. 在**已安装**选项卡，可以查看已安装的全部插件。能够安全卸载的插件将会在右侧显示**卸载**按钮。
+
+6. 在**可更新**选项卡，先勾选插件左侧的复选框，再点击**下载待重启后安装**，即可安装更新的插件。您也可以点击**立即获取**按钮检查更新。
+
+
+
+
+
 ## 9、FAQ
 
 ### FAQ1：如何重置用户密码
@@ -11334,6 +11372,12 @@ mysql> select * from db0.user;
 1 row in set (0.00 sec)
 ```
 
+### NodePort服务
+
+| 协议 | 名称      | 容器端口 | 服务端口 |
+| ---- | --------- | -------- | -------- |
+| HTTP | http-3306 | 3306     | 3306     |
+
 ## 99.3、Redis单机
 
 project-regular账户fsmall-project项目
@@ -11429,6 +11473,12 @@ project-regular账户fsmall-project项目
 
   - 高级设置：默认
 
+### NodePort服务
+
+| 协议 | 名称      | 容器端口 | 服务端口 |
+| ---- | --------- | -------- | -------- |
+| HTTP | http-6379 | 6379     | 6379     |
+
 
 ## 99.4、Elasticsearch单机
 
@@ -11458,6 +11508,20 @@ project-regular账户fsmall-project项目
     - 访问模式：ReadWriteOnce
 
     - 存储卷容量：10G
+
+  - 高级设置：默认
+
+- 存储=>持久卷声明
+
+  - 基本信息： 名称：es-plugins-pvc
+
+  - 存储设置
+
+    - 创建方式：通过存储类创建
+    - 存储类：local
+    - 访问模式：ReadWriteOnce
+
+    - 存储卷容量：5G
 
   - 高级设置：默认
 
@@ -11503,8 +11567,34 @@ project-regular账户fsmall-project项目
   
       - 读写模式：读写
       - 挂载路径：/usr/share/elasticsearch/data
-
+    - 挂载卷
+  
+      - 持久卷：es-plugins-pvc
+  
+      - 读写模式：读写
+      - 挂载路径：/usr/share/elasticsearch/plugins
+  
   - 高级设置：默认
+
+### NodePort服务
+
+| 协议 | 名称      | 容器端口 | 服务端口 |
+| ---- | --------- | -------- | -------- |
+| HTTP | http-9200 | 9200     | 9200     |
+
+### 安装ik分词器插件
+
+- 任意节点下载并上传到容器plugins插件解压安装
+
+```bash
+# 下载并上传到es容器的plugins目录
+$ wget -cP /usr/local/dockerv/es/software/ https://github.com/infinilabs/analysis-ik/releases/download/v7.17.18/elasticsearch-analysis-ik-7.17.18.zip
+# 拷贝到容器
+$ kubectl cp /usr/local/dockerv/es/software/elasticsearch-analysis-ik-7.17.18.zip fsmall-project/es-v1-0:/usr/share/elasticsearch/plugins -c container-d3ffxd
+# 进入容器后解压安装
+$ unzip /usr/share/elasticsearch/plugins/elasticsearch-analysis-ik-7.17.18.zip  -d /usr/share/elasticsearch/plugins/analysis-ik
+# 重新部署es服务
+```
 
 ## 99.5、Kibana
 
@@ -11611,17 +11701,24 @@ project-regular账户fsmall-project项目
     | ------ | --------------------- | --------- |
     | 自定义 | RABBITMQ_DEFAULT_USER | rabbit    |
     | 自定义 | RABBITMQ_DEFAULT_PASS | rabbit123 |
-  
+
   - 挂载存储
 
     - 挂载卷
-  
+
       - 持久卷：rabbitmq-pvc
-  
+
       - 读写模式：读写
       - 挂载路径：/var/lib/rabbitmq
-  
+
   - 高级设置：默认
+
+### NodePort服务
+
+| 协议 | 名称       | 容器端口 | 服务端口 |
+| ---- | ---------- | -------- | -------- |
+| HTTP | http-5672  | 5672     | 5672     |
+| HTTP | http-15672 | 15672    | 15672    |
 
 ## 99.7、Nacos单机
 
