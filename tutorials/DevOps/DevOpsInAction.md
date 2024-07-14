@@ -2819,6 +2819,29 @@ $ vim /usr/local/dockerv/nginx/html/index.html
 
 http://192.168.32.116
 
+- 把配置后的nginx打包镜像
+
+```bash
+$ mkdir fsmall-nginx && cd fsmall-nginx
+$ tar -zcvf conf.tar.gz -C /usr/local/dockerv/nginx/conf .
+$ tar -zcvf html.tar.gz -C /usr/local/dockerv/nginx/html/ .
+$ cat << EOF > Dockerfile
+FROM nginx:1.25.4
+MAINTAINER 问秋 liming2011071@163.com
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+EXPOSE 80
+
+ADD html.tar.gz /usr/share/nginx/html
+ADD conf.tar.gz /etc/nginx
+CMD ["nginx","-g","daemon off;"]
+EOF
+$ docker build -t rushing/fsmall-nginx:v1.0.0 -f Dockerfile .
+$ docker push rushing/fsmall-nginx:v1.0.0
+```
+
+
+
 
 
 ## 12、Nacos

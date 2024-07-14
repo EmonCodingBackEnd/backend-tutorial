@@ -992,6 +992,8 @@ centos              7                   b5b4d78bc90c        2 days ago          
 
 ### 8.1、基于已有镜像的容器创建【不推荐】
 
+<span style="color:red;font-weight:bold;">不会把外部挂载的资源打包到镜像</span>
+
 该方法主要是使用docker commit命令；等效命令：docker container commit
 
 命令格式为`docker commit [OPTIONS] CONTAINTER [REPOSITORY[:TAG]]`，主要选项包括：
