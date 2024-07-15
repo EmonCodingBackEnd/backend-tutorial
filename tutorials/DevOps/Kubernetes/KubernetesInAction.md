@@ -11018,6 +11018,8 @@ server {
 
 ## 99.1、准备
 
+### 创建项目
+
 - <span style="color:green;font-weight:bold;">登录 ws-manager 创建企业空间</span>
 
 企业空间： fsmall-workspace 邀请管理员 ws-admin
@@ -11048,9 +11050,49 @@ server {
 | project-admin   | platform-regular | fsmall-workspace-self-provisioner | admin    |
 | project-regular | platform-regular | fsmall-workspace-viewer           | operator |
 
-- Docker容器下各组件资源占用情况
+### Docker容器下各组件资源占用情况
 
 ![image-20240707070420203](images/image-20240707070420203.png)
+
+### 创建镜像仓库
+
+#### docker官方镜像仓库
+
+project-regular账户fsmall-project项目
+
+- 配置=>保密字典
+
+  - 基本信息：
+    - 名称：docker
+    - 描述：docker官方镜像仓库
+  - 数据设置
+    - 类型：镜像服务信息
+    - 镜像服务地址：docker.io
+    - 用户名：rushing
+    - 密码：xxx
+
+  然后点击“创建”按钮，验证用户名密码通过后，点击“创建"按钮完成创建。
+
+#### aliyun镜像仓库
+
+project-regular账户fsmall-project项目
+
+- 配置=>保密字典
+
+  - 基本信息：
+    - 名称：aliyun-docker
+    - 描述：阿里云镜像仓库
+  - 数据设置
+    - 类型：镜像服务信息
+    - 镜像服务地址：registry.cn-hangzhou.aliyuncs.com
+    - 用户名：18767188240
+    - 密码：xxx
+
+  然后点击“创建”按钮，验证用户名密码通过后，点击“创建"按钮完成创建。
+
+### 创建流水线
+
+project-regular账户fsmall-devops项目
 
 ## 99.2、MySQL主从复制
 
@@ -11942,3 +11984,47 @@ project-regular账户fsmall-project项目
 http://192.168.32.116:30106
 
 账号密码：sentinel/sentinel
+
+
+
+## 99.9、部署Nginx
+
+project-regular账户fsmall-project项目
+
+- 应用负载=>服务=>无状态服务
+
+  - 基本信息：名称：fsmall-nginx
+
+  - 容器组设置
+
+    - 容器组副本数量：1
+
+    - 添加容器
+
+      - 来源：docker（通过保密字典添加的）
+      - 镜像：rushing/fsmall-nginx:v1.0.0
+      - 容器资源限制：
+
+      | CPU预留 | CPU值 | 内存预留 | 内存上限 |
+      | ------- | ----- | -------- | -------- |
+      | 0.01    | 0.3   | 10Mi     | 100Mi    |
+
+      - 端口设置：
+
+      | 协议 | 名称    | 容器端口 | 服务端口 |
+      | ---- | ------- | -------- | -------- |
+      | TCP  | tcp-80  | 80       | 80       |
+      | TCP  | tcp-443 | 443      | 443      |
+
+  - 挂载存储
+
+    - 无
+
+  - 高级设置：
+
+    - 外部访问：勾选
+      - 访问模式：NodePort
+
+部署完成后，访问（注意：每次创建新服务的NodePort可能不一样）
+
+http://192.168.32.116:32761
