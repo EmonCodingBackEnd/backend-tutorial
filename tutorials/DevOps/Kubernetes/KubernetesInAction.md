@@ -16,6 +16,8 @@ Kubernetes简称k8s。是用于自动部署，扩缩和管理容器化应用程�
 
 社区文档：http://docs.kubernetes.org.cn/
 
+CNCF沙箱项目：https://www.cncf.io/sandbox-projects/
+
 # 一、Kubeadmin安装K8S V1.23
 
 单点版本：https://blog.csdn.net/Josh_scott/article/details/121961369?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=3
@@ -2087,9 +2089,27 @@ http://192.168.32.116:30180
 
 6. 在**可更新**选项卡，先勾选插件左侧的复选框，再点击**下载待重启后安装**，即可安装更新的插件。您也可以点击**立即获取**按钮检查更新。
 
+### 5.6、为KubeSphere安装OpenELB
 
+OpenELB安装：https://github.com/openelb/openelb/blob/master/README_zh.md
 
+在应用商店安装Harbor
 
+- 创建企业空间
+
+<span style="color:green;font-weight:bold;">登录 admin 创建企业空间</span>
+
+企业空间： openelb 邀请管理员 admin
+
+- 创建项目
+
+<span style="color:green;font-weight:bold;">登录 admin 在企业空间创建项目</span>
+
+企业空间：openelb 创建项目 openelb
+
+- 安装
+
+在项目中，点击【应用负载】=>【应用】=>【创建】=>【从应用商店】=>搜索“OpenELB”并安装。
 
 ## 9、FAQ
 
@@ -11058,7 +11078,7 @@ server {
 
 #### docker官方镜像仓库
 
-project-regular账户fsmall-project项目
+project-regular账户fsmall-test项目
 
 - 配置=>保密字典
 
@@ -11075,7 +11095,7 @@ project-regular账户fsmall-project项目
 
 #### aliyun镜像仓库
 
-project-regular账户fsmall-project项目
+project-regular账户fsmall-test项目
 
 - 配置=>保密字典
 
@@ -11989,7 +12009,7 @@ http://192.168.32.116:30106
 
 ## 99.9、部署Nginx
 
-project-regular账户fsmall-project项目
+project-regular账户fsmall-test项目
 
 - 应用负载=>服务=>无状态服务
 
@@ -12002,7 +12022,7 @@ project-regular账户fsmall-project项目
     - 添加容器
 
       - 来源：docker（通过保密字典添加的）
-      - 镜像：rushing/fsmall-nginx:v1.0.0
+      - 镜像：rushing/fsmall-nginx:v1.0.1
       - 容器资源限制：
 
       | CPU预留 | CPU值 | 内存预留 | 内存上限 |
@@ -12028,3 +12048,42 @@ project-regular账户fsmall-project项目
 部署完成后，访问（注意：每次创建新服务的NodePort可能不一样）
 
 http://192.168.32.116:32761
+
+## 99.10、部署Ingress
+
+### 为项目开启网关设置
+
+project-admin账户fsmall-test项目
+
+项目设置=>网关设置=>启用网关=>LoadBalancer=>负载均衡器提供商（默认QingCloud Kubernetes Engine），注解和配置选项都默认=>确定。
+
+### 配置项目网关
+
+project-regular账户fsmall-test项目
+
+- 应用负载=>应用路由=>创建
+
+  - 基本信息：fsmall-com
+
+  - 路由规则
+
+    - 域名：fsmall.com
+
+    - 协议：HTTP
+
+    - 路径：
+
+      | 路径 | 服务                                | 端口 |
+      | ---- | ----------------------------------- | ---- |
+      | /    | fsmall-nginx（上面部署的Nginx服务） | 80   |
+
+    点击右下角的**√** 进行确认。
+
+    点击下一步，进入路由规则。
+
+  - 高级设置
+
+    - 无
+
+    点击创建。
+
