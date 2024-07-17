@@ -1831,7 +1831,180 @@ http://192.168.32.116:30880
 
 ![image-20240702093849655](images/image-20240702093849655.png)
 
-  
+### 3.3、安装OpenELB负载均衡器
+
+OpenELB安装：https://github.com/openelb/openelb/blob/master/README_zh.md
+
+[openelb0.5版官网文档](https://openelb-05x-openelb.vercel.app/docs/getting-started/)
+
+[openelb最新版官网文档](https://openelb.io/docs/getting-started/)
+
+#### 3.3.1、通过应用商店OpenELB(vip模式)
+
+备注：安装的是0.5.0版本。
+
+##### 1、准备企业空间与项目
+
+- 创建企业空间
+
+<span style="color:green;font-weight:bold;">登录 admin 创建企业空间</span>
+
+企业空间： openelb 邀请管理员 admin
+
+- 创建项目
+
+<span style="color:green;font-weight:bold;">登录 admin 在企业空间创建项目</span>
+
+企业空间：openelb 创建项目 openelb
+
+##### 2、安装
+
+在项目中，点击【应用负载】=>【应用】=>【创建】=>【从应用商店】=>搜索“OpenELB”并安装。
+
+- 查看安装结果
+
+```bash
+$ kubectl get po -n openelb
+```
+
+##### 3、创建默认Eip对象
+
+```bash
+$ vim vip-eip.yaml
+```
+
+```yaml
+apiVersion: network.kubesphere.io/v1alpha2
+kind: Eip
+metadata:
+  name: vip-eip
+  annotations:
+	# 指定是默认EIP
+    eip.openelb.kubesphere.io/is-default-eip: "true"
+spec:
+  # 一个或多个ip地址，需要与k8s集群节点属于同一个网段
+  address: 192.168.32.91-192.168.32.100
+  interface: ens33
+  protocol: vip
+```
+
+```bash
+$ kubectl apply -f vip-eip.yaml
+# 查看eip
+$ kubectl get eip
+```
+
+> 备注：若不创建一个默认的eip，则创建的service需要配置注解：
+>
+> ```yaml
+>    lb.kubesphere.io/v1alpha1: openelb
+>    protocol.openelb.kubesphere.io/v1alpha1: vip
+>    eip.openelb.kubesphere.io/v1alpha2: vip-eip
+> ```
+
+#### 3.3.2、命令行安装OpenELB(layer2模式)
+
+备注：安装的是0.5.0版本。
+
+##### 1、下载并安装
+
+```bash
+$ wget https://raw.githubusercontent.com/openelb/openelb/release-0.5/deploy/openelb.yaml
+kubectl apply -f openelb.yaml
+```
+
+##### 2、查看安装结果
+
+```bash
+$ kubectl get po -n openelb-system
+```
+
+##### 3、为kube-proxy启用strictARP
+
+- 编辑kube-proxy配置
+
+```bash
+$ kubectl edit configmap kube-proxy -n kube-system
+```
+
+- 设置`data.config.conf.ipvs.strictARP`为true
+
+```bash
+    ipvs:
+      strictARP: true
+```
+
+- 重启kube-proxy
+
+```bash
+$ kubectl rollout restart daemonset kube-proxy -n kube-system
+```
+
+##### 4、为OpenELB指定NIC网络适配器
+
+如果OpenELB的安装节点有多个网络适配器，需要指定OpenELB在Layer 2模式下使用哪一个。如果节点只有1个网络适配器，就不需要指定了。
+
+```bash
+$ kubectl annotate nodes emon layer2.openelb.kubesphere.io/v1alpha1="192.168.31.116"
+```
+
+##### 5、创建默认Eip对象
+
+```bash
+$ vim layer2-eip.yaml
+```
+
+```yaml
+apiVersion: network.kubesphere.io/v1alpha2
+kind: Eip
+metadata:
+  name: layer2-eip
+  annotations:
+	# 指定是默认EIP
+    eip.openelb.kubesphere.io/is-default-eip: "true"
+spec:
+  # 一个或多个ip地址，需要与k8s集群节点属于同一个网段
+  address: 192.168.32.91-192.168.32.100
+  interface: ens33
+  protocol: layer2
+```
+
+```bash
+$ kubectl apply -f layer2-eip.yaml
+# 查看eip
+$ kubectl get eip
+```
+
+> 备注：若不创建一个默认的eip，则创建的service需要配置注解：
+>
+> ```yaml
+>    lb.kubesphere.io/v1alpha1: openelb
+>    protocol.openelb.kubesphere.io/v1alpha1: layer2
+>    eip.openelb.kubesphere.io/v1alpha2: layer2-eip
+> ```
+
+### 3.4、配置集群网关设置
+
+admin 账户操作
+
+- 群设置=>网关设置=>启用网关
+
+  - LoadBalancer
+    - 负载均衡器提供商：默认 QingCloud Kubernets Engine，这里选择 OpenELB（选择哪一个都没关系，使用的是默认EIP）
+    - 注解：默认
+
+  - 点击确定
+
+> 由于上面创建了默认eip，这里可以不用配置注解
+
+- 查看是否启用成功
+
+```bash
+# 查看 EXTERNAL-IP 字段是否已经分配了eip地址，比如：192.168.32.91
+$ kubectl -n kubesphere-controls-system get svc
+```
+
+<span style="color:green;font-weight:bold;">注意：192.168.32.91可以通过网络适配器ens33添加新ip的方式达到宿主机本地DNS访问</span>
 
 ## 4、用户-企业空间-项目
 
@@ -2055,7 +2228,7 @@ $ systemctl daemon-reload && systemctl restart docker
 
 ![image-20240702175016014](images/image-20240702175016014.png)
 
-### 5.5、为 KubeSphere 中的 Jenkins 安装插件
+### 5.5、为 KubeSphere 中的 Jenkins 安装插件（可选）
 
 - 获取Jenkins地址
 
@@ -2088,28 +2261,6 @@ http://192.168.32.116:30180
 5. 在**已安装**选项卡，可以查看已安装的全部插件。能够安全卸载的插件将会在右侧显示**卸载**按钮。
 
 6. 在**可更新**选项卡，先勾选插件左侧的复选框，再点击**下载待重启后安装**，即可安装更新的插件。您也可以点击**立即获取**按钮检查更新。
-
-### 5.6、为KubeSphere安装OpenELB
-
-OpenELB安装：https://github.com/openelb/openelb/blob/master/README_zh.md
-
-在应用商店安装Harbor
-
-- 创建企业空间
-
-<span style="color:green;font-weight:bold;">登录 admin 创建企业空间</span>
-
-企业空间： openelb 邀请管理员 admin
-
-- 创建项目
-
-<span style="color:green;font-weight:bold;">登录 admin 在企业空间创建项目</span>
-
-企业空间：openelb 创建项目 openelb
-
-- 安装
-
-在项目中，点击【应用负载】=>【应用】=>【创建】=>【从应用商店】=>搜索“OpenELB”并安装。
 
 ## 9、FAQ
 
@@ -11074,7 +11225,7 @@ server {
 
 ![image-20240707070420203](images/image-20240707070420203.png)
 
-### 创建镜像仓库
+### 创建镜像仓库【非Docker官方时添加镜像库】
 
 #### docker官方镜像仓库
 
@@ -12049,15 +12200,9 @@ project-regular账户fsmall-test项目
 
 http://192.168.32.116:32761
 
-## 99.10、部署Ingress
+## 99.10、为项目开启应用路由
 
-### 为项目开启网关设置
-
-project-admin账户fsmall-test项目
-
-项目设置=>网关设置=>启用网关=>LoadBalancer=>负载均衡器提供商（默认QingCloud Kubernetes Engine），注解和配置选项都默认=>确定。
-
-### 配置项目网关
+<span style="color:red;font-weight:bold;">前提需要项目开启了网关设置，或者集群的网关设置已开启</span>
 
 project-regular账户fsmall-test项目
 
@@ -12087,3 +12232,6 @@ project-regular账户fsmall-test项目
 
     点击创建。
 
+等待一会可以看到网关地址已经分配了，该网关地址是集群/项目网关设置得到的地址。
+
+![image-20240717222845491](images/image-20240717222845491.png)
