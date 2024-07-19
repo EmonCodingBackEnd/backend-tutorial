@@ -1945,7 +1945,7 @@ $ kubectl rollout restart daemonset kube-proxy -n kube-system
 如果OpenELB的安装节点有多个网络适配器，需要指定OpenELB在Layer 2模式下使用哪一个。如果节点只有1个网络适配器，就不需要指定了。
 
 ```bash
-$ kubectl annotate nodes emon layer2.openelb.kubesphere.io/v1alpha1="192.168.31.116"
+$ kubectl annotate nodes emon layer2.openelb.kubesphere.io/v1alpha1="192.168.32.116"
 ```
 
 ##### 5、创建默认Eip对象
@@ -1963,7 +1963,7 @@ metadata:
 	# 指定是默认EIP
     eip.openelb.kubesphere.io/is-default-eip: "true"
 spec:
-  # 一个或多个ip地址，需要与k8s集群节点属于同一个网段
+  # 一个或多个ip地址，需要与k8s集群节点属于同一个网段；注意：请为网卡配置如下地址段的ip，不然外部无法访问！！！
   address: 192.168.32.91-192.168.32.100
   interface: ens33
   protocol: layer2
