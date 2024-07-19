@@ -450,7 +450,32 @@ drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 
 ---
 
+## 4、异常问题解决办法
 
+[问题解决参考](https://blog.csdn.net/Passerby_Wang/article/details/127179994)
+
+- 网络无法启动
+
+Could not activate connection: Connection 'net8' is not available on device ens33 because device is strictly unmanaged
+
+一般来讲，虚拟机恢复或者重启后，碰到xshell无法访问时，在虚拟机查看如下：
+
+```bash
+$ nmcli conn show
+```
+
+发现所有的网络都没有连接。尝试唤起 nmcli conn up xx 时遇到上面的错误。
+
+修复如下：
+
+```bash
+# 查看状态
+$ nmcli networking
+# 启用
+$ nmcli networking on
+# 重启
+$ systemctl restart NetworkManager
+```
 
 ## 1、安装JDK
 
