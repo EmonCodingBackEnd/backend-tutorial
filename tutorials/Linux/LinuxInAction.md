@@ -1389,7 +1389,7 @@ e is 65537 (0x10001)
 2. 生成CA自签证书
 
 ```bash
-[emon@emon certs]$ sudo openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3655
+[emon@emon certs]$ sudo openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3650
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
 What you are about to enter is what is called a Distinguished Name or a DN.
@@ -1516,7 +1516,7 @@ vsftpd.csr                                                                      
 
 ```bash
 [root@emon ~]# cd /tmp/
-[root@emon tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 365
+[root@emon tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 3650
 Using configuration from /etc/pki/tls/openssl.cnf
 Check that the request matches the signature
 Signature ok

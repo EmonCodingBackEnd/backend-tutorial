@@ -1418,7 +1418,7 @@ EnvironmentFile=-/etc/docker/daemon.json
 ```bash
 # 打标签
 [emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
-# 登录
+# 登录，登录后信息存储在用户目录下的 .docker/config.json
 [emon@emon ~]$ docker login -u emon -p Emon@123 emon:5080
 # 上传镜像
 [emon@emon ~]$ docker push emon:5080/devops-learning/openjdk:8-jre
