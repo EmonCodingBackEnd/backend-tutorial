@@ -6,7 +6,7 @@
 
 Linux教程视频地址
 
-https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd_source=b850b3a29a70c8eb888ce7dff776a5d1&p=60
+https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd_source=b850b3a29a70c8eb888ce7dff776a5d1&p=80
 
 
 
@@ -144,7 +144,7 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 - 使用细节
 
 1. logout 注销指令在图形运行级别无效，在运行级别 3 下有效。
-2. 运行级别这个概念，参考8.10章节。
+2. 运行级别这个概念，<span style="color:blue;font-weight:bold;">参考9.1章节</span>。
 
 # 第8章 Linux实操篇-实用指令
 
@@ -222,6 +222,8 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 % whoami 
 # 查询是什么用户身份登录的，以及登录时间
 % who am i
+# 查看当前登录中的用户有哪些
+% who
 ```
 
 ## 8.8 用户组
@@ -298,7 +300,7 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 
 6 ：系统重启
 
-常用运行级别是3和5，也可以指定默认运行级别，后面演示。
+常用运行级别是3和5，也可以指定默认运行级别，<span style="color:blue;font-weight:bold;">参考15.3章节</span>。
 
 ```bash
 % init 3
@@ -316,30 +318,6 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 # 多用户状态有网络服务模式下，执行切换
 % init 5
 ```
-
-- CentOS7之前如何指定运行级别？
-
-在CentOS7之前，在 /etc/inittab 文件中。
-
-- CentOS7及之后如何指定运行级别？
-
-  - 默认级别说明
-    - <span style="color:blue;">multi-user.target</span> : analogous to runlevel 3
-    - <span style="color:blue;">graphical.target</span> : analogous to runlevel 5
-
-  
-
-  - 查看默认级别
-
-  ```bash
-  % systemctl get-default
-  ```
-
-  - 设置默认级别为 3
-
-  ```bash
-  % systemctl set-default multi-user.target
-  ```
 
 ## 9.2 如何找回root密码
 
@@ -1288,7 +1266,7 @@ job 3 at Sun Dec 29 23:36:00 2024
 
 # 第12章 Linux实操篇-Linux磁盘分区、挂载
 
-## 12.1 Linux分区
+## 12.1 lsblk查看Linux分区
 
 - 原理介绍
 
@@ -1308,7 +1286,7 @@ job 3 at Sun Dec 29 23:36:00 2024
 3. 对于SCSI硬盘则标识为”sdx~“，SCSI硬盘是用”sd“来表示分区所在设备的类型的，其余则和IDE硬盘的表示方法一样。
 4. NVMe 硬盘，nvme0n1 这个磁盘名是 NVMe Disk 0 Namespace 1 的缩写，意思是第一个 NVMe 硬盘的第一个命名空间1。每个 NVMe 硬盘上的分区通过在磁盘名后面加上一个 p 和一个十进制数字表示，例如 nvme0n1p1 和 nvme0n1p2 表示系统中第一个 NVMe 硬盘的第一个命名空间的第一个和第二个分区。
 
-## 12.2 挂载的经典案例
+## 12.2 fdisk挂载的经典案例
 
 - 说明
 
@@ -1406,7 +1384,7 @@ nvme0n2            259:4    0    1G  0 disk
 /dev/nvme0n2p1          /newdisk                xfs     defaults        0 0
 ```
 
-## 12.3 磁盘情况查询
+## 12.3 df磁盘情况查询
 
 - 查询系统整体磁盘使用情况
 
@@ -1474,13 +1452,27 @@ nvme0n2            259:4    0    1G  0 disk
 
 ## 13.1 Linux网络环境配置
 
-- 修改网卡配置文件
+- Mac下查看虚拟机的子网IP和子网掩码
+
+![image-20241231174407021](images/image-20241231174407021.png)
+
+- 虚拟机修改网卡配置文件
 
 ![image-20241231145414358](images/image-20241231145414358.png)
 
-- 修改内容如下
+- 虚拟机修改内容如下
 
 ![image-20241231152042388](images/image-20241231152042388.png)
+
+注意：
+
+1. DNS1 表示域名解析器，值也可以是192.168.200.2
+
+2. BOOTPROTO 表示IP的配置方法[none|static|bootp|dhcp]（引导时不使用协议|静态分配IP|BOOTP协议|DHCP协议）
+
+3. TYPE=Ethernet 表示网络类型
+4. DEVICE=ens160 表示接口名（设备，网卡）
+5. ONBOOT=yes 表示系统启动的时候网络接口是否有效
 
 - 重启网络
 
@@ -1491,6 +1483,902 @@ nvme0n2            259:4    0    1G  0 disk
 # 或者
 % reboot
 ```
+
+## 13.2 设置主机名和hosts映射
+
+### 13.2.1 设置主机名
+
+为了方便记忆，可以给linux系统设置主机名，也可以根据需要修改主机名
+
+- 第一步
+
+```bash
+[root@emon ~]# hostnamectl set-hostname emon
+```
+
+- 第二步：验证
+
+```bash
+[root@emon ~]# cat /etc/hostname
+emon
+[root@emon ~]# hostname
+emon
+```
+
+- 第三步：配置
+
+```bash
+[root@emon ~]# vim /etc/hosts
+```
+
+```bash
+# 这里也可以是某个具体的IP地址
+127.0.0.1   emon
+```
+
+- 第四部：退出Shell，重新登录即可
+
+### 13.2.2 设置hosts映射
+
+DNS解析过程分析   ：用户在浏览器输入了www.baidu.com
+
+Hosts是什么？一个文本文件，用来记录IP和Hostname（主机名）的映射关系。
+
+DNS是什么？就是Domain Name System的缩写，翻译过来就是域名系统，是互联网上作为域名和IP地址相互映射的一个分布式数据库。
+
+1. 浏览器先检查浏览器缓存中有没有该域名解析IP地址，有就先调用这个IP完成解析；如果没有，就检查DNS解析器缓存，如果有直接返回IP完成解析。这两个缓存，可以理解为本地解析器缓存。
+2. 一般来说，当电脑第一次成功访问某一网站后在一定时间内，浏览器或操作系统会缓存他的IP地址（DNS解析记录）。如在cmd窗口中输入。
+
+ipconfig /displaydns 	// DNS域名解析缓存
+
+ipconfig /flushdns 	    // 手动清理DNS缓存 
+
+3. 如果本地解析器缓存没有找到对应映射，检查系统中hosts文件中有没有配置对应的域名IP映射，如果有，则完成解析并返回。
+4. 如果本地DNS解析器缓存和hosts文件中均没有找到对应的IP，则到域名服务DNS进行解析域。
+
+![image-20250101112839831](images/image-20250101112839831.png)
+
+
+
+
+
+- 使用SwitchHosts软件配置本地Mac的hosts。
+
+![image-20250101004257104](images/image-20250101004257104.png)
+
+- 编辑 /etc/hosts 修改虚拟机的hosts
+
+```bash
+vim /etc/hosts
+```
+
+```bash
+# 添加下面一行
+192.168.200.1 wenqiu
+```
+
+# 第14章 Linux实操篇-进程管理
+
+## 14.1 基本介绍
+
+1. 在Linux中，每个执行的程序都成为一个进程。每一个进程都分配一个ID号（pid，进程号）。
+2. 每个进程都可能以两种方式存在的。前台与后台，所谓前台进程就是用户目前的屏幕上可以进行操作的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行。
+3. 一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才结束。
+
+## 14.2 ps显示系统执行的进程
+
+**基本介绍**
+
+ps命令是用来查看目前系统中，有哪些正在执行，以及它们执行的状况。可以不加任何参数。
+
+ps显示的信息选项：
+
+| 字段 | 说明                   |
+| ---- | ---------------------- |
+| PID  | 进程识别号             |
+| TTY  | 终端机号               |
+| TIME | 此进程所消耗CPU时间    |
+| CMD  | 正在执行的命令或进程名 |
+
+```bash
+% ps
+  PID TTY          TIME CMD
+ 4811 pts/1    00:00:00 bash
+ 5073 pts/1    00:00:00 ps
+```
+
+| 命令     | 含义                                             |
+| -------- | ------------------------------------------------ |
+| ps -a    | 显示当前终端的所有进程信息                       |
+| ps -u    | 显示与指定用户相关的进程信息                     |
+| ps -x    | 显示后台进程运行的参数                           |
+| ps -aux  | 显示所有进程信息，包括所有用户的进程和无终端进程 |
+| -A 或 -e | 显示所有进程信息                                 |
+| ps -ef   | 显示所有进程的完整信息，包括命令行参数           |
+
+**ps -aux命令的输出内容解释 **
+
+![image-20250101213021970](images/image-20250101213021970.png)
+
+**ps -ef命令的输出内容解释**
+
+![image-20250101211802802](images/image-20250101211802802.png)
+
+## 14.3 终止进程kill和killall
+
+- 介绍：
+
+若是某个进程执行一半需要停止时，或是已消耗了很大的系统资源时，此时可以考虑停止该进程。使用kill命令来完成此项任务。
+
+- 基本语法
+
+`kill [选项] 进程号` （功能描述：通过进程号杀死进程）
+
+`killall 进程名称` （功能描述：通过进程名称杀死进程，也支持通配符，这在系统因负载过大而变得很慢）
+
+- 常用选项
+
+-9 ：表示强迫进程立即停止
+
+- 最佳实践
+
+1. 案例1：踢掉某个非法登录用户
+
+```bash
+# 查找 emon 用户的登录进程ID
+% ps -aux | grep sshd
+% kill 6070
+```
+
+2. 案例2：终止远程登录服务sshd，在适当时候再次重启sshd服务。
+
+```bash
+# 查找 /usr/sbin/sshd 的进程ID
+% ps -aux | grep sshd
+# 杀掉之后，新的用户无法登入了，但已经登录的用户还可以使用
+% kill 1268
+% systemctl start sshd
+```
+
+3.  案例3：终止多个gedit
+
+```bash
+% killall gedit
+```
+
+4. 案例4：强制杀掉一个终端
+
+```bash
+% ps -aux | grep bash
+% kill -9 ps -aux | grep bash
+```
+
+## 14.4 查看进程树pstree
+
+- 基本语法
+
+`pstree [选项]` 可以更加直观的来看进程信息
+
+- 常用选项
+
+-p ：显示进程的PID
+
+-u ：显示进程的所属用户
+
+- 应用实例
+
+1. 案例1：请以树状的形式显示进程的pid
+
+```bash
+% pstree -p
+```
+
+2. 案例2：请以树状的形式进程的用户
+
+```bash
+% pstree -u
+```
+
+## 14.5 服务（service）管理
+
+### 14.5.1 service管理指令
+
+- 介绍
+
+服务（service）本质就是进程，但是是运行在后台的，通常都会监听某个端口，等待其他程序的请求，比如（mysql、sshd防火墙等），因此我们又称为守护进程，是Linux中非常重要的知识点。
+
+- service管理指令
+
+1. service 服务名 [start | stop | restart | reload | status]
+
+2. 在CentOS7.0后，<span style="color:red;font-weight:bold;">很多服务不再使用service，而是systemctl代替</span>。
+3. service指令管理的服务在 /etc/init.d 查看
+
+```bash
+% ls -l /etc/init.d/
+总用量 40
+-rw-r--r--. 1 root root 18281 5月  22 2020 functions
+-rwxr-xr-x. 1 root root  4569 5月  22 2020 netconsole
+-rwxr-xr-x. 1 root root  7928 5月  22 2020 network
+-rw-r--r--. 1 root root  1160 10月  2 2020 README
+```
+
+- service管理指令案例
+
+请使用service指令，查看、关闭、启动 network 【注意：在虚拟系统演示，因为网络连接会关闭】
+
+### 14.5.2 setup查看服务名
+
+- 查看服务名
+
+方式1：使用 setup -> 系统服务 就可以看到全部。
+
+```bash
+% setup
+```
+
+说明：服务名前面带有星号[*]表示开机启动。
+
+方式2：/etc/init.d 看到service指令管理的服务。
+
+```bash
+% ls -l /etc/init.d/
+总用量 40
+-rw-r--r--. 1 root root 18281 5月  22 2020 functions
+-rwxr-xr-x. 1 root root  4569 5月  22 2020 netconsole
+-rwxr-xr-x. 1 root root  7928 5月  22 2020 network
+-rw-r--r--. 1 root root  1160 10月  2 2020 README
+```
+
+### 14.5.3 服务的运行级别（runlevel）
+
+- 服务的运行级别（runlevel）
+
+Linux系统有7种运行级别（runlevel），常用的是级别3和5。
+
+运行级别0：系统停机状态，系统默认运行级别不能设为0，否则不能正常启动。
+
+运行级别1：单用户工作状态，root权限，用于系统维护，禁止远程登录。
+
+运行级别2：多用户工作状态（没有NFS），不支持网络。
+
+运行级别3：完全的多用户状态（有NFS），登录后进入控制台命令行模式。
+
+运行级别4：系统未使用，保留。
+
+运行级别5：X11控制台，登录后进入图形GUI模式。
+
+运行级别6：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动。
+
+开机的流程说明：
+
+开机=>BIOS=>/boot=>systemd进程=>运行级别=>运行级对应的服务。
+
+- CentOS7之前如何指定运行级别？
+
+在CentOS7之前，在 /etc/inittab 文件中。
+
+- CentOS7及之后如何指定运行级别？
+
+  - 默认级别说明
+    - <span style="color:blue;">multi-user.target</span> : analogous to runlevel 3
+    - <span style="color:blue;">graphical.target</span> : analogous to runlevel 5
+
+  
+
+  - 查看默认级别
+
+  ```bash
+  % systemctl get-default
+  ```
+
+  - 设置默认级别为 3
+
+  ```bash
+  % systemctl set-default multi-user.target
+  ```
+
+### 14.5.4 chkconfig指令
+
+- 介绍
+
+1. 通过chkconfig命令可以给服务的各个运行级别设置自启动/关闭。
+2. chkconfig指令管理的服务在 /etc/init.d 查看。
+3. 注意：CentOS7.0后，很多服务<span style="color:red;font-weight:bold;">使用 systemctl</span>管理。
+
+- chkconfig基本语法
+
+```bash
+# 查看服务
+% chkconfig --list
+% chkconfig network --list
+```
+
+```bash
+# 设置服务在5级别下自启动/关闭，这种设置需要重启生效
+% chkconfig --level 5 network on/off 
+```
+
+### 14.5.5 systemctl管理指令
+
+- 管理指令基本语法
+
+1. 基本语法
+
+```bash
+% systemctl [start | stop | restart | status] 服务名
+```
+
+2. systemctl指令管理的服务在 `/usr/lib/systemd/system` 查看
+
+```bash
+% ls -l /usr/lib/systemd/system
+```
+
+- systemctl设置服务的自启动状态
+
+1. `systemctl list-unit-files [| grep 服务名]`（查看服务开机启动状态，grep可以进行过滤）
+2. `systemctl enable 服务名` （设置服务开机启动）
+3. `systemctl disable 服务名` （关闭服务开机启动）
+4. `systemctl is-enabled 服务名` （查看某个服务是否自启动的）
+
+- 应用案例
+
+1. 查看当前防火墙的状况，关闭防火墙和重启防火墙。
+
+```bash
+# 这种方式只是临时生效，当重启系统后，还是回归以前对服务的设置。
+% systemctl stop firewalld
+# 永久生效命令
+% systemctl disable firewalld
+```
+
+### 14.5.6 firewall-cmd打开或者关闭指定端口
+
+在真正的生产环境，往往需要将防火墙打开，但问题来了，如果我们把防火墙打开，那么外部请求数据包就不能跟服务器监听端口通讯。这时，需要打开制定的端口。比如80、22、8080等，这个又怎么做呢？
+
+- firewall指令
+
+打开端口：`firewall-cmd --permanent --add-port=端口号/协议`
+
+关闭端口：`firewall-cmd --permanent --remove-port=端口号/协议`
+
+重新载入，才能生效：`firewall-cmd --reload`
+
+查询端口是否开放：`firewall-cmd --query-port=端口/协议`
+
+- 应用案例
+
+1. 启用防火墙，测试111端口是否能telnet
+
+```bash
+% telnet 192.168.200.116 111
+```
+
+2. 开放111端口
+
+```bash
+% firewall-cmd --permanent --add-port=111/tcp
+% firewall-cmd --reload
+```
+
+此时，telnet能通：
+
+```bash
+% telnet emon 111
+Trying 192.168.200.116...
+Connected to emon.
+Escape character is '^]'.
+^]
+telnet> quit
+Connection closed.
+```
+
+3. 再次关闭111端口
+
+```bash
+# 特殊说明：关闭的操作，在reload之前已经生效了
+% firewall-cmd --permanent --remove-port=111/tcp
+% firewall-cmd --reload
+```
+
+## 14.6 动态监控进程
+
+### 14.6.1 top命令详解
+
+- 介绍
+
+top与ps命令很相似。它们都用来显示正在执行的进程。top与ps最大的不同之处，在于top在执行一段时间可以更新正在运行的进程。
+
+- 基本语法
+
+```bash
+% top [选项]
+```
+
+- 选项说明
+
+| 选项    | 功能                                               |
+| ------- | -------------------------------------------------- |
+| -d 秒数 | 指定top命令每隔几秒更新。默认是3秒。比如：top -d 5 |
+| -i      | 使top不显示任何闲置或者僵死进程。                  |
+| -p      | 通过指定监控进程ID来仅仅监控某个进程的状态。       |
+
+- top命令输出结果解释
+
+默认top命令进入时是按照CPU占用来排序的。
+
+![image-20250103132909394](images/image-20250103132909394.png)
+
+<span style="color:#1E90FF;font-weight:bold;">第一行：</span>
+
+```bash
+top - 02:36:46 up 1 day,  3:52,  3 users,  load average: 0.00, 0.00, 0.00
+```
+
+当前时间		02:36:46
+
+系统运行时间	up 1 day,  3:52
+
+用户数量		3 users
+
+CPU负载情况	load average: 0.00, 0.00, 0.00	3个值累加除以3，若小于0.7表示压力不大。
+
+<span style="color:#1E90FF;font-weight:bold;">第二行</span>
+
+```bash
+Tasks: 232 total,   1 running, 131 sleeping,   0 stopped,   0 zombie
+```
+
+任务数量		Tasks: 232 total
+
+运行数量		1 running
+
+睡眠数量		131 sleeping
+
+停止数量		0 stopped
+
+僵死数量		0 zombie
+
+<span style="color:#1E90FF;font-weight:bold;">第三行：</span>
+
+```bash
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+```
+
+用户空间占用CPU百分比	0.0 us
+
+内核空间占用CPU百分比	0.0 sy
+
+用户进程空间内改变过优先级的进程占用CPU百分比	0.0 ni
+
+空闲CPU百分比	100.0 id
+
+等待输入输出的CPU时间百分比	0.0 wa
+
+硬中断（Hardware IRQ）占用CPU的百分比	0.0 hi
+
+软中断（Software Interrupts）占用CPU的百分比	0.0 si
+
+用于有虚拟cpu的情况，用来指示被虚拟机偷掉的cpu时间	0.0 st
+
+<span style="color:#1E90FF;font-weight:bold;">第四行：</span>
+
+```bash
+KiB Mem :  8123820 total,  7631400 free,   247432 used,   244988 buff/cache
+```
+
+物理总内存	8123820 total
+
+物理空闲内存	7631400 free
+
+物理使用内存	247432 used
+
+缓存内存		244988 buff/cache
+
+<span style="color:#1E90FF;font-weight:bold;">第五行：</span>
+
+```bash
+KiB Swap:  8388604 total,  8388604 free,        0 used.  7684272 avail Mem 
+```
+
+Swap总内存	8388604 total
+
+Swap空闲内存	8388604 free
+
+Swap使用内存	0 used
+
+swap可用内存	7684272 avail Mem
+
+<span style="color:#1E90FF;font-weight:bold;">进程结果解释</span>
+
+```bash
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                   
+    1 root      20   0  158440   8248   5272 S   0.0  0.1   0:03.10 systemd                                   
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.08 kthreadd  
+```
+
+| 列名    | 含义                                                         |
+| ------- | ------------------------------------------------------------ |
+| PID     | 进程ID                                                       |
+| USER    | 进程拥有者的用户名                                           |
+| PR      | 进程优先级                                                   |
+| NI      | 进程优先级值。正常为0， 负值表示优先级越高，正值表示优先级越低 |
+| VIRT    | 进程使用的虚拟内存总量，单位KB。                             |
+| RES     | 进程使用的物理内存大小，单位KB。                             |
+| SHR     | 进程使用的共享内存大小，单位KB。                             |
+| S       | 进程的状态，通常是'S'-休眠、'R'-运行中、'Z'-僵尸、'N'-低优先级任务 |
+| %CPU    | 进程使用的CPU时间百分比。                                    |
+| %MEM    | 进程使用的物理内存百分比。                                   |
+| TIME+   | 进程运行的总CPU时间。                                        |
+| COMMAND | 启动进程的命令名称                                           |
+
+### 14.6.2 top命令交互
+
+- 交互操作说明
+
+| 操作 | 功能                          |
+| ---- | ----------------------------- |
+| P    | 以CPU使用率排序，默认就是此项 |
+| M    | 以内存的使用率排序            |
+| N    | 以PID排序                     |
+| q    | 退出top                       |
+
+- 应用实例
+
+案例1.监视特定用户
+
+top ：输入此命令，按回车键，查看执行的进程。
+
+u ：然后输入“u”回车，再输入用户名即可。
+
+
+
+案例2.终止指定的进程。
+
+top ：输入此命令，按回车键，查看执行的进程。
+
+k ：然后输入“k”按回车，再输入要结束的进程ID号。
+
+
+
+案例3.指定系统状态更新的时间（每隔10秒自动更新）
+
+top -d 10
+
+## 14.7 监控网络状态
+
+### 14.7.1 查看系统网络情况netstat
+
+- 基本语法
+
+`netstat [选项]`
+
+- 选项说明
+
+| 选项  | 功能                                                         |
+| ----- | ------------------------------------------------------------ |
+| -t    | 仅显示TCP连接                                                |
+| -u    | 进现实UDP连接                                                |
+| -a    | 显示所有连线中的Socket，包括监听的。                         |
+| -n    | 直接使用IP地址，不通过域名服务器。                           |
+| -o    | 显示socket定时器（比如保活定时器）的信息                     |
+| -p    | 显示正在使用Socket的程序识别码和程序名称。                   |
+| -anop | 以数字形式显示所有连接和监听端口、保活定时器信息及其对应的进行信息。 |
+| -l    | 显示处于监听状态的服务端口                                   |
+| -c    | 每隔1s输出一次                                               |
+| -tnlp | 以数字形式显示所有TCP监听端口及其对应的进程信息‌。            |
+| -tnop | 以数字形式显示所有TCP监听端口及其对应的进程信息‌。（仅显示keepalive的数据） |
+
+- 应用案例
+
+请查看服务名尾sshd的服务的信息。
+
+```bash
+% netstat -anop | grep -v unix
+```
+
+![image-20250104133954574](images/image-20250104133954574.png)
+
+### 14.7.2 检测主机连接命令ping
+
+ping是一种网络检测工具，它主要是用于检测远程主机是否正常，或是两部主机间的网线或网卡故障。
+
+如：ping对方ip地址
+
+```bash
+% ping 192.168.200.1
+```
+
+# 第15章 Linux实操篇-RPM于YUM
+
+## 15.1 rpm包的管理
+
+### 15.1.1 查询rpm包
+
+- 介绍
+
+​	rpm用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成具有`.rpm`扩展名的文件。rpm是RedHat Package Manager（RedHat软件包管理工具）的缩写，类似windows的setup.exe，这一文件格式名称虽然打上了RedHat的标志，但理念是通用的。
+
+​	Linux的分发版本都有采用（suse、redhat、centos等等），可以算是公认的行业标准了。
+
+- rpm包的简单查询指令
+
+查询已安装的rpm列表：`rpm -qa|grep xx`
+
+```bash
+# 看看当前系统是否安装了firefox
+% rpm -qa|grep firefox
+firefox-68.10.0-1.el7.centos.aarch64
+```
+
+- rpm包名基本格式
+
+一个rpm包名：firefox-60.2.2-1.el7.centos.x86_64
+
+名称：firefox
+
+版本号：60.2.2-1
+
+适用操作系统：el7.centos.x86_64
+
+表示centos7.x的64位操作系统
+
+如果是i686、i368表示32位系统，noarch表示通用。
+
+- rpm包的其它查询指令
+
+  - `rpm -qa` 查询所安装的所有rpm软件包
+
+  ```bash
+  % rpm -qa | more
+  % rpm -qa | grep firefox
+  ```
+
+  - `rpm -q 软件包名` 查询软件包是否安装
+
+  如果软件包已经安装，该命令会输出软件包的版本信息；如果未安装，则会输出“package <package_name> is not installed”
+
+  ```bash
+  % rpm -q firefox
+  firefox-68.10.0-1.el7.centos.aarch64
+  # 如果命令的输出为空，则说明所有列出的软件包都已安装；如果输出包含“not installed”，则说明至少有一个软件包未安装。
+  % rpm -q wget curl git | grep "not installed"
+  ```
+
+  - `rpm -qi 软件包名` 查询软件包信息
+
+  ```bash
+  % rpm -qi firefox
+  Name        : firefox
+  Version     : 68.10.0
+  Release     : 1.el7.centos
+  Architecture: aarch64
+  Install Date: 2024年12月22日 星期日 19时44分25秒
+  Group       : Unspecified
+  Size        : 225389870
+  License     : MPLv1.1 or GPLv2+ or LGPLv2+
+  Signature   : RSA/SHA256, 2020年07月09日 星期四 00时26分19秒, Key ID 6c7cb6ef305d49d6
+  Source RPM  : firefox-68.10.0-1.el7.centos.src.rpm
+  Build Date  : 2020年07月08日 星期三 07时21分07秒
+  Build Host  : aarch64-02.bsys.centos.org
+  Relocations : (not relocatable)
+  Packager    : CentOS BuildSystem <http://bugs.centos.org>
+  Vendor      : CentOS
+  URL         : https://www.mozilla.org/firefox/
+  Summary     : Mozilla Firefox Web browser
+  Description :
+  Mozilla Firefox is an open-source web browser, designed for standards
+  compliance, performance and portability.
+  ```
+
+  - `rpm -ql 软件包名` 查询软件包中的文件
+
+  ```bash
+  % rpm -ql firefox
+  /etc/firefox
+  /etc/firefox/pref
+  /usr/bin/firefox
+  ......
+  ```
+
+  - `rpm -qf 文件全路径名` 查询文件所属的软件包
+
+  ```bash
+  % rpm -qf /etc/passwd
+  setup-2.8.71-11.el7.noarch
+  % rpm -qf /root/install.log
+  错误：文件 /root/install.log：没有那个文件或目录
+  % rpm -qf /root/anaconda-ks.cfg 
+  文件 /root/anaconda-ks.cfg 不属于任何软件包
+  ```
+
+  - `rpm -qc 软件包名` 显示已安装的指定软件的配置文件
+
+  ```bash
+  % rpm -qc wget
+  /etc/wgetrc
+  % rpm -qc yum
+  /etc/logrotate.d/yum
+  /etc/yum.conf
+  /etc/yum/version-groups.conf
+  ```
+
+  - `rpm -qd 软件包名` 显示已安装的指定软件的软件包文档所在位置
+
+  ```bash
+  % rpm -qd yum
+  /usr/share/doc/yum-3.4.3/AUTHORS
+  /usr/share/doc/yum-3.4.3/COPYING
+  /usr/share/doc/yum-3.4.3/ChangeLog
+  /usr/share/doc/yum-3.4.3/INSTALL
+  /usr/share/doc/yum-3.4.3/PLUGINS
+  /usr/share/doc/yum-3.4.3/README
+  /usr/share/doc/yum-3.4.3/TODO
+  /usr/share/doc/yum-3.4.3/comps.rng
+  /usr/share/man/man5/yum.conf.5
+  /usr/share/man/man8/yum-shell.8
+  /usr/share/man/man8/yum.8
+  ```
+
+  - `rpm -qR 软件包名` 显示已安装的指定软件的依赖的软件包及文件
+
+  ```bash
+  % rpm -qR yum
+  /usr/bin/python
+  config(yum) = 3.4.3-168.el7.centos
+  cpio
+  diffutils
+  pygpgme
+  pyliblzma
+  python >= 2.4
+  python(abi) = 2.7
+  python-iniparse
+  python-sqlite
+  python-urlgrabber >= 3.10-8
+  pyxattr
+  rpm >= 0:4.11.3-22
+  rpm-python
+  rpmlib(CompressedFileNames) <= 3.0.4-1
+  rpmlib(FileDigests) <= 4.6.0-1
+  rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+  yum-metadata-parser >= 1.1.0
+  yum-plugin-fastestmirror
+  rpmlib(PayloadIsXz) <= 5.2-1
+  ```
+
+### 15.1.2 卸载rpm包
+
+- 基本语法
+
+`rpm -e RPM包的名称`
+
+- 应用案例
+
+1. 案例1：删除firefox软件包
+
+```bash
+% rpm -e firefox
+```
+
+- 细节讨论
+
+1. 如果其他软件包依赖于你要卸载的软件包，卸载时会产生错误信息。
+
+```bash
+% rpm -e cpio
+错误：依赖检测失败：
+        cpio 被 (已安裝) yum-3.4.3-168.el7.centos.noarch 需要
+        cpio 被 (已安裝) dracut-033-572.el7.aarch64 需要
+        cpio 被 (已安裝) initscripts-9.49.53-1.el7.aarch64 需要
+        cpio 被 (已安裝) plymouth-scripts-0.8.9-0.34.20140113.el7.centos.aarch64 需要
+        cpio 被 (已安裝) abrt-addon-ccpp-2.1.11-60.el7.centos.aarch64 需要
+        cpio 被 (已安裝) rpm-build-4.11.3-45.el7.aarch64 需要
+        /usr/bin/cpio 被 (已安裝) kmod-20-28.el7.aarch64 需要
+        /usr/bin/cpio 被 (已安裝) file-roller-3.28.1-2.el7.aarch64 需要
+```
+
+2. 如果我们就是要删除 cpio 这个rpm包，可以增加参数 -nodeps ，就可以强制删除，但是一般不推荐这样做，因为依赖于该软件包的程序可能无法运行。
+
+比如：`rpm -e --nodeps cpio`
+
+### 15.1.3 安装rpm包
+
+- 基本语法
+
+`rpm -ivh RPM包全路径名称`
+
+- 参数说明
+
+| 参数      | 功能   |
+| --------- | ------ |
+| i=install | 安装   |
+| v=verbose | 提示   |
+| h=hash    | 进度条 |
+
+- 应用实例
+
+1. 案例1：演示卸载和安装firefox浏览器
+
+![image-20250104163714123](images/image-20250104163714123.png)
+
+## 15.2 yum
+
+### 15.2.1 基本用法
+
+- 介绍
+
+yum是一个shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包。
+
+- yum的基本指令
+
+查询yum服务器是否有需要安装的软件
+
+`yum list | grep xxx`
+
+安装指定的yum包
+
+`yum install xxx`
+
+- 应用实例
+
+案例1：请使用yum的方式来安装firefox
+
+```bash
+% rpm -e firefox
+% yum list firefox
+% yum install -y firefox
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
