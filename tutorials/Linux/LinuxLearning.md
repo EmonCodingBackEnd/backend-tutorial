@@ -1517,17 +1517,22 @@ nvme0n2            259:4    0    1G  0 disk
 
 <img src="images/image-20250109171519133.png" alt="image-20250109171519133" style="zoom:50%;" />
 
-nmcli n 查看NM托管状态，如果是disabled会导致无法nmcli conn up XX成功
-nmcli n on 开启NM托管状态
-
-| 命令                                                        | 说明                 |
-| ----------------------------------------------------------- | -------------------- |
-| nmcli conn show ens160                                      | 查看ens160的配置信息 |
-| nmcli conn modify ens160 ipv4.method manual                 | 设置IP地址为手动指定 |
-| nmcli conn modify ens160 connection.autoconnect yes         | 设置网卡开机自启动   |
-| nmcli conn modify ens160 ipv4.addreses '192.168.200.116/24' | 设置网卡IP           |
-| nmcli conn modify ens160 ipv4.gateway '192.168.200.2'       | 设置网关             |
-| nmcli conn modify ens160 ipv4.dns '192.168.200.2'           | 设置DNS              |
+| 命令                                                        | 说明                                                         |
+| ----------------------------------------------------------- | ------------------------------------------------------------ |
+| nmcli n                                                     | 查看NM托管状态，<br />如果是disabled会导致无法nmcli conn up XX成功 |
+| nmcli n on                                                  | 开启NM托管状态                                               |
+| nmcli conn show                                             | 查询网卡的配置信息                                           |
+| nmcli device status                                         | 查询网卡的连接状态                                           |
+| nmcli device disconnect ens160                              | 断开设备连接                                                 |
+| nmcli device connect ens160                                 | 打开连接                                                     |
+| nmcli                                                       | 查询所有网卡信息                                             |
+| nmcli device show ens160                                    | 查看ens160网卡信息                                           |
+| nmcli conn show ens160                                      | 查看ens160网卡配置                                           |
+| nmcli conn modify ens160 ipv4.method manual                 | 设置IP地址为手动指定                                         |
+| nmcli conn modify ens160 connection.autoconnect yes         | 设置网卡开机自启动                                           |
+| nmcli conn modify ens160 ipv4.addreses '192.168.200.116/24' | 设置网卡IP                                                   |
+| nmcli conn modify ens160 ipv4.gateway '192.168.200.2'       | 设置网关                                                     |
+| nmcli conn modify ens160 ipv4.dns '192.168.200.2'           | 设置DNS                                                      |
 
 <span style="color:red;font-weight:bold;">注意：DNS还可以是`nmcli conn modify ens160 ipv4.dns '192.168.200.2,223.5.5.5,8.8.8.8,114.114.114.114'`</span>
 
