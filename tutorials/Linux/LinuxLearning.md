@@ -8,7 +8,9 @@ Linux教程视频地址
 
 https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd_source=b850b3a29a70c8eb888ce7dff776a5d1&p=126
 
+# 第1章 安装
 
+主机名： wenqiu
 
 # 第4章 Linux基础篇-目录结构
 
@@ -1507,7 +1509,39 @@ nvme0n2            259:4    0    1G  0 disk
 
 ### 13.1.2 Rocky9网卡配置
 
+```bash
+% vim /etc/NetworkManager/system-connections/ens160.nmconnection
+```
 
+<img src="images/image-20250109171308445.png" alt="image-20250109171308445" style="zoom:50%;" />
+
+<img src="images/image-20250109171519133.png" alt="image-20250109171519133" style="zoom:50%;" />
+
+nmcli n 查看NM托管状态，如果是disabled会导致无法nmcli conn up XX成功
+nmcli n on 开启NM托管状态
+
+| 命令                                                        | 说明                 |
+| ----------------------------------------------------------- | -------------------- |
+| nmcli conn show ens160                                      | 查看ens160的配置信息 |
+| nmcli conn modify ens160 ipv4.method manual                 | 设置IP地址为手动指定 |
+| nmcli conn modify ens160 connection.autoconnect yes         | 设置网卡开机自启动   |
+| nmcli conn modify ens160 ipv4.addreses '192.168.200.116/24' | 设置网卡IP           |
+| nmcli conn modify ens160 ipv4.gateway '192.168.200.2'       | 设置网关             |
+| nmcli conn modify ens160 ipv4.dns '192.168.200.2'           | 设置DNS              |
+
+<span style="color:red;font-weight:bold;">注意：DNS还可以是`nmcli conn modify ens160 ipv4.dns '192.168.200.2,223.5.5.5,8.8.8.8,114.114.114.114'`</span>
+
+- 重新加载配置文件
+
+```bash
+% nmcli conn reload
+```
+
+- 不重启系统，让网卡生效
+
+```bash
+% nmcli conn up ens160
+```
 
 ## 13.2 设置主机名和hosts映射
 

@@ -28,18 +28,14 @@ https://www.bilibili.com/video/BV1Sv411r7vd/?spm_id_from=333.337.search-card.all
 | /tmp   | 逻辑分区，分配20G                                            |
 | /usr   | 逻辑分区，剩下全部空间（大约105G左右）                       |
 
-![300G分配情况](images/image-20200403201105131.png)
-
-
-
 <span style="color:red;font-weight:bold;">多年使用心得：如果没有特殊需要，建议分3个区（或4个分区，包含/boot/efi分区）即可：</span>
 
 | 挂载点    | 说明                                                         |
 | --------- | ------------------------------------------------------------ |
 | /boot/efi | 为使用EFI固件的系统设置的特定目录，用于存放EFI启动加载器等内容。分配200M |
-| /boot     | 主分区，存放Linux启动所需的核心文件，推荐大小200M足够，分配1G |
-| swap      | 逻辑分区，虚拟内存，分区格式swap，分配大小与内存相关         |
-| /         | 逻辑分区，剩余所有可分配内存，比如100G基本很多场景都够用。   |
+| /boot     | 存放Linux启动所需的核心文件，推荐大小200M足够，分配800M      |
+| swap      | 虚拟内存，分区格式swap，分配大小与内存相关                   |
+| /         | 剩余所有可分配内存，比如100G基本很多场景都够用。             |
 
 其中`swap`分区的大小说明如下：
 
@@ -56,37 +52,37 @@ https://www.bilibili.com/video/BV1Sv411r7vd/?spm_id_from=333.337.search-card.all
 
 | 挂载点    | 大小         | 说明                                                         | 设备类型 | 文件系统             |
 | --------- | ------------ | ------------------------------------------------------------ | -------- | -------------------- |
-| /boot/efi | 500MB        | 为使用EFI固件的系统设置的特定目录，<br />用于存放EFI启动加载器等内容 | 标准分区 | EFI System Partition |
-| /boot     | 1G           | 主分区，存放Linux启动所需的核心文件，<br />推荐大小200M足够，分配1G | 标准分区 | xfs                  |
-| swap      | 8G           | 逻辑分区，虚拟内存，分区格式swap，分配大小与内存相关         | LVM      | swap                 |
-| /         | 剩下全部空间 | 逻辑分区，剩下全部空间                                       | LVM      | Xfs                  |
+| /boot/efi | 200M         | 为使用EFI固件的系统设置的特定目录，<br />用于存放EFI启动加载器等内容。分配200M | 标准分区 | EFI System Partition |
+| /boot     | 800M         | 存放Linux启动所需的核心文件，<br />推荐大小200M足够，分配800M | 标准分区 | xfs                  |
+| swap      | 8G           | 虚拟内存，分区格式swap，分配大小与内存相关                   | LVM      | swap                 |
+| /         | 剩下全部空间 | 剩下全部空间                                                 | LVM      | Xfs                  |
 
 ### 1.3、修改主机名
 
 - 第一步
 
 ```bash
-[root@emon ~]# hostnamectl set-hostname emon
+[root@wenqiu ~]# hostnamectl set-hostname wenqiu
 ```
 
 - 第二步：验证
 
 ```bash
-[root@emon ~]# cat /etc/hostname
-emon
-[root@emon ~]# hostname
-emon
+[root@wenqiu ~]# cat /etc/hostname
+wenqiu
+[root@wenqiu ~]# hostname
+wenqiu
 ```
 
 - 第三步：配置
 
 ```bash
-[root@emon ~]# vim /etc/hosts
+[root@wenqiu ~]# vim /etc/hosts
 ```
 
 ```bash
 # 这里也可以是某个具体的IP地址
-127.0.0.1   emon
+192.168.200.116   wenqiu
 ```
 
 - 第四部：退出Shell，重新登录即可
@@ -98,21 +94,21 @@ emon
 1. 查看网卡会话
 
 ```bash
-[root@emon ~]# nmcli conn show
+[root@wenqiu ~]# nmcli conn show
 ```
 
 2. 配置公司网卡会话
 
 ```bash
-[root@emon ~]# nmcli connection add con-name company ifname ens33 autoconnect no type ethernet ip4 10.0.0.116/24 gw4 10.0.0.1
-[root@emon ~]# nmcli con modify company +ipv4.dns 223.6.6.6
+[root@wenqiu ~]# nmcli connection add con-name company ifname ens33 autoconnect no type ethernet ip4 10.0.0.116/24 gw4 10.0.0.1
+[root@wenqiu ~]# nmcli con modify company +ipv4.dns 223.6.6.6
 ```
 
 3. 配置家庭网卡会话
 
 ```bash
-[root@emon ~]# nmcli connection add con-name house ifname ens33 type ethernet ip4 192.168.1.116/24 gw4 192.168.1.1
-[root@emon ~]# nmcli con modify house +ipv4.dns 211.140.188.188
+[root@wenqiu ~]# nmcli connection add con-name house ifname ens33 type ethernet ip4 192.168.1.116/24 gw4 192.168.1.1
+[root@wenqiu ~]# nmcli con modify house +ipv4.dns 211.140.188.188
 ```
 
 4. 配置通用net8会话
@@ -132,11 +128,11 @@ emon
 此时，可配置如下：
 
 ```bash
-[root@emon ~]# nmcli conn add con-name net8 ifname ens33 type ethernet ip4 192.168.32.116/24 gw4 192.168.32.2
+[root@wenqiu ~]# nmcli conn add con-name net8 ifname ens33 type ethernet ip4 192.168.32.116/24 gw4 192.168.32.2
 # 指定了DNS后，还需要重新激活（nmtui图形界面操作）一下 net8，网络才通
-[root@emon ~]# nmcli con modify net8 +ipv4.dns 192.168.32.2
+[root@wenqiu ~]# nmcli con modify net8 +ipv4.dns 192.168.32.2
 # 配置开机自动启动该会话
-[root@emon ~]# nmcli conn mod net8 connection.autoconnect yes 
+[root@wenqiu ~]# nmcli conn mod net8 connection.autoconnect yes 
 ```
 
 > 执行： `nmcli conn up net8` 报错如下：
@@ -151,16 +147,18 @@ emon
 5. 编辑网卡会话
 
 ```bash
-[root@emon ~]# nmtui
+[root@wenqiu ~]# nmtui
 ```
 
 6. 删除网卡会话
 
 ```bash
-[root@emon ~]# nmcliconn delete company
+[root@wenqiu ~]# nmcliconn delete company
 ```
 
 ### 2.2、使用系统镜像文件配置本地yum源
+
+#### 2.2.1 CentOS7
 
 如果本地安装了Git Bash，或者可以使用scp命令，使用scp传输到系统的`/usr/local/src`目录即可。
 
@@ -169,8 +167,8 @@ emon
 1. 创建挂载点并挂载
 
 ```bash
-[root@emon ~]# mkdir /media/cdrom
-[root@emon ~]# mount -t iso9660 -o loop /usr/local/src/CentOS-7-x86_64-DVD-2009.iso /media/cdrom/
+[root@wenqiu ~]# mkdir /media/cdrom
+[root@wenqiu ~]# mount -t iso9660 -o loop /usr/local/src/CentOS-7-x86_64-DVD-2009.iso /media/cdrom/
 ```
 
 2. 设置开机自动挂载系统镜像文件
@@ -178,7 +176,7 @@ emon
 打开文件后，在最后一行追加如下内容：
 
 ```bash
-[root@emon ~]# vi /etc/fstab
+[root@wenqiu ~]# vi /etc/fstab
 # 个人配置
 /usr/local/src/CentOS-7-x86_64-DVD-2009.iso /media/cdrom        iso9660         defaults,ro,loop 0 0
 ```
@@ -186,7 +184,7 @@ emon
 3. 配置本地yum
 
 ```bash
-[root@emon ~]# vi /etc/yum.repos.d/CentOS-7.9.repo
+[root@wenqiu ~]# vi /etc/yum.repos.d/CentOS-7.9.repo
 # 如下内容为编辑的文件内容
 [CentOS7.9]
 name=CentOS7.9
@@ -199,13 +197,60 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 4. 查看可用的yum
 
 ```bash
-[root@emon ~]# yum repolist all
+[root@wenqiu ~]# yum repolist all
 ```
 
 5. 缓存服务器包信息，之后配合`yum -C search xxx`可用不用联网即可检索软件信息
 
 ```bash
-[root@emon ~]# yum makecache
+[root@wenqiu ~]# yum makecache
+```
+
+#### 2.2.2 Rocky9
+
+1. 设置开机自动挂载系统镜像文件
+
+```bash
+[root@wenqiu ~]# vi /etc/fstab
+# 个人配置
+/opt/Rocky-9.5-aarch64-dvd.iso /media/cdrom        iso9660         defaults,ro,loop 0 0
+```
+
+```bash
+[root@wenqiu ~]# mount -a
+mount: (hint) your fstab has been modified, but systemd still uses
+       the old version; use 'systemctl daemon-reload' to reload.
+[root@wenqiu ~]# systemctl daemon-reload
+```
+
+2. 配置本地yum
+
+```bash
+[root@wenqiu ~]# vi /etc/yum.repos.d/Rocky-9.5.repo
+# 如下内容为编辑的文件内容
+[Rocky9.5-BaseOS]
+name=Rocky9.5-BaseOS
+baseurl=file:///media/cdrom/BaseOS
+enabled=1
+gpgcheck=0
+
+[Rocky9.5-AppStream]
+name=Rocky9.5-AppStream
+baseurl=file:///media/cdrom/AppStream
+enabled=1
+gpgcheck=0
+```
+
+3. 查看可用的yum
+
+```bash
+[root@wenqiu ~]# yum repolist all
+```
+
+4. 缓存服务器包信息，之后配合`yum -C search xxx`可用不用联网即可检索软件信息
+
+```bash
+[root@wenqiu ~]# yum makecache
 ```
 
 ### 2.3、安装常用命令
@@ -215,37 +260,37 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 1. vim
 
 ```bash
-[root@emon ~]# yum install -y vim*
+[root@wenqiu ~]# yum install -y vim*
 ```
 
 2. wget
 
 ```bash
-[root@emon ~]# yum install -y wget
+[root@wenqiu ~]# yum install -y wget
 ```
 
 3. tree
 
 ```bash
-[root@emon ~]# yum install -y tree
+[root@wenqiu ~]# yum install -y tree
 ```
 
 4. netstat和ifconfig
 
 ```bash
-[root@emon ~]# yum install -y net-tools
+[root@wenqiu ~]# yum install -y net-tools
 ```
 
 5. unzip
 
 ```bash
-[root@emon ~]# yum install -y unzip
+[root@wenqiu ~]# yum install -y unzip
 ```
 
 6. lsof
 
 ```bash
-[root@emon ~]# yum install -y lsof
+[root@wenqiu ~]# yum install -y lsof
 ```
 
 7. semanage
@@ -253,29 +298,35 @@ gpgkey=file:///media/cdrom/RPM-GPG-KEY-CentOS-7
 CentOS8默认没安装semanage命令，安装如下：
 
 ```bash
-[root@emon ~]# yum install -y policycoreutils-python-utils
+[root@wenqiu ~]# yum install -y policycoreutils-python-utils
 ```
 
 8. nc
 
 ```bash
-[root@emon ~]# yum install -y nmap
+[root@wenqiu ~]# yum install -y nmap
 ```
 
+9. tar
 
+```bash
+[root@wenqiu ~]# yum install -y tar
+```
 
 ### 2.4、更换yum源配置为阿里云源配置
+
+#### 2.4.1 CentOS7
 
 1. 备份
 
 ```bash
-[root@emon ~]# mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+[root@wenqiu ~]# mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
 ```
 
 2. 下载新的CentOS-Base.repo到/etc/yum.repos.d/目录
 
 ```bash
-[root@emon ~]# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+[root@wenqiu ~]# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 ```
 
 【备注】如果提示无法解析`mirrors.aliyun.com`，应该是当前会话的DNS属于内网IP，只需要再增加`8.8.8.8`这个DNS即可。
@@ -283,7 +334,32 @@ CentOS8默认没安装semanage命令，安装如下：
 3. 生成缓存
 
 ```bash
-[root@emon ~]# yum makecache
+[root@wenqiu ~]# yum makecache
+```
+
+#### 2.4.2 Rocky9
+
+1. 备份
+
+```bash
+[root@wenqiu ~]# cd /etc/yum.repos.d/
+[root@wenqiu yum.repos.d]# cp rocky-addons.repo rocky-addons.repo.bak
+[root@wenqiu yum.repos.d]# cp rocky-devel.repo rocky-devel.repo.bak
+[root@wenqiu yum.repos.d]# cp rocky-extras.repo rocky-extras.repo.bak
+[root@wenqiu yum.repos.d]# cp rocky.repo rocky.repo.bak
+[root@wenqiu yum.repos.d]# tar -zcvf Rocky.repo.bak.tar.gz rocky*.bak
+[root@wenqiu yum.repos.d]# rm -rf rocky*.bak
+```
+
+2. 执行以下命令替换默认源
+
+```bash
+sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+    -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.aliyun.com/rockylinux|g' \
+    -i.bak \
+    /etc/yum.repos.d/rocky*.repo
+
+dnf makecache
 ```
 
 ### 2.5、创建具有sudo权限的普通用户
@@ -291,13 +367,13 @@ CentOS8默认没安装semanage命令，安装如下：
 1. 创建普通用户
 
 ```bash
-[root@emon ~]# useradd -c "Web Site User" emon
+[root@wenqiu ~]# useradd -c "Web Site User" emon
 ```
 
 2. 修改密码
 
 ```bash
-[root@emon ~]# passwd emon
+[root@wenqiu ~]# passwd emon
 ```
 
 3. 赋权sudo
@@ -315,7 +391,7 @@ emon    ALL=(ALL)       ALL
 打开文件后，在最后一行追加如下内容：
 
 ```bash
-[root@emon ~]# vim /etc/vimrc 
+[root@wenqiu ~]# vim /etc/vimrc 
 " 个人配置
 set tabstop=4
 set softtabstop=4
@@ -330,16 +406,16 @@ set pastetoggle=<F9>
 打开文件后，在最后一行追加如下内容：
 
 ```bash
-[root@emon ~]# vim /etc/hosts
-127.0.0.1   emon
+[root@wenqiu ~]# vim /etc/hosts
+192.168.200.116   wenqiu
 ```
 
-### 2.8、切换主机脚本
+### 2.8、切换主机脚本【仅参考】
 
 - 编辑脚本
 
 ```bash
-[emon@emon ~]$ vim ~/bin/switchHosts.sh
+[emon@wenqiu ~]$ vim ~/bin/switchHosts.sh
 ```
 
 ```bash
@@ -391,13 +467,13 @@ cat /etc/hosts
 - 修改权限
 
 ```bash
-[emon@emon ~]$ chmod u+x ~/bin/switchHosts.sh 
+[emon@wenqiu ~]$ chmod u+x ~/bin/switchHosts.sh 
 ```
 
 - 执行切换
 
 ```bash
-[emon@emon ~]$ ~/bin/switchHosts.sh 
+[emon@wenqiu ~]$ ~/bin/switchHosts.sh 
 ```
 
 ## 3、一些说明
@@ -413,8 +489,8 @@ cat /etc/hosts
 由于下面采用emon进行安装，安装目录在`/usr/local/`，这里先修改目录的属主。
 
 ```bash
-[emon@emon ~]$ sudo chown -R emon /usr/local/
-[emon@emon ~]$ ll -d /usr/local/
+[emon@wenqiu ~]$ sudo chown -R emon /usr/local/
+[emon@wenqiu ~]$ ll -d /usr/local/
 drwxr-xr-x. 13 emon root 4096 Feb 24  2017 /usr/local/
 ```
 
@@ -454,7 +530,7 @@ $ systemctl restart NetworkManager
 1. 检查是否已安装
 
 ```bash
-[emon@emon ~]$ rpm -qa|grep jdk
+[emon@wenqiu ~]$ rpm -qa|grep jdk
 ```
 
 2. 下载
@@ -464,25 +540,25 @@ $ systemctl restart NetworkManager
 官网下载页地址： http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u251-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u251-linux-x64.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ http://111.1.50.18/files/3104000006BC77D6/download.oracle.com/otn-pub/java/jdk/8u251-b11/512cd62ec5174c3487ac17c61aaa89e8/jdk-8u251-linux-x64.tar.gz
 ```
 
 3. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Java
+[emon@wenqiu ~]$ mkdir /usr/local/Java
 ```
 
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/jdk-8u251-linux-x64.tar.gz -C /usr/local/Java/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/jdk-8u251-linux-x64.tar.gz -C /usr/local/Java/
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Java/jdk1.8.0_251/ /usr/local/java
+[emon@wenqiu ~]$ ln -s /usr/local/Java/jdk1.8.0_251/ /usr/local/java
 ```
 
 6. 配置环境变量
@@ -490,7 +566,7 @@ $ systemctl restart NetworkManager
 在`/etc/profile.d`目录创建`jdk.sh`文件：
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/jdk.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/jdk.sh
 ```
 
 ```bash
@@ -502,13 +578,13 @@ export PATH=$JAVA_HOME/bin:$PATH
 使之生效：
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 7. 校验
 
 ```bash
-[emon@emon ~]$ java -version
+[emon@wenqiu ~]$ java -version
 java version "1.8.0_251"
 Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
 Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
@@ -521,25 +597,25 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 下载地址获取页面： https://tomcat.apache.org/whichversion.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.34/bin/apache-tomcat-9.0.34.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://mirror.bit.edu.cn/apache/tomcat/tomcat-9/v9.0.34/bin/apache-tomcat-9.0.34.tar.gz
 ```
 
 2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Tomcat
+[emon@wenqiu ~]$ mkdir /usr/local/Tomcat
 ```
 
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-tomcat-9.0.34.tar.gz -C /usr/local/Tomcat/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/apache-tomcat-9.0.34.tar.gz -C /usr/local/Tomcat/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Tomcat/apache-tomcat-9.0.34/ /usr/local/tomcat
+[emon@wenqiu ~]$ ln -s /usr/local/Tomcat/apache-tomcat-9.0.34/ /usr/local/tomcat
 ```
 
 5. 配置UTF-8字符集
@@ -547,7 +623,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 打开文件`/usr/local/tomcat/conf/server.xml ` 找到8080默认端口的配置位置，在xml节点末尾增加`URIEncoding="UTF-8"` ，修改后的内容如下：
 
 ```bash
- [emon@emon ~]$ vim /usr/local/tomcat/conf/server.xml 
+ [emon@wenqiu ~]$ vim /usr/local/tomcat/conf/server.xml 
      <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
                redirectPort="8443" URIEncoding="UTF-8"/>
@@ -556,7 +632,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 6. 校验
 
 ```bash
-[emon@emon ~]$ /usr/local/tomcat/bin/catalina.sh version
+[emon@wenqiu ~]$ /usr/local/tomcat/bin/catalina.sh version
 ```
 
 ## 3、安装Maven
@@ -566,25 +642,25 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 下载地址获取页面： https://maven.apache.org/download.cgi
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
 ```
 
 2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Maven
+[emon@wenqiu ~]$ mkdir /usr/local/Maven
 ```
 
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/apache-maven-3.8.6-bin.tar.gz -C /usr/local/Maven/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/apache-maven-3.8.6-bin.tar.gz -C /usr/local/Maven/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Maven/apache-maven-3.8.6/ /usr/local/maven
+[emon@wenqiu ~]$ ln -s /usr/local/Maven/apache-maven-3.8.6/ /usr/local/maven
 ```
 
 5. 配置环境变量
@@ -592,7 +668,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 在`/etc/profile.d`目录创建`mvn.sh`文件：
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/mvn.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/mvn.sh
 export MAVEN_HOME=/usr/local/maven
 export PATH=$MAVEN_HOME/bin:$PATH
 ```
@@ -600,13 +676,13 @@ export PATH=$MAVEN_HOME/bin:$PATH
 使之生效：
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 6. 校验
 
 ```bash
-[emon@emon ~]$ mvn -v
+[emon@wenqiu ~]$ mvn -v
 ```
 
 7. 配置
@@ -614,13 +690,13 @@ export PATH=$MAVEN_HOME/bin:$PATH
 - 创建repo存放目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/maven/repository
+[emon@wenqiu ~]$ mkdir /usr/local/maven/repository
 ```
 
 - 配置存放repo
 
   ```bash
-  [emon@emon ~]$ vim /usr/local/maven/conf/settings.xml 
+  [emon@wenqiu ~]$ vim /usr/local/maven/conf/settings.xml 
   ```
 
   - 配置`localRepository`【多用户访问不建议配置】
@@ -637,7 +713,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
 
   **说明：**需要修改`/usr/local/maven/repository`为`jenkins`用户权限。
 
-  > [emon@emon ~]$ sudo chown jenkins.jenkins /usr/local/maven/repository
+  > [emon@wenqiu ~]$ sudo chown jenkins.jenkins /usr/local/maven/repository
   
   - 配置`mirror`
   
@@ -673,19 +749,19 @@ export PATH=$MAVEN_HOME/bin:$PATH
 1. 检查是否安装
 
 ```bash
-[emon@emon ~]$ rpm -qa|grep vsftpd
+[emon@wenqiu ~]$ rpm -qa|grep vsftpd
 ```
 
 2. 使用yum安装
 
 ```bash
-[emon@emon ~]$ sudo yum -y install vsftpd
+[emon@wenqiu ~]$ sudo yum -y install vsftpd
 ```
 
 3. 备份`vsftpd.conf`配置文件
 
 ```bash
-[emon@emon ~]$ sudo cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.bak
+[emon@wenqiu ~]$ sudo cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.bak
 ```
 
 4. 创建文件服务器根目录`/fileserver`
@@ -693,25 +769,25 @@ export PATH=$MAVEN_HOME/bin:$PATH
 首先，`fileserver` 并非ftp专享的目录，而是ftp、ftps、sftp这三种文件服务器共享的根目录。
 
 ```bash
-[emon@emon ~]$ sudo mkdir /fileserver
+[emon@wenqiu ~]$ sudo mkdir /fileserver
 ```
 
 5. 创建ftp本地用户
 
 ```bash
-[emon@emon ~]$ sudo useradd -d /fileserver/ftproot -s /sbin/nologin -c "Ftp User" ftpuser
+[emon@wenqiu ~]$ sudo useradd -d /fileserver/ftproot -s /sbin/nologin -c "Ftp User" ftpuser
 ```
 
 创建用户后，自动创建了`/fileserver/ftproot/`目录，但是该目录权限为700，需要修改为755
 
 ```bash
-[emon@emon ~]$ sudo chmod -R 755 /fileserver/ftproot/
+[emon@wenqiu ~]$ sudo chmod -R 755 /fileserver/ftproot/
 ```
 
 为了创建本地用户模式+虚拟用户模式，都可以登录ftp服务器，这里设置ftpuser用户的密码
 
 ```bash
-[emon@emon ~]$ sudo passwd ftpuser
+[emon@wenqiu ~]$ sudo passwd ftpuser
 ```
 
 6. 虚拟用户模式需要如下准备
@@ -719,7 +795,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
    1. 配置虚拟用户
 
    ```bash
-   [emon@emon ~]$ sudo vim /etc/vsftpd/virtual_user_list
+   [emon@wenqiu ~]$ sudo vim /etc/vsftpd/virtual_user_list
    ftp
    ftp123
    extra
@@ -731,15 +807,15 @@ export PATH=$MAVEN_HOME/bin:$PATH
    2. 根据配置的虚拟用户，生成虚拟用户数据库文件
 
    ```bash
-   [emon@emon ~]$ sudo db_load -T -t hash -f /etc/vsftpd/virtual_user_list /etc/vsftpd/virtual_user_list.db
-   [emon@emon ~]$ file /etc/vsftpd/virtual_user_list.db
+   [emon@wenqiu ~]$ sudo db_load -T -t hash -f /etc/vsftpd/virtual_user_list /etc/vsftpd/virtual_user_list.db
+   [emon@wenqiu ~]$ file /etc/vsftpd/virtual_user_list.db
    /etc/vsftpd/virtual_user_list.db: Berkeley DB (Hash, version 9, native byte-order)
    ```
 
    3. 配置支持虚拟用户的PAM认证文件，引用生成的虚拟用户数据库文件（默认带`.db`后缀，无需指定）
 
    ```bash
-   [emon@emon ~]$ sudo vim /etc/pam.d/vsftpd 
+   [emon@wenqiu ~]$ sudo vim /etc/pam.d/vsftpd 
    ```
 
    打开文件，在文件头非注释行开始，插入如下内容（插入的内容必须第一行开始）：
@@ -755,7 +831,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
 7. 配置`vsftpd.conf`
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/vsftpd/vsftpd.conf
+[emon@wenqiu ~]$ sudo vim /etc/vsftpd/vsftpd.conf
 ```
 
 ```bash
@@ -817,7 +893,7 @@ pasv_max_port=62000
    1. `chroot_list_file`所需
 
    ```bash
-   [emon@emon ~]$ sudo vim /etc/vsftpd/chroot_list
+   [emon@wenqiu ~]$ sudo vim /etc/vsftpd/chroot_list
    ```
 
    文件内容：
@@ -834,13 +910,13 @@ pasv_max_port=62000
    创建指定目录：
 
    ```bash
-   [emon@emon ~]$ sudo mkdir /etc/vsftpd/virtual_user_dir
+   [emon@wenqiu ~]$ sudo mkdir /etc/vsftpd/virtual_user_dir
    ```
 
    为虚拟用户`ftp` 和`extra` 创建权限控制文件：
 
    ```bash
-   [emon@emon ~]$ sudo vim /etc/vsftpd/virtual_user_dir/ftp
+   [emon@wenqiu ~]$ sudo vim /etc/vsftpd/virtual_user_dir/ftp
    ```
 
    文件内容：
@@ -852,7 +928,7 @@ pasv_max_port=62000
    ```
 
    ```bash
-   [emon@emon ~]$ sudo vim /etc/vsftpd/virtual_user_dir/extra
+   [emon@wenqiu ~]$ sudo vim /etc/vsftpd/virtual_user_dir/extra
    ```
 
    文件内容：
@@ -864,12 +940,12 @@ pasv_max_port=62000
    3. 创建`index.html`文件
 
    ```bash
-   [emon@emon ~]$ sudo vim /fileserver/ftproot/index.html
+   [emon@wenqiu ~]$ sudo vim /fileserver/ftproot/index.html
    ```
 
    **由于sudo创建的，属于root用户，最好修改为ftpuser用户所有**
 
-   > [emon@emon ~]$ sudo chown ftpuser:ftpuser /fileserver/ftproot/index.html 
+   > [emon@wenqiu ~]$ sudo chown ftpuser:ftpuser /fileserver/ftproot/index.html 
 
    ```html
    <html>
@@ -947,7 +1023,7 @@ pasv_max_port=62000
 查看限制情况：
 
 ```bash
-[emon@emon ~]$ getsebool -a|grep ftp
+[emon@wenqiu ~]$ getsebool -a|grep ftp
 ftpd_anon_write --> off
 ftpd_connect_all_unreserved --> off
 ftpd_connect_db --> off
@@ -965,7 +1041,7 @@ tftp_home_dir --> off
 放开限制：
 
 ```bash
-[emon@emon ~]$ sudo setsebool -P ftpd_full_access=on
+[emon@wenqiu ~]$ sudo setsebool -P ftpd_full_access=on
 ```
 
 10. 校验
@@ -973,22 +1049,22 @@ tftp_home_dir --> off
     1. 启动vsftpd
 
     ```bash
-    [emon@emon ~]$ sudo systemctl start vsftpd
+    [emon@wenqiu ~]$ sudo systemctl start vsftpd
     ```
 
     为了ftp登录，需要安装ftp客户端：
 
     ```bash
-    [emon@emon ~]$ yum list ftp|tail -n 2
+    [emon@wenqiu ~]$ yum list ftp|tail -n 2
     可安装的软件包
     ftp.x86_64                         0.17-67.el7                         CentOS7.5
-    [emon@emon ~]$ sudo yum install -y ftp
+    [emon@wenqiu ~]$ sudo yum install -y ftp
     ```
 
     2. 登录ftp验证
 
     ```bash
-    [emon@emon ~]$ ftp 127.0.0.1
+    [emon@wenqiu ~]$ ftp 127.0.0.1
     Connected to 127.0.0.1 (127.0.0.1).
     220 Welcome to emon FTP service
     Name (127.0.0.1:emon): ftp
@@ -1017,13 +1093,13 @@ tftp_home_dir --> off
 11. 开放端口
 
 ```bash
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=20-21/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=20-21/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=61001-62000/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=61001-62000/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp
 ```
 
@@ -1041,7 +1117,7 @@ success
 由于要使用到openssl，这里先检查openssl安装情况。
 
 ```bash
-[emon@emon ~]$ yum list openssl|tail -n 2
+[emon@wenqiu ~]$ yum list openssl|tail -n 2
 已安装的软件包
 openssl.x86_64                     1:1.0.2k-12.el7                     @anaconda
 ```
@@ -1051,15 +1127,15 @@ openssl.x86_64                     1:1.0.2k-12.el7                     @anaconda
 1. 切换目录
 
 ```bash
-[emon@emon ~]$ cd /etc/ssl/certs/
-[emon@emon certs]$ ls
+[emon@wenqiu ~]$ cd /etc/ssl/certs/
+[emon@wenqiu certs]$ ls
 ca-bundle.crt  ca-bundle.trust.crt  make-dummy-cert  Makefile  renew-dummy-cert
 ```
 
 2. 生成RSA私钥和自签名证书
 
 ```bash
-[emon@emon certs]$ sudo openssl req -newkey rsa:2048 -nodes -keyout rsa_private.key -x509 -days 365 -out cert.crt
+[emon@wenqiu certs]$ sudo openssl req -newkey rsa:2048 -nodes -keyout rsa_private.key -x509 -days 365 -out cert.crt
 [sudo] emon 的密码：
 Generating a 2048 bit RSA private key
 ..................+++
@@ -1085,14 +1161,14 @@ Email Address []:
 3. 查看生成的RSA私钥和自签名证书
 
 ```bash
-[emon@emon certs]$ ls
+[emon@wenqiu certs]$ ls
 ca-bundle.crt  ca-bundle.trust.crt  cert.crt  make-dummy-cert  Makefile  renew-dummy-cert  rsa_private.key
 ```
 
 4. 配置`vsftpd.conf`
 
 ```bash
-[emon@emon certs]$ sudo vim /etc/vsftpd/vsftpd.conf
+[emon@wenqiu certs]$ sudo vim /etc/vsftpd/vsftpd.conf
 ```
 
 ```bash
@@ -1150,7 +1226,7 @@ listen_port=990
 5. 重启vsftpd服务
 
 ```bash
-[emon@emon certs]$ sudo systemctl restart vsftpd
+[emon@wenqiu certs]$ sudo systemctl restart vsftpd
 ```
 
 6. 校验
@@ -1158,9 +1234,9 @@ listen_port=990
 对于ftps的校验，无法使用ftp命令校验了：
 
 ```bash
-[emon@emon certs]$ sudo systemctl restart vsftpd
+[emon@wenqiu certs]$ sudo systemctl restart vsftpd
 [sudo] emon 的密码：
-[emon@emon certs]$ ftp 127.0.0.1
+[emon@wenqiu certs]$ ftp 127.0.0.1
 Connected to 127.0.0.1 (127.0.0.1).
 220 Welcome to emon FTP service
 Name (127.0.0.1:emon): ftp
@@ -1177,8 +1253,8 @@ ftp>
 - 安装lftp
 
 ```bash
-[emon@emon certs]$ sudo yum install -y lftp
-[emon@emon certs]$ lftp ftp@127.0.0.1:21
+[emon@wenqiu certs]$ sudo yum install -y lftp
+[emon@wenqiu certs]$ lftp ftp@127.0.0.1:21
 口令: 
 lftp ftp@127.0.0.1:~> ls            
 ls: 严重错误: Certificate verification: Not trusted
@@ -1190,7 +1266,7 @@ lftp ftp@127.0.0.1:~>
 打开文件后，在最后一行追加如下内容： 
 
 ```bash
-[emon@emon certs]$ sudo vim /etc/lftp.conf 
+[emon@wenqiu certs]$ sudo vim /etc/lftp.conf 
 # 个人配置
 set ssl:verify-certificate no
 ```
@@ -1198,7 +1274,7 @@ set ssl:verify-certificate no
 再次校验：
 
 ```bash
-[emon@emon certs]$ lftp ftp@127.0.0.1:21
+[emon@wenqiu certs]$ lftp ftp@127.0.0.1:21
 口令: 
 lftp ftp@127.0.0.1:~> ls            
 -rw-r--r--    1 1001     1001         1006 May 27 15:44 index.html
@@ -1209,7 +1285,7 @@ lftp ftp@127.0.0.1:/>
 如果是隐式的ftps，lftp就无法校验了，除非lftp是` compiled with OpenSSL (configure --with-openssl)`：
 
 ```bash
-[emon@emon certs]$ lftp ftp@127.0.0.1:990
+[emon@wenqiu certs]$ lftp ftp@127.0.0.1:990
 Password: 
 lftp ftp@127.0.0.1:~> ls
 `ls' at 0 [FEAT negotiation...]
@@ -1230,25 +1306,25 @@ lftp ftp@127.0.0.1:~> ls
 下载地址获取页面： http://lftp.yar.ru/get.html
 
 ```bash
-[emon@emon certs]$ wget -cP /usr/local/src/ http://lftp.yar.ru/ftp/lftp-4.8.3.tar.gz
+[emon@wenqiu certs]$ wget -cP /usr/local/src/ http://lftp.yar.ru/ftp/lftp-4.8.3.tar.gz
 ```
 
 2. 依赖安装
 
 ```bash
-[emon@emon certs]$ sudo yum install -y gcc* *md5* openssl* ncurses* readline-devel
+[emon@wenqiu certs]$ sudo yum install -y gcc* *md5* openssl* ncurses* readline-devel
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon certs]$ mkdir /usr/local/LFTP
+[emon@wenqiu certs]$ mkdir /usr/local/LFTP
 ```
 
 4. 解压
 
 ```bash
-[emon@emon certs]$ tar -zxvf /usr/local/src/lftp-4.8.3.tar.gz -C /usr/local/LFTP/
+[emon@wenqiu certs]$ tar -zxvf /usr/local/src/lftp-4.8.3.tar.gz -C /usr/local/LFTP/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -1256,27 +1332,27 @@ lftp ftp@127.0.0.1:~> ls
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon certs]$ cd /usr/local/LFTP/lftp-4.8.3/
-[emon@emon lftp-4.8.3]$ ./configure --prefix=/usr/local/LFTP/lftp4.8.3 --with-openssl
+[emon@wenqiu certs]$ cd /usr/local/LFTP/lftp-4.8.3/
+[emon@wenqiu lftp-4.8.3]$ ./configure --prefix=/usr/local/LFTP/lftp4.8.3 --with-openssl
 ```
 
 - 编译
 
 ```bash
-[emon@emon lftp-4.8.3]$ make
+[emon@wenqiu lftp-4.8.3]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon lftp-4.8.3]$ make install
-[emon@emon lftp-4.8.3]$ cd /etc/ssl/certs/
+[emon@wenqiu lftp-4.8.3]$ make install
+[emon@wenqiu lftp-4.8.3]$ cd /etc/ssl/certs/
 ```
 
 6. 创建软连接
 
 ```bash
-[emon@emon certs]$ ln -s /usr/local/LFTP/lftp4.8.3/ /usr/local/lftp
+[emon@wenqiu certs]$ ln -s /usr/local/LFTP/lftp4.8.3/ /usr/local/lftp
 ```
 
 7. 配置环境变量
@@ -1284,14 +1360,14 @@ lftp ftp@127.0.0.1:~> ls
 在`/etc/profile.d`目录创建`.sh`文件： 
 
 ```bash
-[emon@emon certs]$ sudo vim /etc/profile.d/lftp.sh
+[emon@wenqiu certs]$ sudo vim /etc/profile.d/lftp.sh
 export PATH=/usr/local/lftp/bin:$PATH
 ```
 
 使之生效：
 
 ```bash
-[emon@emon certs]$ source /etc/profile
+[emon@wenqiu certs]$ source /etc/profile
 ```
 
 8. 配置`lftp.conf`
@@ -1299,7 +1375,7 @@ export PATH=/usr/local/lftp/bin:$PATH
 打开文件后，在最后一行追加如下内容： 
 
 ```bash
-[emon@emon certs]$ vim /usr/local/lftp/etc/lftp.conf
+[emon@wenqiu certs]$ vim /usr/local/lftp/etc/lftp.conf
 # 个人配置
 set ssl:verify-certificate no
 ```
@@ -1307,7 +1383,7 @@ set ssl:verify-certificate no
 **紧接上面的校验，这里使用lftp命令：**
 
 ```bash
-[emon@emon certs]$ lftp ftp@127.0.0.1:21
+[emon@wenqiu certs]$ lftp ftp@127.0.0.1:21
 口令: 
 lftp ftp@127.0.0.1:~> ls                        
 -rw-r--r--    1 1001     1001         1006 May 27 15:44 index.html
@@ -1348,20 +1424,20 @@ lftp ftp@127.0.0.1:/> exit
 因为在默认配置文件中CA自己的私钥配置在`/etc/pki/CA/private/cakey.pem`，所以指定目录和文件名要和配置文件一致。
 
 ```bash
-[emon@emon certs]$ sudo bash -c "umask 077;openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096"
+[emon@wenqiu certs]$ sudo bash -c "umask 077;openssl genrsa -out /etc/pki/CA/private/cakey.pem 4096"
 [sudo] emon 的密码：
 Generating RSA private key, 4096 bit long modulus
 ......................................................................................................++
 .........................++
 e is 65537 (0x10001)
-[emon@emon certs]$ sudo ls -l /etc/pki/CA/private/cakey.pem
+[emon@wenqiu certs]$ sudo ls -l /etc/pki/CA/private/cakey.pem
 -rw-------. 1 root root 3243 5月  27 19:13 /etc/pki/CA/private/cakey.pem
 ```
 
 2. 生成CA自签证书
 
 ```bash
-[emon@emon certs]$ sudo openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3650
+[emon@wenqiu certs]$ sudo openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -out /etc/pki/CA/cacert.pem -days 3650
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
 What you are about to enter is what is called a Distinguished Name or a DN.
@@ -1397,19 +1473,19 @@ Email Address []:
 当不存在时需要创建签发证书、吊销证书、新证书目录
 
 ```bash
-[emon@emon certs]$ sudo mkdir -pv /etc/pki/CA/{certs,crl,newcerts}
+[emon@wenqiu certs]$ sudo mkdir -pv /etc/pki/CA/{certs,crl,newcerts}
 ```
 
 创建证书序列号文件、证书索引文件
 
 ```bash
-[emon@emon certs]$ sudo touch /etc/pki/CA/{serial,index.txt}
+[emon@wenqiu certs]$ sudo touch /etc/pki/CA/{serial,index.txt}
 ```
 
 第一次创建的时候需要给予证书序列号
 
 ```bash
-[emon@emon certs]$ echo 01 | sudo tee /etc/pki/CA/serial
+[emon@wenqiu certs]$ echo 01 | sudo tee /etc/pki/CA/serial
 01
 ```
 
@@ -1422,14 +1498,14 @@ Email Address []:
 生成vsftpd服务的私钥创建时候无需在`/etc/pki/CA/private`目录创建，该目录仅在创建CA主机时需要的。
 
 ```bash
-[emon@emon certs]$ sudo mkdir /etc/vsftpd/ssl
-[emon@emon certs]$ cd /etc/vsftpd/ssl/
-[emon@emon ssl]$ sudo bash -c "umask 077; openssl genrsa -out /etc/vsftpd/ssl/vsftpd.key 2048"
+[emon@wenqiu certs]$ sudo mkdir /etc/vsftpd/ssl
+[emon@wenqiu certs]$ cd /etc/vsftpd/ssl/
+[emon@wenqiu ssl]$ sudo bash -c "umask 077; openssl genrsa -out /etc/vsftpd/ssl/vsftpd.key 2048"
 Generating RSA private key, 2048 bit long modulus
 ..+++
 ................+++
 e is 65537 (0x10001)
-[emon@emon ssl]$ ll
+[emon@wenqiu ssl]$ ll
 总用量 4
 -rw-------. 1 root root 1675 5月  27 19:22 vsftpd.key
 ```
@@ -1437,7 +1513,7 @@ e is 65537 (0x10001)
 2. 生成证书签署请求
 
 ```bash
-[emon@emon ssl]$ sudo openssl req -new -key /etc/vsftpd/ssl/vsftpd.key -out /etc/vsftpd/ssl/vsftpd.csr -days 365
+[emon@wenqiu ssl]$ sudo openssl req -new -key /etc/vsftpd/ssl/vsftpd.key -out /etc/vsftpd/ssl/vsftpd.csr -days 365
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
 What you are about to enter is what is called a Distinguished Name or a DN.
@@ -1474,7 +1550,7 @@ An optional company name []:
 3. 将请求通过可靠方式发送给CA主机
 
 ```bash
-[emon@emon ssl]$ sudo scp /etc/vsftpd/ssl/vsftpd.csr root@127.0.0.1:/tmp/
+[emon@wenqiu ssl]$ sudo scp /etc/vsftpd/ssl/vsftpd.csr root@127.0.0.1:/tmp/
 The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
 ECDSA key fingerprint is SHA256:Z9evxGkdmtBGu8pEB1oRNAiy3N32cEbJUL9uK71UTMo.
 ECDSA key fingerprint is MD5:f0:62:1e:0b:64:61:31:df:f5:46:79:2a🇩🇪45:47:b2.
@@ -1487,8 +1563,8 @@ vsftpd.csr                                                                      
 4. 在CA主机上签署证书
 
 ```bash
-[root@emon ~]# cd /tmp/
-[root@emon tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 3650
+[root@wenqiu ~]# cd /tmp/
+[root@wenqiu tmp]# openssl ca -in /tmp/vsftpd.csr -out /etc/pki/CA/certs/vsftpd.crt -days 3650
 Using configuration from /etc/pki/tls/openssl.cnf
 Check that the request matches the signature
 Signature ok
@@ -1527,7 +1603,7 @@ Data Base Updated
 - 方法一
 
 ```bash
-[root@emon tmp]# cat /etc/pki/CA/index.txt
+[root@wenqiu tmp]# cat /etc/pki/CA/index.txt
 V	190527113144Z		01	unknown	/C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip
 ```
 
@@ -1540,7 +1616,7 @@ V	190527113144Z		01	unknown	/C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./
 - 方法二
 
 ```bash
-[root@emon tmp]# openssl x509 -in /etc/pki/CA/certs/vsftpd.crt -noout -serial -subject
+[root@wenqiu tmp]# openssl x509 -in /etc/pki/CA/certs/vsftpd.crt -noout -serial -subject
 serial=01
 subject= /C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emon.vip
 ```
@@ -1552,7 +1628,7 @@ subject= /C=CN/ST=ZheJiang/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=*.emo
 6. 将CA签署机构的.crt证书发送给服务器
 
 ```bash
-[root@emon tmp]# scp /etc/pki/CA/certs/vsftpd.crt root@127.0.0.1:/etc/vsftpd/ssl/
+[root@wenqiu tmp]# scp /etc/pki/CA/certs/vsftpd.crt root@127.0.0.1:/etc/vsftpd/ssl/
 root@127.0.0.1's password: 
 vsftpd.crt                                                                                           100% 5843     2.5MB/s   00:00    
 ```
@@ -1562,13 +1638,13 @@ vsftpd.crt                                                                      
 CA主机： 
 
 ```bash
-[root@emon tmp]# rm -rf /tmp/vsftpd.csr
+[root@wenqiu tmp]# rm -rf /tmp/vsftpd.csr
 ```
 
 vsftpd主机：
 
 ```bash
-[emon@emon ssl]$ sudo rm -rf /etc/vsftpd/ssl/vsftpd.csr
+[emon@wenqiu ssl]$ sudo rm -rf /etc/vsftpd/ssl/vsftpd.csr
 ```
 
 8. 配置`vsftpd.conf`
@@ -1612,8 +1688,8 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 2. 创建用户组
 
 ```bash
-[emon@emon ~]$ sudo groupadd sftpadmin
-[emon@emon ~]$ sudo groupadd sftpnormal
+[emon@wenqiu ~]$ sudo groupadd sftpadmin
+[emon@wenqiu ~]$ sudo groupadd sftpnormal
 ```
 
 3. 创建用户
@@ -1621,36 +1697,36 @@ sftp是Secure File Transfer Protocol的缩写，安全文件传输协议。sftp�
 创建用户所需目录：
 
 ```bash
-[emon@emon ~]$ sudo mkdir -p /fileserver/sftproot/{sftpadmin,sftpnormal}
+[emon@wenqiu ~]$ sudo mkdir -p /fileserver/sftproot/{sftpadmin,sftpnormal}
 ```
 
 创建sftp用户：
 
 ```bash
-[emon@emon ~]$ sudo useradd -g sftpadmin -d /fileserver/sftproot/sftpadmin/sftpadmin -s /sbin/nologin -c "Sftp User" sftpadmin
-[emon@emon ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser1 -s /sbin/nologin -c "Sftp User" sftpuser1
-[emon@emon ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser2 -s /sbin/nologin -c "Sftp User" sftpuser2
+[emon@wenqiu ~]$ sudo useradd -g sftpadmin -d /fileserver/sftproot/sftpadmin/sftpadmin -s /sbin/nologin -c "Sftp User" sftpadmin
+[emon@wenqiu ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser1 -s /sbin/nologin -c "Sftp User" sftpuser1
+[emon@wenqiu ~]$ sudo useradd -g sftpnormal -d /fileserver/sftproot/sftpnormal/sftpuser2 -s /sbin/nologin -c "Sftp User" sftpuser2
 ```
 
 设置密码：
 
 ```bash
-[emon@emon ~]$ sudo passwd sftpadmin
-[emon@emon ~]$ sudo passwd sftpuser1
-[emon@emon ~]$ sudo passwd sftpuser2
+[emon@wenqiu ~]$ sudo passwd sftpadmin
+[emon@wenqiu ~]$ sudo passwd sftpuser1
+[emon@wenqiu ~]$ sudo passwd sftpuser2
 ```
 
 查看权限：
 
 ```bash
-[emon@emon ~]$ ll /fileserver/sftproot/
+[emon@wenqiu ~]$ ll /fileserver/sftproot/
 总用量 0
 drwxr-xr-x. 3 root root 23 5月  27 20:01 sftpadmin
 drwxr-xr-x. 4 root root 40 5月  27 20:02 sftpnormal
-[emon@emon ~]$ ll /fileserver/sftproot/sftpadmin/
+[emon@wenqiu ~]$ ll /fileserver/sftproot/sftpadmin/
 总用量 0
 drwx------. 2 sftpadmin sftpadmin 62 5月  27 20:01 sftpadmin
-[emon@emon ~]$ ll /fileserver/sftproot/sftpnormal/
+[emon@wenqiu ~]$ ll /fileserver/sftproot/sftpnormal/
 总用量 0
 drwx------. 2 sftpuser1 sftpnormal 62 5月  27 20:02 sftpuser1
 drwx------. 2 sftpuser2 sftpnormal 62 5月  27 20:02 sftpuser2
@@ -1661,7 +1737,7 @@ drwx------. 2 sftpuser2 sftpnormal 62 5月  27 20:02 sftpuser2
 4. 配置`sshd_config`
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/ssh/sshd_config 
+[emon@wenqiu ~]$ sudo vim /etc/ssh/sshd_config 
 ```
 
 注释掉下面这一行：
@@ -1688,13 +1764,13 @@ Match Group sftpnormal
 5. 重启`sshd`
 
 ```bash
-[emon@emon ~]$ sudo systemctl restart sshd
+[emon@wenqiu ~]$ sudo systemctl restart sshd
 ```
 
 6. 校验
 
 ```bash
-[emon@emon ~]$ sftp sftpadmin@127.0.0.1
+[emon@wenqiu ~]$ sftp sftpadmin@127.0.0.1
 sftpadmin@127.0.0.1's password: 
 Connected to 127.0.0.1.
 sftp> ls
@@ -1715,26 +1791,26 @@ sftp>
 下载页：  http://nginx.org/en/download.html
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://nginx.org/download/nginx-1.22.0.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ http://nginx.org/download/nginx-1.22.0.tar.gz
 ```
 
 2. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
-[emon@emon ~]$ sudo yum -y install gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
+[emon@wenqiu ~]$ yum list gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
+[emon@wenqiu ~]$ sudo yum -y install gcc gcc-c++ automake pcre pcre-devel zlib zlib-devel open openssl-devel
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Nginx
+[emon@wenqiu ~]$ mkdir /usr/local/Nginx
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/nginx-1.22.0.tar.gz -C /usr/local/Nginx/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/nginx-1.22.0.tar.gz -C /usr/local/Nginx/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -1742,8 +1818,8 @@ sftp>
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Nginx/nginx-1.22.0/
-[emon@emon nginx-1.22.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_module --with-stream --with-stream_ssl_module
+[emon@wenqiu ~]$ cd /usr/local/Nginx/nginx-1.22.0/
+[emon@wenqiu nginx-1.22.0]$ ./configure --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_module --with-stream --with-stream_ssl_module
 ```
 
 命令解释： `--with-http_ssl_module`指定编译时支持ssl，为Nginx代理时https准备。
@@ -1753,28 +1829,28 @@ sftp>
 - 编译
 
 ```bash
-[emon@emon nginx-1.22.0]$ make
+[emon@wenqiu nginx-1.22.0]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon nginx-1.22.0]$ make install
-[emon@emon nginx-1.22.0]$ cd
-[emon@emon ~]$ ls /usr/local/Nginx/nginx1.22.0/
+[emon@wenqiu nginx-1.22.0]$ make install
+[emon@wenqiu nginx-1.22.0]$ cd
+[emon@wenqiu ~]$ ls /usr/local/Nginx/nginx1.22.0/
 conf  html  logs  sbin
 ```
 
 6. 备份主配置文件`nginx.conf`
 
 ```bash
-[emon@emon ~]$ cp -a /usr/local/Nginx/nginx1.22.0/conf/nginx.conf /usr/local/Nginx/nginx1.22.0/conf/nginx.conf.bak
+[emon@wenqiu ~]$ cp -a /usr/local/Nginx/nginx1.22.0/conf/nginx.conf /usr/local/Nginx/nginx1.22.0/conf/nginx.conf.bak
 ```
 
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Nginx/nginx1.22.0/ /usr/local/nginx
+[emon@wenqiu ~]$ ln -s /usr/local/Nginx/nginx1.22.0/ /usr/local/nginx
 ```
 
 8. 配置环境变量【特殊】
@@ -1786,26 +1862,26 @@ conf  html  logs  sbin
 所以，采用软连接的方式：
 
 ```bash
-[emon@emon ~]$ sudo ln -s /usr/local/nginx/sbin/nginx /usr/sbin/nginx
+[emon@wenqiu ~]$ sudo ln -s /usr/local/nginx/sbin/nginx /usr/sbin/nginx
 ```
 
 9. 校验
 
 ```bash
-[emon@emon ~]$ nginx -V
+[emon@wenqiu ~]$ nginx -V
 nginx version: nginx/1.22.0
 built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) 
 built with OpenSSL 1.0.2k-fips  26 Jan 2017
 TLS SNI support enabled
 configure arguments: --prefix=/usr/local/Nginx/nginx1.22.0 --with-http_ssl_modul
-[emon@emon ~]$ nginx -v
+[emon@wenqiu ~]$ nginx -v
 nginx version: nginx/1.22.0
 ```
 
 10. 配置`nginx.conf`
 
 ```bash
-[emon@emon ~]$ vim /usr/local/nginx/conf/nginx.conf
+[emon@wenqiu ~]$ vim /usr/local/nginx/conf/nginx.conf
 ```
 
 打开文件，找到`HTTPS server`上一行，大约95行，添加如下内容：
@@ -1817,13 +1893,13 @@ nginx version: nginx/1.22.0
 创建文件夹`vhost` ：
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/nginx/conf/vhost
+[emon@wenqiu ~]$ mkdir /usr/local/nginx/conf/vhost
 ```
 
 创建一个虚拟主机，映射到ftp服务器目录（与ftp提供的服务无关，是Nginx代理的访问方式）：
 
 ```bash
-[emon@emon ~]$ vim /usr/local/nginx/conf/vhost/file.emon.vip.conf
+[emon@wenqiu ~]$ vim /usr/local/nginx/conf/vhost/file.emon.vip.conf
 ```
 
 ```nginx
@@ -1852,7 +1928,7 @@ server {
 `-t` Nginx服务器配置文件是否有语法错误，可以与`-c`一起使用，使输出内容更详细，这对查找配置文件中错误语法很有帮助。
 
 ```bash
-[emon@emon ~]$ sudo nginx -t -c /usr/local/nginx/conf/nginx.conf
+[emon@wenqiu ~]$ sudo nginx -t -c /usr/local/nginx/conf/nginx.conf
 [sudo] emon 的密码：
 nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok
 nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
@@ -1861,35 +1937,35 @@ nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
 - 启动
 
 ```bash
-[emon@emon ~]$ sudo nginx
+[emon@wenqiu ~]$ sudo nginx
 ```
 
 - 重新加载
 
 ```bash
-[emon@emon ~]$ sudo nginx -s reload
+[emon@wenqiu ~]$ sudo nginx -s reload
 ```
 
 - 停止（等待正在执行的任务）
 
 ```bash
-[emon@emon ~]$ sudo nginx -s quit
+[emon@wenqiu ~]$ sudo nginx -s quit
 ```
 
 - 停止（不等待正在执行的任务）
 
 ```bash
-[emon@emon ~]$ sudo nginx -s stop
+[emon@wenqiu ~]$ sudo nginx -s stop
 ```
 
 12. 开放端口
 
 ```bash
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp
 ```
 
@@ -1902,7 +1978,7 @@ http://192.168.1.116/
 - 脚本编写
 
 ```bash
-[emon@emon ~]$ vim /usr/local/nginx/sbin/cut_my_log.sh
+[emon@wenqiu ~]$ vim /usr/local/nginx/sbin/cut_my_log.sh
 ```
 
 ```bash
@@ -1919,13 +1995,13 @@ kill -USR1 `cat $PID`
 - 配置脚本可执行权限
 
 ```bash
-[emon@emon ~]$ chmod +x /usr/local/nginx/sbin/cut_my_log.sh 
+[emon@wenqiu ~]$ chmod +x /usr/local/nginx/sbin/cut_my_log.sh 
 ```
 
 - 使用root权限执行
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/nginx/sbin/cut_my_log.sh 
+[emon@wenqiu ~]$ sudo /usr/local/nginx/sbin/cut_my_log.sh 
 ```
 
 ## 8、安装MySQL
@@ -1935,7 +2011,7 @@ kill -USR1 `cat $PID`
 1. 检查是否安装
 
 ```bash
-[emon@emon ~]$ rpm -qa|grep mysql
+[emon@wenqiu ~]$ rpm -qa|grep mysql
 ```
 
 2. 下载
@@ -1943,25 +2019,25 @@ kill -USR1 `cat $PID`
 下载页地址： https://dev.mysql.com/downloads/mysql/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz
 ```
 
 3. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/MySQL
+[emon@wenqiu ~]$ mkdir /usr/local/MySQL
 ```
 
 4. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz -C /usr/local/MySQL/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz -C /usr/local/MySQL/
 ```
 
 5. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@wenqiu ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
 ```
 
 6. 配置环境变量
@@ -1969,7 +2045,7 @@ kill -USR1 `cat $PID`
 在`/etc/profile.d`目录创建`mysql.sh`文件： 
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/mysql.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/mysql.sh
 ```
 
 ```bash
@@ -1979,15 +2055,15 @@ export PATH=/usr/local/mysql/bin:$PATH
 使之生效：
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 7. 数据库目录规划
 
 ```bash
 # 多版本安装
-[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql5.7.30
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
+[emon@wenqiu ~]$ sudo mkdir -p /data/MySQL/mysql5.7.30
+[emon@wenqiu ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
 ```
 
 | 文件说明                      | 软连接位置                                | 实际存储位置                  |
@@ -2003,20 +2079,20 @@ export PATH=/usr/local/mysql/bin:$PATH
 备注：考虑到数据和二进制日志比较大，需要软链接：
 
 ```bash
-[emon@emon ~]$ sudo mkdir -p /data/mysql/{data,binlogs,log,etc,run}
-[emon@emon ~]$ sudo ln -s /data/mysql/data /usr/local/mysql/data
-[emon@emon ~]$ sudo ln -s /data/mysql/binlogs /usr/local/mysql/binlogs
-[emon@emon ~]$ sudo ln -s /data/mysql/log /usr/local/mysql/log
-[emon@emon ~]$ sudo ln -s /data/mysql/etc /usr/local/mysql/etc
-[emon@emon ~]$ sudo ln -s /data/mysql/run /usr/local/mysql/run
+[emon@wenqiu ~]$ sudo mkdir -p /data/mysql/{data,binlogs,log,etc,run}
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/data /usr/local/mysql/data
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/binlogs /usr/local/mysql/binlogs
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/log /usr/local/mysql/log
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/etc /usr/local/mysql/etc
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/run /usr/local/mysql/run
 ```
 
 创建mysql用户，为`/data/mysql`和`/usr/local/mysql/{data,binlogs,log,etc,run}`赋权：
 
 ```bash
-[emon@emon ~]$ sudo useradd -s /sbin/nologin -M -c "MySQL User" mysql
-[emon@emon ~]$ sudo chown -R mysql.mysql /data/mysql/
-[emon@emon ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
+[emon@wenqiu ~]$ sudo useradd -s /sbin/nologin -M -c "MySQL User" mysql
+[emon@wenqiu ~]$ sudo chown -R mysql.mysql /data/mysql/
+[emon@wenqiu ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
 ```
 
 8. 配置`my.cnf`
@@ -2025,13 +2101,13 @@ export PATH=/usr/local/mysql/bin:$PATH
 
 ```bash
 # 在CentOS8不需要处理了，默认不存在
-[emon@emon ~]$ sudo mv /etc/my.cnf /etc/my.cnf.bak
+[emon@wenqiu ~]$ sudo mv /etc/my.cnf /etc/my.cnf.bak
 ```
 
 在`/usr/local/mysql/etc/`下创建`my.cnf`文件并配置如下：
 
 ```bash
-[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ sudo vim /usr/local/mysql/etc/my.cnf
 ```
 
 ```bash
@@ -2084,7 +2160,7 @@ server-id=1
 9. 初始化数据库
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
+[emon@wenqiu ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
 
 > 如果是单独安装Mysql，而不是从上到下按照我的安装流程而来，有可能碰到如下错误：
@@ -2104,7 +2180,7 @@ server-id=1
 在日志文件里会提示一个临时密码，记录这个密码：
 
 ```bash
-[emon@emon ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
+[emon@wenqiu ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
 2020-05-02T09:28:34.098958Z 1 [Note] A temporary password is generated for root@localhost: gQpHosqS+1h(
 ```
 
@@ -2112,7 +2188,7 @@ server-id=1
 
 ```bash
 # mysql5.7.30执行命令时已经不再会输出生成日志了
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
 Generating a 2048 bit RSA private key
 ..................+++
 ................................................................+++
@@ -2133,7 +2209,7 @@ writing new private key to 'client-key.pem'
 11. 设置启动项
 
 ```bash
-[emon@emon ~]$ sudo vim /usr/lib/systemd/system/mysqld.service
+[emon@wenqiu ~]$ sudo vim /usr/lib/systemd/system/mysqld.service
 ```
 
 ```bash
@@ -2202,19 +2278,19 @@ PrivateTmp=false
 加载启动项：
 
 ```bash
-[emon@emon ~]$ sudo systemctl daemon-reload
+[emon@wenqiu ~]$ sudo systemctl daemon-reload
 ```
 
 12. 启动mysql
 
 ```bash
-[emon@emon ~]$ sudo systemctl start mysqld.service
+[emon@wenqiu ~]$ sudo systemctl start mysqld.service
 ```
 
 启动时发现命令卡住了，查看如下：
 
 ```bash
-[emon@emon ~]$ sudo systemctl status mysqld
+[emon@wenqiu ~]$ sudo systemctl status mysqld
 ● mysqld.service - MySQL Server
    Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; vendor preset: disabled)
    Active: activating (start) since Sat 2020-05-02 18:39:10 CST; 1min 1s ago
@@ -2235,28 +2311,28 @@ PrivateTmp=false
 - 方式一：【不推荐】
 
 ```bash
-[emon@emon ~]$ sudo setenforece 0
+[emon@wenqiu ~]$ sudo setenforece 0
 ```
 
 - 方式二：【推荐】
 
 ```bash
 # 查询
-[emon@emon ~]$ sudo semanage fcontext -l|grep mysqld_db
+[emon@wenqiu ~]$ sudo semanage fcontext -l|grep mysqld_db
 /var/lib/mysql(-files|-keyring)?(/.*)?             all files          system_u:object_r:mysqld_db_t:s0 
 ```
 
 ```bash
 # 设置
-[emon@emon ~]$ sudo semanage fcontext -a -t mysqld_db_t "/usr/local/mysql(/.*)?"
+[emon@wenqiu ~]$ sudo semanage fcontext -a -t mysqld_db_t "/usr/local/mysql(/.*)?"
 # estorecon命令用来恢复SELinux文件属性即恢复文件的安全上下文
-[emon@emon ~]$ sudo restorecon -Rv /usr/local/mysql
+[emon@wenqiu ~]$ sudo restorecon -Rv /usr/local/mysql
 Relabeled /usr/local/mysql from unconfined_u:object_r:usr_t:s0 to unconfined_u:object_r:mysqld_db_t:s0
 ```
 
 ```bash
 # 查询
-[emon@emon ~]$ sudo semanage fcontext -l|grep mysqld_db
+[emon@wenqiu ~]$ sudo semanage fcontext -l|grep mysqld_db
 /usr/local/mysql(/.*)?                             all files          system_u:object_r:mysqld_db_t:s0 
 /var/lib/mysql(-files|-keyring)?(/.*)?             all files          system_u:object_r:mysqld_db_t:s0
 ```
@@ -2266,7 +2342,7 @@ Relabeled /usr/local/mysql from unconfined_u:object_r:usr_t:s0 to unconfined_u:o
 13. 初始化mysql服务程序
 
 ```bash
-[emon@emon ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
 
 Securing the MySQL server deployment.
 
@@ -2341,20 +2417,20 @@ All done!
 14. 测试
 
 ```bash
-[emon@emon ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+[emon@wenqiu ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 ```
 
 查看变量：
 
 ```bash
-[emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
+[emon@wenqiu ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
 514
 ```
 
 登录：
 
 ```bash
-[emon@emon ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+[emon@wenqiu ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysql> select user,host from mysql.user;
 +---------------+-----------+
 | user          | host      |
@@ -2372,7 +2448,7 @@ mysql> select user,host from mysql.user;
 
 ```bash
 # CentOS8报错如下
-[emon@emon ~]$ mysql -uroot -p
+[emon@wenqiu ~]$ mysql -uroot -p
 mysql: error while loading shared libraries: libncurses.so.5: cannot open shared object file: No such file or directory
 ```
 
@@ -2380,23 +2456,23 @@ mysql: error while loading shared libraries: libncurses.so.5: cannot open shared
 
 ```bash
 # 特别说明：yum list libncurses* 匹配不到，但是可以安装成功
-[emon@emon ~]$ sudo yum install -y libncurses*
+[emon@wenqiu ~]$ sudo yum install -y libncurses*
 ```
 
 停止：
 
 ```bash
-[emon@emon ~]$ sudo systemctl stop mysqld
+[emon@wenqiu ~]$ sudo systemctl stop mysqld
 ```
 
 15. 开放端口
 
 ```bash
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp
 ```
 
@@ -2424,13 +2500,13 @@ success
 下载页地址： <https://dev.mysql.com/downloads/mysql/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz
 ```
 
 2. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz -C /usr/local/MySQL/
+[emon@wenqiu ~]$ tar -Jxvf /usr/local/src/mysql-8.0.20-linux-glibc2.12-x86_64.tar.xz -C /usr/local/MySQL/
 ```
 
 3. 修改软件连接
@@ -2439,39 +2515,39 @@ success
 
 ```bash
 # 注意，删除软连接时，软连接名称后面不要跟 / ，否则就是删除软连接对应的文件目录了
-[emon@emon ~]$ rm -rf /usr/local/mysql
+[emon@wenqiu ~]$ rm -rf /usr/local/mysql
 ```
 
 创建软连接：
 
 ```baash
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@wenqiu ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
 ```
 
 4. 修改数据库目录规划所用的软连接
 
 ```bash
-[emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo mkdir -p /data/MySQL/mysql8.0.20
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
+[emon@wenqiu ~]$ sudo rm -rf /data/mysql
+[emon@wenqiu ~]$ sudo mkdir -p /data/MySQL/mysql8.0.20
+[emon@wenqiu ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
 ```
 
 备注：考虑到数据和二进制日志比较大，需要软链接： 
 
 ```bash
-[emon@emon ~]$ sudo mkdir -p /data/mysql/{data,binlogs,log,etc,run}
-[emon@emon ~]$ sudo ln -s /data/mysql/data /usr/local/mysql/data
-[emon@emon ~]$ sudo ln -s /data/mysql/binlogs /usr/local/mysql/binlogs
-[emon@emon ~]$ sudo ln -s /data/mysql/log /usr/local/mysql/log
-[emon@emon ~]$ sudo ln -s /data/mysql/etc /usr/local/mysql/etc
-[emon@emon ~]$ sudo ln -s /data/mysql/run /usr/local/mysql/run
+[emon@wenqiu ~]$ sudo mkdir -p /data/mysql/{data,binlogs,log,etc,run}
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/data /usr/local/mysql/data
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/binlogs /usr/local/mysql/binlogs
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/log /usr/local/mysql/log
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/etc /usr/local/mysql/etc
+[emon@wenqiu ~]$ sudo ln -s /data/mysql/run /usr/local/mysql/run
 ```
 
 为`/data/mysql`和`/usr/local/mysql/{data,binlogs,log,etc,run}`赋权： 
 
 ```bash
-[emon@emon ~]$ sudo chown -R mysql.mysql /data/mysql/
-[emon@emon ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
+[emon@wenqiu ~]$ sudo chown -R mysql.mysql /data/mysql/
+[emon@wenqiu ~]$ sudo chown -R mysql.mysql /usr/local/mysql/{data,binlogs,log,etc,run}
 ```
 
 5. 配置
@@ -2479,7 +2555,7 @@ success
 在`/usr/local/mysql/etc/`下创建`my.cnf`文件并配置如下： 
 
 ```bash
-[emon@emon ~]$ sudo vim /usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ sudo vim /usr/local/mysql/etc/my.cnf
 ```
 
 ```bash
@@ -2533,32 +2609,32 @@ server-id=1
 6. 初始化数据库
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
+[emon@wenqiu ~]$ sudo /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf --initialize --user=mysql
 ```
 
 在日志文件里会提示一个临时密码，记录这个密码： 
 
 ```bash
-[emon@emon ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
+[emon@wenqiu ~]$ sudo grep 'temporary password' /usr/local/mysql/log/mysql_error.log 
 2020-05-02T13:12:48.974545Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: =3w5d=karZtj
 ```
 
 7. 生成SSL【未提示输出信息，记录】
 
 ```bash
-[emon@emon ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ sudo /usr/local/mysql/bin/mysql_ssl_rsa_setup --defaults-file=/usr/local/mysql/etc/my.cnf
 ```
 
 8. 启动mysql
 
 ```bash
-[emon@emon ~]$ sudo systemctl start mysqld.service
+[emon@wenqiu ~]$ sudo systemctl start mysqld.service
 ```
 
 9. 初始化mysql服务程序
 
 ```bash
-[emon@emon ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
+[emon@wenqiu ~]$ mysql_secure_installation --defaults-file=/usr/local/mysql/etc/my.cnf
 
 Securing the MySQL server deployment.
 
@@ -2633,7 +2709,7 @@ All done!
 10. 测试
 
 ```bash
-[emon@emon ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+[emon@wenqiu ~]$ mysqladmin version -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysqladmin  Ver 8.0.11 for linux-glibc2.12 on x86_64 (MySQL Community Server - GPL)
 Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
 
@@ -2653,14 +2729,14 @@ Threads: 2  Questions: 14  Slow queries: 0  Opens: 139  Flush tables: 2  Open ta
 查看变量： 
 
 ```bash
-[emon@emon ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
+[emon@wenqiu ~]$ mysqladmin variables -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]|wc -l
 578
 ```
 
 登录：
 
 ```bash
-[emon@emon ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
+[emon@wenqiu ~]$ mysql -uroot -p [(-S|--socket=)/usr/local/mysql/run/mysql.sock]
 mysql> select user,host from mysql.user;
 +------------------+-----------+
 | user             | host      |
@@ -2676,33 +2752,33 @@ mysql> select user,host from mysql.user;
 停止： 
 
 ```bash
-[emon@emon ~]$ sudo systemctl stop mysqld
+[emon@wenqiu ~]$ sudo systemctl stop mysqld
 ```
 
 **目前还是使用MySQL5.7，如下切换**
 
 ```bash
 # 如果服务器启动中，先停止
-[emon@emon ~]$ sudo systemctl stop mysqld
+[emon@wenqiu ~]$ sudo systemctl stop mysqld
 # 再执行如下
-[emon@emon ~]$ rm -rf /usr/local/mysql
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
-[emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
-[emon@emon ~]$ sudo systemctl start mysqld
+[emon@wenqiu ~]$ rm -rf /usr/local/mysql
+[emon@wenqiu ~]$ ln -s /usr/local/MySQL/mysql-5.7.30-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@wenqiu ~]$ sudo rm -rf /data/mysql
+[emon@wenqiu ~]$ sudo ln -s /data/MySQL/mysql5.7.30/ /data/mysql
+[emon@wenqiu ~]$ sudo systemctl start mysqld
 ```
 
 **若需要切换到MySQL8.0，如下切换**
 
 ```bash
 # 如果服务器启动中，先停止
-[emon@emon ~]$ sudo systemctl stop mysqld
+[emon@wenqiu ~]$ sudo systemctl stop mysqld
 # 再执行如下
-[emon@emon ~]$ rm -rf /usr/local/mysql
-[emon@emon ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
-[emon@emon ~]$ sudo rm -rf /data/mysql
-[emon@emon ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
-[emon@emon ~]$ sudo systemctl start mysqld
+[emon@wenqiu ~]$ rm -rf /usr/local/mysql
+[emon@wenqiu ~]$ ln -s /usr/local/MySQL/mysql-8.0.20-linux-glibc2.12-x86_64/ /usr/local/mysql
+[emon@wenqiu ~]$ sudo rm -rf /data/mysql
+[emon@wenqiu ~]$ sudo ln -s /data/MySQL/mysql8.0.20/ /data/mysql
+[emon@wenqiu ~]$ sudo systemctl start mysqld
 ```
 
 ## 9、安装Git
@@ -2710,7 +2786,7 @@ mysql> select user,host from mysql.user;
 1. 检查安装情况
 
 ```bash
-[emon@emon ~]$ yum list git|tail -n 2
+[emon@wenqiu ~]$ yum list git|tail -n 2
 可安装的软件包
 git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 ```
@@ -2720,26 +2796,26 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 下载地址：  https://www.kernel.org/pub/software/scm/git/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.gz
 ```
 
 3. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
-[emon@emon ~]$ sudo yum install -y gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+[emon@wenqiu ~]$ yum list gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
+[emon@wenqiu ~]$ sudo yum install -y gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel gcc gcc-c+ curl-devel expat-devel perl-ExtUtils-MakeMaker perl-ExtUtils-CBuilder cpio
 ```
 
 4. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Git
+[emon@wenqiu ~]$ mkdir /usr/local/Git
 ```
 
 5. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/git-2.42.0.tar.gz -C /usr/local/Git/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/git-2.42.0.tar.gz -C /usr/local/Git/
 ```
 
 6. 执行配置脚本，并编译安装
@@ -2747,35 +2823,35 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 - 切换目录并执行脚本
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Git/git-2.42.0/
-[emon@emon git-2.42.0]$ ./configure --prefix=/usr/local/Git/git2.42.0
+[emon@wenqiu ~]$ cd /usr/local/Git/git-2.42.0/
+[emon@wenqiu git-2.42.0]$ ./configure --prefix=/usr/local/Git/git2.42.0
 ```
 
 - 编译
 
 ```bash
-[emon@emon git-2.42.0]$ make
+[emon@wenqiu git-2.42.0]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon git-2.42.0]$ make install
-[emon@emon git-2.42.0]$ cd
-[emon@emon ~]$ ls /usr/local/Git/git2.42.0/
+[emon@wenqiu git-2.42.0]$ make install
+[emon@wenqiu git-2.42.0]$ cd
+[emon@wenqiu ~]$ ls /usr/local/Git/git2.42.0/
 bin  libexec  share
 ```
 
 7. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Git/git2.42.0/ /usr/local/git
+[emon@wenqiu ~]$ ln -s /usr/local/Git/git2.42.0/ /usr/local/git
 ```
 
 8. 配置环境变量
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/git.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/git.sh
 ```
 
 ```bash
@@ -2787,14 +2863,14 @@ export PATH=$GIT_HOME/bin:$PATH
 使之生效：
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 9. 设置账户信息
 
 ```bash
-[emon@emon ~]$ git config --global user.name "emon"
-[emon@emon ~]$ git config --global user.email "[邮箱]"
+[emon@wenqiu ~]$ git config --global user.name "emon"
+[emon@wenqiu ~]$ git config --global user.email "[邮箱]"
 ```
 
 10. 配置SSH信息
@@ -2810,14 +2886,14 @@ authorized_keys作用时，把本机的ssh公钥放到对方机器的该文件�
 - 检查SSH keys是否存在：
 
 ```bas
-[emon@emon ~]$ ls -a ~/.ssh/
+[emon@wenqiu ~]$ ls -a ~/.ssh/
 .  ..  known_hosts
 ```
 
 - 如果不存在，生成SSH keys：
 
 ```bash
-[emon@emon ~]$ ssh-keygen -t rsa -b 4096 -C "[邮箱]"
+[emon@wenqiu ~]$ ssh-keygen -t rsa -b 4096 -C "[邮箱]"
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/emon/.ssh/id_rsa): `[默认]`
 Enter passphrase (empty for no passphrase): `[输入口令，其他用户切换到emon会提示输入]`
@@ -2845,7 +2921,7 @@ The key's randomart image is:
 把下面的内容放入`~/.bashrc`或`~/.bash_profile` 即可。
 
 ```bash
-[emon@emon ~]$ vim ~/.bash_profile 
+[emon@wenqiu ~]$ vim ~/.bash_profile 
 ```
 
 以下是关于SSH keys中私钥加载到ssh-agent的自动配置，无需每次登陆配置。
@@ -2879,7 +2955,7 @@ unset env
 - 拷贝公钥到GitHub上【需要有GitHub账户才可以配置】
 
 ```bash
-[emon@emon ~]$ cat ~/.ssh/id_rsa.pub
+[emon@wenqiu ~]$ cat ~/.ssh/id_rsa.pub
 ```
 
 拷贝了公钥，打开GitHub配置SSH keys的页面： https://github.com/settings/keys 【Settings->SSH and GPG keys->New SSH key->写入Title，粘贴Key】
@@ -2893,7 +2969,7 @@ unset env
 - 验证SSH连接
 
 ```bash
-[emon@emon ~]$ ssh -T git@github.com
+[emon@wenqiu ~]$ ssh -T git@github.com
 The authenticity of host 'github.com (13.250.177.223)' can't be established.
 RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
 RSA key fingerprint is MD5:16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
@@ -2901,14 +2977,14 @@ Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added 'github.com,13.250.177.223' (RSA) to the list of known hosts.
 Enter passphrase for key '/home/emon/.ssh/id_rsa': `[生成SSH keys时设置的口令]`
 Hi Rushing0711! You've successfully authenticated, but GitHub does not provide shell access.
-[emon@emon ~]$ ls -a ~/.ssh/
+[emon@wenqiu ~]$ ls -a ~/.ssh/
 .  ..  id_rsa  id_rsa.pub  known_hosts
 ```
 
 11. 校验
 
 ```bash
-[emon@emon ~]$ git --version
+[emon@wenqiu ~]$ git --version
 git version 2.42.0
 ```
 
@@ -2919,7 +2995,7 @@ git version 2.42.0
 1. 检查是否安装
 
 ```bash
-[emon@emon ~]$ yum list python|tail -n 2
+[emon@wenqiu ~]$ yum list python|tail -n 2
 已安装的软件包
 python.x86_64                       2.7.5-68.el7                       @anaconda
 ```
@@ -2929,19 +3005,19 @@ python.x86_64                       2.7.5-68.el7                       @anaconda
 下载页地址： https://www.python.org/ftp/python/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tar.xz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tar.xz
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Python
+[emon@wenqiu ~]$ mkdir /usr/local/Python
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-2.7.15.tar.xz -C /usr/local/Python/
+[emon@wenqiu ~]$ tar -Jxvf /usr/local/src/Python-2.7.15.tar.xz -C /usr/local/Python/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -2949,8 +3025,8 @@ python.x86_64                       2.7.5-68.el7                       @anaconda
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Python/Python-2.7.15/
-[emon@emon Python-2.7.15]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python2.7.15
+[emon@wenqiu ~]$ cd /usr/local/Python/Python-2.7.15/
+[emon@wenqiu Python-2.7.15]$ ./configure --enable-optimizations --prefix=/usr/local/Python/Python2.7.15
 ```
 
 命令解释：`--enable-optimizations`：启用优化安装，建议使用。
@@ -2958,28 +3034,28 @@ python.x86_64                       2.7.5-68.el7                       @anaconda
 - 编译
 
 ```bash
-[emon@emon Python-2.7.15]$ make
+[emon@wenqiu Python-2.7.15]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon Python-2.7.15]$ make install
-[emon@emon Python-2.7.15]$ cd
-[emon@emon ~]$ ls /usr/local/Python/Python2.7.15/
+[emon@wenqiu Python-2.7.15]$ make install
+[emon@wenqiu Python-2.7.15]$ cd
+[emon@wenqiu ~]$ ls /usr/local/Python/Python2.7.15/
 bin  include  lib  share
 ```
 
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Python/Python2.7.15/ /usr/local/python
+[emon@wenqiu ~]$ ln -s /usr/local/Python/Python2.7.15/ /usr/local/python
 ```
 
 7. 配置环境变量
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/python.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/python.sh
 ```
 
 ```bash
@@ -2990,13 +3066,13 @@ export PATH=$PYTHON_HOME/bin:$PATH
 使之生效：  
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 8. 校验
 
 ```bash
-[emon@emon ~]$ python -V
+[emon@wenqiu ~]$ python -V
 Python 2.7.15
 ```
 
@@ -3008,7 +3084,7 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 
 ```bash
 # 3.7版本需要一个新的包 libffi-devel，否则make install报错： ModuleNotFoundError: No module named '_ctypes'
-[emon@emon ~]$ sudo yum install -y libffi-devel gcc-c++
+[emon@wenqiu ~]$ sudo yum install -y libffi-devel gcc-c++
 ```
 
 如果是直接安装Python，还需要安装 `gcc-c++`，否则在configure时报错：
@@ -3021,19 +3097,19 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 下载页地址： <https://www.python.org/ftp/python/> 
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Python
+[emon@wenqiu ~]$ mkdir /usr/local/Python
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -Jxvf /usr/local/src/Python-3.9.9.tar.xz -C /usr/local/Python/
+[emon@wenqiu ~]$ tar -Jxvf /usr/local/src/Python-3.9.9.tar.xz -C /usr/local/Python/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -3041,8 +3117,8 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Python/Python-3.9.9/
-[emon@emon Python-3.9.9]$ ./configure --prefix=/usr/local/Python/Python3.9.9
+[emon@wenqiu ~]$ cd /usr/local/Python/Python-3.9.9/
+[emon@wenqiu Python-3.9.9]$ ./configure --prefix=/usr/local/Python/Python3.9.9
 ```
 
 命令解释：`--enable-optimizations`：启用优化安装。
@@ -3050,7 +3126,7 @@ Python3.7和Python2.7安装类似，同一时刻环境变量只会指向一个�
 - 编译
 
 ```bash
-[emon@emon Python-3.9.9]$ make
+[emon@wenqiu Python-3.9.9]$ make
 ```
 
 > 安装3.9.9版本时make报错：
@@ -3074,22 +3150,22 @@ make: *** [profile-opt] 错误 2
 - 安装
 
 ```bash
-[emon@emon Python-3.9.9]$ make install
-[emon@emon Python-3.9.9]$ cd
-[emon@emon ~]$ ls /usr/local/Python/Python3.9.9/
+[emon@wenqiu Python-3.9.9]$ make install
+[emon@wenqiu Python-3.9.9]$ cd
+[emon@wenqiu ~]$ ls /usr/local/Python/Python3.9.9/
 bin  include  lib  share
 ```
 
 6. 修改软连接
 
 ```bash
-[emon@emon ~]$ ln -snf /usr/local/Python/Python3.9.9/ /usr/local/python3
+[emon@wenqiu ~]$ ln -snf /usr/local/Python/Python3.9.9/ /usr/local/python3
 ```
 
 7. 配置环境变量
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/python3.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/python3.sh
 ```
 
 ```bash
@@ -3100,13 +3176,13 @@ export PATH=$PYTHON_HOME/bin:$PATH
 使之生效：
 
 ```
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 8. 校验
 
 ```bash
-[emon@emon ~]$ python3 -V
+[emon@wenqiu ~]$ python3 -V
 Python 3.9.9
 ```
 
@@ -3116,7 +3192,7 @@ Python 3.9.9
 
 > 创建PyPI(Python Package Index)的安装目录：
 >
-> [emon@emon ~]$ mkdir /usr/local/PythonPyPI
+> [emon@wenqiu ~]$ mkdir /usr/local/PythonPyPI
 
 #### 10.3.1、安装setuptools模块【Python3.9.9无需安装】
 
@@ -3127,11 +3203,11 @@ Python 3.9.9
 下载页地址： https://pypi.org/project/setuptools/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/b5/96/af1686ea8c1e503f4a81223d4a3410e7587fd52df03083de24161d0df7d4/setuptools-46.1.3.zip
-[emon@emon ~]$ unzip /usr/local/src/setuptools-46.1.3.zip -d /usr/local/PythonPyPI/
-[emon@emon ~]$ cd /usr/local/PythonPyPI/setuptools-46.1.3/
-[emon@emon setuptools-46.1.3]$ python3 setup.py install
-[emon@emon setuptools-46.1.3]$ cd
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/b5/96/af1686ea8c1e503f4a81223d4a3410e7587fd52df03083de24161d0df7d4/setuptools-46.1.3.zip
+[emon@wenqiu ~]$ unzip /usr/local/src/setuptools-46.1.3.zip -d /usr/local/PythonPyPI/
+[emon@wenqiu ~]$ cd /usr/local/PythonPyPI/setuptools-46.1.3/
+[emon@wenqiu setuptools-46.1.3]$ python3 setup.py install
+[emon@wenqiu setuptools-46.1.3]$ cd
 ```
 
 #### 10.3.2、安装easy_install【Python3.9.9无需安装】
@@ -3141,11 +3217,11 @@ Python 3.9.9
 下载页地址： https://pypi.org/project/ez_setup
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/ba/2c/743df41bd6b3298706dfe91b0c7ecdc47f2dc1a3104abeb6e9aa4a45fa5d/ez_setup-0.9.tar.gz
-[emon@emon ~]$ tar -zxvf /usr/local/src/ez_setup-0.9.tar.gz -C /usr/local/PythonPyPI/
-[emon@emon ~]$ cd /usr/local/PythonPyPI/ez_setup-0.9/
-[emon@emon ez_setup-0.9]$ python3 setup.py install
-[emon@emon ez_setup-0.9]$ cd
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/ba/2c/743df41bd6b3298706dfe91b0c7ecdc47f2dc1a3104abeb6e9aa4a45fa5d/ez_setup-0.9.tar.gz
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/ez_setup-0.9.tar.gz -C /usr/local/PythonPyPI/
+[emon@wenqiu ~]$ cd /usr/local/PythonPyPI/ez_setup-0.9/
+[emon@wenqiu ez_setup-0.9]$ python3 setup.py install
+[emon@wenqiu ez_setup-0.9]$ cd
 ```
 
 2. easy_install命令
@@ -3164,12 +3240,12 @@ Python 3.9.9
 下载页地址：https://pypi.org/project/pip/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/d1/05/059c78cd5d740d2299266ffa15514dad6692d4694df571bf168e2cdd98fb/pip-20.1.tar.gz
-[emon@emon ~]$ tar -zxvf /usr/local/src/pip-20.1.tar.gz -C /usr/local/PythonPyPI/
-[emon@emon ~]$ cd /usr/local/PythonPyPI/pip-20.1/
-[emon@emon pip-20.1]$ python3 setup.py install
-[emon@emon pip-20.1]$ cd
-[emon@emon ~]$ pip -V
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://files.pythonhosted.org/packages/d1/05/059c78cd5d740d2299266ffa15514dad6692d4694df571bf168e2cdd98fb/pip-20.1.tar.gz
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/pip-20.1.tar.gz -C /usr/local/PythonPyPI/
+[emon@wenqiu ~]$ cd /usr/local/PythonPyPI/pip-20.1/
+[emon@wenqiu pip-20.1]$ python3 setup.py install
+[emon@wenqiu pip-20.1]$ cd
+[emon@wenqiu ~]$ pip -V
 pip 20.1 from /usr/local/Python/Python3.7.7/lib/python3.7/site-packages/pip-20.1-py3.7.egg/pip (python 3.7)
 ```
 
@@ -3231,14 +3307,14 @@ pip install -r packages.txt
 1. 安装
 
 ```bash
-[emon@emon ~]$ pip install supervisor
+[emon@wenqiu ~]$ pip install supervisor
 ```
 
 2. 创建配置文件
 
 ```bash
-[emon@emon ~]$ sudo mkdir /etc/supervisor
-[emon@emon ~]$ echo_supervisord_conf | sudo tee /etc/supervisor/supervisord.conf 
+[emon@wenqiu ~]$ sudo mkdir /etc/supervisor
+[emon@wenqiu ~]$ echo_supervisord_conf | sudo tee /etc/supervisor/supervisord.conf 
 ```
 
 3. 调整配置文件
@@ -3246,7 +3322,7 @@ pip install -r packages.txt
 打开配置文件：
 
 ````bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisord.conf 
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisord.conf 
 ````
 
 - 增加Web管理界面
@@ -3276,8 +3352,8 @@ password=spvr123            ; default is no password (open server)
 创建目录：
 
 ```bash
-[emon@emon ~]$ sudo mkdir /var/run/supervisor
-[emon@emon ~]$ sudo mkdir /var/log/supervisor
+[emon@wenqiu ~]$ sudo mkdir /var/run/supervisor
+[emon@wenqiu ~]$ sudo mkdir /var/log/supervisor
 ```
 
 配置修改规划：
@@ -3298,8 +3374,8 @@ password=spvr123            ; default is no password (open server)
 创建目录：
 
 ```bash
-[emon@emon ~]$ sudo mkdir /etc/supervisor/supervisor.d
-[emon@emon ~]$ mkdir /home/emon/supervisor.d
+[emon@wenqiu ~]$ sudo mkdir /etc/supervisor/supervisor.d
+[emon@wenqiu ~]$ mkdir /home/emon/supervisor.d
 ```
 
 修改配置：
@@ -3323,7 +3399,7 @@ files = /etc/supervisor/supervisor.d/*.ini /home/emon/supervisor.d/*.ini
 - 配置tomcat
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/tomcat.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/tomcat.ini
 ```
 
 ```ini
@@ -3350,8 +3426,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ```bash
 # 创建所需目录，并通过scp命令上传到/home/emon/spring-boot-demo目录
-[emon@emon ~]$ mkdir -p /home/emon/spring-boot-demo/logs
-[emon@emon ~]$ vim supervisor.d/sbd.ini
+[emon@wenqiu ~]$ mkdir -p /home/emon/spring-boot-demo/logs
+[emon@wenqiu ~]$ vim supervisor.d/sbd.ini
 ```
 
 ```ini
@@ -3377,11 +3453,11 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```bash
 # 开放一个系列的端口（生产环境按需开放，安全第一）
 # 开放8080-8090端口，供Web服务器使用。
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8080-8090/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8080-8090/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp
 ```
 
@@ -3401,16 +3477,16 @@ success
 
 ```bash
 # 提升到root权限
-[emon@emon ~]$ sudo -s
+[emon@wenqiu ~]$ sudo -s
 # 明确指定配置文件
-[root@emon emon]# supervisord -c /etc/supervisor/supervisord.conf
-[root@emon emon]# supervisorctl status
+[root@wenqiu emon]# supervisord -c /etc/supervisor/supervisord.conf
+[root@wenqiu emon]# supervisorctl status
 tomcat                           STOPPED   Not started
 sbd                              STOPPED   Not started
 # 启动
-[root@emon emon]# supervisorctl start tomcat
+[root@wenqiu emon]# supervisorctl start tomcat
 # 降级到emon权限
-[root@emon emon]# exit
+[root@wenqiu emon]# exit
 exit
 ```
 
@@ -3419,14 +3495,14 @@ exit
 具体原因参见Nginx中关于`配置环境变量【特殊】`的描述。
 
 ```bash
-[emon@emon ~]$ sudo ln -s /usr/local/python3/bin/supervisord /usr/sbin/supervisord
-[emon@emon ~]$ sudo ln -s /usr/local/python3/bin/supervisorctl /usr/sbin/supervisorctl
+[emon@wenqiu ~]$ sudo ln -s /usr/local/python3/bin/supervisord /usr/sbin/supervisord
+[emon@wenqiu ~]$ sudo ln -s /usr/local/python3/bin/supervisorctl /usr/sbin/supervisorctl
 ```
 
 接下来可以直接使用sudo+命令模式了：
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl status
+[emon@wenqiu ~]$ sudo supervisorctl status
 tomcat                           STOPPED   Not started
 sbd                              STOPPED   Not started
 ```
@@ -3434,10 +3510,10 @@ sbd                              STOPPED   Not started
 6. 开放端口
 
 ```bash
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=9001/tcp
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=9001/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 8080-8090/tcp 9001/tcp
 ```
 
@@ -3468,7 +3544,7 @@ success
 8. 添加自启动脚本
 
 ```bash
-[emon@emon ~]$ sudo vim /usr/lib/systemd/system/supervisord.service
+[emon@wenqiu ~]$ sudo vim /usr/lib/systemd/system/supervisord.service
 ```
 
 ```bash
@@ -3491,25 +3567,25 @@ WantedBy=multi-user.target
 - 加载
 
 ```bash
-[emon@emon ~]$ sudo systemctl daemon-reload
+[emon@wenqiu ~]$ sudo systemctl daemon-reload
 ```
 
 - 启动
 
 ```bash
-[emon@emon ~]$ sudo systemctl start supervisord.service 
+[emon@wenqiu ~]$ sudo systemctl start supervisord.service 
 ```
 
 - 查看
 
 ```bash
-[emon@emon ~]$ sudo systemctl status supervisord.service
+[emon@wenqiu ~]$ sudo systemctl status supervisord.service
 ```
 
 - 停止
 
 ```bash
-[emon@emon ~]$ sudo systemctl stop supervisord.service 
+[emon@wenqiu ~]$ sudo systemctl stop supervisord.service 
 ```
 
 ## 11、安装NVM
@@ -3531,7 +3607,7 @@ NVM管理不同版本的node与npm：
 1. 安装
 
 ```bash
-[emon@emon ~]$ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+[emon@wenqiu ~]$ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
 => Downloading nvm from git to '/root/.nvm'
 => Cloning into '/root/.nvm'...
 remote: Enumerating objects: 356, done.
@@ -3558,11 +3634,11 @@ export NVM_DIR="$HOME/.nvm"
 【需要重新开启shell加载，或者`source ~/.bashrc`使之生效，否则命令无法生效，因为配置到了用户根目录下的`.bashrc`文件中】
 
 ```bash
-[emon@emon ~]$ command -v nvm
+[emon@wenqiu ~]$ command -v nvm
 nvm
-[emon@emon ~]$ nvm --version
+[emon@wenqiu ~]$ nvm --version
 0.39.2
-[emon@emon ~]$ nvm --help
+[emon@wenqiu ~]$ nvm --help
 ```
 
 3. 安装 node/npm 并切换版本
@@ -3570,13 +3646,13 @@ nvm
 查看远程可安装的node版本：
 
 ```bash
-[emon@emon ~]$ nvm ls-remote
+[emon@wenqiu ~]$ nvm ls-remote
 ```
 
 选择并安装：最新的(Latest LTS: XXX)或者(LTS: XXX)版本，如下，安装两个版本：
 
 ```bash
-[emon@emon ~]$ nvm install v6.14.2
+[emon@wenqiu ~]$ nvm install v6.14.2
 Downloading and installing node v6.14.2...
 Downloading https://nodejs.org/dist/v6.14.2/node-v6.14.2-linux-x64.tar.xz...
 ######################################################################## 100.0%
@@ -3584,7 +3660,7 @@ Computing checksum with sha256sum
 Checksums matched!
 Now using node v6.14.2 (npm v3.10.10)
 Creating default alias: default -> v6.14.2
-[emon@emon ~]$ nvm install v8.11.2
+[emon@wenqiu ~]$ nvm install v8.11.2
 Downloading and installing node v8.11.2...
 Downloading https://nodejs.org/dist/v8.11.2/node-v8.11.2-linux-x64.tar.xz...
 ######################################################################## 100.0%
@@ -3615,16 +3691,16 @@ Now using node v8.11.2 (npm v5.6.0)
 想要安装PM2，需要有node环境，且可以使用npm命令。
 
 ```bash
-[emon@emon ~]$ node --version
+[emon@wenqiu ~]$ node --version
 v8.11.2
-[emon@emon ~]$ npm --version
+[emon@wenqiu ~]$ npm --version
 5.6.0
 ```
 
 2. 安装
 
 ```bash
-[emon@emon ~]$ npm install pm2 -g
+[emon@wenqiu ~]$ npm install pm2 -g
 ```
 
 3. pm2常用命令
@@ -3657,7 +3733,7 @@ ThinkJS是一款面向未来开发的Node.js框架，整合了大量的项目最
 1. 安装
 
 ```bash
-[emon@emon ~]$ npm install -g think-cli
+[emon@wenqiu ~]$ npm install -g think-cli
 ```
 
 安装完成后，系统中会有thinkjs命令（可以通过`thinkjs -V`查看think-cli的版本号，此版本号非thinkjs的版本号）。如果找不到这个命令，请确认环境变量是否正确。
@@ -3665,7 +3741,7 @@ ThinkJS是一款面向未来开发的Node.js框架，整合了大量的项目最
 查看版本：
 
 ```bash
-[emon@emon ~]$ thinkjs -V
+[emon@wenqiu ~]$ thinkjs -V
 2.2.3
 ```
 
@@ -3674,7 +3750,7 @@ ThinkJS是一款面向未来开发的Node.js框架，整合了大量的项目最
 卸载旧版本命令：
 
 ```bash
-[emon@emon ~]$ npm uninstall -g thinkjs
+[emon@wenqiu ~]$ npm uninstall -g thinkjs
 ```
 
 2. 创建项目
@@ -3682,18 +3758,18 @@ ThinkJS是一款面向未来开发的Node.js框架，整合了大量的项目最
 执行`thinkjs new <project_name>`来创建项目，如：
 
 ```bash
-[emon@emon ~]$ cd saas/
-[emon@emon saas]$ thinkjs new demo
-[emon@emon saas]$ cd demo/
-[emon@emon demo]$ npm install
-[emon@emon demo]$ npm start
+[emon@wenqiu ~]$ cd saas/
+[emon@wenqiu saas]$ thinkjs new demo
+[emon@wenqiu saas]$ cd demo/
+[emon@wenqiu demo]$ npm install
+[emon@wenqiu demo]$ npm start
 ```
 
 项目结构：
 
 ```bash
 # 刚创建的项目，在npm install之前的目录结构如下：
-[emon@emon saas]$ tree demo/
+[emon@wenqiu saas]$ tree demo/
 demo/
 ├── development.js                      // 开发环境下的入口文件
 ├── nginx.conf                          // nginx配置文件
@@ -3737,11 +3813,11 @@ demo/
 ```bash
 # 开放一个系列的端口（生产环境按需开放，安全第一）
 # 开放8360-8370端口，供Web服务器使用。
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8360-8370/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=8360-8370/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 9001/tcp 8080-8090/tcp 8360-8370/tcp
 ```
 
@@ -3750,7 +3826,7 @@ success
 4. 通过PM2启动
 
 ```bash
-[emon@emon demo]$ pm2 start pm2.json 
+[emon@wenqiu demo]$ pm2 start pm2.json 
 [PM2][WARN] Applications demo not running, starting...
 [PM2] App [demo] launched (1 instances)
 ┌──────────┬────┬──────┬───────┬────────┬─────────┬────────┬─────┬───────────┬──────┬──────────┐
@@ -3772,8 +3848,8 @@ success
 1. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list gcc libpng libjpeg libpng-devel libjpeg-devel ghostscript libtiff libtiff-devel freetype freetype-devel
-[emon@emon ~]$ sudo yum install -y gcc libpng libjpeg libpng-devel libjpeg-devel ghostscript libtiff libtiff-devel freetype freetype-devel
+[emon@wenqiu ~]$ yum list gcc libpng libjpeg libpng-devel libjpeg-devel ghostscript libtiff libtiff-devel freetype freetype-devel
+[emon@wenqiu ~]$ sudo yum install -y gcc libpng libjpeg libpng-devel libjpeg-devel ghostscript libtiff libtiff-devel freetype freetype-devel
 ```
 
 2. 下载
@@ -3783,19 +3859,19 @@ success
 下载页地址：ftp://ftp.graphicsmagick.org/pub/GraphicsMagick
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/1.3/GraphicsMagick-1.3.35.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/1.3/GraphicsMagick-1.3.35.tar.gz
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/GraphicsMagick
+[emon@wenqiu ~]$ mkdir /usr/local/GraphicsMagick
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/GraphicsMagick-1.3.35.tar.gz -C /usr/local/GraphicsMagick/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/GraphicsMagick-1.3.35.tar.gz -C /usr/local/GraphicsMagick/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -3803,29 +3879,29 @@ success
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/GraphicsMagick/GraphicsMagick-1.3.35/
-[emon@emon GraphicsMagick-1.3.35]$ ./configure --prefix=/usr/local/GraphicsMagick/GraphicsMagick1.3.35 --enable-shared
+[emon@wenqiu ~]$ cd /usr/local/GraphicsMagick/GraphicsMagick-1.3.35/
+[emon@wenqiu GraphicsMagick-1.3.35]$ ./configure --prefix=/usr/local/GraphicsMagick/GraphicsMagick1.3.35 --enable-shared
 ```
 
 - 编译
 
 ```bash
-[emon@emon GraphicsMagick-1.3.35]$ make
+[emon@wenqiu GraphicsMagick-1.3.35]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon GraphicsMagick-1.3.35]$ make install
-[emon@emon GraphicsMagick-1.3.35]$ cd
-[emon@emon ~]$ ls /usr/local/GraphicsMagick/GraphicsMagick1.3.29/
+[emon@wenqiu GraphicsMagick-1.3.35]$ make install
+[emon@wenqiu GraphicsMagick-1.3.35]$ cd
+[emon@wenqiu ~]$ ls /usr/local/GraphicsMagick/GraphicsMagick1.3.29/
 bin  include  lib  share
 ```
 
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/GraphicsMagick/GraphicsMagick1.3.35/ /usr/local/graphicsMagick
+[emon@wenqiu ~]$ ln -s /usr/local/GraphicsMagick/GraphicsMagick1.3.35/ /usr/local/graphicsMagick
 ```
 
 7. 配置环境变量
@@ -3833,7 +3909,7 @@ bin  include  lib  share
 在`/etc/profile.d`目录创建`.sh`文件： 
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/graphicksMagick.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/graphicksMagick.sh
 export GraphicsMagick_HOME=/usr/local/graphicsMagick
 export PATH=$GraphicsMagick_HOME/bin:$PATH
 ```
@@ -3841,13 +3917,13 @@ export PATH=$GraphicsMagick_HOME/bin:$PATH
 使之生效： 
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 8. 测试
 
 ```bash
-[emon@emon ~]$ gm version
+[emon@wenqiu ~]$ gm version
 ```
 
 ### 11.5、安装ImageMagick
@@ -3855,8 +3931,8 @@ export PATH=$GraphicsMagick_HOME/bin:$PATH
 1. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list libjpeg* libpng* freetype* gd*
-[emon@emon ~]$ sudo yum install -y libjpeg* libpng* freetype* gd*
+[emon@wenqiu ~]$ yum list libjpeg* libpng* freetype* gd*
+[emon@wenqiu ~]$ sudo yum install -y libjpeg* libpng* freetype* gd*
 ```
 
 2. 下载
@@ -3866,19 +3942,19 @@ export PATH=$GraphicsMagick_HOME/bin:$PATH
 下载页地址：http://www.imagemagick.org/script/download.php
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://www.imagemagick.org/download/ImageMagick.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://www.imagemagick.org/download/ImageMagick.tar.gz
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/ImageMagick
+[emon@wenqiu ~]$ mkdir /usr/local/ImageMagick
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/ImageMagick.tar.gz -C /usr/local/ImageMagick/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/ImageMagick.tar.gz -C /usr/local/ImageMagick/
 ```
 
 5. 执行配置脚本，并编译安装
@@ -3886,29 +3962,29 @@ export PATH=$GraphicsMagick_HOME/bin:$PATH
 - 切换目录并执行配置脚本生成Makefile
 
 ```bash
-[emon@emon ~]$ cd /usr/local/ImageMagick/ImageMagick-7.0.10-10/
-[emon@emon ImageMagick-7.0.10-10]$ ./configure --prefix=/usr/local/ImageMagick/ImageMagick7.0.10-10 --enable-shared
+[emon@wenqiu ~]$ cd /usr/local/ImageMagick/ImageMagick-7.0.10-10/
+[emon@wenqiu ImageMagick-7.0.10-10]$ ./configure --prefix=/usr/local/ImageMagick/ImageMagick7.0.10-10 --enable-shared
 ```
 
 - 编译
 
 ```bash
-[emon@emon ImageMagick-7.0.10-10]$ make
+[emon@wenqiu ImageMagick-7.0.10-10]$ make
 ```
 
 - 安装
 
 ```bash
-[emon@emon ImageMagick-7.0.10-10]$ make install
-[emon@emon ImageMagick-7.0.10-10]$ cd
-[emon@emon ~]$ ls /usr/local/ImageMagick/ImageMagick7.0.10-10/
+[emon@wenqiu ImageMagick-7.0.10-10]$ make install
+[emon@wenqiu ImageMagick-7.0.10-10]$ cd
+[emon@wenqiu ~]$ ls /usr/local/ImageMagick/ImageMagick7.0.10-10/
 bin  etc  include  lib  share
 ```
 
 6. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/ImageMagick/ImageMagick7.0.10-10/ /usr/local/imageMagick
+[emon@wenqiu ~]$ ln -s /usr/local/ImageMagick/ImageMagick7.0.10-10/ /usr/local/imageMagick
 ```
 
 7. 配置环境变量
@@ -3916,7 +3992,7 @@ bin  etc  include  lib  share
 在`/etc/profile.d`目录创建`.sh`文件： 
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/imageMagick.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/imageMagick.sh
 export ImageMagick_HOME=/usr/local/imageMagick
 export PATH=$ImageMagick_HOME/bin:$PATH
 ```
@@ -3924,13 +4000,13 @@ export PATH=$ImageMagick_HOME/bin:$PATH
 使之生效： 
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 8. 测试
 
 ```bash
-[emon@emon ~]$ convert --version
+[emon@wenqiu ~]$ convert --version
 ```
 
 ### 11.6、部署图片服务器
@@ -3942,22 +4018,22 @@ export PATH=$ImageMagick_HOME/bin:$PATH
 从本地上传到`/usr/local/src`目录即可。
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/gimg.tar.gz -C /home/emon/saas/
-[emon@emon ~]$ cd /home/emon/saas/gimg/
-[emon@emon gimg]$ npm install
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/gimg.tar.gz -C /home/emon/saas/
+[emon@wenqiu ~]$ cd /home/emon/saas/gimg/
+[emon@wenqiu gimg]$ npm install
 ```
 
 2. 创建图片保存目录
 
 ```bash
-[emon@emon ~]$ sudo mkdir /data/gimg
-[emon@emon ~]$ sudo chown -R emon.emon /data/gimg/
+[emon@wenqiu ~]$ sudo mkdir /data/gimg
+[emon@wenqiu ~]$ sudo chown -R emon.emon /data/gimg/
 ```
 
 3. 编辑gimg项目配置
 
 ```bash
-[emon@emon ~]$ vim /home/emon/saas/gimg/config.js 
+[emon@wenqiu ~]$ vim /home/emon/saas/gimg/config.js 
 ```
 
 ```bash
@@ -3990,19 +4066,19 @@ exports.imgtypes={
 启动：
 
 ```bash
-[emon@emon ~]$ pm2 start /home/emon/saas/gimg/bin/www --name ImageServer
+[emon@wenqiu ~]$ pm2 start /home/emon/saas/gimg/bin/www --name ImageServer
 ```
 
 停止：
 
 ```bash
-[emon@emon ~]$ pm2 stop ImageServer
+[emon@wenqiu ~]$ pm2 stop ImageServer
 ```
 
 重启：
 
 ```bash
-[emon@emon ~]$ pm2 restart ImageServer
+[emon@wenqiu ~]$ pm2 restart ImageServer
 ```
 
 5. 访问地址
@@ -4018,8 +4094,8 @@ exports.imgtypes={
 1. 依赖检查与安装
 
 ```bash
-[emon@emon ~]$ yum list gcc gcc-c++ tcl
-[emon@emon ~]$ sudo yum install -y gcc gcc-c++ tcl
+[emon@wenqiu ~]$ yum list gcc gcc-c++ tcl
+[emon@wenqiu ~]$ sudo yum install -y gcc gcc-c++ tcl
 ```
 
 2. 下载
@@ -4027,27 +4103,27 @@ exports.imgtypes={
 下载页地址： https://redis.io/download
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ http://download.redis.io/releases/redis-5.0.8.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ http://download.redis.io/releases/redis-5.0.8.tar.gz
 ```
 
 3. 创建解压目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis
+[emon@wenqiu ~]$ mkdir /usr/local/Redis
 ```
 
 4. 解压
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/redis-5.0.8.tar.gz -C /usr/local/Redis/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/redis-5.0.8.tar.gz -C /usr/local/Redis/
 ```
 
 5. 切换目录并执行编译
 
 ```bash
-[emon@emon ~]$ cd /usr/local/Redis/redis-5.0.8/
+[emon@wenqiu ~]$ cd /usr/local/Redis/redis-5.0.8/
 # 默认的是jemalloc分配器，如果不存在，需要设置malloc分配器才可以
-[emon@emon redis-5.0.8]$ make MALLOC=libc
+[emon@wenqiu redis-5.0.8]$ make MALLOC=libc
 cd src && make all
 make[1]: 进入目录“/usr/local/Redis/redis-4.0.9/src”
     CC Makefile.dep
@@ -4070,7 +4146,7 @@ make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
 6. 编译测试
 
 ```bash
-[emon@emon redis-5.0.8]$ make test
+[emon@wenqiu redis-5.0.8]$ make test
 cd src && make test
 make[1]: 进入目录“/usr/local/Redis/redis-5.0.8/src”
     CC Makefile.dep
@@ -4081,7 +4157,7 @@ Starting test server at port 11111
 
 Cleanup: may take some time... OK
 make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
-[emon@emon redis-5.0.8]$ cd
+[emon@wenqiu redis-5.0.8]$ cd
 ```
 
 ### 12.1、【一主二从三哨兵】
@@ -4093,32 +4169,32 @@ make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
 - 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis5.0.8
+[emon@wenqiu ~]$ mkdir /usr/local/Redis/redis5.0.8
 ```
 
 - 复制`/usr/local/Redis/redis-5.0.8/src`目录下的可执行文件，到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-5.0.8/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis5.0.8/
+[emon@wenqiu ~]$ cp /usr/local/Redis/redis-5.0.8/src/{redis-server,redis-sentinel,redis-cli,redis-benchmark,redis-check-rdb,redis-check-aof,redis-trib.rb} /usr/local/Redis/redis5.0.8/
 ```
 
 - 复制`redis.config`与`sentinel.conf`到安装目录
 
 ```bash
-[emon@emon ~]$ cp /usr/local/Redis/redis-5.0.8/{redis.conf,sentinel.conf} /usr/local/Redis/redis5.0.8/
+[emon@wenqiu ~]$ cp /usr/local/Redis/redis-5.0.8/{redis.conf,sentinel.conf} /usr/local/Redis/redis5.0.8/
 ```
 
 - 在内置目录创建RDB文件目录与log日志文件
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Redis/redis5.0.8/redis_rdb
-[emon@emon ~]$ touch /usr/local/Redis/redis5.0.8/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
+[emon@wenqiu ~]$ mkdir /usr/local/Redis/redis5.0.8/redis_rdb
+[emon@wenqiu ~]$ touch /usr/local/Redis/redis5.0.8/redis_rdb/{redis.log,redis-slave.log,redis-slave2.log,sentinel.log,sentinel-slave.log,sentinel-slave2.log}
 ```
 
 - 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Redis/redis5.0.8/ /usr/local/redis
+[emon@wenqiu ~]$ ln -s /usr/local/Redis/redis5.0.8/ /usr/local/redis
 ```
 
 - 配置环境变量
@@ -4126,7 +4202,7 @@ make[1]: 离开目录“/usr/local/Redis/redis-5.0.8/src”
 在`/etc/profile.d`目录创建`.sh`文件： 
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/profile.d/redis.sh
+[emon@wenqiu ~]$ sudo vim /etc/profile.d/redis.sh
 export REDIS_HOME=/usr/local/redis
 export PATH=$REDIS_HOME:$PATH
 ```
@@ -4134,7 +4210,7 @@ export PATH=$REDIS_HOME:$PATH
 使之生效： 
 
 ```bash
-[emon@emon ~]$ source /etc/profile
+[emon@wenqiu ~]$ source /etc/profile
 ```
 
 #### 12.1.2、配置【一主】
@@ -4144,7 +4220,7 @@ export PATH=$REDIS_HOME:$PATH
 1. 配置【一主】的配置文件
 
 ```bash
-[emon@emon ~]$ vim /usr/local/redis/redis.conf 
+[emon@wenqiu ~]$ vim /usr/local/redis/redis.conf 
 ```
 
 ```bash
@@ -4174,7 +4250,7 @@ requirepass `[密码]`
 - 增加开机服务systemctl
 
 ```bash
-[emon@emon ~]$ sudo vim /usr/lib/systemd/system/redisd.service
+[emon@wenqiu ~]$ sudo vim /usr/lib/systemd/system/redisd.service
 ```
 
 ```bash
@@ -4193,14 +4269,14 @@ WantedBy=multi-user.target
 ```
 
 ```bash
-[emon@emon ~]$ sudo systemctl daemon-reload
-[emon@emon ~]$ sudo systemctl start redisd
+[emon@wenqiu ~]$ sudo systemctl daemon-reload
+[emon@wenqiu ~]$ sudo systemctl start redisd
 ```
 
 - 使用supervisor（或者类似的工具）【推荐】
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis.ini
 ```
 
 ```ini
@@ -4221,8 +4297,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis
 ```
 
 **关于警告：**(启动后有三个警告)
@@ -4233,10 +4309,10 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 
 ```bash
 # 打开文件追加
-[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+[emon@wenqiu ~]$ sudo vim /etc/sysctl.conf 
 net.core.somaxconn=1024
 # 使配置生效
-[emon@emon ~]$ sudo sysctl -p
+[emon@wenqiu ~]$ sudo sysctl -p
 ```
 
 - 第二个警告
@@ -4245,10 +4321,10 @@ net.core.somaxconn=1024
 
 ```bash
 # 打开文件追加
-[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+[emon@wenqiu ~]$ sudo vim /etc/sysctl.conf 
 vm.overcommit_memory=1
 # 使配置生效
-[emon@emon ~]$ sudo sysctl -p
+[emon@wenqiu ~]$ sudo sysctl -p
 ```
 
 - 第三个警告
@@ -4258,12 +4334,12 @@ vm.overcommit_memory=1
 解决方法：将其写入`/etc/rc.local`文件中。
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/rc.local
+[emon@wenqiu ~]$ sudo vim /etc/rc.local
 if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 fi
 # 使配置生效
-[emon@emon ~]$ sudo bash -c "source /etc/rc.local"
+[emon@wenqiu ~]$ sudo bash -c "source /etc/rc.local"
 ```
 
 
@@ -4273,7 +4349,7 @@ fi
 在Redis启动情况下：
 
 ```bash
-[emon@emon ~]$ redis-cli -h 192.168.1.116 -p 6379
+[emon@wenqiu ~]$ redis-cli -h 192.168.1.116 -p 6379
 192.168.1.116:6379> auth `[密码]`
 OK
 192.168.1.116:6379> set name emon
@@ -4292,8 +4368,8 @@ OK
 1. 配置【二从】的配置文件
 
 ```bash
-[emon@emon ~]$ cp /usr/local/redis/redis.conf /usr/local/redis/redis-slave.conf
-[emon@emon ~]$ vim /usr/local/redis/redis-slave.conf
+[emon@wenqiu ~]$ cp /usr/local/redis/redis.conf /usr/local/redis/redis-slave.conf
+[emon@wenqiu ~]$ vim /usr/local/redis/redis-slave.conf
 ```
 
 ```bash
@@ -4324,7 +4400,7 @@ masterauth `[密码]`
 2. 配置启动
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-slave.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-slave.ini
 ```
 
 ```ini
@@ -4345,14 +4421,14 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis-slave
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis-slave
 ```
 
 3. 校验
 
 ```bash
-[emon@emon ~]$ redis-cli -h 192.168.1.116 -p 6389
+[emon@wenqiu ~]$ redis-cli -h 192.168.1.116 -p 6389
 192.168.1.116:6389> auth `[密码]`
 OK
 192.168.1.116:6389> get name
@@ -4365,8 +4441,8 @@ OK
 1. 配置【二从】的配置文件
 
 ```bash
-[emon@emon ~]$ cp /usr/local/redis/redis.conf /usr/local/redis/redis-slave2.conf
-[emon@emon ~]$ vim /usr/local/redis/redis-slave2.conf
+[emon@wenqiu ~]$ cp /usr/local/redis/redis.conf /usr/local/redis/redis-slave2.conf
+[emon@wenqiu ~]$ vim /usr/local/redis/redis-slave2.conf
 ```
 
 ```bash
@@ -4397,7 +4473,7 @@ masterauth `[密码]`
 2. 配置启动
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-slave2.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-slave2.ini
 ```
 
 ```ini
@@ -4418,14 +4494,14 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis-slave2
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis-slave2
 ```
 
 3. 校验
 
 ```bash
-[emon@emon ~]$ redis-cli -h 192.168.1.116 -p 6399
+[emon@wenqiu ~]$ redis-cli -h 192.168.1.116 -p 6399
 192.168.1.116:6399> auth `[密码]`
 OK
 192.168.1.116:6399> get name
@@ -4436,7 +4512,7 @@ OK
 ##### 12.1.3.3、【一主二从】校验
 
 ```bash
-[emon@emon ~]$ redis-cli -h 192.168.1.116 -p 6379
+[emon@wenqiu ~]$ redis-cli -h 192.168.1.116 -p 6379
 192.168.1.116:6379> auth `[密码]`
 OK
 192.168.1.116:6379> info replication
@@ -4463,7 +4539,7 @@ repl_backlog_histlen:33521
 1. 配置【三哨兵】的配置文件
 
 ```bash
-[emon@emon ~]$ vim /usr/local/redis/sentinel.conf 
+[emon@wenqiu ~]$ vim /usr/local/redis/sentinel.conf 
 ```
 
 ```bash
@@ -4496,7 +4572,7 @@ logfile "/usr/local/redis/redis_rdb/sentinel.log"
 2. 配置启动
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel.ini
 ```
 
 ```ini
@@ -4517,8 +4593,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis-sentinel
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis-sentinel
 ```
 
 【警告】
@@ -4532,11 +4608,11 @@ WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net
 
 ```shell
 # 第一步：打开`/etc/sysctl.conf`文件
-[emon@emon ~]$ sudo vim /etc/sysctl.conf 
+[emon@wenqiu ~]$ sudo vim /etc/sysctl.conf 
 # 第二步：追加如下内容
 net.core.somaxconn=1024
 # 第三步：使之生效
-[emon@emon ~]$ sudo sysctl -p
+[emon@wenqiu ~]$ sudo sysctl -p
 ```
 
 
@@ -4548,8 +4624,8 @@ net.core.somaxconn=1024
 1. 配置【三哨兵】的配置文件
 
 ```bash
-[emon@emon ~]$ cp /usr/local/redis/sentinel.conf /usr/local/redis/sentinel-slave.conf 
-[emon@emon ~]$ vim /usr/local/redis/sentinel-slave.conf
+[emon@wenqiu ~]$ cp /usr/local/redis/sentinel.conf /usr/local/redis/sentinel-slave.conf 
+[emon@wenqiu ~]$ vim /usr/local/redis/sentinel-slave.conf
 ```
 
 ```bash
@@ -4570,7 +4646,7 @@ logfile "/usr/local/redis/redis_rdb/sentinel-slave.log"
 2. 配置启动
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel-slave.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel-slave.ini
 ```
 
 ```ini
@@ -4591,8 +4667,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis-sentinel-slave
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis-sentinel-slave
 ```
 
 ##### 112.1.4.3、【三哨兵】之三
@@ -4600,8 +4676,8 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 1. 配置【三哨兵】的配置文件
 
 ```bash
-[emon@emon ~]$ cp /usr/local/redis/sentinel.conf /usr/local/redis/sentinel-slave2.conf 
-[emon@emon ~]$ vim /usr/local/redis/sentinel-slave2.conf
+[emon@wenqiu ~]$ cp /usr/local/redis/sentinel.conf /usr/local/redis/sentinel-slave2.conf 
+[emon@wenqiu ~]$ vim /usr/local/redis/sentinel-slave2.conf
 ```
 
 ```bash
@@ -4622,7 +4698,7 @@ logfile "/usr/local/redis/redis_rdb/sentinel-slave2.log"
 2. 配置启动
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel-slave2.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-sentinel-slave2.ini
 ```
 
 ```ini
@@ -4643,14 +4719,14 @@ killasgroup=true                ;默认为false，向进程组发送kill信号�
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl start redis-sentinel-slave2
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl start redis-sentinel-slave2
 ```
 
 #### 12.1.5、配置redis启动组
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/supervisor/supervisor.d/redis-group.ini
+[emon@wenqiu ~]$ sudo vim /etc/supervisor/supervisor.d/redis-group.ini
 ```
 
 ```bash
@@ -4660,28 +4736,28 @@ priority=999
 ```
 
 ```bash
-[emon@emon ~]$ sudo supervisorctl update
-[emon@emon ~]$ sudo supervisorctl restart redis-group:
+[emon@wenqiu ~]$ sudo supervisorctl update
+[emon@wenqiu ~]$ sudo supervisorctl restart redis-group:
 ```
 
 #### 12.1.6、开放端口
 
 ```bash
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6379/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6379/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26379/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26379/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6389/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6389/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26389/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26389/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6399/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=6399/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26399/tcp
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --add-port=26399/tcp
 success
-[emon@emon ~]$ sudo firewall-cmd --reload
+[emon@wenqiu ~]$ sudo firewall-cmd --reload
 success
-[emon@emon ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
+[emon@wenqiu ~]$ sudo firewall-cmd --permanent --zone=public --list-ports
 20-21/tcp 61001-62000/tcp 80/tcp 3306/tcp 9001/tcp 8080-8090/tcp 8360-8370/tcp 6379/tcp 26379/tcp 6389/tcp 26389/tcp 6399/tcp 26399/tcp
 ```
 
@@ -4698,19 +4774,19 @@ success
 下载地址专项页面(war)： http://mirrors.jenkins.io/war-stable/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://pkg.jenkins.io/redhat-stable/jenkins-2.222.3-1.1.noarch.rpm
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://pkg.jenkins.io/redhat-stable/jenkins-2.222.3-1.1.noarch.rpm
 ```
 
 2. 安装
 
 ```bash
-[emon@emon ~]$ sudo rpm -ivh /usr/local/src/jenkins-2.222.3-1.1.noarch.rpm
+[emon@wenqiu ~]$ sudo rpm -ivh /usr/local/src/jenkins-2.222.3-1.1.noarch.rpm
 ```
 
 3. 修改配置
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/sysconfig/jenkins 
+[emon@wenqiu ~]$ sudo vim /etc/sysconfig/jenkins 
 ```
 
 ```bash
@@ -4726,13 +4802,13 @@ JENKINS_PORT="8085"
 - 检测JDK：
 
 ```bash
-[emon@emon ~]$ java -version
+[emon@wenqiu ~]$ java -version
 ```
 
 - 检测jenkins是否配置JDK，在candidates后面加上自己的jdk路径，如下：
 
 ```bash
-[emon@emon ~]$ sudo vim /etc/rc.d/init.d/jenkins
+[emon@wenqiu ~]$ sudo vim /etc/rc.d/init.d/jenkins
 
 candidates="
 /etc/alternatives/java
@@ -4753,9 +4829,9 @@ candidates="
 
 ```bash
 加载服务：
-[emon@emon ~]$ sudo systemctl daemon-reload
+[emon@wenqiu ~]$ sudo systemctl daemon-reload
 启动服务：
-[emon@emon ~]$ sudo systemctl start jenkins.service
+[emon@wenqiu ~]$ sudo systemctl start jenkins.service
 ```
 
 7. 访问
@@ -4765,7 +4841,7 @@ http://192.168.1.116:8085
 首次进入页面需要输入初始密码，该密码在`/var/lib/jenkins/secrets/initialAdminPassword`文件里面，复制密码，粘贴登录。
 
 ```bash
-[emon@emon ~]$ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+[emon@wenqiu ~]$ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
 
 8. 自定义Jenkins
@@ -4789,13 +4865,13 @@ System.setProperty('org.apache.commons.jelly.tags.fmt.timeZone', 'Asia/Shanghai'
 同时确保linux服务器的时区：
 
 ```bash
-[emon@emon ~]$ timedatectl |grep "Time zone"
+[emon@wenqiu ~]$ timedatectl |grep "Time zone"
        Time zone: Asia/Shanghai (CST, +0800)
-[emon@emon ~]$ ll /etc/localtime 
+[emon@wenqiu ~]$ ll /etc/localtime 
 lrwxrwxrwx. 1 root root 35 5月   3 20:19 /etc/localtime -> ../usr/share/zoneinfo/Asia/Shanghai
 # 如果不是上面的时区，可以修改
 rm -rf /etc/localtime
-[emon@emon ~]$ ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+[emon@wenqiu ~]$ ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
 ```
 
 9. Jenkins URL
@@ -4870,15 +4946,15 @@ ls /var/lib/jenkins/users                           用户的存放位置
 检查是否存在SSH keys
 
 ```bash
-[emon@emon ~]$ ls /var/lib/jenkins/.ssh
+[emon@wenqiu ~]$ ls /var/lib/jenkins/.ssh
 ```
 
 如果不存在，则生成SSH keys
 
 ```bash
-[emon@emon ~]$ sudo mkdir /var/lib/jenkins/.ssh
-[emon@emon ~]$ sudo chown jenkins.jenkins /var/lib/jenkins/.ssh/
-[emon@emon ~]$ sudo ssh-keygen -t rsa -b 4096 -C "liming20110711@163.com"
+[emon@wenqiu ~]$ sudo mkdir /var/lib/jenkins/.ssh
+[emon@wenqiu ~]$ sudo chown jenkins.jenkins /var/lib/jenkins/.ssh/
+[emon@wenqiu ~]$ sudo ssh-keygen -t rsa -b 4096 -C "liming20110711@163.com"
 Generating public/private rsa key pair.
 Enter file in which to save the key (/root/.ssh/id_rsa): /var/lib/jenkins/.ssh/id_rsa
 Enter passphrase (empty for no passphrase): 
@@ -4899,7 +4975,7 @@ The key's randomart image is:
 |.= .     ...     |
 |o o.     .o.     |
 +----[SHA256]-----+
-[emon@emon ~]$ sudo chown -R jenkins.jenkins /var/lib/jenkins/.ssh/
+[emon@wenqiu ~]$ sudo chown -R jenkins.jenkins /var/lib/jenkins/.ssh/
 ```
 
 在GitHub的SSH keys加入jenkins用户公钥
@@ -4924,7 +5000,7 @@ Key `上面生成的公钥id_rsa.pub的内容`
   Kind: SSH Username with private key
   Username: SSH所属用户的名称，这里是：jenkins
   Private Key：执行如下命令，并拷贝私钥到这里
-  [emon@emon ~]$ sudo cat /var/lib/jenkins/.ssh/id_rsa
+  [emon@wenqiu ~]$ sudo cat /var/lib/jenkins/.ssh/id_rsa
   Passphrase: 如果你在创建 ssh key 的时候输入了 Passphrase 那就填写相应的Passphrase，为空就不填写 
   ID: 空，保存后会自动生成
   Description： 空
@@ -5042,12 +5118,12 @@ test                Overall->Read,Run->Replay
 start.sh是什么？
 
 ```bash
-[emon@emon ~]$ mkdir bin
-[emon@emon ~]$ vim /home/emon/bin/start.sh 
+[emon@wenqiu ~]$ mkdir bin
+[emon@wenqiu ~]$ vim /home/emon/bin/start.sh 
 #!/bin/bash
 MODULE=$1
 echo 'emon123' | sudo -S supervisorctl restart $MODULE
-[emon@emon ~]$ chmod u+x /home/emon/bin/start.sh 
+[emon@wenqiu ~]$ chmod u+x /home/emon/bin/start.sh 
 ```
 
 ## 14、安装FastDFS
@@ -5296,25 +5372,25 @@ https://jetty.org/download.html
 下载地址获取页面：https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/
 
 ```bash
-[emon@emon ~]$ wget -cP /usr/local/src/ https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.55.v20240627/jetty-distribution-9.4.55.v20240627.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.55.v20240627/jetty-distribution-9.4.55.v20240627.tar.gz
 ```
 
 2. 创建安装目录
 
 ```bash
-[emon@emon ~]$ mkdir /usr/local/Jetty
+[emon@wenqiu ~]$ mkdir /usr/local/Jetty
 ```
 
 3. 解压安装
 
 ```bash
-[emon@emon ~]$ tar -zxvf /usr/local/src/jetty-distribution-9.4.55.v20240627.tar.gz -C /usr/local/Jetty/
+[emon@wenqiu ~]$ tar -zxvf /usr/local/src/jetty-distribution-9.4.55.v20240627.tar.gz -C /usr/local/Jetty/
 ```
 
 4. 创建软连接
 
 ```bash
-[emon@emon ~]$ ln -s /usr/local/Jetty/jetty-distribution-9.4.55.v20240627/ /usr/local/jetty
+[emon@wenqiu ~]$ ln -s /usr/local/Jetty/jetty-distribution-9.4.55.v20240627/ /usr/local/jetty
 ```
 
 5. 启动
