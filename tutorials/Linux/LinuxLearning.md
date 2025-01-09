@@ -6,7 +6,7 @@
 
 Linux教程视频地址
 
-https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd_source=b850b3a29a70c8eb888ce7dff776a5d1&p=80
+https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd_source=b850b3a29a70c8eb888ce7dff776a5d1&p=126
 
 
 
@@ -165,6 +165,25 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 1. 当创建用户成功后，会自动的创建和用户同名的家目录
 2. 也可以通过 `useradd -d 指定目录 新的用户名`，给新创建的用户指定家目录
 
+- 选项说明
+
+| 选项        | 功能                                               |
+| ----------- | -------------------------------------------------- |
+| -c 备注     | 加上备注文字。备注文字会保存在passwd的备注栏位中； |
+| -d 登入目录 | 指定用户登入时的起始目录；                         |
+| -e 有效期   | 指定账户的有效期限；                               |
+| -f 缓冲天数 | 指定在密码过期后多少天即关闭该账号；               |
+| -g 群组     | 指定用户所属的群组；                               |
+| -G 群组     | 指定用户所属的附加群组；                           |
+| -m          | 自动建立用户的登入目录；                           |
+| -M          | 不要自动建立用户的登入目录；                       |
+| -n          | 取消建立以用户名称为名的群组；                     |
+| -r          | 建立系统账号；                                     |
+| -s shell    | 指定用户登入后所使用的shell；                      |
+| -u uid      | 指定用户id。                                       |
+
+
+
 ## 8.3  修改用户密码
 
 - 基本语法
@@ -300,7 +319,7 @@ https://www.bilibili.com/video/BV1Sv411r7vd?spm_id_from=333.788.player.switch&vd
 
 6 ：系统重启
 
-常用运行级别是3和5，也可以指定默认运行级别，<span style="color:blue;font-weight:bold;">参考15.3章节</span>。
+常用运行级别是3和5，也可以指定默认运行级别，<span style="color:blue;font-weight:bold;">参考14.5.3章节</span>。
 
 ```bash
 % init 3
@@ -1456,6 +1475,8 @@ nvme0n2            259:4    0    1G  0 disk
 
 ![image-20241231174407021](images/image-20241231174407021.png)
 
+### 13.1.1 CentOS7网卡配置
+
 - 虚拟机修改网卡配置文件
 
 ![image-20241231145414358](images/image-20241231145414358.png)
@@ -1483,6 +1504,10 @@ nvme0n2            259:4    0    1G  0 disk
 # 或者
 % reboot
 ```
+
+### 13.1.2 Rocky9网卡配置
+
+
 
 ## 13.2 设置主机名和hosts映射
 
@@ -1818,6 +1843,10 @@ Linux系统有7种运行级别（runlevel），常用的是级别3和5。
 - systemctl设置服务的自启动状态
 
 1. `systemctl list-unit-files [| grep 服务名]`（查看服务开机启动状态，grep可以进行过滤）
+
+   ```bash
+   % systemctl list-unit-files  --type=service
+   ```
 2. `systemctl enable 服务名` （设置服务开机启动）
 3. `systemctl disable 服务名` （关闭服务开机启动）
 4. `systemctl is-enabled 服务名` （查看某个服务是否自启动的）
@@ -2329,6 +2358,1137 @@ yum是一个shell前端软件包管理器。基于RPM包管理，能够从指定
 % yum list firefox
 % yum install -y firefox
 ```
+
+
+
+# 第16章 Linux之大数据定制篇-Shell编程
+
+## 16.1 基本介绍
+
+- 为什么要学习Shell编程
+
+1. Linux运维工程师在进行服务器集群管理时，需要编写Shell程序来进行服务器管理。
+2. 对于JavaEE和Python程序员来说，工作的需要，你的老大会要求你编写一些Shell脚本进行程序或者是服务器的维护，比如编写一个定时备份数据库的脚本。
+3. 对于大数据程序员来说，需要编写Shell程序来管理集群。
+
+- Shell是什么
+
+​	Shell是一个命令行解释器，它为用户提供了一个向Linux内核发送请求以便运行程序的界面系统级程序，用户可以用Shell来启动、挂起、停止甚至是编写一些程序。
+
+## 16.2 Shell脚本的执行方式
+
+- 脚本格式要求
+
+1. 脚本以`#!/bin/bash`开头
+2. 脚本需要有可执行权限
+
+- 编写第一个Shell脚本
+
+需求说明：创建一个Shell脚本，输出hello world！
+
+```bash
+% vim hello.sh
+```
+
+```bash
+#!/bin/bash
+echo "hello world!"
+```
+
+- 脚本的常用执行方式
+
+1. 方式1（输入脚本的绝对路径或相对路径）
+
+说明：首先要赋予helloworld.sh脚本的+x权限，再执行脚本。
+
+```bash
+% chmod u+x hello.sh
+% ./hello.sh
+```
+
+2. 方式2（sh+脚本）
+
+说明：不用赋予脚本+x权限，直接执行即可。
+
+```bash
+% sh hello.sh
+```
+
+## 16.3 Shell的变量
+
+- Shell变量介绍
+
+1. Linux Shell中的变量分为，系统变量和用户自定义变量。
+2. 系统变量：$HOME、$PWD、$SHELL、$USER等等，比如： echo $HOME 等等。
+3. 显示当前shell中所有变量：set
+
+```bash
+% set | more
+```
+
+- Shell变量的定义
+
+1. 定义变量：`变量名=值`
+2. 撤销变量：`unset 变量`
+3. 声明静态变量（readonly变量），注意：不能 unset
+4. 变量名的规则
+   1. 变量名可以由字母、数字和下划线组成，但是不能以数字开头。
+   2. 等号两侧不能有空格。
+   3. 变量名称一般习惯为大写，这时一个规范，我们遵守即可。
+5. 将指令的返回值赋值给变量
+   1. A=\`date\` 反引号，运行里面的命令，并把结果返回给变量A
+   2. A=$(date) 等价于反引号
+6. 读取变量值
+   1. ${变量}
+   2. $变量
+
+
+- 应用实例
+
+```bash
+% vim var.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1:定义变量A
+A=100
+# 输出变量A
+echo A=$A
+echo "A=$A"
+# 案例2:撤销变量A
+unset A
+echo "A=$A"
+# 案例3:声明静态的变量B=2,不能unset
+readonly B=2
+echo "B=$B"
+# 对B执行unset会报错:"unset: B: 无法反设定: 只读 variable"
+# unset B
+# 将指令返回的结果赋值给变量
+C=`date`
+D=$(date)
+echo "C=$C"
+echo "D=$D"
+```
+
+## 16.3 设置环境变量
+
+- 基本语法
+
+1. `export 变量名=变量值` （功能描述：将shell变量输出为环境变量/全局变量）
+2. `source 配置文件` （功能描述：让修改后的配置信息立即生效）
+3. `echo $变量名` （功能描述：查询环境变量的值）
+
+- 快速入门
+
+1. 在 /etc/profile 文件中定义 TOMCAT_HOME 环境变量
+
+```bash
+% vim /etc/profile
+```
+
+```bash
+# 定义一个环境变量
+export TOMCAT_HOME=/usr/local/tomcat
+```
+
+```bash
+% source /etc/profile
+```
+
+2. 查看环境变量 TOMCAT_HOME 的值
+
+```bash
+% echo $TOMCAT_HOME
+```
+
+- Shell脚本的多行注释
+
+`:<<! `
+
+`内容 `
+
+`!`
+
+示例：
+
+```bash
+:<<!
+C=`date`
+D=$(date)
+echo "C=$C"
+echo "D=$D"
+!
+```
+
+## 16.4 位置参数变量
+
+- 介绍
+
+当我们执行一个shell脚本时，如果希望获取到命令行的参赛信息，就可以使用到位置参数变量。
+
+比如：`./myshell.sh 100 200`，这个就是一个执行shell的命令行，可以在myshell.sh脚本中获取到参数信息。
+
+```bash
+% vim myshell.sh
+```
+
+```bahs
+#!/bin/bash
+echo "0=$0 1=$1 2=$2"
+echo "所有的参数 $*"
+echo "所有的参数 $@"
+echo "参数的个数 $#"
+```
+
+```bash
+% sh myshell.sh 100 200
+0=myshell.sh 1=100 2=200
+所有的参数 100 200
+所有的参数 100 200
+参数的个数 2
+```
+
+- 基本语法
+
+`$n` （功能描述：n为数字，$0代表命令本身，$1-$9代表第一到第九个参数，十以上的参数，需要用大括号包含，${10}）
+
+`$*` （功能描述：这个变量代表命令行中所有的参数，$*把所有的参数看成一个整体）
+
+`$@` （功能描述：这个变量也代表命令行中的所有参数，不过$@把每个参数区分对待）
+
+`$#` （功能描述：这个变量代表命令行中所有参数的个数）
+
+
+
+ ## 16.5 预定义变量
+
+- 基本介绍
+
+就是shell设计者事先已经定义好的变量，可以直接在shell脚本中使用。
+
+- 基本语法
+
+`$$` （功能描述：当前进程的进程号（PID））
+
+`$!` （功能描述：后台运行的最后一个进程的进程号（PID））
+
+`$?` （功能描述：最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值为非0（具体是哪个数，由命令自己来决定）。则证明上一个命令执行不正确了。）
+
+- 应用实例
+
+在一个shell脚本中简单使用一下预定义变量。
+
+```bash
+% vim preVar.sh
+```
+
+```bash
+#!/bin/bash
+echo "当前执行的进程id=$$"
+# 以后台的方式运行一个脚本,并获取他的进程号
+sh /root/shcode/myshell.sh &
+echo "最后一个后台方式运行的进程id=$!"
+echo "执行的结果是result=$?"
+```
+
+## 16.6 运算符
+
+- 基本介绍
+
+学习如何在shell中进行各种运算操作。
+
+- 基本语法
+
+1. `"$((运算式))"` 或 `"$[运算式]"` 或者 `expr m + n`
+2. 注意 `expr` 运算符间要有空格，如果希望将expr表达式的结果赋值给变量，那么需要对expr表达式，使用反引号\`expr\`包裹在内。
+3. `expr m - n`
+4. `expr \*,/,%` 乘，除，取舍
+
+- 应用实例
+
+案例1：计算（2+3）✖️ 4 的值
+
+案例2：请求出命令行的两个参数[整数]的和
+
+```bash
+% vim oper.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：计算（2+3）✖️ 4 的值
+# 使用第一种方式
+RES1=$(((2+3)*4))
+echo "res1=$RES1"
+# 使用第二种方式,推荐使用
+RES2=$[(2+3)*4]
+echo "res2=$RES2"
+# 使用第三种方式
+TEMP=`expr 2 + 3`
+RES3=`expr $TEMP \* 4`
+echo "res3=$RES3"
+# 案例2：请求出命令行的两个参数[整数]的和
+SUM=$[$1+$2]
+echo "SUM=$SUM"
+```
+
+## 16.7 条件判断
+
+- 基本语法
+
+`[ condition ]` （注意condition前后要有空格）
+
+非空返回true，可使用`$?`验证（0为true，>1为false）
+
+- 应用实例
+
+`[ wenqiu ]` 结果为：true
+
+`[ ]` 结果为：false
+
+`[ condition ] && echo OK || echo notok` 
+
+- 常用判断条件
+
+| 操作符               | 含义                                                 |
+| -------------------- | ---------------------------------------------------- |
+| 字符串比较           |                                                      |
+| =                    | 比较字符串内容是否相同。                             |
+| !=                   | 比较字符串内容是否不同。                             |
+| -n                   | 判断字符串是否为空，非空时为真。                     |
+| -z                   | 判断字符串内容是否为空，空时为真。                   |
+| =~                   | 判断字符串内容是否包含。用法，[[ $VAR =~ "string" ]] |
+| 两个整数的比较       |                                                      |
+| -lt                  | 小于                                                 |
+| -le                  | 小于等于                                             |
+| -eq                  | 等于                                                 |
+| -gt                  | 大于                                                 |
+| -ge                  | 大于等于                                             |
+| -ne                  | 不等于                                               |
+| 按照文件权限进行判断 |                                                      |
+| -r                   | 有读的权限                                           |
+| -w                   | 有写的权限                                           |
+| -x                   | 有执行的权限                                         |
+| 按照文件类型进行判断 |                                                      |
+| -f                   | 文件存在并且是一个常规的文件                         |
+| -e                   | 文件存在                                             |
+| -d                   | 文件存在并是一个目录                                 |
+
+- 应用案例
+
+案例1 ："ok"是否等于"ok"
+
+案例2 ：23是否大于等于22
+
+案例3 ：/root/shcode/aaa.txt 目录中的文件是否存在
+
+```bash
+% vim ifdemo.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1 ："ok"是否等于"ok"
+if [ "ok" = "ok" ]
+then
+        echo "相等"
+else
+        echo "不等"
+fi
+# 案例2 ：23是否大于等于22
+if [ 23 -ge 22 ]
+then
+        echo "大于"
+fi
+# 案例3 ：/root/shcode/aaa.txt 目录中的文件是否存在
+if [ -f /root/shcode/aaa.txt ]
+then
+        echo "文件存在,是普通文件"
+else
+        echo "文件根本不存在"
+fi
+# 其他案例
+if [ ]
+then
+        echo "为真"
+else
+        echo "为假"
+fi
+
+if [ wenqiu ]
+then
+        echo "为真的"
+fi
+```
+
+## 16.8 流程控制
+
+### 16.8.1 if判断
+
+- 基本语法
+
+```bash
+if [条件判断式]
+then
+代码
+fi
+```
+
+或者多分支
+
+```bash
+if [条件判断式]
+then
+代码
+elif [条件判断式]
+then
+代码
+fi
+```
+
+注意事项：`[ 条件判断式 ]`，中括号和条件判断式之间必须有空格。
+
+- 案例：
+
+案例1：请编写一个shell程序，如果输入的参数，大于等于60，则输出”及格了“，如果小于60，则输出”不及格“。
+
+```bash
+% vim ifcase.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：请编写一个shell程序，如果输入的参数，大于等于60，则输出”及格了“，如果小于60，则输出”不及格“。
+if [ $1 -ge 60 ]
+then
+        echo "及格了"
+elif [ $1 -lt 60 ]
+then
+        echo "不及格"
+fi
+```
+
+### 16.8.2 case语句
+
+- 基本语法
+
+```bash
+case $变量名 in
+"值1")
+如果变量的值等于值1，则执行程序1
+;;
+"值2")
+如果变量的值等于值2，则执行程序2
+;;
+...省略其他分支...
+*)
+如果变量的值都不是以上的值，则执行此程序
+;;
+esac
+```
+
+- 应用实例
+
+案例1：当命令行参数是 1 时，输出 ”周一“，是 2 时，就输出”周二“，其他情况输出”other“
+
+```bash
+% vim testcase.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：当命令行参数是 1 时，输出 ”周一“，是 2 时，就输出”周二“，其他情况输出”other“
+case $1 in
+"1")
+        echo "周一"
+;;
+"2")
+        echo "周二"
+;;
+* )
+        echo "other"
+esac
+```
+
+### 16.8.3 for循环
+
+- 基本语法
+
+```bash
+for 变量 in 值1 值2 值3...
+do
+程序
+done
+```
+
+或者
+
+```bash
+# 注意，括号(后和)前的空格
+for (( 初始值;循环控制条件;变量变化 ))
+do
+程序
+done
+```
+
+- 应用实例
+
+案例1：打印命令行输入的参数（这里可以看出 $* 和 $@ 的区别）
+
+```bash
+% vim testfor1.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：打印命令行输入的参数（这里可以看出 $* 和 $@ 的区别）
+# $*把所有的参数看成一个整体
+# $@把每个参数区分对待
+for i in "$*"
+do
+        echo "num is $i"
+done
+
+for i in "$@"
+do
+        echo "num is $i"
+done
+```
+
+```bash
+sh fortest1.sh 1 2 3
+num is 1 2 3
+num is 1
+num is 2
+num is 3
+```
+
+案例2：从1加到100的值输出显示
+
+```bash
+% vim testfor2.sh
+```
+
+```bash
+#!/bin/bash
+# 案例2：从1加到100的值输出显示
+SUM=0
+for (( i=0;i<=100;i++ ))
+do
+        SUM=$[$SUM+$i]
+done
+echo "SUM=$SUM"
+```
+
+### 16.8.4 while循环
+
+- 基本语法
+
+```bash
+# 注意，括号[后和]前的空格
+while [ 条件判断式 ]
+do
+程序
+done
+```
+
+- 应用实例
+
+案例1：从命令行输入一个数n，统计从 1+...+n 的值是多少？
+
+```bash
+% vim testwhile.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：从命令行输入一个数n，统计从 1+...+n 的值是多少？
+SUM=0
+i=0
+while [ $i -le $1 ]
+do
+        SUM=$[$SUM+$i]
+        i=$[$i+1]
+done
+echo "SUM=$SUM"
+```
+
+### 16.8.5 read读取控制台输入
+
+- 基本语法
+
+`read (选项) (参数)`
+
+选项：
+
+-p ：指定读取值时的提示符；
+
+-t ：指定读取值时等待的时间（秒），如果没有在指定的时间内输入，就不再等待了。
+
+参数：
+
+变量 ：指定读取值的变量名
+
+- 应用实例
+
+案例1：读取控制台输入一个num值
+
+案例2：读取控制台输入一个num值，在10秒内输入。
+
+```bash
+% vim testread.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：读取控制台输入一个num值
+read -p "请输入一个数NUM1=" NUM1
+echo "你输入的NUM1=$NUM1"
+# 案例2：读取控制台输入一个num值，在10秒内输入。
+read -p "请输入一个数NUM2=" -t 10  NUM2
+echo "你输入的NUM2=$NUM2"
+```
+
+## 16.9 函数
+
+### 16.9.1 系统函数basename
+
+- 函数介绍
+
+shell编程和其他编程语言一样，有系统函数，也可以自定义函数。系统函数中，我们这里就介绍两个。
+
+- 功能：返回完整路径最后 / 的后面的部分，常用于获取文件名
+
+- 基本语法：（功能描述：basename命令会删掉所有的前缀，包括最后一个 '/' 字符，然后将字符串显示出来。）
+
+`basename [pathname] [suffix]`
+
+`basename [string] [suffix]` 
+
+选项：
+
+suffix为后缀，如果suffix被指定了，basename会将pathname或string中的suffix去掉。
+
+- 应用实例
+
+案例1：请返回 /home/aaa/test.txt 的”test.txt“部分。
+
+```bash
+% basename /home/aaa/test.txt
+```
+
+### 16.9.2 dirname函数
+
+- 功能：返回完整路径最后 / 的前面的部分，常用于返回路径部分
+
+- 基本语法
+
+`dirname 文件绝对路径` （功能描述：从给定的包含绝对路径的文件名中去除文件名（非目录的部分），然后返回剩下的路径（目录的部分））
+
+- 应用实例
+
+案例1：请返回 /home/aaa/test.txt 的 /home/aaa
+
+```bash
+% dirname /home/aaa/test.txt
+```
+
+### 16.9.3 自定义函数
+
+- 基本语法
+
+```bash
+[function] funname[()]
+{
+	Action;
+	[return int;]
+}
+```
+
+调用直接写函数名：`funname [值]`
+
+- 应用实例
+
+案例1：计算输入两个参数的和（动态的获取）
+
+```bash
+% vim testfun.sh
+```
+
+```bash
+#!/bin/bash
+# 案例1：计算输入两个参数的和（动态的获取）
+# 自定义函数
+function getSum() {
+        SUM=$[$n1+$n2]
+        echo "求和结果是SUM=$SUM"
+        return  $SUM
+}
+
+# 调用自定义函数
+read -p "请输入一个数n1=" n1
+read -p "请输入一个数n2=" n2
+getSum $n1 $n2
+```
+
+## 16.10 shell编程综合案例
+
+- 需求分析
+
+1. 每天凌晨 2:30 备份数据库 testdb 到 /data/backup/db
+2. 备份开始和备份结束能够给出相应的提示信息
+3. 备份后的文件要求以备份时间为文件名，并打包成 .tar.gz 的形式，比如：2021-03-12_230201.tar.gz
+4. 在备份的同时，检查是否有10天前备份的数据库文件，如果有就将其删除。
+
+第一步：创建脚本
+
+```bash
+% vim /usr/local/sbin/mysql_db_backup.sh
+```
+
+```bash
+#!/bin/bash
+# 备份目录
+BACKUP=/data/backup/db
+# 当前时间
+DATETIME=`date +%Y-%m-%d-%M%H%S`
+echo $DATETIME
+# 数据库的地址
+HOST=localhost
+# 数据库用户名
+DB_USER=root
+# 数据库密码
+DB_PWD=root123
+# 备份的数据库名
+DATABASE=testdb
+
+# 创建备份目录,如果不存在则创建
+[ ! -d "${BACKUP}/$DATETIME" ] && mkdir -p "$BACKUP/$DATETIME"
+
+# 备份数据库
+mysqldump -u$DB_USER -p$DB_PWD --host=$HOST -q -R --databases $DATABASE | gzip > "$BACKUP/$DATETIME/$DATETIME.sql.gz"
+
+# 将文件处理成tar.gz格式
+cd $BACKUP
+tar -zcvf $DATETIME.tar.gz $DATETIME
+
+# 删除对应的备份目录
+rm -rf $BACKUP/$DATETIME
+
+# 删除10天之前备份的文件
+find $BACKUP -atime +10 -name "*.tar.gz" -exec rm -rf {} \;
+echo "备份数据库 $DATABASE 成功"
+```
+
+第二步：配置定时任务
+
+```bash
+% crontab -l
+30 2 * * * sh /usr/local/sbin/mysql_db_backup.sh
+```
+
+
+
+# 第17章 Ubuntu安装
+
+## 17.1 安装
+
+[Ubuntu安装参考](https://www.bilibili.com/video/BV1V4421D7Gt/?spm_id_from=333.337.search-card.all.click&vd_source=b850b3a29a70c8eb888ce7dff776a5d1)
+
+- 手动配置网络
+
+<img src="images/image-20250107161654648.png" alt="image-20250107161654648" style="zoom:50%;" />
+
+说明：
+
+Search domains也可以是`192.168.200.2,8.8.8.8`
+
+- 创建一个用户
+
+<img src="images/image-20250107161922278.png" alt="image-20250107161922278" style="zoom:50%;" />
+
+- 注意，安装OpenSSH服务。
+
+- 安装ifconfig命令
+
+```bash
+% sudo apt install -y net-tools
+```
+
+- 更新
+
+```bash
+% sudo apt update
+```
+
+- 安装图形界面
+
+```bash
+% sudo apt install -y ubuntu-desktop
+```
+
+- 问题：安装图形界面启动时，会提示：
+
+![image-20250107173928487](images/image-20250107173928487.png)
+
+ubuntu不连接网线的情况下，开机后卡在网络等待界面，预计会等待3-5分钟，一直显示
+
+`Job system-networkd-wait-online.service/start runnning (31s /no limint)`
+
+解决办法：
+
+先登录，然后配置网络如下：
+
+```bash
+% sudo vim /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
+```
+
+![image-20250107175348216](images/image-20250107175348216.png)
+
+然后，重启。
+
+```bash
+% shutdown -r now
+```
+
+## 17.2 中文支持
+
+默认安装的Ubuntu中只有英文语言，因此是不能显示汉字的。要正确显示汉字，需要安装中文语言包。
+
+安装中文支持步骤：
+
+1. 单击左侧图标栏打开 Language Support 菜单，点击打开 Language Support（语言支持）选项卡。
+2. 点击 Install/Remove Languages，在弹出的选项卡种下拉找到 Chinese(Simplified)，即中文简体，在后面的选项框中打勾。然后点击Apply Changes提交，系统会自动联网下载中文语言包。（保证Ubuntu是联网的）。
+3. 这时”汉语（中国）“在最后一位因为当前第一位是”English“，所以默认显示都是英文。我们如果希望默认显示中文，则应该将”汉语（中国）“设置为第一位。设置方法是拖动，鼠标单击”汉语（中国）”，当底色变化（表示选中了）后，按住鼠标左键不松手，向上拖动放置到第一位。
+4. 设置后不会立即生效，需要下次登录时才会生效。
+
+## 17.3 Ubuntu的root用户
+
+安装Ubuntu成功后，都是普通用户权限，并没有最高root权限。
+
+虽然命令前面加上 sudo 可以使用root权限，但如果每次都这样也比较麻烦。
+
+可以给root初始密码，然后su切换到root更方便。
+
+```bash
+% sudo passwd
+```
+
+## 17.4 Ubuntu软件操作命令apt
+
+apt是Advanced Packaging Tool的简称，是一卷安装包管理工具。在Ubuntu下，我们可以使用apt命令进行软件包的安装、删除、清理等，类似于Windows中的软件管理工具。
+
+Ubuntu软件管理的原理示意图：
+
+Ubuntu下的apt源在哪里？
+
+```bash
+% cat /etc/apt/sources.list.d/ubuntu.sources
+Types: deb
+URIs: http://ports.ubuntu.com/ubuntu-ports/
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+Types: deb
+URIs: http://ports.ubuntu.com/ubuntu-ports/
+Suites: noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+```
+
+命令如下：
+
+| 命令                                                         | 作用                                   |
+| ------------------------------------------------------------ | -------------------------------------- |
+| <span style="color:red;font-weight:bold;">sudo apt update</span> | 更新源                                 |
+| <span style="color:red;font-weight:bold;">sudo apt install package</span> | 安装包                                 |
+| <span style="color:red;font-weight:bold;">sudo apt remove package</span> | 删除包                                 |
+| sudo apt search package                                      | 搜索软件包                             |
+| <span style="color:red;font-weight:bold;">sudo apt show package</span> | 获取包的相关信息，如说明、大小、版本等 |
+| sudo apt install package --reinstall                         | 重新安装包                             |
+| sudo apt -f install                                          | 修复安装                               |
+| sudo apt remove package --purge                              | 删除包，包括配置文件等                 |
+| sudo apt build-dep package                                   | 安装相关的编译环境                     |
+| sudo apt upgrade                                             | 更新已安装的包                         |
+| sudo apt dist-upgrade                                        | 升级系统                               |
+| sudo apt depends package                                     | 了解使用该包依赖哪些包                 |
+| sudo apt rdepends package                                    | 查看该包被哪些包依赖                   |
+| <span style="color:red;font-weight:bold;">sudo apt source package</span> | 下载该包的源代码                       |
+| sudo apt list                                                | 查看已安装软件                         |
+|                                                              |                                        |
+
+## 17.5 如何切换apt源？【24版不需要】
+
+参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+
+# 第18章 Linux高级篇-日志管理
+
+- 基本介绍
+
+1. 日志文件是重要的系统信息文件，其中记录了<span style="color:red;font-weight:bold;">重要的系统事件</span>，包括用户的登录信息、系统的启动信息、系统的安全信息、邮箱相关信息、各种服务相关信息等。
+2. 日志对于<span style="color:red;font-weight:bold;">安全来说也很重要</span>，它记录了系统每天发生的各种事情，通过日志来检查错误发生的原因或者受到攻击时攻击者留下的痕迹。
+3. 可以这样理解，日志是用来记录重大事件的工具。
+
+## 18.1 系统常用的日志
+
+`/var/log`目录就是系统日志文件的保存位置，如下图：
+
+```bash
+% ls /var/log/
+```
+
+![image-20250108221016006](images/image-20250108221016006.png)
+
+- 系统常用的日志
+
+| 日志文件                                                     | 说明                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <span style="color:red;font-weight:bold;">/var/log/boot.log</span> | 系统启动日志                                                 |
+| <span style="color:red;font-weight:bold;">/var/log/corn</span> | 记录与系统定时任务相关的日志                                 |
+| /var/log/cups/                                               | 记录打印信息的日志                                           |
+| /var/log/dmesg                                               | 记录了系统在开机时内核自检的信息。也可以使用dmesg命令直接查看内核自检信息。 |
+| /var/log/btmp                                                | 记录错误登录的日志。这个文件是二进制文件，不能直接用vi查看，而要使用`lsatb`命令查看。 |
+| <span style="color:red;font-weight:bold;">/var/log/lasllog</span> | 记录系统中所有用户最后一次的登录时间的日志。这个文件也是二进制文件，要使用`lastlog`命令查看。 |
+| <span style="color:red;font-weight:bold;">/var/log/mailog</span> | 记录邮件信息的日志。                                         |
+| <span style="color:red;font-weight:bold;">/var/log/message</span> | 记录系统重要消息的日志，这个日志文件中会记录Linux系统的绝大多数重要信息。如果系统出现问题，首先要检查的应该就是这个日志文件。 |
+| <span style="color:red;font-weight:bold;">/var/log/secure</span> | 记录验证和授权方面的信息，只要涉及账户和密码的程序都会记录，比如系统的登录、ssh的登录、su切换账户、sudo授权，甚至添加用户和修改用户密码都会记录在这个日志文件中。 |
+| /var/log/wtmp                                                | 永久记录所有用户的登录、注销信息，同时记录系统的启动、重启、关机事件。是二进制文件，需要使用`last`命令查看。 |
+| <span style="color:red;font-weight:bold;">/var/log/ulmp</span> | 记录当前已经登录的用户的信息。这个文件会随着用户的登录和注销二不断变化，只记录当前登录用户的信息。这个文件不能用vi查看，而是要使用w、who、users等命令查看。 |
+
+## 18.2 日志管理服务 rsyslogd
+
+CentOS7.6日志服务是 rsyslogd，CentOS6.x日志服务是 syslogd。rsyslogd功能更强大。
+
+rsyslogd的使用、日志文件的格式和syslogd服务兼容的。
+
+- 查询Linux中的rsyslogd服务是否启动
+
+```bash
+% ps aux | grep "rsyslog" | grep -v "grep"
+```
+
+- 查询rsyslogd服务的自启动状态
+
+```bash
+% systemctl list-unit-files | grep rsyslog
+```
+
+- rsyslogd服务的配置文件
+
+```bash
+% cat /etc/rsyslog.conf | more
+```
+
+- 配置文件：/etc/rsyslog.conf
+
+编辑文件时的格式为：`*.*` 存放日志文件
+
+其中第一个`*`代表日志类型，第二个`*`代表日志级别。
+
+1. 日志类型分为：
+
+| 日志类型             | 说明                                |
+| -------------------- | ----------------------------------- |
+| auth                 | pam产生的日志                       |
+| authpriv             | ssh、ftp等登录信息的验证信息        |
+| corn                 | 时间任务相关                        |
+| kern                 | 内核                                |
+| lpr                  | 打印                                |
+| mail                 | 邮件                                |
+| mark(syslog)-rsyslog | 服务内部的信息，时间标识            |
+| news                 | 新闻组                              |
+| user                 | 用户程序产生的相关信息              |
+| uucp                 | unix to nuix copy主机之间相关的通信 |
+| local 1-7            | 自定义的日志设备                    |
+
+2. 日志级别分为
+
+| 日志级别 | 说明                                                 |
+| -------- | ---------------------------------------------------- |
+| debug    | 有调试信息的，日志通信最多                           |
+| info     | 一般日志信息，最常用                                 |
+| notice   | 最具有重要性的普通条件的信息                         |
+| warning  | 警告级别                                             |
+| err      | 错误级别，阻止某个功能或者模块不能正常工作的信息     |
+| crit     | 严重级别，阻止整个系统或者整个软件不能正常工作的信息 |
+| alert    | 需要立刻修改的信息                                   |
+| emerg    | 内核崩溃等重要信息                                   |
+| none     | 什么都不记录                                         |
+
+注意：从上到下，级别从低到高，记录信息越来越少。
+
+- 日志文件格式
+
+由日志服务rsyslogd记录的日志文件，日志文件的格式包含以下4列。
+
+1. 事件产生的时间
+
+2. 产生时间的服务的主机名
+
+3. 产生时间的服务名或程序名
+
+4. 事件的具体信息
+
+日志如何查看实例？
+
+查看一下 `/var/log/secure` 日志，这个日志中记录的是用户验证和授权方面的信息，来分析如何查看。
+
+## 18.3 自定义日志服务
+
+在 /etc/rsyslog.conf 中添加一个日志文件 /var/log/wenqiu.log，当有事件发送时（比如sshd服务相关事件），该文件会接收到信息并保存。
+
+```bash
+% vim /etc/rsyslog.conf
+```
+
+![image-20250109065449464](images/image-20250109065449464.png)
+
+重启系统，然后观察日志文件。
+
+```bash
+% reboot
+```
+
+![image-20250109065719629](images/image-20250109065719629.png)
+
+## 18.4 自定义日志轮替
+
+- 基本介绍
+
+日志轮替就是把旧的日志文件移动并改名，同时建立新的空日志文件，当旧日志文件超出保存的范围之后，就会进行删除。
+
+- 日志轮替文件命名
+
+1. centos7使用logrotate进行日志轮替管理，要想改变日志轮替文件名字，通过 /etc/logrotate.conf 配置文件中“dateext”参数。
+2. 如果配置文件中有“dateext”参数，那么日志会用<span style="color:red;font-weight:bold;">日期</span>来作为日志文件的后缀，例如：“secure-20201010“。这样日志文件名不会重叠，也就不需要日志文件的改名，只需要指定保存日志个数，删除多余的日志文件即可。
+3. 如果配置文件中没有”dateext“参数，日志文件就需要进行改名了。当第一次进行日志轮替时，<span style="color:red;font-weight:bold;">当前的”secure“日志会自动改名为”scure.1“，然后新建”secure“日志，用来保存新的日志。</span>当第二次进行日志轮替时，”secure.1“会自动改名为”secure.2“，当前的”secure“日志会自动改名为”secure.1“，然后也会新建”secure“日志，用来保存新的日志，以此类推。
+
+![image-20250109085826583](images/image-20250109085826583.png)
+
+- 日志轮替参数说明
+
+| 参数                    | 参数说明                                                     |
+| ----------------------- | ------------------------------------------------------------ |
+| daily                   | 日志的轮替周期是每天                                         |
+| weekly                  | 日志的轮替周期是每周                                         |
+| monthly                 | 日志的轮替周期是每月                                         |
+| copytruncate            | 用于还在打开中的日志文件，把当前日志备份并截断；是先拷贝再清空的方式，拷贝和清空之间有一个时间差，可能会丢失部分日志数据。 |
+| nocopytruncate          | 备份日志文件不过不截断                                       |
+| rotate 数字             | 保留的日志文件的个数。0指没有备份                            |
+| compress                | 日志轮替时，旧的日志进行压缩；通过gzip 压缩转储以后的日志    |
+| nocompress              | 不做gzip压缩处理                                             |
+| delaycompress           | 和compress 一起使用时，转储的日志文件到下一次转储时才压缩    |
+| nodelaycompress         | 覆盖 delaycompress 选项，转储同时压缩。                      |
+| create mode owner group | 建立新日志，同时指定新日志的权限与所有者和所属组             |
+| mail address            | 当日志轮替时，输出内容通过邮件发送到指定的邮件地址           |
+| nomail                  | 转储时不发送日志文件                                         |
+| olddir directory        | 转储后的日志文件放入指定的目录，必须和当前日志文件在同一个文件系统 |
+| noolddir                | 转储后的日志文件和当前日志文件放在同一个目录下               |
+| missingok               | 如果日志不存在，则忽略该日志的警告信息                       |
+| ifempty                 | 即使日志文件为空文件也做轮转，这个是logrotate的缺省选项。    |
+| notifempty              | 当日志文件为空时，不进行轮转                                 |
+| minsize 大小            | 日志轮替的最小值。也就是日志一定要达到这个最小值才会轮替，否则就算时间达到也不轮替 |
+| size 大小               | 日志只有大于指定大小才进行日志轮替，而不是按照时间轮替。     |
+| dateext                 | 使用日期作为日志轮替文件的后缀。                             |
+| dateformat .%s          | 配合dateext使用，紧跟在下一行出现，定义文件切割后的文件名，必须配合dateext使用，只支持 %Y %m %d %s 这四个参数 |
+| sharedscripts           | 运行postrotate脚本，作用是在所有日志都轮转后统一执行一次脚本。如果没有配置这个，那么每个日志轮转后都会执行一次脚本 |
+| prerotate/endscript     | 在日志轮替之前执行脚本命令。                                 |
+| postrotate/endscript    | 在日志轮替之后执行脚本命令。                                 |
+
+- 把自己的日志加入日志轮替
+
+第一种方法：直接在 /etc/logrotate.conf 配置文件中写入该日志的轮替策略。
+
+第二种方法：在 /etc/logrotate.d/ 目录中新建立该日志的轮替文件，在该轮替文件中写入正确的轮替策略，因为该目录中的文件都会被”include“到主配置文件中，所以也可以把日志加入轮替。
+
+推荐使用第二种方法，因为系统中需要轮替的日志非常多，如果全部直接写入 /etc/logrotate.conf 配置文件，那么这个文件的可管理性就会非常差，不利于此文件的维护。
+
+```bash
+% cat /etc/logrotate.d/wenqiulog 
+```
+
+```bash
+/var/log/wenqiu.log
+{
+    missingok
+    daily
+    copytruncate
+    rotate 7
+    notifempty
+}
+```
+
+## 18.5 日志轮替机制原理
+
+日志轮替之所以可以在指定的时间备份日志，是依赖系统定时任务。在 /etc/cron.daily/目录 ，就会发现这个目录中是有 logrotate 文件（可执行），logrotate通过这个文件依赖定时任务执行的。
+
+```bash
+% ls -l /etc/cron.daily/
+总用量 12
+-rwx------. 1 root root 219 4月   1 2020 logrotate
+-rwxr-xr-x. 1 root root 618 10月 30 2018 man-db.cron
+-rwx------. 1 root root 208 4月  11 2018 mlocate
+```
+
+## 18.6 查看内存日志
+
+- journalctl 可以查看内存日志，这里我们看看常用的指令
+
+| 命令                                      | 说明                                     |
+| ----------------------------------------- | ---------------------------------------- |
+| journalctl                                | 查看全部                                 |
+| journalctl -n 3                           | 查看最新3条                              |
+| journalctl --since 19:00 --until 19:10:10 | 查看起始时间到结束时间的日志             |
+| journalctl -p err                         | 报错日志                                 |
+| journalctl -o verbose                     | 日志详细内容                             |
+| journalctl _PID=1245 _COMM=sshd           | 查看包含这些参数的日志（在详细日志查看） |
+| journalctl \| grep sshd                   | 同上                                     |
+
+<span style="color:red;font-weight:bold;">注意：journalctl 查看的是内存日志，重启清空。</span>
+
+
+
+# 第19章 Linux高级篇-定制自己的Linux系统
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
