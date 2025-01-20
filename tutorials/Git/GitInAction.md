@@ -1178,6 +1178,49 @@ git reflog --date=local | grep <branchName>
 $ git config --global core.quotepath false
 ```
 
+## 7.96、`.gitattributes`
+
+- 什么是gitattributes
+
+[gitattributes](https://git-scm.com/docs/gitattributes) 是 Git 提供的一种配置机制，允许你在 `.gitattributes` 文件中定义特定文件类型的属性和行为。这些属性可以影响诸如文本编码转换、行结束符处理、合并策略等关键操作。通过自定义这些设置，你可以确保代码在不同操作系统和开发环境中的一致性，从而提升团队协作效率。
+
+- 技术分析
+
+`.gitattributes` 文件通常放置在项目的根目录下，但也可以按需在子目录中创建。每一行定义一个或多个文件模式（基于文件名、扩展名、通配符）及对应的属性。例如：
+
+```tex
+*.txt eol=CRLF
+*.java diff=java
+```
+
+上面的示例中，所有 `.txt` 文件将在提交时转换为 CRLF 行结束符，而 `.java` 文件则使用 `diff=java` 策略进行差异比较，这对于 Java 代码的阅读更为友好。
+
+- 属性类型
+
+gitattributes 支持多种属性，包括但不限于：
+
+1. text: 控制是否将文件视为纯文本并进行自动换行转换。
+2. eol: 指定文件的行结束字符。
+3. diff: 使用特定的差异算法处理特定类型的文件。
+4. merge: 定义如何处理合并冲突。
+5. filter: 在 checkout 和 commit 之间应用过滤器，如 LFS (Large File Storage）。
+
+- 应用场景
+
+gitattributes 能解决以下常见问题：
+
+1. 跨平台兼容性：通过统一行结束符，避免在 Windows/Linux/MacOS 环境间切换导致的问题。
+2. 代码格式化：利用 filter 属性配合工具如 autopep8 或 clang-format 自动格式化代码。
+3. 二进制文件管理：与 Git LFS 结合，管理大型二进制文件，防止仓库体积过大。
+4. 语言特性支持：针对某些编程语言（如 Java, Go）提供更精确的差异和合并策略。
+
+- 特点与优势
+
+1. **灵活性**：可以根据不同的文件类型定制策略，针对性强。
+2. **可扩展性**：易于添加新规则，并且可以覆盖全局默认设置。
+3. **易用性**：只需简单修改 `.gitattributes` 文件即可生效，无需额外安装插件或配置。
+4. **团队协作**：通过规范化文件处理，增强团队间的代码一致性，降低协同成本。
+
 ## 7.97、ssh: connect to host github.com port 22: Connection timed out
 
 问题：
