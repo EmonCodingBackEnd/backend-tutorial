@@ -266,3 +266,35 @@ Scrapy 2.4.1 - no active project
 (firstenv) [emon@emon ~]$ scrapy shell 'http://www.huiba123.com'
 ```
 
+## 2、安装ModelScope
+
+1. 创建虚拟环境
+
+```bash
+python3 -m venv p3
+```
+
+2. 激活环境
+
+```bash
+source p3/bin/activate
+```
+
+3. 安装
+
+```bash
+pip install modelscope
+```
+
+4. 下载
+
+```bash
+modelscope download --model deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+```
+
+5. 退出环境
+
+```bash
+deactivate
+```
+

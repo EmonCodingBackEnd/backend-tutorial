@@ -1175,8 +1175,74 @@ git reflog --date=local | grep <branchName>
 解决如下：
 
 ```shell
-$ git config --global core.quotepath false
+git config --global core.quotepath false
 ```
+
+## 7.95、 什么是git lfs？
+
+​	**Git LFS**（Git Large File Storage）是 Git 的一个扩展工具，用于高效地管理大文件。它通过将大文件存储在远程服务器上，而在本地仓库中仅保留文件的指针（pointer），从而解决 Git 本身对大文件支持不佳的问题。
+
+1. **安装 Git LFS**：
+
+   - 需要先安装 Git LFS 客户端。
+
+   - 安装方法：
+
+   ```bash
+   # macOS (Homebrew)
+   brew install git-lfs
+   ```
+
+   - 安装后初始化
+
+   ```bash
+   git lfs install
+   ```
+
+2. **跟踪大文件**：
+
+   - 使用 `git lfs track` 命令指定需要跟踪的大文件类型。
+   - 示例：
+
+   ```bash
+   git lfs track "*.psd"  # 跟踪所有 PSD 文件
+   git lfs track "data/*.bin"  # 跟踪 data 目录下的所有 .bin 文件
+   ```
+
+   - 跟踪规则会写入 `.gitattributes` 文件。
+
+3. **提交和推送**：
+
+   - 像平常一样使用 `git add` 和 `git commit`。
+   - 大文件会被上传到 LFS 服务器，本地仓库中只保存指针文件。
+
+4. **克隆和拉取**：
+
+   - 克隆仓库时，默认只下载指针文件。
+   - 实际的大文件会在需要时按需下载（例如切换到某个分支或查看文件内容）。
+
+**Git LFS 的常用命令**
+
+| 命令                        | 说明                                          |
+| :-------------------------- | :-------------------------------------------- |
+| `git lfs install`           | 在当前仓库中初始化 Git LFS。                  |
+| `git lfs track <pattern>`   | 跟踪指定模式的文件（如 `*.mp4`）。            |
+| `git lfs untrack <pattern>` | 取消跟踪指定模式的文件。                      |
+| `git lfs ls-files`          | 列出当前被 Git LFS 跟踪的文件。               |
+| `git lfs pull`              | 拉取 LFS 文件（通常 `git pull` 会自动处理）。 |
+| `git lfs fetch`             | 从远程服务器下载 LFS 文件，但不更新工作目录。 |
+| `git lfs checkout`          | 将 LFS 文件从本地缓存恢复到工作目录。         |
+| `git lfs status`            | 查看 Git LFS 文件的状态。                     |
+| `git lfs prune`             | 删除本地不再需要的 LFS 文件缓存。             |
+
+**Git LFS 的适用场景**
+
+1. **大文件管理**：
+   - 适合管理超过 100MB 的文件（如数据集、视频、图像、二进制文件等）。
+2. **版本控制**：
+   - 需要保留大文件的历史版本时，Git LFS 可以高效地管理这些版本。
+3. **协作开发**：
+   - 在团队协作中，避免每个成员都下载所有大文件的历史版本。
 
 ## 7.96、`.gitattributes`
 

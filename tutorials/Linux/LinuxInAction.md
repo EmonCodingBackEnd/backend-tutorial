@@ -82,7 +82,7 @@ wenqiu
 
 ```bash
 # 这里也可以是某个具体的IP地址
-192.168.200.116   wenqiu
+192.168.200.116	emon
 ```
 
 - 第四部：退出Shell，重新登录即可
@@ -475,6 +475,42 @@ cat /etc/hosts
 ```bash
 [emon@wenqiu ~]$ ~/bin/switchHosts.sh 
 ```
+
+### 2.9 Rocky9时间同步问题
+
+Rocky Linux 9 默认使用 `chrony` 作为 NTP 客户端。
+
+若发现同步时间失败，请：
+
+（1）编辑 Chrony 配置文件
+
+```bash
+sudo vi /etc/chrony.conf
+```
+
+- **添加或修改 NTP 服务器**（选择国内服务器）
+
+```bash
+server ntp.aliyun.com iburst
+server cn.pool.ntp.org iburst
+```
+
+- 保存并退出。
+
+（2） 重启 Chrony 并强制同步
+
+```bash
+sudo systemctl restart chronyd
+sudo chronyc -a makestep
+```
+
+（3）验证同步状态
+
+```bash
+chronyc sources -v
+```
+
+- 输出中检查源服务器的状态是否为 `^*`（表示已同步）。
 
 ## 3、一些说明
 
@@ -2796,7 +2832,7 @@ git.x86_64                       1.8.3.1-13.el7                        CentOS7.5
 下载地址：  https://www.kernel.org/pub/software/scm/git/
 
 ```bash
-[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.42.0.tar.gz
+[emon@wenqiu ~]$ wget -cP /usr/local/src/ https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.48.1.tar.gz
 ```
 
 3. 依赖检查与安装

@@ -679,6 +679,100 @@ cal [选项] （功能描述：不加选项，显示本月日历）
  % cal 2020
  ```
 
+### 9.5.3 timedatectl 指令
+
+（1）查看当前时间。
+
+- 基本语法
+
+```bash
+% timedatectl
+               Local time: 三 2025-03-05 13:27:39 CST
+           Universal time: 三 2025-03-05 05:27:39 UTC
+                 RTC time: 三 2025-03-05 05:27:40
+                Time zone: Asia/Shanghai (CST, +0800)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+
+- **输出关键信息**：
+  - `Local time`：本地时间
+  - `Universal time`：UTC 时间
+  - `Time zone`：时区（如 `Asia/Shanghai`）
+  - `System clock synchronized`：是否已同步（`yes` 或 `no`）
+  - `NTP service`：NTP 服务状态（`active` 或 `inactive`）
+
+（2）修正时区（如不正确）
+
+```bash
+# 列出所有可用时区
+% timedatectl list-timezones | grep -i shanghai
+
+# 设置时区（例如 Asia/Shanghai）
+% sudo timedatectl set-timezone Asia/Shanghai
+```
+
+### 9.5.4 时间同步服务
+
+Rocky Linux 9 默认使用 `chrony` 作为 NTP 客户端。
+
+（1）安装并启动 Chrony （如未安装）
+
+```bash
+sudo dnf install chrony -y
+sudo systemctl enable --now chronyd
+```
+
+（2）检查 Chrony 状态
+
+```bash
+systemctl status chronyd
+```
+
+- 确保服务状态为 `active (running)`。
+
+（3）编辑 Chrony 配置文件
+
+```bash
+sudo vi /etc/chrony.conf
+```
+
+- **添加或修改 NTP 服务器**（选择国内服务器）
+
+```bash
+server ntp.aliyun.com iburst
+server cn.pool.ntp.org iburst
+```
+
+- 保存并退出。
+
+（4） 重启 Chrony 并强制同步
+
+```bash
+sudo systemctl restart chronyd
+sudo chronyc -a makestep
+```
+
+（5）验证同步状态
+
+```bash
+chronyc sources -v
+```
+
+- 输出中检查源服务器的状态是否为 `^*`（表示已同步）。
+
+### 9.5.5 查看硬件时钟时间
+
+```bash
+# 查看硬件时钟时间
+sudo hwclock --show
+```
+
+
+
+
+
 ## 9.6 查找类
 
 ### 9.6.1 find 指令

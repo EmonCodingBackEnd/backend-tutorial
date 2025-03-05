@@ -1883,7 +1883,7 @@ bind 0.0.0.0
 protected-mode yes
 ==>
 protected-mode no
-# [修改] 默认弄，改为yes意为开启aof持久化
+# [修改] 默认no，改为yes意为开启aof持久化
 appendonly no
 ==>
 appendonly yes
@@ -3039,6 +3039,167 @@ $ docker run --name ssproxy \
     -e PORT=3308 -p13308:3308 \
     -d apache/shardingsphere-proxy:5.5.0 && docker logs -f ssproxy
 ```
+
+# 九十一、通过docker compose批量安装
+
+- prometheus.yml
+
+```bash
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
+```
+
+- docker-compose.yml
+
+```yml
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ALLOW_ANONYMOUS_LOGIN: yes
+    networks:
+      - backend
+
+  zookeeper-ui:
+    image: rushing/zkui-arm64:latest
+    container_name: zookeeper-ui
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+     - "9190:9090"
+    environment:
+      ZK_SERVER: zookeeper:2181
+    networks:
+      - backend
+      
+  kafka:
+    image: bitnami/kafka:3.4.0
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - backend
+  
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name:  kafka-ui
+    restart: always
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: dev
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    networks:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: backend
+```
+
+- 启动
+
+```bash
+$ docker compose -f docker-compose.yml up -d
+```
+
+- 停止
+
+```bash
+ docker compose -f docker-compose.yml down -v
+```
+
+- 验证
+
+  - redis：你的ip:6379
+
+    - 填写表单，下载官方可视化工具：
+
+    - https://redis.com/redis-enterprise/redis-insight/#insight-form
+
+  - zookeeper:你的ip:2181
+
+  - zookeeper-ui:
+
+    - 直接浏览器访问：http://192.168.200.116:9190
+
+      > admin/manager 读写账号；appconfig/appconfig 普通用户
+
+  - Kafka:你的ip:9092
+    - idea安装大数据插件
+  - kafka-ui：
+    - 直接浏览器访问：http://192.168.200.116:8080/
+
+  - Prometheus:
+    - 直接浏览器访问：http://192.168.200.116:9090
+
+  - Grafana:
+    - 直接浏览器访问：http://192.168.200.116:3000
+
+
+
+
+
+
 
 
 

@@ -50,7 +50,7 @@ Kubeadm是一个K8s部署工具，提供kubeadm init和kubeadm join，用于快�
 # 查看主机名
 $ hostname
 # 设置主机名：注意修改为具体的主机名
-$ hostnamectl set-hostname emon
+$ hostnamectl set-hostname wenqiu
 ```
 
 #### 1.2.2、本地DNS
@@ -62,9 +62,9 @@ $ vim /etc/hosts
 ```
 
 ```bash
-192.168.32.116 emon
-192.168.32.117 emon2
-192.168.32.118 emon3
+192.168.200.116	emon
+192.168.200.117 emon2
+192.168.200.118 emon3
 ```
 
 #### 1.2.3、安装依赖包
@@ -235,6 +235,13 @@ $ docker info
 $ docker run hello-world
 ```
 
+7. 隐含安装了compose
+
+```bash
+$ docker compose version
+Docker Compose version v2.33.1
+```
+
 #### 2.1.2、配置Docker的cgroup driver
 
 k8s的v1.23版本使用的 systemd，而Docker的20.10版本默认 
@@ -267,9 +274,9 @@ $ vim /etc/systemd/system/docker.service.d/proxy.conf
 
 ```bash
 [Service]
-Environment="HTTP_PROXY=http://192.168.32.1:29290"
-Environment="HTTPS_PROXY=http://192.168.32.1:29290"
-Environment="NO_PROXY=127.0.0.1,localhost,192.168.32.116"
+Environment="HTTP_PROXY=http://192.168.200.1:7890"
+Environment="HTTPS_PROXY=http://192.168.200.1:7890"
+Environment="NO_PROXY=127.0.0.1,localhost,192.168.200.116"
 ```
 
 - 重启Docker并查看代理配置情况
@@ -277,7 +284,8 @@ Environment="NO_PROXY=127.0.0.1,localhost,192.168.32.116"
 ```bash
 $ systemctl daemon-reload && systemctl restart docker
 $ systemctl show --property=Environment docker
-Environment=HTTP_PROXY=http://192.168.32.1:29290 HTTPS_PROXY=http://192.168.32.1:29290
+# Environment=HTTP_PROXY=http://192.168.32.1:29290 HTTPS_PROXY=http://192.168.32.1:29290
+Environment=HTTP_PROXY=http://192.168.200.1:7890 HTTPS_PROXY=http://192.168.200.1:7890 NO_PROXY=127.0.0.1,localhost,192.168.200.116
 ```
 
 #### 2.1.4、配置alias
