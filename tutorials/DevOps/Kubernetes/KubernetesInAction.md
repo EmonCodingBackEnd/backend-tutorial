@@ -1519,9 +1519,9 @@ $ kubectl apply -f tomcat8.yaml
 
 # 二、Kubesphere
 
-官网：https://kubesphere.com.cn/
+Kubesphere Cloud 官网：https://kubesphere.com.cn/
 
-文档官网：https://kubesphere.com.cn/
+Kubesphere 开源版官网：https://kubesphere.io/zh/
 
 Github：https://github.com/kubesphere/kubesphere/blob/master/README_zh.md  可以查看与k8s版本关系
 

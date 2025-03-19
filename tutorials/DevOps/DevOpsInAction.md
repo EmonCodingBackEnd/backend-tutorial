@@ -3069,6 +3069,7 @@ scrape_configs:
 services:
   redis:
     image: redis:latest
+    hostname: redis
     container_name: redis
     restart: always
     ports:
@@ -3078,6 +3079,7 @@ services:
 
   zookeeper:
     image: bitnami/zookeeper:latest
+    hostname: zookeeper
     container_name: zookeeper
     restart: always
     environment:
@@ -3102,6 +3104,7 @@ services:
       
   kafka:
     image: bitnami/kafka:3.4.0
+    hostname: kafka
     container_name: kafka
     restart: always
     depends_on:
@@ -3165,7 +3168,7 @@ $ docker compose -f docker-compose.yml up -d
 - 停止
 
 ```bash
- docker compose -f docker-compose.yml down -v
+$ docker compose -f docker-compose.yml down -v
 ```
 
 - 验证
@@ -3186,14 +3189,16 @@ $ docker compose -f docker-compose.yml up -d
 
   - Kafka:你的ip:9092
     - idea安装大数据插件
+    
   - kafka-ui：
     - 直接浏览器访问：http://192.168.200.116:8080/
-
+  
   - Prometheus:
     - 直接浏览器访问：http://192.168.200.116:9090
-
+  
   - Grafana:
     - 直接浏览器访问：http://192.168.200.116:3000
+    - admin/admin -> 修改密码为 admin/admin
 
 
 

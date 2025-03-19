@@ -769,10 +769,6 @@ chronyc sources -v
 sudo hwclock --show
 ```
 
-
-
-
-
 ## 9.6 查找类
 
 ### 9.6.1 find 指令
