@@ -852,7 +852,7 @@ grep [选项] 查找内容 源文件
 
 ### 9.7.1 gzip/gunzip 指令
 
-​	gzip 用于压缩文件， gunzip 用于解压文件。
+gzip 用于压缩文件， gunzip 用于解压文件。
 
 **基本语法**
 
@@ -917,40 +917,356 @@ tar指令是打包指令，最后打包后的文件是.tar.gz的文件
 
 **选项说明**
 
-| 选项 | 功能               |
-| ---- | ------------------ |
-| -c   | 产生.tar打包文件   |
-| -v   | 显示详细信息       |
-| -f   | 指定压缩后的文件名 |
-| -z   | 打包同时压缩       |
-| -x   | 解包.tar文件       |
-| -C   | 指定解压目录       |
+| 选项 | 功能                                       |
+| ---- | ------------------------------------------ |
+| -c   | create；产生.tar打包文件                   |
+| -v   | verbose；显示详细信息                      |
+| -f   | filename；指定压缩后的文件名               |
+| -z   | 打包同时压缩，使用gzip算法来实现压缩/解压  |
+| -x   | extract；解包.tar文件                      |
+| -C   | 指定解压目录                               |
+| -j   | 打包同时压缩，使用bzip2算法来实现压缩/解压 |
+| -J   | 打包同时压缩，使用xz算法来实现压缩/解压    |
+| -t   | 列出归档内容                               |
 
-**应用实例**
+#### 1 *.tar 格式【仅归档不压缩】
 
-- 案例1：压缩多个文件，将 /home/pig.txt 和 /home/cat.txt 压缩成 pc.tar.gz
-
-```bash
-% tar -zcvf pc.tar.gz /home/pig.txt /home/cat.txt
-```
-
-- 案例2：将 /home 的文件夹压缩成 myhome.tar.gz
+- 打包
 
 ```bash
-% tar -zcvf myhome.tar.gz /home
+tar -cvf [目标文件名].tar [原文件名/目录名]
 ```
 
-- 案例3：将 pc.tar.gz 解压到当前目录
+- 解包
 
 ```bash
-% tar -zxvf pc.tar.gz
+tar -xvf [原文件名].tar
 ```
 
-- 案例4：将 myhome.tar.gz 解压到 /opt/tmp2 目录下
+- 查看归档包列表
 
 ```bash
-% tar -zxvf myhome.tar.gz -C /opt/tmp2
+tar -tvf [原文件名].tar
 ```
+
+- 指定解包目录
+
+```bash
+tar -xvf [原文件名].tar -C [目标目录]
+```
+
+#### 2 *.tar.gz 格式【快速压缩】
+
+##### 1 基于tar压缩/解压缩
+
+- 压缩
+
+```bash
+gzip [原文件名].tar
+```
+
+- 解压
+
+```bash
+gunzip [原文件名].tar.gz
+```
+
+##### 2 一次性打包并压缩、解压并解包
+
+- 打包并压缩
+
+```bash
+tar -zcvf [目标文件名].tar.gz [原文件名/目录名]
+```
+
+- 解压并解包
+
+```bash
+tar -zxvf [原文件名].tar.gz
+```
+
+- 查看压缩包列表
+
+```bash
+tar -tvf [原文件名].tar
+```
+
+#### 3 *.tar.bz2 格式【中等压缩】
+
+- 安装bzip2
+
+```bash
+sudo dnf install bzip2
+```
+
+##### 1 基于tar压缩/解压缩
+
+- 压缩
+
+```bash
+bzip2 [原文件名].tar
+```
+
+- 解压：
+
+```bash
+bunzip2 [原文件名].tar.bz2
+```
+
+##### 2 一次性打包并压缩、解压并解包
+
+- 打包并压缩
+
+```bash
+tar -jcvf [目标文件名].tar.bz2 [原文件名/目录名]
+```
+
+- 解压并解包
+
+```bash
+tar -jxvf [原文件名].tar.bz2
+```
+
+#### 4 *.tar.xz格式【高压缩率】
+
+##### 1 基于tar压缩/解压缩
+
+- 压缩
+
+```bash
+xz [元文件名].tar
+```
+
+- 解压
+
+```bash
+unxz [原文件名].tar.xz
+```
+
+- 查看压缩包文件内容
+
+```bash
+xzcat [原文件名].tar.xz|more
+```
+
+##### 2 一次性打包并压缩、解压并解包
+
+- 打包并压缩
+
+```bash
+tar -Jcvf [目标文件名].tar.xz [原文件名/目录名]
+```
+
+- 解压并解包
+
+```bash
+tar -Jxvf [原文件名].tar.xz
+```
+
+### 9.7.4 *.7z格式【最大压缩率】
+
+- 安装p7zip
+
+```bash
+# Rocky Linux 默认仓库可能不包含 p7zip，需先启用 EPEL 仓库：
+sudo dnf install epel-release
+# 安装p7zip
+sudo dnf install p7zip p7zip-plugins
+```
+
+- `p7zip`：提供 `7z` 命令行工具。
+- `p7zip-plugins`：支持更多压缩格式（如 RAR）。
+
+
+
+- 压缩
+
+```bash
+7z a [目标文件名].7z [原文件名/目录名]
+```
+
+- 解压
+
+```bash
+7z x [原文件名].7z
+```
+
+- 查看压缩内容列表
+
+```bash
+ 7z l [原文件名].7z
+```
+
+- 解压到指定目录
+
+```bash
+# 注意-o后不要指定空格
+7z x [原文件名].7z -o[目标目录]
+```
+
+注意：这个7z解压命令支持rar格式，即：
+7z x [原文件名].rar
+
+### 场景推荐
+
+| **需求**                   | **推荐格式**          | **理由**                 |
+| :------------------------- | :-------------------- | :----------------------- |
+| 快速压缩/解压              | `.tar.gz` 或 `.gz`    | 速度快，兼容性强         |
+| 节省存储空间（不介意时间） | `.tar.xz` 或 `.7z`    | 压缩率最高               |
+| 跨平台共享                 | `.zip` 或 `.7z`       | Windows/macOS/Linux 通用 |
+| 长期备份                   | `.tar.xz`             | 高压缩率，节省磁盘空间   |
+| 处理大量小文件             | `.tar` + 任意压缩格式 | 避免单独压缩文件的开销   |
+
+## 9.8 下载 curl/wget
+
+cURL 更适合 **API 调试**、**复杂 HTTP 请求** 和 **灵活数据传输**。
+
+### 9.8.1 curl
+
+#### 1 基础下载
+
+```bash
+# 下载文件并保存为原文件名
+curl -O https://example.com/file.zip
+
+# 下载文件并指定保存路径
+curl -o custom_name.zip https://example.com/file.zip
+```
+
+#### 2 发送HTTP请求
+
+```bash
+# GET 请求
+curl https://api.example.com/data
+
+# POST 请求（JSON 数据）
+curl -X POST -H "Content-Type: application/json" -d '{"key":"value"}' https://api.example.com/endpoint
+
+# 带表单数据的 POST
+curl -X POST -d "username=admin&password=123" https://example.com/login
+```
+
+#### 3 设置请求头与Cookie
+
+```bash
+# 添加自定义请求头
+curl -H "Authorization: Bearer token123" https://api.example.com/protected
+
+# 从文件加载 Cookie 并发送
+curl -b cookies.txt https://example.com/dashboard
+```
+
+#### 4 处理重定向与代理
+
+```bash
+# 跟随重定向（默认不跟随）
+curl -L https://example.com/redirect
+
+# 使用代理
+curl -x http://proxy-server:8080 https://example.com
+```
+
+#### 5 高级功能
+
+```bash
+# 上传文件（PUT/POST）
+curl -F "file=@localfile.txt" https://example.com/upload
+
+# 断点续传（需服务器支持）
+curl -C - -O https://example.com/largefile.iso
+
+# 忽略 SSL 证书验证（不安全）
+curl -k https://example.com
+```
+
+### 9.8.2 wget
+
+Wget 更适合 **批量下载**、**递归抓取** 和 **离线存储**。
+
+#### 1 基础下载
+
+```bash
+# 下载文件到当前目录
+wget https://example.com/file.zip
+
+# 指定保存路径
+wget -O /path/to/save/file.zip https://example.com/file.zip
+```
+
+#### 2 批量与递归下载
+
+```bash
+# 下载多个文件（URL 列表在文件中）
+wget -i urls.txt
+
+# 递归下载整个网站（谨慎使用！）
+wget -r -l 5 --convert-links https://example.com
+```
+
+#### 3 后台下载与限速
+
+```bash
+# 后台下载（日志保存到 wget-log）
+wget -b https://example.com/largefile.iso
+
+# 限制下载速度（KB/s）
+wget --limit-rate=100k https://example.com/file.iso
+```
+
+#### 4 断点续传与重试
+
+```bash
+# 断点续传（自动检测未完成的任务）
+wget -c https://example.com/interrupted.iso
+
+# 失败后重试（默认 20 次）
+wget --tries=50 https://example.com/unstable.file
+```
+
+#### 5 镜像与认证
+
+```bash
+# 镜像站点（保持目录结构）
+wget -m https://example.com
+
+# 带用户名密码认证
+wget --user=admin --password=123 https://example.com/secure
+```
+
+### **对比与选择建议**
+
+| **特性**         | **cURL**                       | **Wget**               |
+| :--------------- | :----------------------------- | :--------------------- |
+| **主要用途**     | API 调试、复杂 HTTP 交互       | 批量下载、网站抓取     |
+| **输出默认行为** | 输出到终端（需 `-O` 保存文件） | 直接保存到文件         |
+| **递归下载**     | 不支持                         | 支持（`-r` 或 `-m`）   |
+| **协议支持**     | 更广泛（如 SFTP、SMTP）        | HTTP/HTTPS/FTP         |
+| **脚本友好性**   | 灵活，适合自动化 HTTP 请求     | 简单，适合批量下载任务 |
+| **断点续传**     | 需手动指定（`-C -`）           | 自动支持（`-c`）       |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 第10章 Linux实操篇-组管理和权限管理
 

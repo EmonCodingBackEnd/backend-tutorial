@@ -1,59 +1,59 @@
-# DockerÊµ¼ù
+# Dockerå®è·µ
 
-[·µ»ØÁĞ±í](https://github.com/EmonCodingBackEnd/backend-tutorial)
+[è¿”å›åˆ—è¡¨](https://github.com/EmonCodingBackEnd/backend-tutorial)
 
 [TOC]
 
-# ĞòÒ»¡¢VagrantµÄ°²×°ÓëÊ¹ÓÃ
+# åºä¸€ã€Vagrantçš„å®‰è£…ä¸ä½¿ç”¨
 
-## 1¡¢VagrantÊÇÊ²Ã´
+## 1ã€Vagrantæ˜¯ä»€ä¹ˆ
 
-VagrantÊÇ¹¹½¨ÔÚĞéÄâ»¯¼¼ÊõÖ®ÉÏµÄĞéÄâ»úÔËĞĞ»·¾³¹ÜÀí¹¤¾ß¡£
+Vagrantæ˜¯æ„å»ºåœ¨è™šæ‹ŸåŒ–æŠ€æœ¯ä¹‹ä¸Šçš„è™šæ‹Ÿæœºè¿è¡Œç¯å¢ƒç®¡ç†å·¥å…·ã€‚
 
-- ½¨Á¢ºÍÉ¾³ıĞéÄâ»ú
-- ÅäÖÃĞéÄâ»úÔËĞĞ²ÎÊı
-- ¹ÜÀíĞéÄâ»úÔËĞĞ×´Ì¬
-- ×Ô¶¯»¯ÅäÖÃºÍ°²×°¿ª·¢»·¾³
-- ´ò°üºÍ·Ö·¢ĞéÄâ»úÔËĞĞ»·¾³
+- å»ºç«‹å’Œåˆ é™¤è™šæ‹Ÿæœº
+- é…ç½®è™šæ‹Ÿæœºè¿è¡Œå‚æ•°
+- ç®¡ç†è™šæ‹Ÿæœºè¿è¡ŒçŠ¶æ€
+- è‡ªåŠ¨åŒ–é…ç½®å’Œå®‰è£…å¼€å‘ç¯å¢ƒ
+- æ‰“åŒ…å’Œåˆ†å‘è™šæ‹Ÿæœºè¿è¡Œç¯å¢ƒ
 
-- VagrantµÄÔËĞĞ£¬ĞèÒªÒÀÀµÄ³Ïî¾ßÌåµÄĞéÄâ»¯¼¼Êõ
+- Vagrantçš„è¿è¡Œï¼Œéœ€è¦ä¾èµ–æŸé¡¹å…·ä½“çš„è™šæ‹ŸåŒ–æŠ€æœ¯
   - VirtualBox
   - VMWare
 
 
 
-### 1.1¡¢¸öÈË½Ç¶ÈÓÅÊÆ
+### 1.1ã€ä¸ªäººè§’åº¦ä¼˜åŠ¿
 
-- ¿çÆ½Ì¨
-- ¿ÉÒÆ¶¯
-- ×Ô¶¯»¯²¿ÊğÎŞĞèÈË¹¤²ÎÓë
-- ÃæÊÔ¼Ó·ÖÏî
+- è·¨å¹³å°
+- å¯ç§»åŠ¨
+- è‡ªåŠ¨åŒ–éƒ¨ç½²æ— éœ€äººå·¥å‚ä¸
+- é¢è¯•åŠ åˆ†é¡¹
 
-### 1.2¹«Ë¾½Ç¶È
+### 1.2å…¬å¸è§’åº¦
 
-- ¼õÉÙÈËÁ¦ÅàÑµ³É±¾
-- Í³Ò»¿ª·¢»·¾³
+- å‡å°‘äººåŠ›åŸ¹è®­æˆæœ¬
+- ç»Ÿä¸€å¼€å‘ç¯å¢ƒ
 
-VAGRANT+Virtualbox/VMWare+ubuntu/CentOS=Ä¿±ê»·¾³
+VAGRANT+Virtualbox/VMWare+ubuntu/CentOS=ç›®æ ‡ç¯å¢ƒ
 
-## 2¡¢VagrantÊÊÓÃ·¶Î§
+## 2ã€Vagranté€‚ç”¨èŒƒå›´
 
-- ¿ª·¢»·¾³
-- ÏîÄ¿ÅäÖÃ±È½Ï¸´ÔÓ
+- å¼€å‘ç¯å¢ƒ
+- é¡¹ç›®é…ç½®æ¯”è¾ƒå¤æ‚
 
 
 
-## 3¡¢Window°²×°Vagrant
+## 3ã€Windowå®‰è£…Vagrant
 
-1. ÏÂÔØ
+1. ä¸‹è½½
 
-ÏÂÔØµØÖ·£ºhttps://www.vagrantup.com/downloads
+ä¸‹è½½åœ°å€ï¼šhttps://www.vagrantup.com/downloads
 
-2. °²×°
+2. å®‰è£…
 
-Ë«»÷°²×°£¬°²×°ºóÌáÊ¾ÖØÆô¼ÆËã»ú£¬ÖØÆô¼´¿É£¡
+åŒå‡»å®‰è£…ï¼Œå®‰è£…åæç¤ºé‡å¯è®¡ç®—æœºï¼Œé‡å¯å³å¯ï¼
 
-3. ²é¿´°æ±¾
+3. æŸ¥çœ‹ç‰ˆæœ¬
 
 ```bash
 $ vagrant --version
@@ -62,48 +62,48 @@ $ vagrant -v
 Vagrant 2.2.19
 ```
 
-4. ĞŞ¸ÄVagrant box±£´æÂ·¾¶
+4. ä¿®æ”¹Vagrant boxä¿å­˜è·¯å¾„
 
-add boxµÄÊ±ºòÄ¬ÈÏ±£´æÔÚÓÃ»§ÎÄ¼ş¼ĞÏÂµÄ`.vagrant.d`Ä¿Â¼£¬Í¨¹ıÉèÖÃVAGRANT_HOME»·¾³±äÁ¿¿ÉÒÔ¸Ä±äÄ¬ÈÏÎ»ÖÃ¡£
+add boxçš„æ—¶å€™é»˜è®¤ä¿å­˜åœ¨ç”¨æˆ·æ–‡ä»¶å¤¹ä¸‹çš„`.vagrant.d`ç›®å½•ï¼Œé€šè¿‡è®¾ç½®VAGRANT_HOMEç¯å¢ƒå˜é‡å¯ä»¥æ”¹å˜é»˜è®¤ä½ç½®ã€‚
 
 VAGRANT_HOME = `D:\SharedWorkspace\.vagrant.d`
 
-## 4¡¢VagrantµÄÊ¹ÓÃ
+## 4ã€Vagrantçš„ä½¿ç”¨
 
-### 4.1¡¢Ê¹ÓÃVirtualBox´´½¨ĞéÄâ»ú
+### 4.1ã€ä½¿ç”¨VirtualBoxåˆ›å»ºè™šæ‹Ÿæœº
 
-#### µÚÒ»²½£ºÆô¶¯virtualbox
+#### ç¬¬ä¸€æ­¥ï¼šå¯åŠ¨virtualbox
 
-virtualbox°²×°ºóÆô¶¯£¡
+virtualboxå®‰è£…åå¯åŠ¨ï¼
 
-#### µÚ¶ş²½£ºÏÂÔØbox
+#### ç¬¬äºŒæ­¥ï¼šä¸‹è½½box
 
-ÈçºÎ²éÑ¯¸÷ÖÖboxes£ºhttps://app.vagrantup.com/boxes/search
+å¦‚ä½•æŸ¥è¯¢å„ç§boxesï¼šhttps://app.vagrantup.com/boxes/search
 
-ÏÂÔØµØÖ·£ºhttps://app.vagrantup.com/centos/boxes/7
+ä¸‹è½½åœ°å€ï¼šhttps://app.vagrantup.com/centos/boxes/7
 
-¸ù¾İÊ¹ÓÃµÄVagrantÊÇVirtualBox»¹ÊÇVMWare£¬Ñ¡Ôñ`virtualbox`»òÕß`vmware_desktop ` ÀàĞÍµÄ providerÏÂÔØ£¡
+æ ¹æ®ä½¿ç”¨çš„Vagrantæ˜¯VirtualBoxè¿˜æ˜¯VMWareï¼Œé€‰æ‹©`virtualbox`æˆ–è€…`vmware_desktop ` ç±»å‹çš„ providerä¸‹è½½ï¼
 
-ÏÂÔØºó±¾µØ°²×°£º
+ä¸‹è½½åæœ¬åœ°å®‰è£…ï¼š
 
 ```bash
-# Èç¹û²»ÊÇÎªÁË`vagrant add box boxesname boxespath`¿ÉÒÔ²»ÏÂÔØ¡£
+# å¦‚æœä¸æ˜¯ä¸ºäº†`vagrant add box boxesname boxespath`å¯ä»¥ä¸ä¸‹è½½ã€‚
 vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
 ```
 
-#### µÚÈı²½£ºVagrantfile
+#### ç¬¬ä¸‰æ­¥ï¼šVagrantfile
 
-- ¹æ»®Ò»¸öÄ¿Â¼£¬×÷ÎªVagrantĞéÄâ»úÄ¿Â¼£¬±ÈÈç£ºVagrant/centos7
+- è§„åˆ’ä¸€ä¸ªç›®å½•ï¼Œä½œä¸ºVagrantè™šæ‹Ÿæœºç›®å½•ï¼Œæ¯”å¦‚ï¼šVagrant/centos7
 
-Èç¹ûÉĞÎ´¿´µ½Vagrantfile£¬³õÊ¼»¯ÅäÖÃVagrantfile
+å¦‚æœå°šæœªçœ‹åˆ°Vagrantfileï¼Œåˆå§‹åŒ–é…ç½®Vagrantfile
 
 ```bash
 vagrant init
-# »òÕßÖ¸¶¨boxes¡¾ÍÆ¼ö¡¿
+# æˆ–è€…æŒ‡å®šboxesã€æ¨èã€‘
 vagrant init centos/7
 ```
 
-- ±à¼­Vagrantfile
+- ç¼–è¾‘Vagrantfile
 
 ```bash
 $ vim Vagrantfile
@@ -115,67 +115,67 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-#### µÚËÄ²½£º³õÊ¼»¯»úÆ÷
+#### ç¬¬å››æ­¥ï¼šåˆå§‹åŒ–æœºå™¨
 
 ```bash
 $ vagrant up
-# Ö¸¶¨virtualboxÕâ¸öprovider¡¾ÍÆ¼ö¡¿£»ÌØ±ğËµÃ÷£ºÄ¬ÈÏÒ²ÊÇ virtualbox
+# æŒ‡å®švirtualboxè¿™ä¸ªproviderã€æ¨èã€‘ï¼›ç‰¹åˆ«è¯´æ˜ï¼šé»˜è®¤ä¹Ÿæ˜¯ virtualbox
 $ vagrant up --provider virtualbox
 ```
 
 
 
-### 4.2¡¢Ê¹ÓÃVMWare´´½¨ĞéÄâ»ú
+### 4.2ã€ä½¿ç”¨VMWareåˆ›å»ºè™šæ‹Ÿæœº
 
-#### µÚÒ»²½£º°²×°VMWare provider²å¼şvmware-desktop
+#### ç¬¬ä¸€æ­¥ï¼šå®‰è£…VMWare provideræ’ä»¶vmware-desktop
 
-1. ÏÂÔØVMWare-utility
+1. ä¸‹è½½VMWare-utility
 
 https://www.vagrantup.com/docs/providers/vmware/vagrant-vmware-utility
 
-ÏÂÔØºó£¬Ë«»÷°²×°£¡
+ä¸‹è½½åï¼ŒåŒå‡»å®‰è£…ï¼
 
-2. ÏÂÔØVMWare-desktop²é¿´
+2. ä¸‹è½½VMWare-desktopæŸ¥çœ‹
 
 ```bash
 $ vagrant plugin install vagrant-vmware-desktop
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Installing the 'vagrant-vmware-desktop' plugin. This can take a few minutes...
 Installed the plugin 'vagrant-vmware-desktop (3.0.1)'!
 ```
 
-3. °²×°VMWare²¢Æô¶¯
+3. å®‰è£…VMWareå¹¶å¯åŠ¨
 
-Ë«»÷VMWare°²×°ºó£¬Æô¶¯£¡
+åŒå‡»VMWareå®‰è£…åï¼Œå¯åŠ¨ï¼
 
-#### µÚ¶ş²½£ºÏÂÔØbox
+#### ç¬¬äºŒæ­¥ï¼šä¸‹è½½box
 
-ÈçºÎ²éÑ¯¸÷ÖÖboxes£ºhttps://app.vagrantup.com/boxes/search
+å¦‚ä½•æŸ¥è¯¢å„ç§boxesï¼šhttps://app.vagrantup.com/boxes/search
 
-ÏÂÔØµØÖ·£ºhttps://app.vagrantup.com/centos/boxes/7
+ä¸‹è½½åœ°å€ï¼šhttps://app.vagrantup.com/centos/boxes/7
 
-¸ù¾İÊ¹ÓÃµÄVagrantÊÇVirtualBox»¹ÊÇVMWare£¬Ñ¡Ôñ`virtualbox`»òÕß`vmware_desktop ` ÀàĞÍµÄ providerÏÂÔØ£¡
+æ ¹æ®ä½¿ç”¨çš„Vagrantæ˜¯VirtualBoxè¿˜æ˜¯VMWareï¼Œé€‰æ‹©`virtualbox`æˆ–è€…`vmware_desktop ` ç±»å‹çš„ providerä¸‹è½½ï¼
 
-ÏÂÔØºó±¾µØ°²×°£º
+ä¸‹è½½åæœ¬åœ°å®‰è£…ï¼š
 
 ```bash
-# Èç¹û²»ÊÇÎªÁË`vagrant add box boxesname boxespath`¿ÉÒÔ²»ÏÂÔØ¡£
+# å¦‚æœä¸æ˜¯ä¸ºäº†`vagrant add box boxesname boxespath`å¯ä»¥ä¸ä¸‹è½½ã€‚
 vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
 ```
 
-#### µÚÈı²½£ºVagrantfile
+#### ç¬¬ä¸‰æ­¥ï¼šVagrantfile
 
-- ¹æ»®Ò»¸öÄ¿Â¼£¬×÷ÎªVagrantĞéÄâ»úÄ¿Â¼£¬±ÈÈç£ºVagrant/centos7
+- è§„åˆ’ä¸€ä¸ªç›®å½•ï¼Œä½œä¸ºVagrantè™šæ‹Ÿæœºç›®å½•ï¼Œæ¯”å¦‚ï¼šVagrant/centos7
 
-Èç¹ûÉĞÎ´¿´µ½Vagrantfile£¬³õÊ¼»¯ÅäÖÃVagrantfile
+å¦‚æœå°šæœªçœ‹åˆ°Vagrantfileï¼Œåˆå§‹åŒ–é…ç½®Vagrantfile
 
 ```bash
 vagrant init
-# »òÕßÖ¸¶¨boxes¡¾ÍÆ¼ö¡¿
+# æˆ–è€…æŒ‡å®šboxesã€æ¨èã€‘
 vagrant init centos/7
 ```
 
-- ±à¼­Vagrant
+- ç¼–è¾‘Vagrant
 
 ```bash
 $ vim Vagrantfile
@@ -187,18 +187,18 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-#### µÚËÄ²½£º³õÊ¼»¯»úÆ÷
+#### ç¬¬å››æ­¥ï¼šåˆå§‹åŒ–æœºå™¨
 
 ```bash
-# Ö¸¶¨vmware_desktopÕâ¸öprovider¡¾ÍÆ¼ö¡¿
+# æŒ‡å®švmware_desktopè¿™ä¸ªproviderã€æ¨èã€‘
 vagrant up --provider vmware_desktop
 ```
 
 
 
-### 4.3¡¢VagrantĞéÄâ»ú·ÃÎÊ
+### 4.3ã€Vagrantè™šæ‹Ÿæœºè®¿é—®
 
-### 4.3.1¡¢Í¨¹ıvagrant sshÃüÁî
+### 4.3.1ã€é€šè¿‡vagrant sshå‘½ä»¤
 
 ```bash
 $ vagrant ssh
@@ -208,13 +208,13 @@ $ vagrant ssh
 
 
 
-### 4.3.2¡¢Í¨¹ıXShell¹¤¾ß
+### 4.3.2ã€é€šè¿‡XShellå·¥å…·
 
-#### 1.²é¿´vagrantµÄsshÅäÖÃ
+#### 1.æŸ¥çœ‹vagrantçš„sshé…ç½®
 
 ```bash
 $ vagrant ssh-config
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Host default
   HostName 127.0.0.1
   User vagrant
@@ -227,13 +227,13 @@ Host default
   LogLevel FATAL
 ```
 
-¿ÉÒÔ¿´µ½£º
+å¯ä»¥çœ‹åˆ°ï¼š
 
 - HostName 127.0.0.1
 - Port 2222
 - IdentityFile D:/SharedWorkspace/Vagrant/centos7/.vagrant/machines/default/virtualbox/private_key
 
-#### 2.XShellÁ¬½Ó
+#### 2.XShellè¿æ¥
 
 ![image-20220311142612246](images/image-20220311142612246.png)
 
@@ -241,12 +241,12 @@ Host default
 
 ![image-20220311155658798](images/image-20220311155658798.png)
 
-µã»÷È·¶¨ºóµÇÂ½£¬Ê×´ÎµÇÂ½£¬»áÌáÊ¾ÊäÈëÃÜÂë£»ÕâÊ±£¬ÊäÈëÃÜÂë£º vagrant ¼´¿É£¡
+ç‚¹å‡»ç¡®å®šåç™»é™†ï¼Œé¦–æ¬¡ç™»é™†ï¼Œä¼šæç¤ºè¾“å…¥å¯†ç ï¼›è¿™æ—¶ï¼Œè¾“å…¥å¯†ç ï¼š vagrant å³å¯ï¼
 
-#### 3.ÇĞ»»µ½root
+#### 3.åˆ‡æ¢åˆ°root
 
 ```bash
-# ÃÜÂëÊÇ vagrant
+# å¯†ç æ˜¯ vagrant
 [vagrant@localhost ~]$ su - root
 Password: 
 Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
@@ -255,87 +255,87 @@ Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 
 
 
-## 5¡¢VagrantµÄ³£ÓÃÃüÁî
+## 5ã€Vagrantçš„å¸¸ç”¨å‘½ä»¤
 
-| ÃüÁî                         | ÃüÁîÖ´ĞĞ½á¹û×´Ì¬ | ½âÊÍ                                |
+| å‘½ä»¤                         | å‘½ä»¤æ‰§è¡Œç»“æœçŠ¶æ€ | è§£é‡Š                                |
 | ---------------------------- | ---------------- | ----------------------------------- |
-| vagrant --version/vagrant -v |                  | ²é¿´µ±Ç°°æ±¾                        |
-| vagrant box list             |                  | ²é¿´Ä¿Ç°ÒÑÓĞµÄbox                   |
-| vagrant box add              |                  | ĞÂÔö¼ÓÒ»¸öbox                       |
-| vagrant box remove < name >  |                  | É¾³ıÖ¸¶¨box                         |
-| vagrant init < boxes >       |                  | ³õÊ¼»¯ÅäÖÃvagrantfile               |
-| vagrant up                   | running          | Æô¶¯ĞéÄâ»ú                          |
-| vagrant ssh                  |                  | sshµÇÂ¼ĞéÄâ»ú                       |
-| vagrant suspend              | saved            | ¹ÒÆğĞéÄâ»ú                          |
-| vagrant resume               | running          | »½ĞÑĞéÄâ»ú                          |
-| vagrant halt                 | poweroff         | ¹Ø±ÕĞéÄâ»ú                          |
-| vagrant reload               | running          | ÖØÆôĞéÄâ»ú                          |
-| vagratn status               | running          | ²é¿´ĞéÄâ»ú×´Ì¬                      |
-| vagrant destroy [name\|id]   |                  | É¾³ıĞéÄâ»ú£¬Èç¹ûÊÇdefault¿ÉÒÔÊ¡ÂÔid |
+| vagrant --version/vagrant -v |                  | æŸ¥çœ‹å½“å‰ç‰ˆæœ¬                        |
+| vagrant box list             |                  | æŸ¥çœ‹ç›®å‰å·²æœ‰çš„box                   |
+| vagrant box add              |                  | æ–°å¢åŠ ä¸€ä¸ªbox                       |
+| vagrant box remove < name >  |                  | åˆ é™¤æŒ‡å®šbox                         |
+| vagrant init < boxes >       |                  | åˆå§‹åŒ–é…ç½®vagrantfile               |
+| vagrant up                   | running          | å¯åŠ¨è™šæ‹Ÿæœº                          |
+| vagrant ssh                  |                  | sshç™»å½•è™šæ‹Ÿæœº                       |
+| vagrant suspend              | saved            | æŒ‚èµ·è™šæ‹Ÿæœº                          |
+| vagrant resume               | running          | å”¤é†’è™šæ‹Ÿæœº                          |
+| vagrant halt                 | poweroff         | å…³é—­è™šæ‹Ÿæœº                          |
+| vagrant reload               | running          | é‡å¯è™šæ‹Ÿæœº                          |
+| vagratn status               | running          | æŸ¥çœ‹è™šæ‹ŸæœºçŠ¶æ€                      |
+| vagrant destroy [name\|id]   |                  | åˆ é™¤è™šæ‹Ÿæœºï¼Œå¦‚æœæ˜¯defaultå¯ä»¥çœç•¥id |
 
-ÌØÊâËµÃ÷£ºvagrant upÊÇÒ»¸öÍòÄÜÃüÁî£¬¿ÉÒÔ¶Ôsaved/poweroff×´Ì¬µÄĞéÄâ»ú»½ĞÑ¡£
+ç‰¹æ®Šè¯´æ˜ï¼švagrant upæ˜¯ä¸€ä¸ªä¸‡èƒ½å‘½ä»¤ï¼Œå¯ä»¥å¯¹saved/poweroffçŠ¶æ€çš„è™šæ‹Ÿæœºå”¤é†’ã€‚
 
-## 6¡¢Vagrant PluginÃüÁî
+## 6ã€Vagrant Pluginå‘½ä»¤
 
-| ÃüÁî                                  | ½âÊÍ           |
+| å‘½ä»¤                                  | è§£é‡Š           |
 | ------------------------------------- | -------------- |
-| vagrant plugin install < pluginName > | °²×°²å¼ş       |
-| vagrant plugin list                   | ²é¿´°²×°µÄ²å¼ş |
-| vagrant plugin uninstall              | Ğ¶ÔØ²å¼ş       |
-| vagrant plugin help                   | ²é¿´ÃüÁîÓÃ·¨   |
+| vagrant plugin install < pluginName > | å®‰è£…æ’ä»¶       |
+| vagrant plugin list                   | æŸ¥çœ‹å®‰è£…çš„æ’ä»¶ |
+| vagrant plugin uninstall              | å¸è½½æ’ä»¶       |
+| vagrant plugin help                   | æŸ¥çœ‹å‘½ä»¤ç”¨æ³•   |
 
 
 
-# Ğò¶ş¡¢Docker DesktopµÄ°²×°ÓëÊ¹ÓÃ¡¾²»ÍÆ¼ö¡¿
+# åºäºŒã€Docker Desktopçš„å®‰è£…ä¸ä½¿ç”¨ã€ä¸æ¨èã€‘
 
-1. ÏÂÔØ
+1. ä¸‹è½½
 
-ÏÂÔØµØÖ·£ºhttps://docs.docker.com/desktop/windows/install/
+ä¸‹è½½åœ°å€ï¼šhttps://docs.docker.com/desktop/windows/install/
 
-2. °²×°
+2. å®‰è£…
 
-ÔÚWindowsÉÏË«»÷°²×°£¬°²×°ºó¸ù¾İÌáÊ¾ÖØÆôµçÄÔ¡£
+åœ¨Windowsä¸ŠåŒå‡»å®‰è£…ï¼Œå®‰è£…åæ ¹æ®æç¤ºé‡å¯ç”µè„‘ã€‚
 
-3. ½â¾öWSL 2 installation is incompleteÎÊÌâ
+3. è§£å†³WSL 2 installation is incompleteé—®é¢˜
 
-´ò¿ªDocker DesktopÊ±ÌáÊ¾£º
+æ‰“å¼€Docker Desktopæ—¶æç¤ºï¼š
 
 ![image-20220311180310750](images/image-20220311180310750.png)
 
 
 
-Ê×ÏÈ£¬È·±£ÈçÏÂ¹¦ÄÜÒÑ¹´Ñ¡£º
+é¦–å…ˆï¼Œç¡®ä¿å¦‚ä¸‹åŠŸèƒ½å·²å‹¾é€‰ï¼š
 
 ![image-20220311180528462](images/image-20220311180528462.png)
 
-Èç¹ûÒÔ¹´Ñ¡£¬²¢ÇÒWSLÈ·ÊµÓĞÏÂÔØ£¬ÄÇÃ´³¢ÊÔ¸üĞÂWSL£º
+å¦‚æœä»¥å‹¾é€‰ï¼Œå¹¶ä¸”WSLç¡®å®æœ‰ä¸‹è½½ï¼Œé‚£ä¹ˆå°è¯•æ›´æ–°WSLï¼š
 
-1£ºÒÔ¹ÜÀíÔ±Éí·İÆô¶¯ powershell
+1ï¼šä»¥ç®¡ç†å‘˜èº«ä»½å¯åŠ¨ powershell
 
-2£ºÖ´ĞĞ
+2ï¼šæ‰§è¡Œ
 
 ```bash
 wsl --update
 ```
 
-3£ºÖØÆôwsl¡¾¿ªÆôºó£¬»áµ¼ÖÂVMWareÆô¶¯Ê§°Ü£ºVMware Workstation Óë Device/Credential Guard ²»¼æÈİ¡£¡¿
+3ï¼šé‡å¯wslã€å¼€å¯åï¼Œä¼šå¯¼è‡´VMWareå¯åŠ¨å¤±è´¥ï¼šVMware Workstation ä¸ Device/Credential Guard ä¸å…¼å®¹ã€‚ã€‘
 
 ```bash
 net stop LxssManager
 net start LxssManager
 ```
 
-°²×°Docker Desktopºó£¬Ò²»áÄ¬ÈÏÆôÓÃ¡¾ÆôÓÃ»ò¹Ø±ÕWindows¹¦ÄÜ¡¿=>¡¾ĞéÄâ»¯Æ½Ì¨¡¿£¬Ò²»áµ¼ÖÂÈçÉÏVMWareÆô¶¯Ê§°ÜÎÊÌâ¡£
+å®‰è£…Docker Desktopåï¼Œä¹Ÿä¼šé»˜è®¤å¯ç”¨ã€å¯ç”¨æˆ–å…³é—­WindowsåŠŸèƒ½ã€‘=>ã€è™šæ‹ŸåŒ–å¹³å°ã€‘ï¼Œä¹Ÿä¼šå¯¼è‡´å¦‚ä¸ŠVMWareå¯åŠ¨å¤±è´¥é—®é¢˜ã€‚
 
-Í¬Ê±£¬¡¾·şÎñ¡¿=>¡¾HVÖ÷»ú·şÎñ¡¿Ò²½¨Òé¹Ø±Õ£¡
+åŒæ—¶ï¼Œã€æœåŠ¡ã€‘=>ã€HVä¸»æœºæœåŠ¡ã€‘ä¹Ÿå»ºè®®å…³é—­ï¼
 
-# Ò»¡¢DockerµÄ°²×°ÓëÅäÖÃ
+# ä¸€ã€Dockerçš„å®‰è£…ä¸é…ç½®
 
-## 1¡¢°²×°
+## 1ã€å®‰è£…
 
-[²é¿´¹Ù·½CentOS°²×°Docker½Ì³Ì](https://docs.docker.com/engine/install/centos/)
+[æŸ¥çœ‹å®˜æ–¹CentOSå®‰è£…Dockeræ•™ç¨‹](https://docs.docker.com/engine/install/centos/)
 
-### 1.0¡¢É¾³ı¾É°æDocker
+### 1.0ã€åˆ é™¤æ—§ç‰ˆDocker
 
 ```bash
 sudo yum remove docker \
@@ -346,26 +346,26 @@ sudo yum remove docker \
                   docker-latest-logrotate \
                   docker-logrotate \
                   docker-engine
-# ±ØÒªÊ±£ºÇåÀíyum°²×°µÄĞÂ°æ±¾docker
+# å¿…è¦æ—¶ï¼šæ¸…ç†yumå®‰è£…çš„æ–°ç‰ˆæœ¬docker
 yum remote -y docker* container-selinux
 ```
 
-Èç¹ûyum±¨¸æËµÒÔÉÏ°²×°°üÎ´°²×°£¬Î´Æ¥Åä£¬Î´É¾³ıÈÎºÎ°²×°°ü£¬»îÂë»·¾³¸É¾»£¬Ã»ÓĞÀúÊ·ÒÅÁô¾É°æ°²×°¡£
+å¦‚æœyumæŠ¥å‘Šè¯´ä»¥ä¸Šå®‰è£…åŒ…æœªå®‰è£…ï¼ŒæœªåŒ¹é…ï¼Œæœªåˆ é™¤ä»»ä½•å®‰è£…åŒ…ï¼Œæ´»ç ç¯å¢ƒå¹²å‡€ï¼Œæ²¡æœ‰å†å²é—ç•™æ—§ç‰ˆå®‰è£…ã€‚
 
-### 1.1¡¢°²×°ÒªÇó
+### 1.1ã€å®‰è£…è¦æ±‚
 
-	°²×°DockerµÄ»ù±¾ÒªÇóÈçÏÂ£º
+	å®‰è£…Dockerçš„åŸºæœ¬è¦æ±‚å¦‚ä¸‹ï¼š
 
-- DockrÖ»Ö§³Ö64Î»µÄCPU¼Ü¹¹µÄ¼ÆËã»ú£¬Ä¿Ç°²»Ö§³Ö32Î»CPU
-- ½¨ÒéÏµÍ³µÄLinuxÄÚºË°æ±¾Îª3.10¼°ÒÔÉÏ
-- LinuxÄÚºËĞèÒª¿ªÆôcgroupsºÍnamespace¹¦ÄÜ
-- ¶ÔÓÚ·ÇLinuxÄÚºËµÄÆ½Ì¨£¬ÈçMicrosoft WindowsºÍOS X£¬ĞèÒª°²×°Ê¹ÓÃBoot2Docker¹¤¾ß
+- Dockråªæ”¯æŒ64ä½çš„CPUæ¶æ„çš„è®¡ç®—æœºï¼Œç›®å‰ä¸æ”¯æŒ32ä½CPU
+- å»ºè®®ç³»ç»Ÿçš„Linuxå†…æ ¸ç‰ˆæœ¬ä¸º3.10åŠä»¥ä¸Š
+- Linuxå†…æ ¸éœ€è¦å¼€å¯cgroupså’ŒnamespaceåŠŸèƒ½
+- å¯¹äºéLinuxå†…æ ¸çš„å¹³å°ï¼Œå¦‚Microsoft Windowså’ŒOS Xï¼Œéœ€è¦å®‰è£…ä½¿ç”¨Boot2Dockerå·¥å…·
 
-### 1.2¡¢CentOS»·¾³ÏÂ°²×°Docker
+### 1.2ã€CentOSç¯å¢ƒä¸‹å®‰è£…Docker
 
-	DockerÄ¿Ç°Ö»ÄÜÔËĞĞÔÚ64Î»Æ½Ì¨ÉÏ£¬²¢ÇÒÒªÇóÄÚºË°æ±¾²»µÍÓÚ3.10£¬Êµ¼ÊÉÏÄÚºË°æ±¾Ô½ĞÂÔ½ºÃ£¬¹ıµÍµÄÄÚºË°æ±¾ÈİÒ×Ôì³É¹¦ÄÜ²»ÎÈ¶¨¡£
+	Dockerç›®å‰åªèƒ½è¿è¡Œåœ¨64ä½å¹³å°ä¸Šï¼Œå¹¶ä¸”è¦æ±‚å†…æ ¸ç‰ˆæœ¬ä¸ä½äº3.10ï¼Œå®é™…ä¸Šå†…æ ¸ç‰ˆæœ¬è¶Šæ–°è¶Šå¥½ï¼Œè¿‡ä½çš„å†…æ ¸ç‰ˆæœ¬å®¹æ˜“é€ æˆåŠŸèƒ½ä¸ç¨³å®šã€‚
 	
-	ÓÃ»§¿ÉÒÔÍ¨¹ıÈçÏÂÃüÁî¼ì²é×Ô¼ºµÄÄÚºË°æ±¾ÏêÏ¸ĞÅÏ¢£º
+	ç”¨æˆ·å¯ä»¥é€šè¿‡å¦‚ä¸‹å‘½ä»¤æ£€æŸ¥è‡ªå·±çš„å†…æ ¸ç‰ˆæœ¬è¯¦ç»†ä¿¡æ¯ï¼š
 
 ```shell
 [emon@emon ~]$ uname -a
@@ -374,31 +374,31 @@ Linux emon 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64 x86_
 Linux version 3.10.0-862.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) #1 SMP Fri Apr 20 16:44:24 UTC 2018
 ```
 
-1. °²×°ĞèÒªµÄÈí¼ş°ü£¬yum-utilÌá¹©yum-config-manager¹¦ÄÜ£¬ÁíÍâÁ½¸öÊÇdevicemapperÇı¶¯ÒÀÀµµÄ
+1. å®‰è£…éœ€è¦çš„è½¯ä»¶åŒ…ï¼Œyum-utilæä¾›yum-config-manageråŠŸèƒ½ï¼Œå¦å¤–ä¸¤ä¸ªæ˜¯devicemapperé©±åŠ¨ä¾èµ–çš„
 
 ```shell
 [emon@emon ~]$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
-2. ÉèÖÃyumÔ´
+2. è®¾ç½®yumæº
 
 ```shell
 [emon@emon ~]$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ```
 
-3. ¿ÉÒÔ²é¿´ËùÓĞ²Ö¿âÖĞËùÓĞdocker°æ±¾£¬²¢Ñ¡Ôñ°²×°ÌØ¶¨µÄ°æ±¾
+3. å¯ä»¥æŸ¥çœ‹æ‰€æœ‰ä»“åº“ä¸­æ‰€æœ‰dockerç‰ˆæœ¬ï¼Œå¹¶é€‰æ‹©å®‰è£…ç‰¹å®šçš„ç‰ˆæœ¬
 
 ```shell
 [emon@emon ~]$ yum list docker-ce --showduplicates |sort -r
 ```
 
-4. °²×°docker
+4. å®‰è£…docker
 
 ```shell
-# °²×°×îĞÂ
+# å®‰è£…æœ€æ–°
 # $ sudo yum install -y docker-ce
-# °²×°Ö¸¶¨°æ±¾
-# $ sudo yum install -y docker-ce-18.06.3.ce ¡¾Ò»¸öÊ¹ÓÃÁËºÜ¾ÃµÄ°æ±¾¡¿
+# å®‰è£…æŒ‡å®šç‰ˆæœ¬
+# $ sudo yum install -y docker-ce-18.06.3.ce ã€ä¸€ä¸ªä½¿ç”¨äº†å¾ˆä¹…çš„ç‰ˆæœ¬ã€‘
 # $ sudo yum install -y docker-ce-19.03.15
 $ sudo yum install -y docker-ce-20.10.24
 # $ sudo yum install -y docker-ce-23.0.6
@@ -407,13 +407,13 @@ $ sudo yum install -y docker-ce-20.10.24
 # $ sudo yum install -y docker-ce-26.1.4
 ```
 
-5. Æô¶¯
+5. å¯åŠ¨
 
 ```shell
 [emon@emon ~]$ sudo systemctl start docker
 ```
 
-6. ÑéÖ¤°²×°
+6. éªŒè¯å®‰è£…
 
 ```shell
 [emon@emon ~]$ sudo docker version
@@ -421,11 +421,11 @@ $ sudo yum install -y docker-ce-20.10.24
 [emon@emon ~]$ sudo docker run hello-world
 ```
 
-> ËµÃ÷£ºÈç¹ûdocker infoÓĞÌáÊ¾£º
+> è¯´æ˜ï¼šå¦‚æœdocker infoæœ‰æç¤ºï¼š
 > WARNING: bridge-nf-call-iptables is disabled
 > WARNING: bridge-nf-call-ip6tables is disabled
 
-½â¾ö°ì·¨£º
+è§£å†³åŠæ³•ï¼š
 
 ```bash
 [emon@emon2 ~]$ sudo vim /etc/sysctl.conf 
@@ -436,23 +436,23 @@ net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```bash
 [emon@emon2 ~]$ sudo sysctl -p
 ```
 
-ÎŞĞèÖØÆô£¬´ËÊ±docker info¾Í¿´²»µ½´Ë±¨´íÁË¡£
+æ— éœ€é‡å¯ï¼Œæ­¤æ—¶docker infoå°±çœ‹ä¸åˆ°æ­¤æŠ¥é”™äº†ã€‚
 
-### 1.3¡¢ÅäÖÃdocker¼ÓËÙÆ÷
+### 1.3ã€é…ç½®dockeråŠ é€Ÿå™¨
 
-- ÅäÖÃ
+- é…ç½®
 
   - DaoCloud
 
-  ²ÉÓÃ DaoCloud: https://www.daocloud.io/ Ìá¹©µÄDocker¼ÓËÙÆ÷¡£
+  é‡‡ç”¨ DaoCloud: https://www.daocloud.io/ æä¾›çš„DockeråŠ é€Ÿå™¨ã€‚
 
-  µÇÂ¼DaoCloud£¬ÕÒµ½Ğ¡»ğ¼ıÍ¼±ê£¬¸ù¾İËµÃ÷²Ù×÷£º
+  ç™»å½•DaoCloudï¼Œæ‰¾åˆ°å°ç«ç®­å›¾æ ‡ï¼Œæ ¹æ®è¯´æ˜æ“ä½œï¼š
 
   ```bash
   [emon@emon ~]$ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
@@ -462,44 +462,44 @@ net.bridge.bridge-nf-call-iptables = 1
   You need to restart docker to take effect: sudo systemctl restart docker
   ```
 
-  - °¢ÀïÔÆ
+  - é˜¿é‡Œäº‘
 
-  µÇÂ¼°¢Àï¿ª·¢ÕßÆ½Ì¨£º https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
+  ç™»å½•é˜¿é‡Œå¼€å‘è€…å¹³å°ï¼š https://promotion.aliyun.com/ntms/act/kubernetes.html#industry
 
-  µã»÷¡¾¾µÏñËÑË÷¡¿°´Å¥£¬×Ô¶¯Ìø×ªµ½¿ØÖÆÌ¨µÄ¾µÏñËÑË÷£¬¸ù¾İÌáÊ¾×¢²á²¢µÇÂ¼£º
+  ç‚¹å‡»ã€é•œåƒæœç´¢ã€‘æŒ‰é’®ï¼Œè‡ªåŠ¨è·³è½¬åˆ°æ§åˆ¶å°çš„é•œåƒæœç´¢ï¼Œæ ¹æ®æç¤ºæ³¨å†Œå¹¶ç™»å½•ï¼š
 
-  ÔÚ×ó²à¡¾¾µÏñ¹¤¾ß¡¿ÖĞÑ¡Ôñ¡¾¾µÏñ¼ÓËÙÆ÷¡¿£¬ÓÒ±ßÊÇÉú³ÉµÄ¼ÓËÙµØÖ·£º±ÈÈçÎÒµÄ£º`https://pyk8pf3k.mirror.aliyuncs.com`£¬Ö´ĞĞÃüÁîÅäÖÃÉÏ¼´¿É£º
+  åœ¨å·¦ä¾§ã€é•œåƒå·¥å…·ã€‘ä¸­é€‰æ‹©ã€é•œåƒåŠ é€Ÿå™¨ã€‘ï¼Œå³è¾¹æ˜¯ç”Ÿæˆçš„åŠ é€Ÿåœ°å€ï¼šæ¯”å¦‚æˆ‘çš„ï¼š`https://pyk8pf3k.mirror.aliyuncs.com`ï¼Œæ‰§è¡Œå‘½ä»¤é…ç½®ä¸Šå³å¯ï¼š
 
-  `daemon.json`ÎÄ¼şÊÇÒ»¸öJSON¸ñÊ½µÄÎÄ¼ş£¬°üº¬¼üÖµ¶ÔÀ´ÉèÖÃDockerÊØ»¤½ø³ÌµÄ²ÎÊı¡£ÒÔÏÂÊÇÒ»Ğ©³£¼ûµÄÅäÖÃÏî£º
+  `daemon.json`æ–‡ä»¶æ˜¯ä¸€ä¸ªJSONæ ¼å¼çš„æ–‡ä»¶ï¼ŒåŒ…å«é”®å€¼å¯¹æ¥è®¾ç½®Dockerå®ˆæŠ¤è¿›ç¨‹çš„å‚æ•°ã€‚ä»¥ä¸‹æ˜¯ä¸€äº›å¸¸è§çš„é…ç½®é¡¹ï¼š
 
-  - daemon.jsonÎÄ¼ş½á¹¹
+  - daemon.jsonæ–‡ä»¶ç»“æ„
 
-    - graphÉèÖÃdockerÊı¾İÄ¿Â¼£ºÑ¡Ôñ±È½Ï´óµÄ·ÖÇø£¨Èç¹ûÕâÀïÊÇ¸ùÄ¿Â¼¾Í²»ĞèÒªÅäÖÃÁË£¬Ä¬ÈÏÎª/var/lib/docker£©
+    - graphè®¾ç½®dockeræ•°æ®ç›®å½•ï¼šé€‰æ‹©æ¯”è¾ƒå¤§çš„åˆ†åŒºï¼ˆå¦‚æœè¿™é‡Œæ˜¯æ ¹ç›®å½•å°±ä¸éœ€è¦é…ç½®äº†ï¼Œé»˜è®¤ä¸º/var/lib/dockerï¼‰
 
-    - data-root: DockerÊı¾İÄ¿Â¼£¬Ä¬ÈÏÎª/var/lib/docker¡£
+    - data-root: Dockeræ•°æ®ç›®å½•ï¼Œé»˜è®¤ä¸º/var/lib/dockerã€‚
 
-      > °æ±¾docker-ce-23.0.6ÒÔÏÂÓÃ graph ¶ø²»ÊÇ data-root
+      > ç‰ˆæœ¬docker-ce-23.0.6ä»¥ä¸‹ç”¨ graph è€Œä¸æ˜¯ data-root
       >
-      > °æ±¾docker-ce-23.0.6¼°ÒÔÉÏ£¬graph -> data-root£¬·ñÔò±¨´íActive: failed (Result: start-limit
+      > ç‰ˆæœ¬docker-ce-23.0.6åŠä»¥ä¸Šï¼Œgraph -> data-rootï¼Œå¦åˆ™æŠ¥é”™Active: failed (Result: start-limit
 
-    - exec-root: DockerÖ´ĞĞ×´Ì¬ÎÄ¼şµÄ´æ´¢Â·¾¶£¬Ä¬ÈÏÎª/var/run/docker¡£
+    - exec-root: Dockeræ‰§è¡ŒçŠ¶æ€æ–‡ä»¶çš„å­˜å‚¨è·¯å¾„ï¼Œé»˜è®¤ä¸º/var/run/dockerã€‚
 
-    - exec-opts£ºÉèÖÃcgroup driver£¨Ä¬ÈÏÊÇcgroupfs£¬²»ÍÆ¼öÉèÖÃsystemd£©
+    - exec-optsï¼šè®¾ç½®cgroup driverï¼ˆé»˜è®¤æ˜¯cgroupfsï¼Œä¸æ¨èè®¾ç½®systemdï¼‰
 
-      > ±ÈÈç£º  `"exec-opts": ["native.cgroupdriver=cgroupfs"],`
+      > æ¯”å¦‚ï¼š  `"exec-opts": ["native.cgroupdriver=cgroupfs"],`
 
-    - log-driver: DockerÈÕÖ¾Çı¶¯ÀàĞÍ£¬Ä¬ÈÏÎªjson-file¡£
+    - log-driver: Dockeræ—¥å¿—é©±åŠ¨ç±»å‹ï¼Œé»˜è®¤ä¸ºjson-fileã€‚
 
-    - log-level: DockerÈÕÖ¾¼ÇÂ¼¼¶±ğ£¬Èçdebug¡¢info¡¢warn¡¢error¡¢fatal¡£
+    - log-level: Dockeræ—¥å¿—è®°å½•çº§åˆ«ï¼Œå¦‚debugã€infoã€warnã€errorã€fatalã€‚
 
-    - insecure-registries: ¿ÉÒÔÍ¨¹ıHTTPÁ¬½ÓµÄ¾µÏñ²Ö¿âµØÖ·¡£
+    - insecure-registries: å¯ä»¥é€šè¿‡HTTPè¿æ¥çš„é•œåƒä»“åº“åœ°å€ã€‚
 
-    - registry-mirrors: ¾µÏñ²Ö¿â¼ÓËÙµØÖ·¡£
+    - registry-mirrors: é•œåƒä»“åº“åŠ é€Ÿåœ°å€ã€‚
 
-    - storage-driver: Docker´æ´¢Çı¶¯ÀàĞÍ£¬ÍÆ¼öoverlay2¡£
+    - storage-driver: Dockerå­˜å‚¨é©±åŠ¨ç±»å‹ï¼Œæ¨èoverlay2ã€‚
 
-    - live-restore: ÊÇ·ñÆôÓÃ¡°ÊµÊ±»Ö¸´¡±¹¦ÄÜ£¬ÔÊĞíDockerÔÚ¸üĞÂ»òÖØÆôÊ±²»ÖÕÖ¹ÔËĞĞÖĞµÄÈİÆ÷¡£
-    - debug£º¿ªÆôµ÷ÊÔ£¬ÈôÆô¶¯Ê§°Ü£¬¿ÉÒÔÔÚ /var/log/messages ²é¿´Ô­Òò
+    - live-restore: æ˜¯å¦å¯ç”¨â€œå®æ—¶æ¢å¤â€åŠŸèƒ½ï¼Œå…è®¸Dockeråœ¨æ›´æ–°æˆ–é‡å¯æ—¶ä¸ç»ˆæ­¢è¿è¡Œä¸­çš„å®¹å™¨ã€‚
+    - debugï¼šå¼€å¯è°ƒè¯•ï¼Œè‹¥å¯åŠ¨å¤±è´¥ï¼Œå¯ä»¥åœ¨ /var/log/messages æŸ¥çœ‹åŸå› 
 
   ```bash
   sudo tee /etc/docker/daemon.json <<-'EOF'
@@ -512,45 +512,45 @@ net.bridge.bridge-nf-call-iptables = 1
   EOF
   ```
 
-  ËµÃ÷£º
+  è¯´æ˜ï¼š
 
-  1. °¢ÀïÔÆ¼ÓËÙÆ÷
-  2. DockerProxy´úÀí¼ÓËÙ
-  3. °Ù¶ÈÔÆMirror
-  4. ÄÏ¾©´óÑ§
-  5. ÉÏº£½»Í¨´óÑ§
+  1. é˜¿é‡Œäº‘åŠ é€Ÿå™¨
+  2. DockerProxyä»£ç†åŠ é€Ÿ
+  3. ç™¾åº¦äº‘Mirror
+  4. å—äº¬å¤§å­¦
+  5. ä¸Šæµ·äº¤é€šå¤§å­¦
   6. USTC
 
-- ²é¿´
+- æŸ¥çœ‹
 
 ```bash
 [emon@emon ~]$ sudo cat /etc/docker/daemon.json 
 {"registry-mirrors": ["http://f1361db2.m.daocloud.io"]}
 ```
 
-- ÖØÆô
+- é‡å¯
 
 ```bash
 [emon@emon ~]$ sudo systemctl restart docker
 ```
 
-### 1.4¡¢ÅäÖÃdocker´úÀí·şÎñÆ÷
+### 1.4ã€é…ç½®dockerä»£ç†æœåŠ¡å™¨
 
-Èô¼ÓËÙÆ÷²»ºÃÊ¹£¬ÇëÊ¹ÓÃ´úÀí·şÎñÆ÷£¬Ç°ÌáÊÇÄÜ¿ÆÑ§ÉÏÍø£¬ÕâÀïÍÆ¼öÒ»¸ö£ºAurora
+è‹¥åŠ é€Ÿå™¨ä¸å¥½ä½¿ï¼Œè¯·ä½¿ç”¨ä»£ç†æœåŠ¡å™¨ï¼Œå‰ææ˜¯èƒ½ç§‘å­¦ä¸Šç½‘ï¼Œè¿™é‡Œæ¨èä¸€ä¸ªï¼šAurora
 
-- °²×°ÁËAuroraºó£¬Í¨¹ı¡¾ÉèÖÃ¡¿=>¡¾ÍøÂçºÍ Internet¡¿=>¡¾´úÀí¡¿=>¡¾ÊÖ¶¯ÉèÖÃ´úÀí¡¿£¨·¢ÏÖÊÇ¿ªÆôµÄ£©=>±à¼­£¬²é¿´´úÀíµØÖ·¡£
+- å®‰è£…äº†Auroraåï¼Œé€šè¿‡ã€è®¾ç½®ã€‘=>ã€ç½‘ç»œå’Œ Internetã€‘=>ã€ä»£ç†ã€‘=>ã€æ‰‹åŠ¨è®¾ç½®ä»£ç†ã€‘ï¼ˆå‘ç°æ˜¯å¼€å¯çš„ï¼‰=>ç¼–è¾‘ï¼ŒæŸ¥çœ‹ä»£ç†åœ°å€ã€‚
 
 ![image-20240623081417693](images/image-20240623081417693.png)
 
-µã»÷±à¼­ºó£¬¿´µ½µÄ´úÀíÅäÖÃ£º
+ç‚¹å‡»ç¼–è¾‘åï¼Œçœ‹åˆ°çš„ä»£ç†é…ç½®ï¼š
 
 ![image-20240623081523824](images/image-20240623081523824.png)
 
-ÆäÖĞ127.0.0.1¿ÉÒÔ¸ü»»ÎªÆäËûÍø¿¨µØÖ·£¨±ÈÈçVMware Network Adapter VMnet8£©£º192.168.32.1
+å…¶ä¸­127.0.0.1å¯ä»¥æ›´æ¢ä¸ºå…¶ä»–ç½‘å¡åœ°å€ï¼ˆæ¯”å¦‚VMware Network Adapter VMnet8ï¼‰ï¼š192.168.32.1
 
 ![image-20240623081740357](images/image-20240623081740357.png)
 
-- ÅäÖÃDocker´úÀí
+- é…ç½®Dockerä»£ç†
 
 ```bash
 $ mkdir -p /etc/systemd/system/docker.service.d
@@ -564,7 +564,7 @@ Environment="HTTPS_PROXY=http://192.168.32.1:29290"
 Environment="NO_PROXY=127.0.0.1,localhost,192.168.32.116"
 ```
 
-- ÖØÆôDocker²¢²é¿´´úÀíÅäÖÃÇé¿ö
+- é‡å¯Dockerå¹¶æŸ¥çœ‹ä»£ç†é…ç½®æƒ…å†µ
 
 ```bash
 $ systemctl daemon-reload && systemctl restart docker
@@ -572,54 +572,54 @@ $ systemctl show --property=Environment docker
 Environment=HTTP_PROXY=http://192.168.32.1:29290 HTTPS_PROXY=http://192.168.32.1:29290
 ```
 
-## 2¡¢ÅäÖÃDocker·şÎñ
+## 2ã€é…ç½®DockeræœåŠ¡
 
-### 2.1¡¢ÍÆ¼öÍ¨¹ıÅäÖÃsudoµÄ·½Ê½£º
+### 2.1ã€æ¨èé€šè¿‡é…ç½®sudoçš„æ–¹å¼ï¼š
 
-	²»ÍÆ¼ödocker·şÎñÆô¶¯ºó£¬ĞŞ¸Ä/var/run/docker.sockÎÄ¼şËùÊô×éÎªdockerroot£¬È»ºóÎªÄ³¸öuserÌí¼Ó¸½¼Ó×édockerroot·½Ê½£¬Ê¹µÃdockerÃüÁîÔÚuserµÇÂ¼ºó¿ÉÒÔÖ´ĞĞ¡£
+	ä¸æ¨èdockeræœåŠ¡å¯åŠ¨åï¼Œä¿®æ”¹/var/run/docker.sockæ–‡ä»¶æ‰€å±ç»„ä¸ºdockerrootï¼Œç„¶åä¸ºæŸä¸ªuseræ·»åŠ é™„åŠ ç»„dockerrootæ–¹å¼ï¼Œä½¿å¾—dockerå‘½ä»¤åœ¨userç™»å½•åå¯ä»¥æ‰§è¡Œã€‚
 
 ```shell
 [emon@emon ~]$ sudo visudo
 ```
 
-	ÕÒµ½`## Allow root to run any commands anywhere`ÕâÑùµÄ±êÊ¶£¬ÔÚÏÂ·½ÅäÖÃ£º
+	æ‰¾åˆ°`## Allow root to run any commands anywhere`è¿™æ ·çš„æ ‡è¯†ï¼Œåœ¨ä¸‹æ–¹é…ç½®ï¼š
 
 ```shell
-# ±¸×¢£ºÈç¹ûÒÑ¾­¸³ÓèÁËALLµÄ²Ù×÷È¨ÏŞ£¬¾ÍÃ»±ØÒªÅäÖÃÈçÏÂÁË
+# å¤‡æ³¨ï¼šå¦‚æœå·²ç»èµ‹äºˆäº†ALLçš„æ“ä½œæƒé™ï¼Œå°±æ²¡å¿…è¦é…ç½®å¦‚ä¸‹äº†
 emon    ALL=(ALL)       PASSWD:/usr/bin/docker
 ```
 
 
 
-### 2.2¡¢ÅäÖÃalias
+### 2.2ã€é…ç½®alias
 
-ÅäÖÃÓÀ¾ÃµÄalias£º
+é…ç½®æ°¸ä¹…çš„aliasï¼š
 
 ```shell
-# Èç¹ûÊÇrootÓÃ»§°²×°µÄ£¬²»ĞèÒª´øsudoÃüÁî
+# å¦‚æœæ˜¯rootç”¨æˆ·å®‰è£…çš„ï¼Œä¸éœ€è¦å¸¦sudoå‘½ä»¤
 [emon@emon ~]$ vim ~/.bashrc
 alias docker="sudo /usr/bin/docker"
 alias dockerpsf="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}\""
 alias dockerps="sudo /usr/bin/docker ps --format \"table{{.ID}}\t{{.Status}}\t{{.Names}}\""
 ```
 
-Ê¹Ö®ÉúĞ§£º
+ä½¿ä¹‹ç”Ÿæ•ˆï¼š
 
 ```shell
 [emon@emon ~]$ source ~/.bashrc
 ```
 
-Ê¹ÓÃÊ¾Àı£º
+ä½¿ç”¨ç¤ºä¾‹ï¼š
 
 ```shell
 [emon@emon ~]$ docker images
-[sudo] emon µÄÃÜÂë£º
+[sudo] emon çš„å¯†ç ï¼š
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 ```
 
-## 3¡¢»ù±¾ĞÅÏ¢²é¿´
+## 3ã€åŸºæœ¬ä¿¡æ¯æŸ¥çœ‹
 
-### 3.1¡¢²é¿´DockerµÄ»ù±¾ĞÅÏ¢
+### 3.1ã€æŸ¥çœ‹Dockerçš„åŸºæœ¬ä¿¡æ¯
 
 ```shell
 [emon@emon ~]$ docker info
@@ -670,7 +670,7 @@ Registry Mirrors:
 Live Restore Enabled: false
 ```
 
-### 3.2¡¢²é¿´Docker°æ±¾
+### 3.2ã€æŸ¥çœ‹Dockerç‰ˆæœ¬
 
 ```shell
 [emon@emon ~]$ docker version
@@ -694,41 +694,41 @@ Server:
   Experimental:     false
 ```
 
-## 4¡¢Éı¼¶Docker
+## 4ã€å‡çº§Docker
 
-### 4.1¡¢Ğ¶ÔØµÍ°æ±¾Docker
+### 4.1ã€å¸è½½ä½ç‰ˆæœ¬Docker
 
-- ²é¿´Docker°æ±¾
+- æŸ¥çœ‹Dockerç‰ˆæœ¬
 
 ```bash
 $ rpm -qa|grep docker
 docker-ce-18.06.3.ce-3.el7.x86_64
 ```
 
-- ²é¿´ÒÑ°²×°¾µÏñ
+- æŸ¥çœ‹å·²å®‰è£…é•œåƒ
 
 ```bash
 $ docker images
 ```
 
-- ²é¿´¾µÏñ´æ·ÅÂ·¾¶
+- æŸ¥çœ‹é•œåƒå­˜æ”¾è·¯å¾„
 
 ```bash
 $ docker inspect <image_name>|grep HostsPath
 ```
 
-> LinuxÏµÍ³ÏÂ£¬DockerÄ¬ÈÏ´æ´¢Â·¾¶ÊÇ`/var/lib/docker`
+> Linuxç³»ç»Ÿä¸‹ï¼ŒDockeré»˜è®¤å­˜å‚¨è·¯å¾„æ˜¯`/var/lib/docker`
 
-- É¾³ıDocker
+- åˆ é™¤Docker
 
 ```bash
 $ yum list docker*
 $ yum remove docker*
 ```
 
-> ×¢£º²»É¾³ı`/var/lib/docker`Ä¿Â¼¾Í²»»áÉ¾³ıÒÑ°²×°µÄ¾µÏñºÍÈİÆ÷¡£
+> æ³¨ï¼šä¸åˆ é™¤`/var/lib/docker`ç›®å½•å°±ä¸ä¼šåˆ é™¤å·²å®‰è£…çš„é•œåƒå’Œå®¹å™¨ã€‚
 
-### 4.2¡¢°²×°¸ß°æ±¾Docker
+### 4.2ã€å®‰è£…é«˜ç‰ˆæœ¬Docker
 
 ```bash
 $ yum install -y docker-ce-20.10.24
@@ -739,12 +739,12 @@ $ systemctl enable docker && systemctl start docker
 
 
 
-# ¶ş¡¢DockerµÄ¼Ü¹¹ºÍµ×²ã¼¼Êõ
+# äºŒã€Dockerçš„æ¶æ„å’Œåº•å±‚æŠ€æœ¯
 
-## 1¡¢Docker Platform
+## 1ã€Docker Platform
 
-- DockerÌá¹©ÁËÒ»¸ö¿ª·¢£¬´ò°ü£¬ÔËĞĞappµÄÆ½Ì¨
-- °ÑappºÍµ×²ãinfrastructure¸ôÀë¿ªÀ´
+- Dockeræä¾›äº†ä¸€ä¸ªå¼€å‘ï¼Œæ‰“åŒ…ï¼Œè¿è¡Œappçš„å¹³å°
+- æŠŠappå’Œåº•å±‚infrastructureéš”ç¦»å¼€æ¥
 
 |         Docker Platform          |
 | :------------------------------: |
@@ -752,15 +752,15 @@ $ systemctl enable docker && systemctl start docker
 |          Docker Engine           |
 | Infrastructure(physical/virtual) |
 
-### 1.1¡¢Docker Engine
+### 1.1ã€Docker Engine
 
-- ºóÌ¨½ø³Ì£¨dockerd£©
+- åå°è¿›ç¨‹ï¼ˆdockerdï¼‰
 - REST API Server
-- CLI½Ó¿Ú£¨docker£©
+- CLIæ¥å£ï¼ˆdockerï¼‰
 
 ![image-20220312112414087](images/image-20220312112414087.png)
 
-²é¿´DockerºóÌ¨½ø³Ì£º
+æŸ¥çœ‹Dockeråå°è¿›ç¨‹ï¼š
 
 ```bash
 [vagrant@localhost ~]$ ps -ef|grep docker
@@ -769,56 +769,56 @@ root      1952     1  0 02:02 ?        00:00:00 /usr/bin/dockerd -H fd:// --cont
 
 
 
-## 2¡¢Docker Architecture
+## 2ã€Docker Architecture
 
 ![image-20220312113046549](images/image-20220312113046549.png)
 
-## 3¡¢µ×²ã¼¼ÊõÖ§³Ö
+## 3ã€åº•å±‚æŠ€æœ¯æ”¯æŒ
 
-- Namespaces£º×ö¸ôÀëpid£¬net£¬ipc£¬mnt£¬uts
-- Control groups£º×ö×ÊÔ´ÏŞÖÆ
-- Union file systems£ºContainerºÍimageµÄ·Ö²ã
-
-
+- Namespacesï¼šåšéš”ç¦»pidï¼Œnetï¼Œipcï¼Œmntï¼Œuts
+- Control groupsï¼šåšèµ„æºé™åˆ¶
+- Union file systemsï¼šContainerå’Œimageçš„åˆ†å±‚
 
 
 
-# Èı¡¢¾µÏñ
 
-## 1¡¢Ê²Ã´ÊÇImage
 
-- ÎÄ¼şºÍmeta dataµÄ¼¯ºÏ£¨root filesystem£©
-- ·Ö²ãµÄ£¬²¢ÇÒÃ¿Ò»²ã¶¼¿ÉÒÔÌí¼Ó¸Ä±ä£¬É¾³ıÎÄ¼ş£¬³ÉÎªÒ»¸öĞÂµÄimage
-- ²»Í¬µÄimage¿ÉÒÔ¹²ÏíÏàÍ¬µÄlayer
-- Image±¾ÉíÊÇread-onlyµÄ
+# ä¸‰ã€é•œåƒ
+
+## 1ã€ä»€ä¹ˆæ˜¯Image
+
+- æ–‡ä»¶å’Œmeta dataçš„é›†åˆï¼ˆroot filesystemï¼‰
+- åˆ†å±‚çš„ï¼Œå¹¶ä¸”æ¯ä¸€å±‚éƒ½å¯ä»¥æ·»åŠ æ”¹å˜ï¼Œåˆ é™¤æ–‡ä»¶ï¼Œæˆä¸ºä¸€ä¸ªæ–°çš„image
+- ä¸åŒçš„imageå¯ä»¥å…±äº«ç›¸åŒçš„layer
+- Imageæœ¬èº«æ˜¯read-onlyçš„
 
 ![image-20220312135147138](images/image-20220312135147138.png)
 
 
 
-## 2¡¢»ñÈ¡¾µÏñ
+## 2ã€è·å–é•œåƒ
 
-- »ñÈ¡Docker Hub¾µÏñ
-  - ¾µÏñÊÇÔËĞĞÈİÆ÷µÄÇ°Ìá£¬¹Ù·½µÄDocker HubÍøÕ¾ÒÑ¾­Ìá¹©ÁËÊıÊ®Íò¸ö¾µÏñ¹©¿ª·ÅÏÂÔØ¡£
-  - ÃüÁî¸ñÊ½£º `docker pull NAME[:TAG]` ÆäÖĞ£¬NAMEÊÇ¾µÏñ²Ö¿âµÄÃû³Æ£¨ÓÃÀ´Çø·Ö¾µÏñ£©£¬TAGÊÇ¾µÏñµÄ±êÇ©£¨ÍùÍùÓÃÀ´±íÊ¾°æ±¾ĞÅÏ¢£©¡£Í¨³£Çé¿öÏÂ£¬ÃèÊöÒ»¸ö¾µÏñĞèÒª°üÀ¨`Ãû³Æ+±êÇ©`ĞÅÏ¢¡£
-  - Èç¹û²»Ö¸¶¨TAG£¬Ä¬ÈÏÑ¡Ôñlatest±êÇ©£¬Õâ»áÏÂÔØ²Ö¿âÖĞ×îĞÂ°æ±¾µÄ¾µÏñ¡£
+- è·å–Docker Hubé•œåƒ
+  - é•œåƒæ˜¯è¿è¡Œå®¹å™¨çš„å‰æï¼Œå®˜æ–¹çš„Docker Hubç½‘ç«™å·²ç»æä¾›äº†æ•°åä¸‡ä¸ªé•œåƒä¾›å¼€æ”¾ä¸‹è½½ã€‚
+  - å‘½ä»¤æ ¼å¼ï¼š `docker pull NAME[:TAG]` å…¶ä¸­ï¼ŒNAMEæ˜¯é•œåƒä»“åº“çš„åç§°ï¼ˆç”¨æ¥åŒºåˆ†é•œåƒï¼‰ï¼ŒTAGæ˜¯é•œåƒçš„æ ‡ç­¾ï¼ˆå¾€å¾€ç”¨æ¥è¡¨ç¤ºç‰ˆæœ¬ä¿¡æ¯ï¼‰ã€‚é€šå¸¸æƒ…å†µä¸‹ï¼Œæè¿°ä¸€ä¸ªé•œåƒéœ€è¦åŒ…æ‹¬`åç§°+æ ‡ç­¾`ä¿¡æ¯ã€‚
+  - å¦‚æœä¸æŒ‡å®šTAGï¼Œé»˜è®¤é€‰æ‹©latestæ ‡ç­¾ï¼Œè¿™ä¼šä¸‹è½½ä»“åº“ä¸­æœ€æ–°ç‰ˆæœ¬çš„é•œåƒã€‚
 
 ```shell
-# µÈĞ§ÓÚ docker pull registry.hub.docker.com/ubuntu:14.04
+# ç­‰æ•ˆäº docker pull registry.hub.docker.com/ubuntu:14.04
 [emon@emon ~]$ docker pull ubuntu:14.04
-# ÎÒÏ²»¶µÄcentos
+# æˆ‘å–œæ¬¢çš„centos
 [emon@emon ~]$ docker pull centos:7
 ```
 
-- »ñÈ¡ÆäËû·şÎñÆ÷¾µÏñ
+- è·å–å…¶ä»–æœåŠ¡å™¨é•œåƒ
 
 ```shell
 [emon@emon ~]$ docker pull hub.c.163.com/public/ubuntu:14.04
 ```
 
-### 2.1¡¢°¸Àı£ºDIYÒ»¸öBase Image
+### 2.1ã€æ¡ˆä¾‹ï¼šDIYä¸€ä¸ªBase Image
 
-#### 2.1.1¡¢ÌåÑéhello-world¾µÏñ
+#### 2.1.1ã€ä½“éªŒhello-worldé•œåƒ
 
 ```bash
 [emon@emon ~]$ docker pull hello-world
@@ -826,15 +826,15 @@ root      1952     1  0 02:02 ?        00:00:00 /usr/bin/dockerd -H fd:// --cont
 [emon@emon ~]$ docker run hello-world
 ```
 
-#### 2.1.2¡¢DIY hello-world¾µÏñ
+#### 2.1.2ã€DIY hello-worldé•œåƒ
 
-1£º°²×°CÓïÑÔ±àÒë¹¤¾ß
+1ï¼šå®‰è£…Cè¯­è¨€ç¼–è¯‘å·¥å…·
 
 ```bash
 [emon@emon ~]$ sudo yum install -y gcc glibc-static
 ```
 
-2£º´´½¨hello.cÎÄ¼ş²¢±àÒë
+2ï¼šåˆ›å»ºhello.cæ–‡ä»¶å¹¶ç¼–è¯‘
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/hello-world
@@ -859,7 +859,7 @@ hello  hello.c
 hello docker
 ```
 
-3£º±àĞ´Dockerfile
+3ï¼šç¼–å†™Dockerfile
 
 ```bash
 [emon@emon hello-world]$ vim Dockerfile
@@ -872,9 +872,9 @@ CMD ["/hello"]
 ```
 
 ```bash
-# rushing-dockerhubÓÃ»§Ãû£» .-µ±Ç°Ä¿Â¼Ñ°ÕÒDockerfile
+# rushing-dockerhubç”¨æˆ·åï¼› .-å½“å‰ç›®å½•å¯»æ‰¾Dockerfile
 [emon@emon hello-world]$ docker build -t rushing/hello-world .
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Sending build context to Docker daemon  865.3kB
 Step 1/3 : FROM scratch
  ---> 
@@ -888,70 +888,70 @@ Successfully built 72b24c24801b
 Successfully tagged rushing/hello-world:latest
 ```
 
-4£º²é¿´
+4ï¼šæŸ¥çœ‹
 
-- ²é¿´image
+- æŸ¥çœ‹image
 
 ```bash
 [emon@emon hello-world]$ docker image ls|grep rushing
 rushing/hello-world   latest              72b24c24801b        25 seconds ago      861kB
 ```
 
-- ²é¿´imageµÄ·Ö²ã
+- æŸ¥çœ‹imageçš„åˆ†å±‚
 
 ```bash
 [emon@emon hello-world]$ docker history 72b24c24801b
 IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
 72b24c24801b        2 minutes ago       /bin/sh -c #(nop)  CMD ["/hello"]               0B                  
-340544a0099c        2 minutes ago       /bin/sh -c #(nop) ADD file:e7f35cd45d6ae73c7¡­   861kB 
+340544a0099c        2 minutes ago       /bin/sh -c #(nop) ADD file:e7f35cd45d6ae73c7â‹¯   861kB 
 ```
 
-5£ºÔËĞĞ
+5ï¼šè¿è¡Œ
 
 ```bash
 [emon@emon hello-world]$ docker run rushing/hello-world
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 hello docker
 ```
 
 
 
-## 3¡¢²é¿´¾µÏñ
+## 3ã€æŸ¥çœ‹é•œåƒ
 
-- Ê¹ÓÃ`docker images`ÃüÁîÁĞ³ö¾µÏñ
+- ä½¿ç”¨`docker images`å‘½ä»¤åˆ—å‡ºé•œåƒ
 
 ```shell
 [emon@emon ~]$ docker images
-# »òÕß
+# æˆ–è€…
 [emon@emon ~]$ docker image ls
 ```
 
-- ÁĞÃû½âÎö£º
+- åˆ—åè§£æï¼š
 
-| ÁĞÃû       | ÊÍÒå                                                         |
+| åˆ—å       | é‡Šä¹‰                                                         |
 | ---------- | ------------------------------------------------------------ |
-| REPOSITORY | À´×ÔÓÚÄÄ¸ö²Ö¿â£¬±ÈÈçubuntu²Ö¿âÓÃÀ´±£´æubuntuÏµÁĞ»ù´¡¾µÏñ     |
-| TAG        | ¾µÏñµÄ±êÇ©ĞÅÏ¢£¬±ÈÈç14.04¡¢latestÓÃÀ´±ê×¢²»Í¬µÄ°æ±¾ĞÅÏ¢¡£±êÇ©Ö»ÊÇ±ê¼Ç£¬²»±êÊ¶¾µÏñÄÚÈİ |
-| IMAGE ID   | ¾µÏñµÄID£¨Î¨Ò»±êÊ¶¾µÏñ£©£¬±ÈÈçubuntu:14.04µÄÎ¨Ò»±êÖ¾ÊÇ 971bb384a50a |
-| CREATED    | ´´½¨Ê±¼ä£¬ËµÃ÷¾µÏñ×îºóµÄ¸üĞÂÊ±¼ä                             |
-| SIZE       | ¾µÏñ´óĞ¡£¬ÓÅĞãµÄ¾µÏñÍùÍùÌå»ı±È½ÏĞ¡                           |
+| REPOSITORY | æ¥è‡ªäºå“ªä¸ªä»“åº“ï¼Œæ¯”å¦‚ubuntuä»“åº“ç”¨æ¥ä¿å­˜ubuntuç³»åˆ—åŸºç¡€é•œåƒ     |
+| TAG        | é•œåƒçš„æ ‡ç­¾ä¿¡æ¯ï¼Œæ¯”å¦‚14.04ã€latestç”¨æ¥æ ‡æ³¨ä¸åŒçš„ç‰ˆæœ¬ä¿¡æ¯ã€‚æ ‡ç­¾åªæ˜¯æ ‡è®°ï¼Œä¸æ ‡è¯†é•œåƒå†…å®¹ |
+| IMAGE ID   | é•œåƒçš„IDï¼ˆå”¯ä¸€æ ‡è¯†é•œåƒï¼‰ï¼Œæ¯”å¦‚ubuntu:14.04çš„å”¯ä¸€æ ‡å¿—æ˜¯ 971bb384a50a |
+| CREATED    | åˆ›å»ºæ—¶é—´ï¼Œè¯´æ˜é•œåƒæœ€åçš„æ›´æ–°æ—¶é—´                             |
+| SIZE       | é•œåƒå¤§å°ï¼Œä¼˜ç§€çš„é•œåƒå¾€å¾€ä½“ç§¯æ¯”è¾ƒå°                           |
 
-- ÃüÁîÖ§³ÖµÄÑ¡Ïî
+- å‘½ä»¤æ”¯æŒçš„é€‰é¡¹
 
-| ²ÎÊıÃû³Æ                | ²ÎÊı×÷ÓÃ                                                     |
+| å‚æ•°åç§°                | å‚æ•°ä½œç”¨                                                     |
 | ----------------------- | ------------------------------------------------------------ |
-| -a, --all=true\|false   | ÁĞ³öËùÓĞµÄ¾µÏñÎÄ¼ş£¨°üÀ¨ÁÙÊ±ÎÄ¼ş£©£¬Ä¬ÈÏÎª·ñ                 |
-| --digests=true\|false   | ÁĞ³ö¾µÏñµÄÊı×ÖÕªÒªÖµ£¬Ä¬ÈÏÎª·ñ                               |
-| -f, --filter=[]         | ¹ıÂËÁĞ³öµÄ¾µÏñ£¬Èçdangling=trueÖ»ÏÔÊ¾Ã»ÓĞ±»Ê¹ÓÃµÄ¾µÏñ£»Ò²¿ÉÒÔÖ¸¶¨´øÓĞÌØ¶¨±ê×¢µÄ¾µÏñµÈ |
-| --format="TEMPLATE"     | ¿ØÖÆÊä³ö¸ñÊ½£¬ÀıÈç`.ID`´ú±íIDĞÅÏ¢£¬`.Repository`´ú±í²Ö¿âĞÅÏ¢µÈ |
-| --no-trunc=true\|false  | ¶ÔÊä³ö½á¹ûÖĞÌ«³¤µÄ²¿·ÖÊÇ·ñ½øĞĞ½Ø¶Ï£¬Èç¾µÏñµÄIDĞÅÏ¢£¬Ä¬ÈÏÎªÊÇ |
-| -q, --quiet=true\|false | ½öÊä³öIDĞÅÏ¢£¬Ä¬ÈÏÎª·ñ                                       |
+| -a, --all=true\|false   | åˆ—å‡ºæ‰€æœ‰çš„é•œåƒæ–‡ä»¶ï¼ˆåŒ…æ‹¬ä¸´æ—¶æ–‡ä»¶ï¼‰ï¼Œé»˜è®¤ä¸ºå¦                 |
+| --digests=true\|false   | åˆ—å‡ºé•œåƒçš„æ•°å­—æ‘˜è¦å€¼ï¼Œé»˜è®¤ä¸ºå¦                               |
+| -f, --filter=[]         | è¿‡æ»¤åˆ—å‡ºçš„é•œåƒï¼Œå¦‚dangling=trueåªæ˜¾ç¤ºæ²¡æœ‰è¢«ä½¿ç”¨çš„é•œåƒï¼›ä¹Ÿå¯ä»¥æŒ‡å®šå¸¦æœ‰ç‰¹å®šæ ‡æ³¨çš„é•œåƒç­‰ |
+| --format="TEMPLATE"     | æ§åˆ¶è¾“å‡ºæ ¼å¼ï¼Œä¾‹å¦‚`.ID`ä»£è¡¨IDä¿¡æ¯ï¼Œ`.Repository`ä»£è¡¨ä»“åº“ä¿¡æ¯ç­‰ |
+| --no-trunc=true\|false  | å¯¹è¾“å‡ºç»“æœä¸­å¤ªé•¿çš„éƒ¨åˆ†æ˜¯å¦è¿›è¡Œæˆªæ–­ï¼Œå¦‚é•œåƒçš„IDä¿¡æ¯ï¼Œé»˜è®¤ä¸ºæ˜¯ |
+| -q, --quiet=true\|false | ä»…è¾“å‡ºIDä¿¡æ¯ï¼Œé»˜è®¤ä¸ºå¦                                       |
 
-	ÆäÖĞ£¬¶ÔÊä³ö½á¹û½øĞĞ¿ØÖÆµÄÑ¡ÏîÈç-f, --filter=[]¡¢--no-trunc=true|false¡¢-q, --quiet=true|falseµÈ£¬¶Ô´ó²¿·Ö×ÓÃüÁî¶¼Ö§³Ö¡£
+	å…¶ä¸­ï¼Œå¯¹è¾“å‡ºç»“æœè¿›è¡Œæ§åˆ¶çš„é€‰é¡¹å¦‚-f, --filter=[]ã€--no-trunc=true|falseã€-q, --quiet=true|falseç­‰ï¼Œå¯¹å¤§éƒ¨åˆ†å­å‘½ä»¤éƒ½æ”¯æŒã€‚
 
-## 4¡¢Îª¾µÏñÌí¼Ó±êÇ©Tag
+## 4ã€ä¸ºé•œåƒæ·»åŠ æ ‡ç­¾Tag
 
-	ÎªÁË·½±ãÔÚºóĞø¹¤×÷ÖĞÊ¹ÓÃÌØ¶¨¾µÏñ£¬»¹¿ÉÒÔÊ¹ÓÃ`docker tag`ÃüÁîÀ´Îª±¾µØ¾µÏñÈÎÒâÌí¼ÓĞÂµÄ±êÇ©¡£
+	ä¸ºäº†æ–¹ä¾¿åœ¨åç»­å·¥ä½œä¸­ä½¿ç”¨ç‰¹å®šé•œåƒï¼Œè¿˜å¯ä»¥ä½¿ç”¨`docker tag`å‘½ä»¤æ¥ä¸ºæœ¬åœ°é•œåƒä»»æ„æ·»åŠ æ–°çš„æ ‡ç­¾ã€‚
 
 ```shell
 [emon@emon ~]$ docker tag centos:7 centos:7.8
@@ -961,32 +961,32 @@ centos              7                   b5b4d78bc90c        2 days ago          
 centos              7.8                 b5b4d78bc90c        2 days ago          203MB
 ```
 
-## 5¡¢Ê¹ÓÃ`inspect`ÃüÁî²é¿´¾µÏñÏêÏ¸ĞÅÏ¢
+## 5ã€ä½¿ç”¨`inspect`å‘½ä»¤æŸ¥çœ‹é•œåƒè¯¦ç»†ä¿¡æ¯
 
 ```shell
 [emon@emon ~]$ docker inspect centos:7
 ```
 
-## 6¡¢ËÑÑ°¾µÏñ
+## 6ã€æœå¯»é•œåƒ
 
-	Ê¹ÓÃdocker searchÃüÁî¿ÉÒÔËÑË÷Ô¶¶Ë²Ö¿âÖĞ¹²ÏíµÄ¾µÏñ£¬Ä¬ÈÏËÑË÷¹Ù·½²Ö¿âÖĞµÄ¾µÏñ¡£Ö§³ÖµÄ²ÎÊıÖ÷Òª°üÀ¨£º
+	ä½¿ç”¨docker searchå‘½ä»¤å¯ä»¥æœç´¢è¿œç«¯ä»“åº“ä¸­å…±äº«çš„é•œåƒï¼Œé»˜è®¤æœç´¢å®˜æ–¹ä»“åº“ä¸­çš„é•œåƒã€‚æ”¯æŒçš„å‚æ•°ä¸»è¦åŒ…æ‹¬ï¼š
 
-| ²ÎÊıÃû³Æ                          | ²ÎÊı×÷ÓÃ                                                     |
+| å‚æ•°åç§°                          | å‚æ•°ä½œç”¨                                                     |
 | --------------------------------- | ------------------------------------------------------------ |
-| --filter=is-automated=true\|false | ½öÏÔÊ¾×Ô¶¯´´½¨µÄ¾µÏñ£¬Ä¬ÈÏÎª·ñ                               |
-| --no-trunc=true\|false            | Êä³öĞÅÏ¢²»½Ø¶ÏÏÔÊ¾£¬Ä¬ÈÏÎª·ñ                                 |
-| --filter=stars=3                  | Ö¸¶¨½öÏÔÊ¾ÆÀ¼ÛÎªÖ¸¶¨ĞÇ¼¶ÒÔÉÏµÄ¾µÏñ£¬Ä¬ÈÏÎª0£¬¼´Êä³öËùÓĞ¾µÏñ¡£ |
-| --filter=is-official=true         | ½ö²éÑ¯¹Ù·½¾µÏñ                                               |
+| --filter=is-automated=true\|false | ä»…æ˜¾ç¤ºè‡ªåŠ¨åˆ›å»ºçš„é•œåƒï¼Œé»˜è®¤ä¸ºå¦                               |
+| --no-trunc=true\|false            | è¾“å‡ºä¿¡æ¯ä¸æˆªæ–­æ˜¾ç¤ºï¼Œé»˜è®¤ä¸ºå¦                                 |
+| --filter=stars=3                  | æŒ‡å®šä»…æ˜¾ç¤ºè¯„ä»·ä¸ºæŒ‡å®šæ˜Ÿçº§ä»¥ä¸Šçš„é•œåƒï¼Œé»˜è®¤ä¸º0ï¼Œå³è¾“å‡ºæ‰€æœ‰é•œåƒã€‚ |
+| --filter=is-official=true         | ä»…æŸ¥è¯¢å®˜æ–¹é•œåƒ                                               |
 
-Ê¾Àı£º
+ç¤ºä¾‹ï¼š
 
 ```shell
 [emon@emon ~]$ docker search --filter=stars=3 --filter=is-official=true nginx
 ```
 
-## 7¡¢É¾³ı¾µÏñ
+## 7ã€åˆ é™¤é•œåƒ
 
-- Ê¹ÓÃ±êÇ©É¾³ı¾µÏñ£¬ÃüÁî¸ñÊ½£º `docker rmi IMAGE [IMAGE...]`£¬ÆäÖĞIMAGE¿ÉÒÔÊÇ±êÇ©»òÕßID
+- ä½¿ç”¨æ ‡ç­¾åˆ é™¤é•œåƒï¼Œå‘½ä»¤æ ¼å¼ï¼š `docker rmi IMAGE [IMAGE...]`ï¼Œå…¶ä¸­IMAGEå¯ä»¥æ˜¯æ ‡ç­¾æˆ–è€…ID
 
 ```shell
 [emon@emon ~]$ docker rmi centos:7.8
@@ -995,40 +995,40 @@ REPOSITORY          TAG                 IMAGE ID            CREATED             
 centos              7                   b5b4d78bc90c        2 days ago          203MB
 ```
 
-- Ê¹ÓÃ¾µÏñID£¨»òÕß²¿·ÖID´®Ç°×º£©É¾³ı¾µÏñ
+- ä½¿ç”¨é•œåƒIDï¼ˆæˆ–è€…éƒ¨åˆ†IDä¸²å‰ç¼€ï¼‰åˆ é™¤é•œåƒ
 
 ```shell
 [emon@emon ~]$ docker rmi -f b5b4d78bc90c
 ```
 
-	ÃüÁîº¬Òå£º»áÏÈ³¢ÊÔÉ¾³ıËùÓĞÖ¸Ïò¸Ã¾µÏñµÄ±êÇ©£¬È»ºóÉ¾³ı¸Ã¾µÏñÎÄ¼ş±¾Éí¡£ÄÄÅÂ»ùÓÚ¸Ã¾µÏñÆô¶¯ÁËÈİÆ÷£¬Ò²»áÉ¾³ı¾µÏñ¡£µ«²»Ó°ÏìÈİÆ÷¡£
+	å‘½ä»¤å«ä¹‰ï¼šä¼šå…ˆå°è¯•åˆ é™¤æ‰€æœ‰æŒ‡å‘è¯¥é•œåƒçš„æ ‡ç­¾ï¼Œç„¶ååˆ é™¤è¯¥é•œåƒæ–‡ä»¶æœ¬èº«ã€‚å“ªæ€•åŸºäºè¯¥é•œåƒå¯åŠ¨äº†å®¹å™¨ï¼Œä¹Ÿä¼šåˆ é™¤é•œåƒã€‚ä½†ä¸å½±å“å®¹å™¨ã€‚
 
-- ÅúÁ¿É¾³ıÂú×ãÌõ¼şµÄ¾µÏñ
+- æ‰¹é‡åˆ é™¤æ»¡è¶³æ¡ä»¶çš„é•œåƒ
 
 ```bash
 [emon@emon harbor]$ docker rmi $(docker images goharbor/* -q)
 ```
 
-## 8¡¢´´½¨¾µÏñ
+## 8ã€åˆ›å»ºé•œåƒ
 
-	´´½¨¾µÏñµÄ·½·¨Ö÷ÒªÓĞÈıÖÖ£º»ùÓÚÒÑÓĞ¾µÏñµÄÈİÆ÷´´½¨¡¢»ùÓÚ±¾µØÄ£°åµ¼Èë¡¢»ùÓÚDockerfile´´½¨¡£
+	åˆ›å»ºé•œåƒçš„æ–¹æ³•ä¸»è¦æœ‰ä¸‰ç§ï¼šåŸºäºå·²æœ‰é•œåƒçš„å®¹å™¨åˆ›å»ºã€åŸºäºæœ¬åœ°æ¨¡æ¿å¯¼å…¥ã€åŸºäºDockerfileåˆ›å»ºã€‚
 
-### 8.1¡¢»ùÓÚÒÑÓĞ¾µÏñµÄÈİÆ÷´´½¨¡¾²»ÍÆ¼ö¡¿
+### 8.1ã€åŸºäºå·²æœ‰é•œåƒçš„å®¹å™¨åˆ›å»ºã€ä¸æ¨èã€‘
 
-<span style="color:red;font-weight:bold;">²»»á°ÑÍâ²¿¹ÒÔØµÄ×ÊÔ´´ò°üµ½¾µÏñ</span>
+<span style="color:red;font-weight:bold;">ä¸ä¼šæŠŠå¤–éƒ¨æŒ‚è½½çš„èµ„æºæ‰“åŒ…åˆ°é•œåƒ</span>
 
-¸Ã·½·¨Ö÷ÒªÊÇÊ¹ÓÃdocker commitÃüÁî£»µÈĞ§ÃüÁî£ºdocker container commit
+è¯¥æ–¹æ³•ä¸»è¦æ˜¯ä½¿ç”¨docker commitå‘½ä»¤ï¼›ç­‰æ•ˆå‘½ä»¤ï¼šdocker container commit
 
-ÃüÁî¸ñÊ½Îª`docker commit [OPTIONS] CONTAINTER [REPOSITORY[:TAG]]`£¬Ö÷ÒªÑ¡Ïî°üÀ¨£º
+å‘½ä»¤æ ¼å¼ä¸º`docker commit [OPTIONS] CONTAINTER [REPOSITORY[:TAG]]`ï¼Œä¸»è¦é€‰é¡¹åŒ…æ‹¬ï¼š
 
-| ²ÎÊıÃû³Æ         | ²ÎÊı×÷ÓÃ                                                     |
+| å‚æ•°åç§°         | å‚æ•°ä½œç”¨                                                     |
 | ---------------- | ------------------------------------------------------------ |
-| -a, --author=""  | ×÷ÕßĞÅÏ¢                                                     |
-| -c, --change=[]  | Ìá½»µÄÊÔÊÔÖ´ĞĞDockerfileÖ¸Áî£¬°üÀ¨CMD\|ENTRYPOINT\|ENV\|EXPOSE\|LABEL\|ONBUILD\|USER\|VOLUME\|WORKDIRµÈ |
-| -m, --message="" | Ìá½»ĞÅÏ¢                                                     |
-| -p, --pause=true | Ìá½»Ê±ÔİÍ£ÈİÆ÷ÔËĞĞ                                           |
+| -a, --author=""  | ä½œè€…ä¿¡æ¯                                                     |
+| -c, --change=[]  | æäº¤çš„è¯•è¯•æ‰§è¡ŒDockerfileæŒ‡ä»¤ï¼ŒåŒ…æ‹¬CMD\|ENTRYPOINT\|ENV\|EXPOSE\|LABEL\|ONBUILD\|USER\|VOLUME\|WORKDIRç­‰ |
+| -m, --message="" | æäº¤ä¿¡æ¯                                                     |
+| -p, --pause=true | æäº¤æ—¶æš‚åœå®¹å™¨è¿è¡Œ                                           |
 
-1. Ê×ÏÈ£¬Æô¶¯Ò»¸ö¾µÏñ£¬²¢ÔÚÆäÖĞ½øĞĞĞŞ¸Ä²Ù×÷£¬ÀıÈç´´½¨Ò»¸ötestÎÄ¼ş£¬Ö®ºóÍÆ³ö£º
+1. é¦–å…ˆï¼Œå¯åŠ¨ä¸€ä¸ªé•œåƒï¼Œå¹¶åœ¨å…¶ä¸­è¿›è¡Œä¿®æ”¹æ“ä½œï¼Œä¾‹å¦‚åˆ›å»ºä¸€ä¸ªtestæ–‡ä»¶ï¼Œä¹‹åæ¨å‡ºï¼š
 
 ```shell
 [emon@emon ~]$ docker run -it ubuntu:14.04 /bin/bash
@@ -1036,32 +1036,32 @@ root@fe1aa9bd8460:/# touch test
 root@fe1aa9bd8460:/# exit
 ```
 
-¼Ç×¡ÈİÆ÷µÄIDÎª fe1aa9bd8460¡£
+è®°ä½å®¹å™¨çš„IDä¸º fe1aa9bd8460ã€‚
 
-´ËÊ±£¬¸ÃÈİÆ÷¸úÔ­ubuntu:14.04¾µÏñÏà±È£¬ÒÑ¾­·¢ÉúÁË±ä»¯£¬¿ÉÒÔÊ¹ÓÃ`docker commit`ÃüÁîÌá½»Î´Ò»¸öĞÂµÄ¾µÏñ¡£Ìá½»Ê±¿ÉÒÔÊ¹ÓÃID»òÕßÃû³ÆÀ´Ö¸¶¨ÈİÆ÷£º
+æ­¤æ—¶ï¼Œè¯¥å®¹å™¨è·ŸåŸubuntu:14.04é•œåƒç›¸æ¯”ï¼Œå·²ç»å‘ç”Ÿäº†å˜åŒ–ï¼Œå¯ä»¥ä½¿ç”¨`docker commit`å‘½ä»¤æäº¤æœªä¸€ä¸ªæ–°çš„é•œåƒã€‚æäº¤æ—¶å¯ä»¥ä½¿ç”¨IDæˆ–è€…åç§°æ¥æŒ‡å®šå®¹å™¨ï¼š
 
 ```shell
 [emon@emon ~]$ docker commit -m "Added a new file" -a "Emon" fe1aa9bd8460 test:0.0.1
 ```
 
-### 8.2¡¢»ùÓÚ±¾µØÄ£°åµ¼Èë
+### 8.2ã€åŸºäºæœ¬åœ°æ¨¡æ¿å¯¼å…¥
 
-ÓÃ»§Ò²¿ÉÒÔÖ±½Ó´ÓÒ»¸ö²Ù×÷ÏµÍ³Ä£°åÎÄ¼şµ¼ÈëÒ»¸ö¾µÏñ£¬Ö÷ÒªÊ¹ÓÃ`docker import`ÃüÁî¡£
+ç”¨æˆ·ä¹Ÿå¯ä»¥ç›´æ¥ä»ä¸€ä¸ªæ“ä½œç³»ç»Ÿæ¨¡æ¿æ–‡ä»¶å¯¼å…¥ä¸€ä¸ªé•œåƒï¼Œä¸»è¦ä½¿ç”¨`docker import`å‘½ä»¤ã€‚
 
-ÃüÁî¸ñÊ½Îª`docker import [OPTIONS] file|URL| - [REPOSITORY[:TAG]]`
+å‘½ä»¤æ ¼å¼ä¸º`docker import [OPTIONS] file|URL| - [REPOSITORY[:TAG]]`
 
-### 8.3¡¢»ùÓÚDockerfile´´½¨¡¾ÍÆ¼ö¡¿
+### 8.3ã€åŸºäºDockerfileåˆ›å»ºã€æ¨èã€‘
 
-docker buildÃüÁî£»µÈĞ§ÃüÁî£ºdocker image build
+docker buildå‘½ä»¤ï¼›ç­‰æ•ˆå‘½ä»¤ï¼šdocker image build
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir docker-centos-vim
 [emon@emon ~]$ cd docker-centos-vim/
 ```
 
-2£º´´½¨Dockerfile
+2ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon docker-centos-vim]$ vim Dockerfile 
@@ -1072,75 +1072,75 @@ FROM centos:7
 RUN yum install -y vim
 ```
 
-3£º´´½¨¾µÏñ
+3ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
-# -t Ö¸¶¨repositoryÃû³ÆÎª rushing/centos-vim:latest ÆäÖĞrushingÊÇdockerhubÓÃ»§Ãû£» .-µ±Ç°Ä¿Â¼Ñ°ÕÒDockerfile
+# -t æŒ‡å®šrepositoryåç§°ä¸º rushing/centos-vim:latest å…¶ä¸­rushingæ˜¯dockerhubç”¨æˆ·åï¼› .-å½“å‰ç›®å½•å¯»æ‰¾Dockerfile
 [emon@emon docker-centos-vim]$ docker build -t rushing/centos-vim .
 ```
 
 
 
-## 9¡¢´æ³öºÍÔØÈë¾µÏñ
+## 9ã€å­˜å‡ºå’Œè½½å…¥é•œåƒ
 
-ÓÃ»§¿ÉÒÔÊ¹ÓÃ`docker save`ºÍ`docker load`ÃüÁîÀ´´æ³öºÍÔØÈë¾µÏñ¡£
+ç”¨æˆ·å¯ä»¥ä½¿ç”¨`docker save`å’Œ`docker load`å‘½ä»¤æ¥å­˜å‡ºå’Œè½½å…¥é•œåƒã€‚
 
-### 9.1¡¢´æ³ö¾µÏñ
+### 9.1ã€å­˜å‡ºé•œåƒ
 
 ```shell
 [emon@emon ~]$ docker save -o test_0.0.1.tar test:0.0.1
 ```
 
-ËµÃ÷£ºÓÉÓÚÊÇÍ¨¹ısudoÊ¹ÓÃµÄdockerÃüÁî£¬ÕâÀïµ½´¦µÄ¾µÏñÊôÓÚrootÓÃ»§£»¸Ã¾µÏñ¿ÉÒÔ·Ö·¢¸øÆäËûÈËµ¼Èë¡£
+è¯´æ˜ï¼šç”±äºæ˜¯é€šè¿‡sudoä½¿ç”¨çš„dockerå‘½ä»¤ï¼Œè¿™é‡Œåˆ°å¤„çš„é•œåƒå±äºrootç”¨æˆ·ï¼›è¯¥é•œåƒå¯ä»¥åˆ†å‘ç»™å…¶ä»–äººå¯¼å…¥ã€‚
 
-### 9.2¡¢ÔØÈë¾µÏñ
+### 9.2ã€è½½å…¥é•œåƒ
 
 ```shell
 [emon@emon ~]$ docker load --input test_0.0.1.tar 
 ```
 
-»òÕß£¬Ê¹ÓÃrootÓÃ»§Ö´ĞĞ£º
+æˆ–è€…ï¼Œä½¿ç”¨rootç”¨æˆ·æ‰§è¡Œï¼š
 
 ```shell
 [root@emon ~]# docker load < /home/emon/test_0.0.1.tar 
 ```
 
-»òÕß£¬Ê¹ÓÃ·ÇrootÈçÏÂÖ´ĞĞ£º
+æˆ–è€…ï¼Œä½¿ç”¨érootå¦‚ä¸‹æ‰§è¡Œï¼š
 
 ```shell
 [emon@emon ~]$ sudo bash -c "chown emon.emon test_0.0.1.tar;docker load < test_0.0.1.tar"
 ```
 
-ËµÃ÷£ºÖ±½ÓÊ¹ÓÃdocker loadÃüÁî£¬·ÇrootÓÃ»§ÓĞÈ¨ÏŞÏŞÖÆ£º
+è¯´æ˜ï¼šç›´æ¥ä½¿ç”¨docker loadå‘½ä»¤ï¼Œérootç”¨æˆ·æœ‰æƒé™é™åˆ¶ï¼š
 
 ```shell
 [emon@emon ~]$ docker load < test_0.0.1.tar 
--bash: test_0.0.1.tar: È¨ÏŞ²»¹»
+-bash: test_0.0.1.tar: æƒé™ä¸å¤Ÿ
 ```
 
-## 10¡¢ÉÏ´«¾µÏñ
+## 10ã€ä¸Šä¼ é•œåƒ
 
-ÒÔÊ¹ÓÃdocker pushÃüÁîÉÏ´«¾µÏñµ½²Ö¿â£¬Ä¬ÈÏÉÏ´«µ½Docker Hub¹Ù·½²Ö¿â£¨ĞèÒªµÇÂ¼£©¡£ÃüÁî¸ñÊ½Îª£º
+ä»¥ä½¿ç”¨docker pushå‘½ä»¤ä¸Šä¼ é•œåƒåˆ°ä»“åº“ï¼Œé»˜è®¤ä¸Šä¼ åˆ°Docker Hubå®˜æ–¹ä»“åº“ï¼ˆéœ€è¦ç™»å½•ï¼‰ã€‚å‘½ä»¤æ ¼å¼ä¸ºï¼š
 
 `docker push NAME[:TAG] | [REGISTRY_HOST[:REGISTRY_PORT]/]NAME[:TAG]`
 
-ÓÃ»§ÔÚDocker HubÍøÕ¾×¢²áºó¿ÉÒÔÉÏ´«×ÔÖÆµÄ¾µÏñ¡£ÀıÈçÓÃ»§userÉÏ´«±¾µØµÄtest:latest¾µÏñ£¬¿ÉÒÔÏÈÌí¼ÓĞÂµÄ±êÇ©user/test:latest£¬È»ºóÓÃdocker pushÃüÁîÉÏ´«¾µÏñ£»
+ç”¨æˆ·åœ¨Docker Hubç½‘ç«™æ³¨å†Œåå¯ä»¥ä¸Šä¼ è‡ªåˆ¶çš„é•œåƒã€‚ä¾‹å¦‚ç”¨æˆ·userä¸Šä¼ æœ¬åœ°çš„test:latesté•œåƒï¼Œå¯ä»¥å…ˆæ·»åŠ æ–°çš„æ ‡ç­¾user/test:latestï¼Œç„¶åç”¨docker pushå‘½ä»¤ä¸Šä¼ é•œåƒï¼›
 
-**ÇëÈ·±£×Ô¼ºÔÚ [Docker Hub](https://hub.docker.com/) ÉÏÓĞ×¢²áµÄÓÃ»§£¬²¢°ÑuserÌæ»»Îª×Ô¼ºµÄÓÃ»§Ãû**
+**è¯·ç¡®ä¿è‡ªå·±åœ¨ [Docker Hub](https://hub.docker.com/) ä¸Šæœ‰æ³¨å†Œçš„ç”¨æˆ·ï¼Œå¹¶æŠŠuseræ›¿æ¢ä¸ºè‡ªå·±çš„ç”¨æˆ·å**
 
-1. ´ò±êÇ©
+1. æ‰“æ ‡ç­¾
 
 ```shell
 [emon@emon ~]$ docker tag test:0.0.1 rushing/test:0.0.1
 ```
 
-2. µÇÂ¼ Docker Hub
+2. ç™»å½• Docker Hub
 
 ```shell
 [emon@emon ~]$ docker login
 ```
 
-3. ÉÏ´«
+3. ä¸Šä¼ 
 
 ```shell
 [emon@emon ~]$ docker push rushing/test:0.0.1
@@ -1152,23 +1152,23 @@ RUN yum install -y vim
 
 
 
-## 11¡¢¹¹½¨×Ô¼ºµÄdockerË½·ş
+## 11ã€æ„å»ºè‡ªå·±çš„dockerç§æœ
 
-- ´´½¨dockerË½·ş
+- åˆ›å»ºdockerç§æœ
 
-·ÃÎÊ£ºhttps://hub.docker.com/
+è®¿é—®ï¼šhttps://hub.docker.com/
 
-·ÃÎÊregistryË½·şÎÄµµ£ºhttps://docs.docker.com/registry/spec/api/#listing-repositories
+è®¿é—®registryç§æœæ–‡æ¡£ï¼šhttps://docs.docker.com/registry/spec/api/#listing-repositories
 
-ËÑË÷£ºregistry£¬ÕÒµ½¹Ù·½Ìá¹©µÄregistry£¬ÓÃÀ´´æ´¢ºÍ·¢²¼docker image¡£
+æœç´¢ï¼šregistryï¼Œæ‰¾åˆ°å®˜æ–¹æä¾›çš„registryï¼Œç”¨æ¥å­˜å‚¨å’Œå‘å¸ƒdocker imageã€‚
 
 ```bash
 [emon@emon ~]$ docker run -d -p 5000:5000 --restart always --name registry registry:2
 ```
 
-- Ë½·ş°²È«¿ØÖÆ
+- ç§æœå®‰å…¨æ§åˆ¶
 
-¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ
+å¯¹æ–‡ä»¶ `/etc/docker/daemon.json` è¿½åŠ  `insecure-registries`å†…å®¹
 
 ```bash
 {
@@ -1177,54 +1177,54 @@ RUN yum install -y vim
 }
 ```
 
-¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º
+å¯¹æ–‡ä»¶ `/lib/systemd/system/docker.service` è¿½åŠ `EnvironmentFile`ï¼š
 
 ```bash
-# ÔÚExecStartºóÃæÒ»ĞĞ×·¼Ó
+# åœ¨ExecStartåé¢ä¸€è¡Œè¿½åŠ 
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
-ÖØÆôDocker·şÎñ£º
+é‡å¯DockeræœåŠ¡ï¼š
 
 ```bash
 [emon@emon hello-world]$ sudo systemctl daemon-reload
 [emon@emon hello-world]$ sudo systemctl restart docker
 ```
 
-- ¶ÔDIYµÄhello-world¾µÏñ£¬ÖØĞÂ±àÒë³ÉĞÂµÄ¾µÏñ£º
+- å¯¹DIYçš„hello-worldé•œåƒï¼Œé‡æ–°ç¼–è¯‘æˆæ–°çš„é•œåƒï¼š
 
 ```bash
-# ×¢Òâ£ºÕâÀïÊÇ rushing ==> emon:5000
+# æ³¨æ„ï¼šè¿™é‡Œæ˜¯ rushing ==> emon:5000
 [emon@emon hello-world]$ docker build -t emon:5000/hello-world .
 [emon@emon hello-world]$ docker images | grep hello
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 emon:5000/hello-world      latest              da65ce820d2d        29 seconds ago      861kB
 ```
 
-- ÉÏ´«µ½±¾µØdockerË½·ş
+- ä¸Šä¼ åˆ°æœ¬åœ°dockerç§æœ
 
 ```bash
 [emon@emon hello-world]$ docker push emon:5000/hello-world
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 The push refers to repository [emon:5000/hello-world]
 da4136101ba6: Pushed 
 latest: digest: sha256:77042e6c954be4845eaf2181e4c7cb6d51441fb00cf2c45513b1040cb68f5d32 size: 527
 ```
 
-- ÑéÖ¤Ë½·ş
+- éªŒè¯ç§æœ
 
-·ÃÎÊ£ºhttp://emon:5000/v2/_catalog
+è®¿é—®ï¼šhttp://emon:5000/v2/_catalog
 
-- É¾³ı±¾µØhelle-worldµÄimage£¬²¢´ÓË½·şpullÏÂÀ´
+- åˆ é™¤æœ¬åœ°helle-worldçš„imageï¼Œå¹¶ä»ç§æœpullä¸‹æ¥
 
 ```bash
 [emon@emon ~]$ docker rmi < imageId >
 [emon@emon ~]$ docker pull emon:5000/hello-world
 ```
 
-## 12¡¢¾µÏñË½·şHarbor¡¾ÍÆ¼ö¡¿
+## 12ã€é•œåƒç§æœHarborã€æ¨èã€‘
 
-1. ÏÂÔØµØÖ·
+1. ä¸‹è½½åœ°å€
 
 https://github.com/goharbor/harbor/releases
 
@@ -1232,80 +1232,80 @@ https://github.com/goharbor/harbor/releases
 [emon@emon ~]$ wget -cP /usr/local/src/ https://github.com/goharbor/harbor/releases/download/v2.2.4/harbor-offline-installer-v2.2.4.tgz
 ```
 
-2. ´´½¨½âÑ¹Ä¿Â¼
+2. åˆ›å»ºè§£å‹ç›®å½•
 
 ```bash
-# ´´½¨Harbor½âÑ¹Ä¿Â¼
+# åˆ›å»ºHarborè§£å‹ç›®å½•
 [emon@emon ~]$ mkdir /usr/local/Harbor
-# ´´½¨HarborµÄvolumeÄ¿Â¼
+# åˆ›å»ºHarborçš„volumeç›®å½•
 [emon@emon ~]$ mkdir /usr/local/dockerv/harbor_home
 ```
 
-3. ½âÑ¹
+3. è§£å‹
 
 ```bash
-# ÍÆ¼öv2.2.4°æ±¾£¬¸ü¸ß°æ±¾±ÈÈç2.3ºÍ2.4ÓĞdocker-compose down -v ==> down-compose up -dÊ±postgresql·şÎñÆô¶¯²»ÁËµÄbug£¬Êı¾İ¿âÖØÆôÊ§°Ü£¡
+# æ¨èv2.2.4ç‰ˆæœ¬ï¼Œæ›´é«˜ç‰ˆæœ¬æ¯”å¦‚2.3å’Œ2.4æœ‰docker-compose down -v ==> down-compose up -dæ—¶postgresqlæœåŠ¡å¯åŠ¨ä¸äº†çš„bugï¼Œæ•°æ®åº“é‡å¯å¤±è´¥ï¼
 [emon@emon ~]$ tar -zxvf /usr/local/src/harbor-offline-installer-v2.2.4.tgz -C 
 /usr/local/Harbor/
 [emon@emon ~]$ ls /usr/local/Harbor/harbor
 common.sh  harbor.v2.2.4.tar.gz  harbor.yml.tmpl  install.sh  LICENSE  prepare
 ```
 
-4. ´´½¨×ÔÇ©ÃûÖ¤Êé¡¾²Î¿¼ÊµÏÖ£¬½¨Òé×ßÕı¹æÇşµÀµÄCAÖ¤Êé¡¿¡¾È±ÉÙÖ¤ÊéÎŞ·¨ä¯ÀÀÆ÷µÇÂ¼¡¿
+4. åˆ›å»ºè‡ªç­¾åè¯ä¹¦ã€å‚è€ƒå®ç°ï¼Œå»ºè®®èµ°æ­£è§„æ¸ é“çš„CAè¯ä¹¦ã€‘ã€ç¼ºå°‘è¯ä¹¦æ— æ³•æµè§ˆå™¨ç™»å½•ã€‘
 
-- ´´½¨Ö¤Êé´æ·ÅÄ¿Â¼
+- åˆ›å»ºè¯ä¹¦å­˜æ”¾ç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir /usr/local/Harbor/cert && cd /usr/local/Harbor/cert
 ```
 
-- ´´½¨CA¸ùÖ¤Êé
+- åˆ›å»ºCAæ ¹è¯ä¹¦
 
 ```bash
-# ÆäÖĞCÊÇCountry£¬STÊÇState£¬LÊÇlocal£¬OÊÇOriganization£¬OUÊÇOrganization Unit£¬CNÊÇcommon name(eg, your name or your server's hostname)
+# å…¶ä¸­Cæ˜¯Countryï¼ŒSTæ˜¯Stateï¼ŒLæ˜¯localï¼ŒOæ˜¯Origanizationï¼ŒOUæ˜¯Organization Unitï¼ŒCNæ˜¯common name(eg, your name or your server's hostname)
 [emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ca.key -x509 -days 3650 -out ca.crt \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Generating a 4096 bit RSA private key
 ...........................................................................................................................................................................................................................++
 .............................................................................................++
 writing new private key to 'ca.key'
 -----
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 [emon@emon cert]$ ls
 ca.crt  ca.key
 ```
 
-- Éú³ÉÒ»¸öÖ¤ÊéÇ©Ãû£¬ÉèÖÃ·ÃÎÊÓòÃûÎª emon
+- ç”Ÿæˆä¸€ä¸ªè¯ä¹¦ç­¾åï¼Œè®¾ç½®è®¿é—®åŸŸåä¸º emon
 
 ```bash
 [emon@emon cert]$ openssl req -newkey rsa:4096 -nodes -sha256 -keyout emon.key -out emon.csr \
 -subj "/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon"
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Generating a 4096 bit RSA private key
 ......................................................................................................................................................................................++
 .....................++
 writing new private key to 'emon.key'
 -----
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 [emon@emon cert]$ ls
 ca.crt  ca.key  emon.csr  emon.key
 ```
 
-- Éú³ÉÖ÷»úµÄÖ¤Êé
+- ç”Ÿæˆä¸»æœºçš„è¯ä¹¦
 
 ```bash
 [emon@emon cert]$ openssl x509 -req -days 3650 -in emon.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out emon.crt
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Signature ok
 subject=/C=CN/ST=ZheJiang/L=HangZhou/O=HangZhou emon Technologies,Inc./OU=IT emon/CN=emon
 Getting CA Private Key
-# ²é¿´½á¹û
+# æŸ¥çœ‹ç»“æœ
 [emon@emon cert]$ ls
 ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
-5. ±à¼­ÅäÖÃ
+5. ç¼–è¾‘é…ç½®
 
 ```bash
 [emon@emon ~]$ cp /usr/local/Harbor/harbor/harbor.yml.tmpl /usr/local/Harbor/harbor/harbor.yml
@@ -1313,36 +1313,36 @@ ca.crt  ca.key  ca.srl  emon.crt  emon.csr  emon.key
 ```
 
 ```yaml
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # hostname: reg.mydomain.com
 hostname: emon
-# ĞŞ¸Ä
+# ä¿®æ”¹
   # port: 80
   port: 5080
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # https:
   # https port for harbor, default is 443
   # port: 443
   # The path of cert and key files for nginx
   # certificate: /your/certificate/path
   # private_key: /your/private/key/path
-  # ĞŞ¸Ä£º×¢Òâ£¬ÕâÀï²»ÄÜÊ¹ÓÃÈíÁ¬½ÓÄ¿Â¼ /usr/loca/harborÌæ»»/usr/local/Harbor/harbor-2.4.2
-  # ·ñÔò»á·¢ÉúÖ¤ÊéÕÒ²»µ½´íÎó£ºFileNotFoundError: [Errno 2] No such file or directory: 
+  # ä¿®æ”¹ï¼šæ³¨æ„ï¼Œè¿™é‡Œä¸èƒ½ä½¿ç”¨è½¯è¿æ¥ç›®å½• /usr/loca/harboræ›¿æ¢/usr/local/Harbor/harbor-2.4.2
+  # å¦åˆ™ä¼šå‘ç”Ÿè¯ä¹¦æ‰¾ä¸åˆ°é”™è¯¯ï¼šFileNotFoundError: [Errno 2] No such file or directory: 
   certificate: /usr/local/Harbor/cert/emon.crt
   private_key: /usr/local/Harbor/cert/emon.key
-# ĞŞ¸Ä
+# ä¿®æ”¹
 # data_volume: /data
 data_volume: /usr/local/dockerv/harbor_home
 ```
 
-6. °²×°
+6. å®‰è£…
 
 ```bash
-# °²×°Ê±£¬È·±£ /usr/bin/docker-compose ´æÔÚ£¬·ñÔò»á±¨´í£º? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+# å®‰è£…æ—¶ï¼Œç¡®ä¿ /usr/bin/docker-compose å­˜åœ¨ï¼Œå¦åˆ™ä¼šæŠ¥é”™ï¼š? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 [emon@emon ~]$ sudo /usr/local/Harbor/harbor/install.sh --with-chartmuseum --with-trivy
-# ²é¿´·şÎñ×´Ì¬
+# æŸ¥çœ‹æœåŠ¡çŠ¶æ€
 [emon@emon harbor]$ docker-compose ps
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
       Name                     Command                  State                           Ports                     
 ------------------------------------------------------------------------------------------------------------------
 chartmuseum         ./docker-entrypoint.sh           Up (healthy)                                                 
@@ -1358,29 +1358,29 @@ registryctl         /home/harbor/start.sh            Up (healthy)
 trivy-adapter       /home/scanner/entrypoint.sh      Up (healthy)
 ```
 
-8. µÇÂ¼
+8. ç™»å½•
 
-·ÃÎÊ£ºhttp://emon:5080 £¨»á±»Ìø×ªµ½http://emon:5443£©
+è®¿é—®ï¼šhttp://emon:5080 ï¼ˆä¼šè¢«è·³è½¬åˆ°http://emon:5443ï¼‰
 
-ÓÃ»§ÃûÃÜÂë£º admin/Harbor12345
+ç”¨æˆ·åå¯†ç ï¼š admin/Harbor12345
 
-harborÊı¾İ¿âÃÜÂë£º root123
+harboræ•°æ®åº“å¯†ç ï¼š root123
 
-µÇÂ¼ºó´´½¨ÁËÓÃ»§£ºemon/Emon@123
+ç™»å½•ååˆ›å»ºäº†ç”¨æˆ·ï¼šemon/Emon@123
 
-9. ĞŞ¸ÄÅäÖÃÖØÆô
+9. ä¿®æ”¹é…ç½®é‡å¯
 
 ```bash
 [emon@emon ~]$ cd /usr/local/Harbor/harbor/
 [emon@emon harbor]$ docker-compose down -v
-# Èç¹ûÅöµ½ postgresql ·şÎñ²»ÊÇUP×´Ì¬£¬µ¼ÖÂµÇÂ¼ÌáÊ¾£ººËĞÄ·şÎñ²»¿ÉÓÃ¡£ ÇëÖ´ĞĞÏÂÃæÃüÁî£¨¸ù¾İdata_volumeÅäÖÃµ÷ÕûÂ·¾¶£©£¬Õâ¸öÊÇ¸Ã°æ±¾µÄbug¡£Ä¿Ç°£¬v2.2.4°æ±¾¿ÉÒÔÕıÈ·ÖØÆô£¬ÎŞĞèÉ¾³ıpg13
+# å¦‚æœç¢°åˆ° postgresql æœåŠ¡ä¸æ˜¯UPçŠ¶æ€ï¼Œå¯¼è‡´ç™»å½•æç¤ºï¼šæ ¸å¿ƒæœåŠ¡ä¸å¯ç”¨ã€‚ è¯·æ‰§è¡Œä¸‹é¢å‘½ä»¤ï¼ˆæ ¹æ®data_volumeé…ç½®è°ƒæ•´è·¯å¾„ï¼‰ï¼Œè¿™ä¸ªæ˜¯è¯¥ç‰ˆæœ¬çš„bugã€‚ç›®å‰ï¼Œv2.2.4ç‰ˆæœ¬å¯ä»¥æ­£ç¡®é‡å¯ï¼Œæ— éœ€åˆ é™¤pg13
 # [emon@emon harbor]$ sudo rm -rf /usr/local/dockerv/harbor_home/database/pg13
 [emon@emon harbor]$ docker-compose up -d
 ```
 
-10. Ë½·ş°²È«¿ØÖÆ
+10. ç§æœå®‰å…¨æ§åˆ¶
 
-¶ÔÎÄ¼ş `/etc/docker/daemon.json` ×·¼Ó `insecure-registries`ÄÚÈİ£º
+å¯¹æ–‡ä»¶ `/etc/docker/daemon.json` è¿½åŠ  `insecure-registries`å†…å®¹ï¼š
 
 ```bash
 [emon@emon ~]$ sudo vim /etc/docker/daemon.json
@@ -1393,303 +1393,303 @@ harborÊı¾İ¿âÃÜÂë£º root123
 }
 ```
 
-¶ÔÎÄ¼ş `/lib/systemd/system/docker.service` ×·¼Ó`EnvironmentFile`£º
+å¯¹æ–‡ä»¶ `/lib/systemd/system/docker.service` è¿½åŠ `EnvironmentFile`ï¼š
 
 ```bash
 [emon@emon ~]$ sudo vim /lib/systemd/system/docker.service 
 ```
 
 ```bash
-# ÔÚExecStartºóÃæÒ»ĞĞ×·¼Ó
+# åœ¨ExecStartåé¢ä¸€è¡Œè¿½åŠ 
 EnvironmentFile=-/etc/docker/daemon.json
 ```
 
-ÖØÆôDocker·şÎñ£º
+é‡å¯DockeræœåŠ¡ï¼š
 
 ```bash
 [emon@emon hello-world]$ sudo systemctl daemon-reload
 [emon@emon hello-world]$ sudo systemctl restart docker
 ```
 
-10. ÍÆËÍ¾µÏñ
+10. æ¨é€é•œåƒ
 
-µÇÂ¼harborºó£¬ÏÈ´´½¨devops-learningÏîÄ¿£¬²¢´´½¨emonÓÃ»§¡£
+ç™»å½•harboråï¼Œå…ˆåˆ›å»ºdevops-learningé¡¹ç›®ï¼Œå¹¶åˆ›å»ºemonç”¨æˆ·ã€‚
 
 ```bash
-# ´ò±êÇ©
+# æ‰“æ ‡ç­¾
 [emon@emon ~]$ docker tag openjdk:8-jre emon:5080/devops-learning/openjdk:8-jre
-# µÇÂ¼£¬µÇÂ¼ºóĞÅÏ¢´æ´¢ÔÚÓÃ»§Ä¿Â¼ÏÂµÄ .docker/config.json
+# ç™»å½•ï¼Œç™»å½•åä¿¡æ¯å­˜å‚¨åœ¨ç”¨æˆ·ç›®å½•ä¸‹çš„ .docker/config.json
 [emon@emon ~]$ docker login -u emon -p Emon@123 emon:5080
-# ÉÏ´«¾µÏñ
+# ä¸Šä¼ é•œåƒ
 [emon@emon ~]$ docker push emon:5080/devops-learning/openjdk:8-jre
-# ÍË³öµÇÂ¼
+# é€€å‡ºç™»å½•
 [emon@emon ~]$ docker logout emon:5080
 ```
 
 
 
-# ËÄ¡¢ÈİÆ÷
+# å››ã€å®¹å™¨
 
-	¼òµ¥À´Ëµ£¬ÈİÆ÷ÊÇ¾µÏñµÄÒ»¸öÔËĞĞÊµÀı¡£Ëù²»Í¬µÄÊÇ£¬¾µÏñÊÇ¾²Ì¬µÄÖ»¶ÁÎÄ¼ş£¬¶øÈİÆ÷´øÓĞÔËĞĞÊ±ĞèÒªµÄ
-¿ÉĞ´²ã¡£Èç¹ûÈÏÎªĞéÄâ»úÊÇÄ£ÄâÔËĞĞµÄÒ»ÕûÌ×²Ù×÷ÏµÍ³£¨°üÀ¨ÄÚºË¡¢Ó¦ÓÃÔËĞĞÌ¬»·¾³ºÍÆäËûÏµÍ³»·¾³£©ºÍÅÜÔÚÉÏÃæµÄÓ¦ÓÃ£¬ÄÇÃ´DockerÈİÆ÷¾ÍÊÇ¶ÀÁ¢ÔËĞĞµÄÒ»¸ö£¨»òÒ»×é£©Ó¦ÓÃ£¬ÒÔ¼°ËüÃÇ±ØĞèµÄÔËĞĞ»·¾³¡£
+	ç®€å•æ¥è¯´ï¼Œå®¹å™¨æ˜¯é•œåƒçš„ä¸€ä¸ªè¿è¡Œå®ä¾‹ã€‚æ‰€ä¸åŒçš„æ˜¯ï¼Œé•œåƒæ˜¯é™æ€çš„åªè¯»æ–‡ä»¶ï¼Œè€Œå®¹å™¨å¸¦æœ‰è¿è¡Œæ—¶éœ€è¦çš„
+å¯å†™å±‚ã€‚å¦‚æœè®¤ä¸ºè™šæ‹Ÿæœºæ˜¯æ¨¡æ‹Ÿè¿è¡Œçš„ä¸€æ•´å¥—æ“ä½œç³»ç»Ÿï¼ˆåŒ…æ‹¬å†…æ ¸ã€åº”ç”¨è¿è¡Œæ€ç¯å¢ƒå’Œå…¶ä»–ç³»ç»Ÿç¯å¢ƒï¼‰å’Œè·‘åœ¨ä¸Šé¢çš„åº”ç”¨ï¼Œé‚£ä¹ˆDockerå®¹å™¨å°±æ˜¯ç‹¬ç«‹è¿è¡Œçš„ä¸€ä¸ªï¼ˆæˆ–ä¸€ç»„ï¼‰åº”ç”¨ï¼Œä»¥åŠå®ƒä»¬å¿…éœ€çš„è¿è¡Œç¯å¢ƒã€‚
 
-## 1¡¢Ê²Ã´ÊÇContainer
+## 1ã€ä»€ä¹ˆæ˜¯Container
 
-- Í¨¹ıImage´´½¨£¨Copy£©
+- é€šè¿‡Imageåˆ›å»ºï¼ˆCopyï¼‰
 
-- ÔÚImage layerÖ®ÉÏ½¨Á¢Ò»¸öcontainer layer£¨¿É¶ÁĞ´£©
-- Àà±ÈÃæÏò¶ÔÏó£ºÀàºÍÊµÀı
-- Image¸ºÔğappµÄ´æ´¢ºÍ·Ö·¢£¬Container¸ºÔğÔËĞĞapp
+- åœ¨Image layerä¹‹ä¸Šå»ºç«‹ä¸€ä¸ªcontainer layerï¼ˆå¯è¯»å†™ï¼‰
+- ç±»æ¯”é¢å‘å¯¹è±¡ï¼šç±»å’Œå®ä¾‹
+- Imageè´Ÿè´£appçš„å­˜å‚¨å’Œåˆ†å‘ï¼ŒContainerè´Ÿè´£è¿è¡Œapp
 
 ![image-20220312161602917](images/image-20220312161602917.png)
 
 
 
-## 2¡¢²é¿´ÈİÆ÷
+## 2ã€æŸ¥çœ‹å®¹å™¨
 
-### 2.1¡¢»ù±¾ÓÃ·¨
+### 2.1ã€åŸºæœ¬ç”¨æ³•
 
-- ÃüÁî¸ñÊ½£º `docker ps [OPTIIONS]`
+- å‘½ä»¤æ ¼å¼ï¼š `docker ps [OPTIIONS]`
 
-| Ñ¡ÏîÃû      | Ä¬ÈÏÖµ | ÃèÊö                                                         |
+| é€‰é¡¹å      | é»˜è®¤å€¼ | æè¿°                                                         |
 | ----------- | ------ | ------------------------------------------------------------ |
-| --all,-a    | false  | ÊÇ·ñÏÔÊ¾ËùÓĞÈİÆ÷£¨Ä¬ÈÏ½öÏÔÊ¾ÔËĞĞÖĞµÄÈİÆ÷£©                   |
-| --filter,-f |        | ¸ù¾İ¹ıÂËµÄÌõ¼ş¹ıÂËÊä³ö½á¹û                                   |
-| --format    |        | Ê¹ÓÃÄ£°åÊä³ö¸ñÊ½Á¼ºÃµÄ½á¹û                                   |
-| --last,-n   | -1     | ÏÔÊ¾×îºó´´½¨µÄn¸öÈİÆ÷£¨°üº¬ËùÓĞ×´Ì¬µÄÈİÆ÷£©                  |
-| --latest,-l | false  | ÏÔÊ¾×îºó´´½¨µÄÈİÆ÷£¨°üº¬ËùÓĞ×´Ì¬µÄÈİÆ÷£©                     |
-| --no-trunc  | false  | ²»½Ø¶ÏÊä³ö                                                   |
-| --quiet,-q  | false  | ½ö½öÏÔÊ¾IDÁĞ                                                 |
-| --size,-s   | false  | ÏÔÊ¾ÎÄ¼ş´óĞ¡£¨ÈİÆ÷ÔöÁ¿´óĞ¡ºÍÈİÆ÷ĞéÄâ´óĞ¡£¨ÈİÆ÷ÕæÊµ´óĞ¡+ÒÀÀµµÄ¾µÏñ´óĞ¡£©£© |
+| --all,-a    | false  | æ˜¯å¦æ˜¾ç¤ºæ‰€æœ‰å®¹å™¨ï¼ˆé»˜è®¤ä»…æ˜¾ç¤ºè¿è¡Œä¸­çš„å®¹å™¨ï¼‰                   |
+| --filter,-f |        | æ ¹æ®è¿‡æ»¤çš„æ¡ä»¶è¿‡æ»¤è¾“å‡ºç»“æœ                                   |
+| --format    |        | ä½¿ç”¨æ¨¡æ¿è¾“å‡ºæ ¼å¼è‰¯å¥½çš„ç»“æœ                                   |
+| --last,-n   | -1     | æ˜¾ç¤ºæœ€ååˆ›å»ºçš„nä¸ªå®¹å™¨ï¼ˆåŒ…å«æ‰€æœ‰çŠ¶æ€çš„å®¹å™¨ï¼‰                  |
+| --latest,-l | false  | æ˜¾ç¤ºæœ€ååˆ›å»ºçš„å®¹å™¨ï¼ˆåŒ…å«æ‰€æœ‰çŠ¶æ€çš„å®¹å™¨ï¼‰                     |
+| --no-trunc  | false  | ä¸æˆªæ–­è¾“å‡º                                                   |
+| --quiet,-q  | false  | ä»…ä»…æ˜¾ç¤ºIDåˆ—                                                 |
+| --size,-s   | false  | æ˜¾ç¤ºæ–‡ä»¶å¤§å°ï¼ˆå®¹å™¨å¢é‡å¤§å°å’Œå®¹å™¨è™šæ‹Ÿå¤§å°ï¼ˆå®¹å™¨çœŸå®å¤§å°+ä¾èµ–çš„é•œåƒå¤§å°ï¼‰ï¼‰ |
 
-- ÏÔÊ¾ÕıÔÚÔËĞĞµÄÈİÆ÷
+- æ˜¾ç¤ºæ­£åœ¨è¿è¡Œçš„å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker ps
-# »òÕß
+# æˆ–è€…
 [emon@emon ~]$ docker container ls
 ```
 
-- ÏÔÊ¾ËùÓĞ×´Ì¬µÄÈİÆ÷£¨7ÖÖ×´Ì¬£ºcreated|restarting|runnning|removing|paused|exited|dead)
+- æ˜¾ç¤ºæ‰€æœ‰çŠ¶æ€çš„å®¹å™¨ï¼ˆ7ç§çŠ¶æ€ï¼šcreated|restarting|runnning|removing|paused|exited|dead)
 
 ```shell
 [emon@emon ~]$ docker ps -a
-# »òÕß
+# æˆ–è€…
 [emon@emon ~]$ docker container ls -a
 ```
 
-- ÏÔÊ¾×îºó±»´´½¨µÄn¸öÈİÆ÷£¨²»ÏŞ×´Ì¬£©
+- æ˜¾ç¤ºæœ€åè¢«åˆ›å»ºçš„nä¸ªå®¹å™¨ï¼ˆä¸é™çŠ¶æ€ï¼‰
 
 ```shell
 [emon@emon ~]$ docker ps -n 1
 ```
 
-- ÏÔÊ¾×îºó±»´´½¨µÄÈİÆ÷£¨²»ÏŞ×´Ì¬£©
+- æ˜¾ç¤ºæœ€åè¢«åˆ›å»ºçš„å®¹å™¨ï¼ˆä¸é™çŠ¶æ€ï¼‰
 
 ```shell
 [emon@emon ~]$ docker ps -l
 ```
 
-- ÏÔÊ¾ÍêÕûÊä³ö£¨ÕıÔÚÔËĞĞ×´Ì¬µÄ£©
+- æ˜¾ç¤ºå®Œæ•´è¾“å‡ºï¼ˆæ­£åœ¨è¿è¡ŒçŠ¶æ€çš„ï¼‰
 
 ```shell
 [emon@emon ~]$ docker ps --no-trunc
 ```
 
-- Ö»ÏÔÊ¾ÈİÆ÷ID£¨ÕıÔÚÔËĞĞ×´Ì¬µÄ£©
+- åªæ˜¾ç¤ºå®¹å™¨IDï¼ˆæ­£åœ¨è¿è¡ŒçŠ¶æ€çš„ï¼‰
 
 ```shell
 [emon@emon ~]$ docker ps -q
 ```
 
-- ÏÔÊ¾ÈİÆ÷ÎÄ¼ş´óĞ¡£¨ÕıÔÚÔËĞĞ×´Ì¬µÄ£¬¸ÃÃüÁîÏÔÊ¾ÈİÆ÷ÕæÊµ´óĞ¡ºÍÈİÆ÷µÄĞéÄâ´óĞ¡=(ÈİÆ÷ÕæÊµ´óĞ¡+ÈİÆ÷¾µÏñ´óĞ¡)£©
+- æ˜¾ç¤ºå®¹å™¨æ–‡ä»¶å¤§å°ï¼ˆæ­£åœ¨è¿è¡ŒçŠ¶æ€çš„ï¼Œè¯¥å‘½ä»¤æ˜¾ç¤ºå®¹å™¨çœŸå®å¤§å°å’Œå®¹å™¨çš„è™šæ‹Ÿå¤§å°=(å®¹å™¨çœŸå®å¤§å°+å®¹å™¨é•œåƒå¤§å°)ï¼‰
 
 ```shell
 [emon@emon ~]$ docker ps -s
 ```
 
-### 2.2¡¢¸ß¼¶ÓÃ·¨
+### 2.2ã€é«˜çº§ç”¨æ³•
 
-Èç¹ûÈİÆ÷ÊıÁ¿¹ı¶à£¬»òÕßÏëÅÅ³ı¸ÉÈÅÈİÆ÷£¬¿ÉÒÔÍ¨¹ı--filter»òÕß-fÑ¡Ïî£¬¹ıÂËĞèÒªÏÔÊ¾µÄÈİÆ÷¡£
+å¦‚æœå®¹å™¨æ•°é‡è¿‡å¤šï¼Œæˆ–è€…æƒ³æ’é™¤å¹²æ‰°å®¹å™¨ï¼Œå¯ä»¥é€šè¿‡--filteræˆ–è€…-fé€‰é¡¹ï¼Œè¿‡æ»¤éœ€è¦æ˜¾ç¤ºçš„å®¹å™¨ã€‚
 
-| ¹ıÂËÌõ¼ş | ÃèÊö                                                         |
+| è¿‡æ»¤æ¡ä»¶ | æè¿°                                                         |
 | -------- | ------------------------------------------------------------ |
-| id       | ÈİÆ÷ID                                                       |
-| label    | label=<key>»òÕßlabel=<key>=<value>                           |
-| status   | Ö§³ÖµÄ×´Ì¬ÖµÓĞ£ºcreated/restarting/running/removing/paused/exited/dead |
-| health   | starting/healthy/unhealthy/none »ùÓÚ½¡¿µ¼ì²é×´Ì¬¹ıÂËÈİÆ÷     |
+| id       | å®¹å™¨ID                                                       |
+| label    | label=<key>æˆ–è€…label=<key>=<value>                           |
+| status   | æ”¯æŒçš„çŠ¶æ€å€¼æœ‰ï¼šcreated/restarting/running/removing/paused/exited/dead |
+| health   | starting/healthy/unhealthy/none åŸºäºå¥åº·æ£€æŸ¥çŠ¶æ€è¿‡æ»¤å®¹å™¨     |
 
-Ìõ¼şºÜ¶à£¬µ«Íò±ä²»ÀëÆä×Ú£¬Ö»ĞèÒª¼Ç×¡ÒÔÏÂ3Ìõ×¼Ôò£º
+æ¡ä»¶å¾ˆå¤šï¼Œä½†ä¸‡å˜ä¸ç¦»å…¶å®—ï¼Œåªéœ€è¦è®°ä½ä»¥ä¸‹3æ¡å‡†åˆ™ï¼š
 
-1. Ñ¡Ïîºó¸úµÄ¶¼ÊÇ¼üÖµ¶Ôkey=value(¿É²»´øÒıºÅ)£¬Èç¹ûÓĞ¶à¸ö¹ıÂËÌõ¼ş£¬¾Í¶à´ÎÊ¹ÓÃfilterÑ¡Ïî¡£ÀıÈç£º
+1. é€‰é¡¹åè·Ÿçš„éƒ½æ˜¯é”®å€¼å¯¹key=value(å¯ä¸å¸¦å¼•å·)ï¼Œå¦‚æœæœ‰å¤šä¸ªè¿‡æ»¤æ¡ä»¶ï¼Œå°±å¤šæ¬¡ä½¿ç”¨filteré€‰é¡¹ã€‚ä¾‹å¦‚ï¼š
 
 ```shell
 docker ps --filter id=a1b2c3 --filter name=festive_pasteur
 ```
 
-2. ÏàÍ¬Ìõ¼şÖ®¼äµÄ¹ØÏµÊÇ»ò£¬²»Í¬Ìõ¼şÖ®¼äµÄ¹ØÏµÊÇÓë¡£ÀıÈç£º
+2. ç›¸åŒæ¡ä»¶ä¹‹é—´çš„å…³ç³»æ˜¯æˆ–ï¼Œä¸åŒæ¡ä»¶ä¹‹é—´çš„å…³ç³»æ˜¯ä¸ã€‚ä¾‹å¦‚ï¼š
 
 ```shell
 docker ps --filter name=festive --filter name=pasteur --filter status=running
 ```
 
-ÒÔÉÏ¹ıÂËÌõ¼ş»áÕÒ³öname°üº¬festive»òÕßpasteur²¢ÇÒstatusÎªrunningµÄÈİÆ÷¡£
+ä»¥ä¸Šè¿‡æ»¤æ¡ä»¶ä¼šæ‰¾å‡ºnameåŒ…å«festiveæˆ–è€…pasteurå¹¶ä¸”statusä¸ºrunningçš„å®¹å™¨ã€‚
 
-3. idºÍname£¬Ö§³ÖÕıÔò±í´ïÊ½£¬Ê¹ÓÃÆğÀ´·Ç³£Áé»î¡£ÀıÈç£º
+3. idå’Œnameï¼Œæ”¯æŒæ­£åˆ™è¡¨è¾¾å¼ï¼Œä½¿ç”¨èµ·æ¥éå¸¸çµæ´»ã€‚ä¾‹å¦‚ï¼š
 
 ```shell
 docker ps --filter name=^/festive_pasteur$
 ```
 
-¾«È·Æ¥ÅänameÎªfestive_pasteurµÄÈİÆ÷¡£×¢Òâ£¬ÈİÆ÷Êµ¼ÊÃû³Æ£¬¿ªÍ·ÊÇÓÉÒ»¸öÕıĞ±Ïß/£¬¿ÉÓÃdocker inspectÒ»¿´±ãÖª¡£
+ç²¾ç¡®åŒ¹é…nameä¸ºfestive_pasteurçš„å®¹å™¨ã€‚æ³¨æ„ï¼Œå®¹å™¨å®é™…åç§°ï¼Œå¼€å¤´æ˜¯ç”±ä¸€ä¸ªæ­£æ–œçº¿/ï¼Œå¯ç”¨docker inspectä¸€çœ‹ä¾¿çŸ¥ã€‚
 
 ```shell
 docker ps --filter name=.*festive_pasteur.*
 ```
 
-Æ¥Åäname°üº¬festive_pasteurµÄÈİÆ÷£¬ºÍ--filter name=festive_pasteurĞ§¹ûÒ»ÖÂ
+åŒ¹é…nameåŒ…å«festive_pasteurçš„å®¹å™¨ï¼Œå’Œ--filter name=festive_pasteuræ•ˆæœä¸€è‡´
 
-×îºó£¬ÁĞ¾ÙÒ»¸ö¸´ÔÓµãµÄÀı×Ó£¬ÓÃÓÚÇåÀíÃû³Æ°üº¬festive_pasteur£¬ÇÒ×´Ì¬Îªexited»òdeadµÄÈİÆ÷£¬ÈçÏÂ£º
+æœ€åï¼Œåˆ—ä¸¾ä¸€ä¸ªå¤æ‚ç‚¹çš„ä¾‹å­ï¼Œç”¨äºæ¸…ç†åç§°åŒ…å«festive_pasteurï¼Œä¸”çŠ¶æ€ä¸ºexitedæˆ–deadçš„å®¹å™¨ï¼Œå¦‚ä¸‹ï¼š
 
 ```shell
 docker rm $(docker ps -q --filter name=.*festive_pasteur.* --filter status=exited --filter status=dead 2>/dev/null)
 ```
 
-Èç¹ûÊÇ·ÇrootÓÃ»§£¬ÒªÊ¹ÓÃÈçÏÂÃüÁî£º
+å¦‚æœæ˜¯érootç”¨æˆ·ï¼Œè¦ä½¿ç”¨å¦‚ä¸‹å‘½ä»¤ï¼š
 
 ```shell
 docker rm $(sudo bash -c "docker ps -q --filter name=.*festive_pasteur.* --filter status=exited --filter status=dead 2>/dev/null")
 ```
 
-### 2.3¡¢Format¸ñÊ½»¯ÏÔÊ¾
+### 2.3ã€Formatæ ¼å¼åŒ–æ˜¾ç¤º
 
-Èç¹ûÏëÒª×Ô¶¨ÒåÏÔÊ¾ÈİÆ÷×Ö¶Î£¬¿ÉÒÔÓÃ¸ñÊ½»¯Ñ¡Ïî -format¡£
+å¦‚æœæƒ³è¦è‡ªå®šä¹‰æ˜¾ç¤ºå®¹å™¨å­—æ®µï¼Œå¯ä»¥ç”¨æ ¼å¼åŒ–é€‰é¡¹ -formatã€‚
 
-| Õ¼Î»·û      | ÃèÊö                                                         |
+| å ä½ç¬¦      | æè¿°                                                         |
 | ----------- | ------------------------------------------------------------ |
-| .ID         | ÈİÆ÷ID                                                       |
+| .ID         | å®¹å™¨ID                                                       |
 | .Image      | ImageID                                                      |
-| .Command    | Æô¶¯ÈİÆ÷µÄÃüÁî                                               |
-| .CreatedAt  | ÈİÆ÷´´½¨µÄÊ±¼ä                                               |
-| .RunningFor | ×Ô´ÓÈİÆ÷´´½¨ºóÁ÷ÊÅµÄÊ±¼ä                                     |
-| .Ports      | ±©Â¶µÄ¶Ë¿Ú                                                   |
-| .Status     | ÈİÆ÷Õ¼ÓÃµÄ´ÅÅÌ´óĞ¡                                           |
-| .Names      | ÈİÆ÷µÄÃû³Æ                                                   |
-| .Labels     | ÈİÆ÷ËùÓĞ±»·ÖÅäµÄ±êÇ©                                         |
-| .Label      | ÈİÆ÷Ä³¸öÖ¸¶¨±êÇ©µÄÖµ£¬±ÈÈç£º'{{.Label "com.docker.swarm.cpu"}}' |
-| .Mounts     | ÈİÆ÷¹ÒÔØµÄ¾í±êÃû³Æ                                           |
-| .Networks   | attachedµ½ÈİÆ÷Ê±µÄÍøÂçÃû³Æ                                   |
+| .Command    | å¯åŠ¨å®¹å™¨çš„å‘½ä»¤                                               |
+| .CreatedAt  | å®¹å™¨åˆ›å»ºçš„æ—¶é—´                                               |
+| .RunningFor | è‡ªä»å®¹å™¨åˆ›å»ºåæµé€çš„æ—¶é—´                                     |
+| .Ports      | æš´éœ²çš„ç«¯å£                                                   |
+| .Status     | å®¹å™¨å ç”¨çš„ç£ç›˜å¤§å°                                           |
+| .Names      | å®¹å™¨çš„åç§°                                                   |
+| .Labels     | å®¹å™¨æ‰€æœ‰è¢«åˆ†é…çš„æ ‡ç­¾                                         |
+| .Label      | å®¹å™¨æŸä¸ªæŒ‡å®šæ ‡ç­¾çš„å€¼ï¼Œæ¯”å¦‚ï¼š'{{.Label "com.docker.swarm.cpu"}}' |
+| .Mounts     | å®¹å™¨æŒ‚è½½çš„å·æ ‡åç§°                                           |
+| .Networks   | attachedåˆ°å®¹å™¨æ—¶çš„ç½‘ç»œåç§°                                   |
 
-1. µ±Ê¹ÓÃÁË--formatÑ¡Ïî£¬ÄÇÃ´psÃüÁîÖ»»áÊä³ötemplateÖĞÖ¸¶¨µÄÄÚÈİ£º
+1. å½“ä½¿ç”¨äº†--formaté€‰é¡¹ï¼Œé‚£ä¹ˆpså‘½ä»¤åªä¼šè¾“å‡ºtemplateä¸­æŒ‡å®šçš„å†…å®¹ï¼š
 
 ```shell
 [emon@emon ~]$ docker ps --format "{{.ID}}:{{.Command}}"
 ```
 
-2. Èç¹ûÏë´øÉÏ±í¸ñÁĞÍ·£¬ĞèÒªÔÚtelplateÖĞ¼ÓÉÏtable£º
+2. å¦‚æœæƒ³å¸¦ä¸Šè¡¨æ ¼åˆ—å¤´ï¼Œéœ€è¦åœ¨telplateä¸­åŠ ä¸Štableï¼š
 
 ```shell
 [emon@emon ~]$ docker ps --format "table{{.ID}}:{{.Command}}"
 ```
 
-3. Ò»¸ö±È½ÏºÃÓÃµÄ¸ñÊ½
+3. ä¸€ä¸ªæ¯”è¾ƒå¥½ç”¨çš„æ ¼å¼
 
 ```bash
 [emon@emon ~]$ docker ps --format "table{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.RunningFor}}\t{{.Ports}}"
 ```
 
-[¸ü¶àÓÃ·¨](https://www.cnblogs.com/fuyuteng/p/8847331.html)
+[æ›´å¤šç”¨æ³•](https://www.cnblogs.com/fuyuteng/p/8847331.html)
 
 
 
-## 3¡¢´´½¨ÈİÆ÷
+## 3ã€åˆ›å»ºå®¹å™¨
 
-### 3.1¡¢³£¹æÃüÁî
+### 3.1ã€å¸¸è§„å‘½ä»¤
 
-- ĞÂ½¨ÈİÆ÷
+- æ–°å»ºå®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker create -it --name centos7.8 centos:7
 ```
 
-Ê¹ÓÃdocker createÃüÁî´´½¨µÄÈİÆ÷´¦ÓÚÍ£Ö¹×´Ì¬£¬¿ÉÒÔÊ¹ÓÃdocker startÃüÁîÀ´Æô¶¯¡£
+ä½¿ç”¨docker createå‘½ä»¤åˆ›å»ºçš„å®¹å™¨å¤„äºåœæ­¢çŠ¶æ€ï¼Œå¯ä»¥ä½¿ç”¨docker startå‘½ä»¤æ¥å¯åŠ¨ã€‚
 
-- Æô¶¯ÈİÆ÷
+- å¯åŠ¨å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker start <container_id|container_name>
 ```
 
-- ĞÂ½¨²¢Æô¶¯ÈİÆ÷£ºÊØ»¤Ì¬ÔËĞĞ(Daemonized)¡¾ÍÆ¼öµÄÆô¶¯·½Ê½¡¿
+- æ–°å»ºå¹¶å¯åŠ¨å®¹å™¨ï¼šå®ˆæŠ¤æ€è¿è¡Œ(Daemonized)ã€æ¨èçš„å¯åŠ¨æ–¹å¼ã€‘
 
 ```bash
 [emon@emon ~]$ docker run -itd --name centos7.8 centos:7 [/bin/bash]
 ```
 
-- ĞÂ½¨²¢Æô¶¯ÈİÆ÷£º·ÇÊØ»¤Ì¬ÔËĞĞ
+- æ–°å»ºå¹¶å¯åŠ¨å®¹å™¨ï¼šéå®ˆæŠ¤æ€è¿è¡Œ
 
 ```bash
 [emon@emon ~]$ docker run -it --name centos7.8 centos:7 [/bin/bash]
 ```
 
-ÕâÖÖÔËĞĞ·½Ê½£¬ÓÃ»§¿ÉÒÔ°´Ctrl+d»òÕßÊäÈëexitÃüÁîÀ´ÍË³öÈİÆ÷£º
+è¿™ç§è¿è¡Œæ–¹å¼ï¼Œç”¨æˆ·å¯ä»¥æŒ‰Ctrl+dæˆ–è€…è¾“å…¥exitå‘½ä»¤æ¥é€€å‡ºå®¹å™¨ï¼š
 
-TIPS£ºÍË³öÊ±£¬Ê¹ÓÃ[Ctrl+D]£¬ÕâÑù»á½áÊødockerµ±Ç°Ïß³Ì£¬ÈİÆ÷½áÊø£¬¿ÉÒÔÊ¹ÓÃ[Ctrl+P+Q]ÍË³ö¶ø²»ÊÇÖÕÖ¹ÈİÆ÷¡£
+TIPSï¼šé€€å‡ºæ—¶ï¼Œä½¿ç”¨[Ctrl+D]ï¼Œè¿™æ ·ä¼šç»“æŸdockerå½“å‰çº¿ç¨‹ï¼Œå®¹å™¨ç»“æŸï¼Œå¯ä»¥ä½¿ç”¨[Ctrl+P+Q]é€€å‡ºè€Œä¸æ˜¯ç»ˆæ­¢å®¹å™¨ã€‚
 
-### 3.2¡¢´´½¨ÈİÆ÷Óöµ½IPv4´íÎóÎÊÌâ£¨ĞéÄâ»ú¿É´ïµ«·şÎñ²»¿É´ïµÄÔ­Òò£©
+### 3.2ã€åˆ›å»ºå®¹å™¨é‡åˆ°IPv4é”™è¯¯é—®é¢˜ï¼ˆè™šæ‹Ÿæœºå¯è¾¾ä½†æœåŠ¡ä¸å¯è¾¾çš„åŸå› ï¼‰
 
-<span style="color:red;font-weight:bold;">ĞéÄâ»ú»Ö¸´µ½Ä³¸ö¿ìÕÕºó»á³öÏÖĞéÄâ»ú¿É´ï£¨¿ÉtelnetÍ¨£©£¬µ«ÆäÉÏµÄdocker·şÎñ²»¿É´ï£¨²»¿ÉtelnetÍ¨£©µÄÇé¿ö£¬´ËÊ±ping¶¼ÊÇÍ¨µÄ£¬Ò²ÊÇÕâ¸öipv4×ª·¢µÄÔ­Òò£¡</span>
+<span style="color:red;font-weight:bold;">è™šæ‹Ÿæœºæ¢å¤åˆ°æŸä¸ªå¿«ç…§åä¼šå‡ºç°è™šæ‹Ÿæœºå¯è¾¾ï¼ˆå¯telneté€šï¼‰ï¼Œä½†å…¶ä¸Šçš„dockeræœåŠ¡ä¸å¯è¾¾ï¼ˆä¸å¯telneté€šï¼‰çš„æƒ…å†µï¼Œæ­¤æ—¶pingéƒ½æ˜¯é€šçš„ï¼Œä¹Ÿæ˜¯è¿™ä¸ªipv4è½¬å‘çš„åŸå› ï¼</span>
 
-Èç¹û´´½¨ÈİÆ÷Ê±£¬·¢ÏÖÈçÏÂ´íÎóµÄ´¦Àí°ì·¨£º
+å¦‚æœåˆ›å»ºå®¹å™¨æ—¶ï¼Œå‘ç°å¦‚ä¸‹é”™è¯¯çš„å¤„ç†åŠæ³•ï¼š
 
 `WARNING: IPv4 forwarding is disabled. Networking will not work.`
 
 ```bash
-# ¼ì²é
+# æ£€æŸ¥
 [emon@emon ~]$ sudo sysctl -a|grep net.ipv4.ip_forward
-# ÅäÖÃ
+# é…ç½®
 [emon@emon ~]$ sudo vim /etc/sysctl.conf
 net.ipv4.ip_forward=1
-# Ê¹Ö®ÉúĞ§
+# ä½¿ä¹‹ç”Ÿæ•ˆ
 [emon@emon ~]$ sudo sysctl -p
-# ÖØÆôÍøÂç
+# é‡å¯ç½‘ç»œ
 [emon@emon ~]$ sudo systemctl restart network
 ```
 
-### 3.3¡¢ÈİÆ÷×ÊÔ´ÏŞÖÆ
+### 3.3ã€å®¹å™¨èµ„æºé™åˆ¶
 
-- ÏŞ¶¨ÄÚ´æ
+- é™å®šå†…å­˜
 
 ```bash
-# Ö¸¶¨·ÖÅäÄÚ´æ200M£¨Òşº¬200MµÄSwap£¬¹²400M£©
+# æŒ‡å®šåˆ†é…å†…å­˜200Mï¼ˆéšå«200Mçš„Swapï¼Œå…±400Mï¼‰
 [emon@emon ~]$ docker run --memory=200M rushing/ubuntu-stress --vm 1 --verbose
-# Ö¸¶¨·ÖÅäÄÚ´æ200M£¨Òşº¬200MµÄSwap£¬¹²400M£©£¬Ö¸¶¨Ê¹ÓÃÄÚ´æ500M
+# æŒ‡å®šåˆ†é…å†…å­˜200Mï¼ˆéšå«200Mçš„Swapï¼Œå…±400Mï¼‰ï¼ŒæŒ‡å®šä½¿ç”¨å†…å­˜500M
 [emon@emon ~]$ docker run --memory=200M rushing/ubuntu-stress --vm 1 --verbose --vm-bytes 500M
 ```
 
-- ÏŞ¶¨CPU
+- é™å®šCPU
 
 ```bash
-# ÉèÖÃcpuÊ¹ÓÃÈ¨ÖØ£¬ÈçÏÂtest1Õ¼ÓÃ10£¬test2Õ¼ÓÃ5£»Èç¹ûcpu¹²ÏíÇé¿öÏÂ£¬»á°´ÕÕ2:1·ÖÅä
+# è®¾ç½®cpuä½¿ç”¨æƒé‡ï¼Œå¦‚ä¸‹test1å ç”¨10ï¼Œtest2å ç”¨5ï¼›å¦‚æœcpuå…±äº«æƒ…å†µä¸‹ï¼Œä¼šæŒ‰ç…§2:1åˆ†é…
 [emon@emon ~]$ docker run --cpu-shares=10 --name=test1 rushing/ubuntu-stress --cpu 2
 [emon@emon ~]$ docker run --cpu-shares=5 --name=test2 rushing/ubuntu-stress --cpu 1
 ```
 
-### 3.4¡¢ĞéÄâ»ú¹ÒÆğ²¢»Ö¸´ºódockerÍøÂçÎÊÌâ
+### 3.4ã€è™šæ‹ŸæœºæŒ‚èµ·å¹¶æ¢å¤ådockerç½‘ç»œé—®é¢˜
 
-- ²é¿´Éè±¸×´Ì¬
+- æŸ¥çœ‹è®¾å¤‡çŠ¶æ€
 
 ```bash
 $ nmcli device status
 ```
 
-- ÁÙÊ±unmanaged
+- ä¸´æ—¶unmanaged
 
 ```bash
 $ nmcli device set xxx managed no
 ```
 
-- ÓÀ¾Ãunmanaged
+- æ°¸ä¹…unmanaged
 
 ```bash
 $ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
@@ -1700,86 +1700,86 @@ $ vim /etc/NetworkManager/conf.d/99-unmanaged-devices.conf
 unmanaged-devices=interface-name:docker*;interface-name:veth*;interface-name:br-*;interface-name:vmnet*;interface-name:vboxnet*;interface-name:cni0;interface-name:cali*;interface-name:flannel*
 ```
 
-- ÖØÆôNetworkManager
+- é‡å¯NetworkManager
 
 ```bash
 $ systemctl restart NetworkManager
 ```
 
-### 3.5¡¢´´½¨ÈİÆ÷Ê§°ÜOperation not permitted
+### 3.5ã€åˆ›å»ºå®¹å™¨å¤±è´¥Operation not permitted
 
-docker ÈİÆ÷Æô¶¯±¨´íFailed to create thread: Operation not permitted (1)
+docker å®¹å™¨å¯åŠ¨æŠ¥é”™Failed to create thread: Operation not permitted (1)
 
-½â¾ö°ì·¨£ºÆô¶¯ÈİÆ÷Ê±Ôö¼ÓÑ¡Ïî `docker run --privileged=true` ¼´¿É£¡
+è§£å†³åŠæ³•ï¼šå¯åŠ¨å®¹å™¨æ—¶å¢åŠ é€‰é¡¹ `docker run --privileged=true` å³å¯ï¼
 
-## 4¡¢ÖÕÖ¹ÈİÆ÷
+## 4ã€ç»ˆæ­¢å®¹å™¨
 
-¿ÉÒÔÊ¹ÓÃdocker stopÀ´ÖÕÖ¹Ò»¸öÔËĞĞÖĞµÄÈİÆ÷¡£¸ÃÃüÁîµÄ¸ñÊ½Îªdocker stop [-t|--time[=10]][CONTAINER...]¡£
+å¯ä»¥ä½¿ç”¨docker stopæ¥ç»ˆæ­¢ä¸€ä¸ªè¿è¡Œä¸­çš„å®¹å™¨ã€‚è¯¥å‘½ä»¤çš„æ ¼å¼ä¸ºdocker stop [-t|--time[=10]][CONTAINER...]ã€‚
 
-Ê×ÏÈÏòÈİÆ÷·¢ËÍSIGTERMĞÅºÅ£¬µÈ´ıÒ»¶Î³¬Ê±Ê±¼ä£¨Ä¬ÈÏÎª10Ãë£©ºó£¬ÔÙ·¢ËÍSIGKILLĞÅºÅÀ´ÖÕÖ¹ÈİÆ÷£º
+é¦–å…ˆå‘å®¹å™¨å‘é€SIGTERMä¿¡å·ï¼Œç­‰å¾…ä¸€æ®µè¶…æ—¶æ—¶é—´ï¼ˆé»˜è®¤ä¸º10ç§’ï¼‰åï¼Œå†å‘é€SIGKILLä¿¡å·æ¥ç»ˆæ­¢å®¹å™¨ï¼š
 
 ```shell
 [emon@emon ~]$ docker stop <container_id|container_name>
 ```
 
-[docker kill ÃüÁî»áÖ±½Ó·¢ËÍSIGKILLĞÅºÅÀ´Ç¿ÖÆÖÕÖ¹ÈİÆ÷¡£]
+[docker kill å‘½ä»¤ä¼šç›´æ¥å‘é€SIGKILLä¿¡å·æ¥å¼ºåˆ¶ç»ˆæ­¢å®¹å™¨ã€‚]
 
-´ËÍâ£¬µ±DockerÈİÆ÷ÖĞÖ¸¶¨µÄÓ¦ÓÃÖÕ½áÊ±£¬ÈİÆ÷Ò²»á×Ô¶¯ÖÕÖ¹¡£
+æ­¤å¤–ï¼Œå½“Dockerå®¹å™¨ä¸­æŒ‡å®šçš„åº”ç”¨ç»ˆç»“æ—¶ï¼Œå®¹å™¨ä¹Ÿä¼šè‡ªåŠ¨ç»ˆæ­¢ã€‚
 
-´ËÍâ£¬docker restartÃüÁî»á½«Ò»¸öÔËĞĞÌ¬µÄÈİÆ÷ÏÈÖÕÖ¹£¬È»ºóÔÙÖØĞÂÆô¶¯Ëü£º
+æ­¤å¤–ï¼Œdocker restartå‘½ä»¤ä¼šå°†ä¸€ä¸ªè¿è¡Œæ€çš„å®¹å™¨å…ˆç»ˆæ­¢ï¼Œç„¶åå†é‡æ–°å¯åŠ¨å®ƒï¼š
 
 ```shell
 [emon@emon ~]$ docker restart <container_id|container_name>
 ```
 
-## 5¡¢½øÈëÈİÆ÷
+## 5ã€è¿›å…¥å®¹å™¨
 
-ÔÚÊ¹ÓÃ-d²ÎÊıÊ±£¬ÈİÆ÷Æô¶¯ºó»á½øÈëºóÌ¨£¬ÓÃ»§ÎŞ·¨¿´µ½ÈİÆ÷ÖĞµÄĞÅÏ¢£¬Ò²ÎŞ·¨½øĞĞ²Ù×÷¡£
+åœ¨ä½¿ç”¨-då‚æ•°æ—¶ï¼Œå®¹å™¨å¯åŠ¨åä¼šè¿›å…¥åå°ï¼Œç”¨æˆ·æ— æ³•çœ‹åˆ°å®¹å™¨ä¸­çš„ä¿¡æ¯ï¼Œä¹Ÿæ— æ³•è¿›è¡Œæ“ä½œã€‚
 
-Õâ¸öÊ±ºòÈç¹ûĞèÒª½øÈëÈİÆ÷½øĞĞ²Ù×÷£¬ÓĞ¶àÖÖ·½·¨£¬°üÀ¨Ê¹ÓÃ¹Ù·½µÄattach»òexecÃüÁî£¬ÒÔ¼°µÚÈı·½µÄnsenter¹¤¾ßµÈ¡£
+è¿™ä¸ªæ—¶å€™å¦‚æœéœ€è¦è¿›å…¥å®¹å™¨è¿›è¡Œæ“ä½œï¼Œæœ‰å¤šç§æ–¹æ³•ï¼ŒåŒ…æ‹¬ä½¿ç”¨å®˜æ–¹çš„attachæˆ–execå‘½ä»¤ï¼Œä»¥åŠç¬¬ä¸‰æ–¹çš„nsenterå·¥å…·ç­‰ã€‚
 
-### 5.1¡¢attachÃüÁî
+### 5.1ã€attachå‘½ä»¤
 
-- attachÃüÁî£¨Á¬½ÓºóÖ´ĞĞexit»áÍ£Ö¹ÈİÆ÷£©¡¾¹ıÊ±·½Ê½¡¿
+- attachå‘½ä»¤ï¼ˆè¿æ¥åæ‰§è¡Œexitä¼šåœæ­¢å®¹å™¨ï¼‰ã€è¿‡æ—¶æ–¹å¼ã€‘
 
-attachÊÇDocker×Ô´øµÄÃüÁî£¬ÃüÁî¸ñÊ½Îª£º
+attachæ˜¯Dockerè‡ªå¸¦çš„å‘½ä»¤ï¼Œå‘½ä»¤æ ¼å¼ä¸ºï¼š
 
 docker attach [--detach-keys[=[]]][--no-stdin] [--sig-proxy[=true]] CONTAINER
 
-| Ñ¡ÏîÃû             | Ä¬ÈÏÖµ | ÃèÊö                                                |
+| é€‰é¡¹å             | é»˜è®¤å€¼ | æè¿°                                                |
 | ------------------ | ------ | --------------------------------------------------- |
-| --detach-keys[=[]] |        | Ö¸¶¨ÍË³öattachÄ£Ê½µÄ¿ì½İ¼üĞòÁĞ£¬Ä¬ÈÏÊÇCtrl-p Ctrl-q |
-| --no-stdin         | false  | ÊÇ·ñ¹Ø±Õ±ê×¼ÊäÈë                                    |
-| --sig-proxy        | true   | ÊÇ·ñ´úÀíÊÕµ½µÄÏµÍ³ĞÅºÅ¸øÓ¦ÓÃ½ø³Ì                    |
+| --detach-keys[=[]] |        | æŒ‡å®šé€€å‡ºattachæ¨¡å¼çš„å¿«æ·é”®åºåˆ—ï¼Œé»˜è®¤æ˜¯Ctrl-p Ctrl-q |
+| --no-stdin         | false  | æ˜¯å¦å…³é—­æ ‡å‡†è¾“å…¥                                    |
+| --sig-proxy        | true   | æ˜¯å¦ä»£ç†æ”¶åˆ°çš„ç³»ç»Ÿä¿¡å·ç»™åº”ç”¨è¿›ç¨‹                    |
 
 ```shell
 [emon@emon ~]$ docker attach <container_id|container_name>
 ```
 
-µ«ÊÇÊ¹ÓÃattachÃüÁîÓĞÊ±ºò²»·½±ã¡£µ±¶à¸ö´°¿ÚÍ¬Ê±ÓÃattachÃüÁîÁ¬½Óµ½Í¬Ò»¸öÈİÆ÷µÄÊ±ºò£¬ËùÓĞ´°¿Ú¶¼»áÍ¬²½ÏÔÊ¾¡£µ±Ä³¸ö´°¿ÚÒòÃüÁî×èÈûÊ±£¬ÆäËû´°¿ÚÒ²ÎŞ·¨Ö´ĞĞ²Ù×÷ÁË¡£
+ä½†æ˜¯ä½¿ç”¨attachå‘½ä»¤æœ‰æ—¶å€™ä¸æ–¹ä¾¿ã€‚å½“å¤šä¸ªçª—å£åŒæ—¶ç”¨attachå‘½ä»¤è¿æ¥åˆ°åŒä¸€ä¸ªå®¹å™¨çš„æ—¶å€™ï¼Œæ‰€æœ‰çª—å£éƒ½ä¼šåŒæ­¥æ˜¾ç¤ºã€‚å½“æŸä¸ªçª—å£å› å‘½ä»¤é˜»å¡æ—¶ï¼Œå…¶ä»–çª—å£ä¹Ÿæ— æ³•æ‰§è¡Œæ“ä½œäº†ã€‚
 
-### 5.2¡¢execÃüÁî
+### 5.2ã€execå‘½ä»¤
 
-- execÃüÁî£¨Á¬½ÓºóÖ´ĞĞexit£¬²¢²»»áÍ£Ö¹ÈİÆ÷£©¡¾ÍÆ¼ö·½Ê½¡¿
+- execå‘½ä»¤ï¼ˆè¿æ¥åæ‰§è¡Œexitï¼Œå¹¶ä¸ä¼šåœæ­¢å®¹å™¨ï¼‰ã€æ¨èæ–¹å¼ã€‘
 
- Docker´Ó1.3.0°æ±¾ÆğÌá¹©ÁËÒ»¸ö¸ü¼Ó·½±ãµÄexecÃüÁî£¬¿ÉÒÔÔÚÈİÆ÷ÄÚÖ±½ÓÖ´ĞĞÈÎÒâÃüÁî¡£¸ÃÃüÁîµÄ»ù±¾¸ñÊ½Îª
+ Dockerä»1.3.0ç‰ˆæœ¬èµ·æä¾›äº†ä¸€ä¸ªæ›´åŠ æ–¹ä¾¿çš„execå‘½ä»¤ï¼Œå¯ä»¥åœ¨å®¹å™¨å†…ç›´æ¥æ‰§è¡Œä»»æ„å‘½ä»¤ã€‚è¯¥å‘½ä»¤çš„åŸºæœ¬æ ¼å¼ä¸º
 
 docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged][-t| --tty] [-u| --user[=USER]] CONTAINER COMMAND [ARG...]
 
-| Ñ¡ÏîÃû           | Ä¬ÈÏÖµ | ÃèÊö                         |
+| é€‰é¡¹å           | é»˜è®¤å€¼ | æè¿°                         |
 | ---------------- | ------ | ---------------------------- |
-| -i,--interactive | false  | ´ò¿ª±ê×¼ÊäÈë½ÓÊÜÓÃ»§ÊäÈëÃüÁî |
-| --privileged     | false  | ÊÇ·ñ¸øÖ´ĞĞÃüÁîÒÔ¸ßÈ¨ÏŞ       |
-| -t,--tty         | false  | ·ÖÅäÎ±ÖÕ¶Ë£¬Ä¬ÈÏÎªfalse      |
-| -u,--user        |        | Ö´ĞĞÃüÁîµÄÓÃ»§Ãû»òÕßID       |
+| -i,--interactive | false  | æ‰“å¼€æ ‡å‡†è¾“å…¥æ¥å—ç”¨æˆ·è¾“å…¥å‘½ä»¤ |
+| --privileged     | false  | æ˜¯å¦ç»™æ‰§è¡Œå‘½ä»¤ä»¥é«˜æƒé™       |
+| -t,--tty         | false  | åˆ†é…ä¼ªç»ˆç«¯ï¼Œé»˜è®¤ä¸ºfalse      |
+| -u,--user        |        | æ‰§è¡Œå‘½ä»¤çš„ç”¨æˆ·åæˆ–è€…ID       |
 
-- ½øÈëÈİÆ÷
+- è¿›å…¥å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker exec -it <container_id|container_name> /bin/bash
 ```
 
-- »¹¿ÉÒÔÖ´ĞĞÆäËûÃüÁî
+- è¿˜å¯ä»¥æ‰§è¡Œå…¶ä»–å‘½ä»¤
 
 ```bash
 [emon@emon ~]$ docker exec -it <container_id|container_name> ip addr
@@ -1787,11 +1787,11 @@ docker exec [-d| --detach][--detach-keys[=[]]]	[-i| --interactive] [--privileged
 
 
 
-### 5.3¡¢Ê¹ÓÃnsenter¹¤¾ß
+### 5.3ã€ä½¿ç”¨nsenterå·¥å…·
 
-ÔİÂÔ
+æš‚ç•¥
 
-### 5.4¡¢docker cp
+### 5.4ã€docker cp
 
 ```bash
 $ docker cp a1870eec1273:/usr/local/openjdk-8/lib/security/java.security java.security
@@ -1800,41 +1800,41 @@ $ docker cp java.security a1870eec1273:/usr/local/openjdk-8/lib/security/java.se
 
 
 
-## 6¡¢É¾³ıÈİÆ÷
+## 6ã€åˆ é™¤å®¹å™¨
 
-¿ÉÒÔÊ¹ÓÃdocker rm ÃüÁîÀ´É¾³ı´¦ÓÚÖÕÖ¹»òÍË³ö×´Ì¬µÄÈİÆ÷£¬ÃüÁî¸ñÊ½Îª£º
+å¯ä»¥ä½¿ç”¨docker rm å‘½ä»¤æ¥åˆ é™¤å¤„äºç»ˆæ­¢æˆ–é€€å‡ºçŠ¶æ€çš„å®¹å™¨ï¼Œå‘½ä»¤æ ¼å¼ä¸ºï¼š
 
-docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]¡£
+docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]ã€‚
 
-| Ñ¡ÏîÃû       | Ä¬ÈÏÖµ | ÃèÊö                               |
+| é€‰é¡¹å       | é»˜è®¤å€¼ | æè¿°                               |
 | ------------ | ------ | ---------------------------------- |
-| -f,--force   | false  | ÊÇ·ñÇ¿ĞĞÖÕÖ¹²¢É¾³ıÒ»¸öÔËĞĞÖĞµÄÈİÆ÷ |
-| -l,--link    | false  | É¾³ıÈİÆ÷µÄÁ¬½Ó£¬µ«±£ÁôÈİÆ÷         |
-| -v,--volumes | false  | É¾³ıÈİÆ÷¹ÒÔØµÄÊı¾İ¾í               |
+| -f,--force   | false  | æ˜¯å¦å¼ºè¡Œç»ˆæ­¢å¹¶åˆ é™¤ä¸€ä¸ªè¿è¡Œä¸­çš„å®¹å™¨ |
+| -l,--link    | false  | åˆ é™¤å®¹å™¨çš„è¿æ¥ï¼Œä½†ä¿ç•™å®¹å™¨         |
+| -v,--volumes | false  | åˆ é™¤å®¹å™¨æŒ‚è½½çš„æ•°æ®å·               |
 
-- ²é¿´²¢É¾³ıÍ£Ö¹×´Ì¬µÄÈİÆ÷
+- æŸ¥çœ‹å¹¶åˆ é™¤åœæ­¢çŠ¶æ€çš„å®¹å™¨
 
-1. ²é¿´Í£Ö¹×´Ì¬µÄÈİÆ÷
+1. æŸ¥çœ‹åœæ­¢çŠ¶æ€çš„å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker ps -q -f status=exited
 ```
 
-2. É¾³ıÍ£Ö¹×´Ì¬µÄÈİÆ÷
+2. åˆ é™¤åœæ­¢çŠ¶æ€çš„å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker rm <container_id|container_name>
 ```
 
-3. É¾³ıËùÓĞÍ£Ö¹×´Ì¬µÄÈİÆ÷
+3. åˆ é™¤æ‰€æœ‰åœæ­¢çŠ¶æ€çš„å®¹å™¨
 
 ```bash
 [emon@emon ~]$ docker rm $(docker ps -aq --filter status=exited)
-# »òÕß
+# æˆ–è€…
 [emon@emon ~]$ docker rm $(docker container ls -f "status=exited" -q)
 ```
 
-4. É¾³ıÍ£Ö¹×´Ì¬µÄÈİÆ÷£¬²¢É¾³ıÆävolume£¨±¸×¢£ºÈç¹ûÊÇÆô¶¯Ê±Ö¸¶¨µÄ-v£¬²¢²»»á±»É¾³ı£©
+4. åˆ é™¤åœæ­¢çŠ¶æ€çš„å®¹å™¨ï¼Œå¹¶åˆ é™¤å…¶volumeï¼ˆå¤‡æ³¨ï¼šå¦‚æœæ˜¯å¯åŠ¨æ—¶æŒ‡å®šçš„-vï¼Œå¹¶ä¸ä¼šè¢«åˆ é™¤ï¼‰
 
 ```bash
 [emon@emon ~]$ docker rm -v <container_id|container_name>
@@ -1842,100 +1842,100 @@ docker rm [-f|--force][-l|--link] [-v|--volumes] CONTAINER [CONTAINER...]¡£
 
 
 
-- É¾³ıÔËĞĞ×´Ì¬µÄÈİÆ÷
+- åˆ é™¤è¿è¡ŒçŠ¶æ€çš„å®¹å™¨
 
-1. ²é¿´ÔËĞĞ×´Ì¬µÄÈİÆ÷
+1. æŸ¥çœ‹è¿è¡ŒçŠ¶æ€çš„å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker ps -q
-»òÕß
+æˆ–è€…
 [emon@emon ~]$ docker ps -q --filter status=running
 ```
 
-2. É¾³ıÔËĞĞ×´Ì¬µÄÈİÆ÷
+2. åˆ é™¤è¿è¡ŒçŠ¶æ€çš„å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker rm -f 3aa0487c2904
 ```
 
-## 7¡¢µ¼ÈëºÍµ¼³öÈİÆ÷
+## 7ã€å¯¼å…¥å’Œå¯¼å‡ºå®¹å™¨
 
-Ä³Ğ©Ê±ºò£¬ĞèÒª½«ÈİÆ÷´ÓÒ»¸öÏµÍ³Ç¨ÒÆµ½ÁíÍâÒ»¸öÏµÍ³£¬´ËÊ±¿ÉÒÔÊ¹ÓÃDockerµÄµ¼ÈëºÍµ¼³ö¹¦ÄÜ¡£ÕâÒ²ÊÇDocker×ÔÉíÌá¹©µÄÒ»¸öÖØÒªÌØĞÔ¡£
+æŸäº›æ—¶å€™ï¼Œéœ€è¦å°†å®¹å™¨ä»ä¸€ä¸ªç³»ç»Ÿè¿ç§»åˆ°å¦å¤–ä¸€ä¸ªç³»ç»Ÿï¼Œæ­¤æ—¶å¯ä»¥ä½¿ç”¨Dockerçš„å¯¼å…¥å’Œå¯¼å‡ºåŠŸèƒ½ã€‚è¿™ä¹Ÿæ˜¯Dockerè‡ªèº«æä¾›çš„ä¸€ä¸ªé‡è¦ç‰¹æ€§ã€‚
 
-### 7.1¡¢µ¼³öÈİÆ÷
+### 7.1ã€å¯¼å‡ºå®¹å™¨
 
-µ¼³öÈİÆ÷ÊÇÖ¸µ¼³öÒ»¸öÒÑ¾­´´½¨µÄÈİÆ÷µ½Ò»¸öÎÄ¼ş£¬²»¹Ü´ËÊ±Õâ¸öÈİÆ÷ÊÇ·ñ´¦ÓÚÔËĞĞ×´Ì¬£¬¿ÉÒÔÊ¹ÓÃdocker exportÃüÁî£¬¸ÃÃüÁîµÄ¸ñÊ½Îª£º
+å¯¼å‡ºå®¹å™¨æ˜¯æŒ‡å¯¼å‡ºä¸€ä¸ªå·²ç»åˆ›å»ºçš„å®¹å™¨åˆ°ä¸€ä¸ªæ–‡ä»¶ï¼Œä¸ç®¡æ­¤æ—¶è¿™ä¸ªå®¹å™¨æ˜¯å¦å¤„äºè¿è¡ŒçŠ¶æ€ï¼Œå¯ä»¥ä½¿ç”¨docker exportå‘½ä»¤ï¼Œè¯¥å‘½ä»¤çš„æ ¼å¼ä¸ºï¼š
 
-docker export [-o|--output[=""]] CONTAINER¡£
+docker export [-o|--output[=""]] CONTAINERã€‚
 
-ÆäÖĞ£¬¿ÉÒÔÍ¨¹ı-oÑ¡ÏîÀ´Ö¸¶¨µ¼³öµÄtarÎÄ¼şÃû£¬Ò²¿ÉÒÔÖ±½ÓÍ¨¹ıÖØ¶¨ÏòÀ´ÊµÏÖ¡£
+å…¶ä¸­ï¼Œå¯ä»¥é€šè¿‡-oé€‰é¡¹æ¥æŒ‡å®šå¯¼å‡ºçš„taræ–‡ä»¶åï¼Œä¹Ÿå¯ä»¥ç›´æ¥é€šè¿‡é‡å®šå‘æ¥å®ç°ã€‚
 
-1. ²é¿´ÈİÆ÷
+1. æŸ¥çœ‹å®¹å™¨
 
 ```shell
 [emon@emon ~]$ docker ps -qa
 ```
 
-2. µ¼³öÈİÆ÷ÎÄ¼ş
+2. å¯¼å‡ºå®¹å™¨æ–‡ä»¶
 
 ```shell
 [emon@emon ~]$ docker export -o test_for_centos.tar 7fcaad938106
 ```
 
-Ö®ºó£¬¿É½«µ¼³öµÄtarÎÄ¼ş´«Êäµ½ÆäËû»úÆ÷ÉÏ£¬È»ºóÔÙÍ¨¹ıµ¼ÈëÃüÁîµ¼Èëµ½ÏµÍ³ÖĞ£¬´Ó¶øÊµÏÖÈİÆ÷µÄÇ¨ÒÆ¡£
+ä¹‹åï¼Œå¯å°†å¯¼å‡ºçš„taræ–‡ä»¶ä¼ è¾“åˆ°å…¶ä»–æœºå™¨ä¸Šï¼Œç„¶åå†é€šè¿‡å¯¼å…¥å‘½ä»¤å¯¼å…¥åˆ°ç³»ç»Ÿä¸­ï¼Œä»è€Œå®ç°å®¹å™¨çš„è¿ç§»ã€‚
 
-### 7.2¡¢µ¼ÈëÈİÆ÷
+### 7.2ã€å¯¼å…¥å®¹å™¨
 
-µ¼³öµÄÎÄ¼şÓÖ¿ÉÒÔÊ¹ÓÃdocker importÃüÁîµ¼Èë±ä³É¾µÏñ£¬¸ÃÃüÁî¸ñÊ½Îª£º
+å¯¼å‡ºçš„æ–‡ä»¶åˆå¯ä»¥ä½¿ç”¨docker importå‘½ä»¤å¯¼å…¥å˜æˆé•œåƒï¼Œè¯¥å‘½ä»¤æ ¼å¼ä¸ºï¼š
 
 docker import [-c|--change[=[]]][-m|--message[=MESSAGE]] file|URL|-[REPOSITORY[:TAG]]
 
-ÓÃ»§¿ÉÒÔÍ¨¹ı-c, --change=[]Ñ¡ÏîÔÚµ¼ÈëµÄÍ¬Ê±Ö´ĞĞ¶ÔÈİÆ÷½øĞĞĞŞ¸ÄµÄDockerfileÖ¸Áî¡£
+ç”¨æˆ·å¯ä»¥é€šè¿‡-c, --change=[]é€‰é¡¹åœ¨å¯¼å…¥çš„åŒæ—¶æ‰§è¡Œå¯¹å®¹å™¨è¿›è¡Œä¿®æ”¹çš„DockerfileæŒ‡ä»¤ã€‚
 
 ```shell
 [emon@emon ~]$ docker import test_for_centos.tar centos:7-test
 ```
 
-×¢Òâ£ºµ¼ÈëÈİÆ÷ºó£¬ÌåÏÖÎª¾µÏñ£¬ĞèÒªÆô¶¯²Å»á³öÏÖµ½docker ps -qaÁĞ±íÖĞ¡£
+æ³¨æ„ï¼šå¯¼å…¥å®¹å™¨åï¼Œä½“ç°ä¸ºé•œåƒï¼Œéœ€è¦å¯åŠ¨æ‰ä¼šå‡ºç°åˆ°docker ps -qaåˆ—è¡¨ä¸­ã€‚
 
-## 8¡¢²é¿´ÈİÆ÷ÈÕÖ¾
+## 8ã€æŸ¥çœ‹å®¹å™¨æ—¥å¿—
 
-- ÃüÁî¸ñÊ½£º `docker logs [OPTIONS]` <container_id|container_name>
+- å‘½ä»¤æ ¼å¼ï¼š `docker logs [OPTIONS]` <container_id|container_name>
 
-| Ñ¡ÏîÃû          | Ä¬ÈÏÖµ | ÃèÊö                                                         |
+| é€‰é¡¹å          | é»˜è®¤å€¼ | æè¿°                                                         |
 | --------------- | ------ | ------------------------------------------------------------ |
-| --details       |        | ÏÔÊ¾¸ü¶àµÄĞÅÏ¢                                               |
-| -f,--follow     |        | ¸ú×ÙÊµÊ±ÈÕÖ¾                                                 |
-| --since string  |        | ÏÔÊ¾×ÔÄ³¸ötimestampÖ®ºóµÄÈÕÖ¾£¬»òÏà¶ÔÊ±¼ä£¬Èç42m£¨¼´42·ÖÖÓ£© |
-| --tail string   |        | ´ÓÈÕÖ¾Ä©Î²ÏÔÊ¾¶àÉÙĞĞÈÕÖ¾£¬Ä¬ÈÏÊÇall                          |
-| -t,--timestamps |        | ÏÔÊ¾Ê±¼ä´Á                                                   |
-| --until string  |        | ÏÔÊ¾×ÔÄ³¸ötimestampÖ®Ç°µÄÈÕÖ¾£¬»òÕßÏà¶ÔÊ±¼ä£¬Èç42m£¨¼´42·ÖÖÓ£© |
+| --details       |        | æ˜¾ç¤ºæ›´å¤šçš„ä¿¡æ¯                                               |
+| -f,--follow     |        | è·Ÿè¸ªå®æ—¶æ—¥å¿—                                                 |
+| --since string  |        | æ˜¾ç¤ºè‡ªæŸä¸ªtimestampä¹‹åçš„æ—¥å¿—ï¼Œæˆ–ç›¸å¯¹æ—¶é—´ï¼Œå¦‚42mï¼ˆå³42åˆ†é’Ÿï¼‰ |
+| --tail string   |        | ä»æ—¥å¿—æœ«å°¾æ˜¾ç¤ºå¤šå°‘è¡Œæ—¥å¿—ï¼Œé»˜è®¤æ˜¯all                          |
+| -t,--timestamps |        | æ˜¾ç¤ºæ—¶é—´æˆ³                                                   |
+| --until string  |        | æ˜¾ç¤ºè‡ªæŸä¸ªtimestampä¹‹å‰çš„æ—¥å¿—ï¼Œæˆ–è€…ç›¸å¯¹æ—¶é—´ï¼Œå¦‚42mï¼ˆå³42åˆ†é’Ÿï¼‰ |
 
-- ²é¿´Ö¸¶¨Ê±¼äºóµÄÈÕÖ¾£¬Ö»ÏÔÊ¾×îºó100ĞĞ
+- æŸ¥çœ‹æŒ‡å®šæ—¶é—´åçš„æ—¥å¿—ï¼Œåªæ˜¾ç¤ºæœ€å100è¡Œ
 
 ```bash
 docker logs -f -t --since="2021-02-17" --tail=100 <container_id|container_name>
 ```
 
-- ²é¿´×î½ü30·ÖÖÓµÄÈÕÖ¾
+- æŸ¥çœ‹æœ€è¿‘30åˆ†é’Ÿçš„æ—¥å¿—
 
 ```bash
 docker logs --since 30 <container_id|container_name>
 ```
 
-- ²é¿´Ä³¸öÊ±¼äÖ®ºóµÄÈÕÖ¾
+- æŸ¥çœ‹æŸä¸ªæ—¶é—´ä¹‹åçš„æ—¥å¿—
 
 ```bash
 docker logs -t --since="2021-02-17T13:05:30" <container_id|container_name>
 ```
 
-- ÊµÊ±²é¿´
+- å®æ—¶æŸ¥çœ‹
 
 ```bash
 docker logs -f <container_id|container_name>
 ```
 
-- ÆÕÍ¨²é¿´
+- æ™®é€šæŸ¥çœ‹
 
 ```bash
 docker logs <container_id|container_name>
@@ -1943,52 +1943,55 @@ docker logs <container_id|container_name>
 
 
 
-## 9¡¢Ê¹ÓÃinspectÃüÁî²é¿´ÈİÆ÷ÏêÏ¸ĞÅÏ¢
+## 9ã€ä½¿ç”¨inspectå‘½ä»¤æŸ¥çœ‹å®¹å™¨è¯¦ç»†ä¿¡æ¯
 
 ```bash
 [emon@emon ~]$ docker inspect <container_id|container_name>
 ```
 
-## 10¡¢¸üĞÂÈİÆ÷
+## 10ã€æ›´æ–°å®¹å™¨
 
-- ÉèÖÃÈİÆ÷×Ô¶¯ÖØÆô£¨ÔÚdockerÖØÆôÊ±£©
+- è®¾ç½®å®¹å™¨è‡ªåŠ¨é‡å¯ï¼ˆåœ¨dockeré‡å¯æ—¶ï¼‰
 
 ```bash
 docker update <container_id|container_name> --restart=always
 ```
 
-## 11¡¢²é¿´ÈİÆ÷port
+## 11ã€æŸ¥çœ‹å®¹å™¨port
 
-- ²é¿´ÈİÆ÷µÄport
+- æŸ¥çœ‹å®¹å™¨çš„port
 
 ```bash
 $ docker port <container_id|container_name>
 ```
 
-# Îå¡¢DockerfileÓï·¨ÊáÀí¼°×î¼ÑÊµ¼ù
+# äº”ã€Dockerfileè¯­æ³•æ¢³ç†åŠæœ€ä½³å®è·µ
 
 [Docker reference](https://docs.docker.com/engine/reference/builder/)
 
-## 1¡¢¹Ø¼ü×Ö½²½â
+## 1ã€å…³é”®å­—è®²è§£
 
-### 1.1¡¢¹Ø¼ü×Ö£ºFROM
+### 1.1ã€å…³é”®å­—ï¼šFROM
 
 ```dockerfile
-# ÖÆ×÷base image
+# åˆ¶ä½œbase image
 FROM scratch
 ```
 
 ```dockerfile
-# Ê¹ÓÃbase image
+# ä½¿ç”¨base image
 FROM centos:7
 ```
 
 ```dockerfile
-# Ê¹ÓÃbase imageµÄlatest
+# ä½¿ç”¨base imageçš„latest
 FROM ubuntu
 ```
 
-### 1.2¡¢¹Ø¼ü×Ö£ºLABEL
+### 1.2ã€å…³é”®å­—ï¼šLABEL
+
+- æ·»åŠ é•œåƒçš„å…ƒæ•°æ®ï¼ˆå¦‚ç»´æŠ¤è€…ã€ç‰ˆæœ¬ï¼‰ã€‚
+- ç¤ºä¾‹
 
 ```dockerfile
 LABEL maintainer="rushing@163.com"
@@ -1996,111 +1999,124 @@ LABEL version="1.0"
 LABEL description="This is description"
 ```
 
-ËµÃ÷£º
+è¯´æ˜ï¼š
 
-- Metadata²»¿ÉÉÙ£¡
+- Metadataä¸å¯å°‘ï¼
 
-### 1.3¡¢¹Ø¼ü×Ö£ºRUN
+### 1.3ã€å…³é”®å­—ï¼šRUN
 
 ```dockerfile
-# ·´Ğ±Ïß»»ĞĞ
+# åæ–œçº¿æ¢è¡Œ
 RUN yum update && yum install -y vim \
     python-dev
 RUN /bin/bash -c 'source $HOME/.bashrc;echo $HOME'
 ```
 
-ËµÃ÷£º
+è¯´æ˜ï¼š
 
-Ã¿Ò»´ÎRUNÃüÁî£¬¶¼»áÉú³ÉĞÂµÄÒ»²ã£¡
+æ¯ä¸€æ¬¡RUNå‘½ä»¤ï¼Œéƒ½ä¼šç”Ÿæˆæ–°çš„ä¸€å±‚ï¼
 
-ÎªÁËÃÀ¹Û£¬¸´ÔÓµÄRUNÇëÓÃ·´Ğ±Ïß»»ĞĞ£¡
+ä¸ºäº†ç¾è§‚ï¼Œå¤æ‚çš„RUNè¯·ç”¨åæ–œçº¿æ¢è¡Œï¼
 
-±ÜÃâÎŞÓÃ·Ö²ã£¬ºÏ²¢¶àÌõÃüÁî³ÉÒ»ĞĞ£¡
+é¿å…æ— ç”¨åˆ†å±‚ï¼Œåˆå¹¶å¤šæ¡å‘½ä»¤æˆä¸€è¡Œï¼
 
-### 1.4¡¢¹Ø¼ü×Ö£ºWORKDIR
+### 1.4ã€å…³é”®å­—ï¼šWORKDIR
 
 ```dockerfile
-# ´´½¨¸ùÄ¿Â¼ÏÂtestÎÄ¼ş¼Ğ
+# åˆ›å»ºæ ¹ç›®å½•ä¸‹testæ–‡ä»¶å¤¹
 WORKDIR /root
 ```
 
 ```dockerfile
-# Èç¹ûÃ»ÓĞ»á×Ô¶¯´´½¨testÄ¿Â¼
+# å¦‚æœæ²¡æœ‰ä¼šè‡ªåŠ¨åˆ›å»ºtestç›®å½•
 WORKDIR /test
 WORKDIR demo
-# Êä³ö½á¹ûÓ¦¸ÃÊÇ /test/demo
+# è¾“å‡ºç»“æœåº”è¯¥æ˜¯ /test/demo
 RUN pwd
 ```
 
-ËµÃ÷£º
+è¯´æ˜ï¼š
 
-- ÓÃWORKDIR£¬²»ÒªÓÃRUN cd£¡
-- ¾¡Á¿Ê¹ÓÃ¾ø¶ÔÄ¿Â¼£¡
+- ç”¨WORKDIRï¼Œä¸è¦ç”¨RUN cdï¼
+- å°½é‡ä½¿ç”¨ç»å¯¹ç›®å½•ï¼
 
-### 1.5¡¢¹Ø¼ü×Ö£ºADD and COPY
+### 1.5ã€å…³é”®å­—ï¼šADD and COPY
 
 ```dockerfile
-# °ÑhelloÎÄ¼şÌí¼Óµ½/Ä¿Â¼
+# æŠŠhelloæ–‡ä»¶æ·»åŠ åˆ°/ç›®å½•
 ADD hello /
 ```
 
 ```dockerfile
-# Ìí¼Óµ½¸ùÄ¿Â¼²¢½âÑ¹
+# æ·»åŠ åˆ°æ ¹ç›®å½•å¹¶è§£å‹
 ADD test.tar.gz /
 ```
 
 ```dockerfile
 WORKDIR /root
-# »á´´½¨²»´æÔÚµÄÎÄ¼ş¼Ğ£¬½á¹û£º/root/test/hello
+# ä¼šåˆ›å»ºä¸å­˜åœ¨çš„æ–‡ä»¶å¤¹ï¼Œç»“æœï¼š/root/test/hello
 ADD hello test/
 ```
 
 ```dockerfile
 WORKDIR /root
-# »á´´½¨²»´æÔÚµÄÎÄ¼ş¼Ğ£¬½á¹û£º/root/test/hello
+# ä¼šåˆ›å»ºä¸å­˜åœ¨çš„æ–‡ä»¶å¤¹ï¼Œç»“æœï¼š/root/test/hello
 COPY hello test/
 ```
 
-ËµÃ÷£º
+è¯´æ˜ï¼š
 
-- ´ó²¿·ÖÇé¿ö£¬COPYÓÅÓÚADD£¡
+- å¤§éƒ¨åˆ†æƒ…å†µï¼ŒCOPYä¼˜äºADDï¼
 
-- ADD³ıÁËCOPY»¹ÓĞ¶îÍâ¹¦ÄÜ£¨½âÑ¹£©£¡
-- Ìí¼ÓÔ¶³ÌÎÄ¼ş/Ä¿Â¼ÇëÊ¹ÓÃcurl»òÕßwget£¡
+- ADDé™¤äº†COPYè¿˜æœ‰é¢å¤–åŠŸèƒ½ï¼ˆè§£å‹ï¼‰ï¼
+- æ·»åŠ è¿œç¨‹æ–‡ä»¶/ç›®å½•è¯·ä½¿ç”¨curlæˆ–è€…wgetï¼
 
-### 1.6¡¢¹Ø¼ü×Ö£ºENV
+### 1.6ã€å…³é”®å­—ï¼šENV
 
-```doc
-# ÉèÖÃ³£Á¿
+- è®¾ç½®ç¯å¢ƒå˜é‡ï¼ˆå¯è¢«åç»­æŒ‡ä»¤æˆ–å®¹å™¨è¿è¡Œæ—¶ä½¿ç”¨ï¼‰ã€‚
+- ç¤ºä¾‹
+
+```dockerfile
+# è®¾ç½®å¸¸é‡
 ENV MYSQL_VERSION 5.6
-# ÒıÓÃ³£Á¿
+ENV JAVA_HOME /usr/lib/jvm/java-11
+# å¼•ç”¨å¸¸é‡
 RUN apt-get install -y mysql-server="${MYSQL_VERSION}" \
 	&& rm -rf /var/lib/apt/lists/*
 ```
 
-ËµÃ÷£º
+è¯´æ˜ï¼š
 
-- ¾¡Á¿Ê¹ÓÃENVÔö¼Ó¿ÉÎ¬»¤ĞÔ£¡
+- å°½é‡ä½¿ç”¨ENVå¢åŠ å¯ç»´æŠ¤æ€§ï¼
 
-### 1.7¡¢¹Ø¼ü×Ö£ºVOLUME and EXPOSE
+### 1.7ã€å…³é”®å­—ï¼šVOLUME and EXPOSE
 
-´æ´¢ºÍÍøÂç¡£
+å­˜å‚¨å’Œç½‘ç»œã€‚
 
-### 1.8¡¢RUN vs CMD vs ENTRYPOINT
+### 1.8ã€RUN vs CMD vs ENTRYPOINT
 
-- RUN£ºÖ´ĞĞÃüÁî²¢´´½¨ĞÂµÄ IMAGE Layer
+- RUNï¼šæ‰§è¡Œå‘½ä»¤å¹¶åˆ›å»ºæ–°çš„ IMAGE Layer
 
-- CMD£ºÉèÖÃÈİÆ÷Æô¶¯ºóÄ¬ÈÏÖ´ĞĞµÄÃüÁîºÍ²ÎÊı
-  - ÈİÆ÷Æô¶¯Ê±Ä¬ÈÏÖ´ĞĞµÄÃüÁî
-  - Èç¹ûdocker runÖ¸¶¨ÁËÆäËûÃüÁî£¬CMDÃüÁî±»ºöÂÔ
-  - Èç¹û¶¨ÒåÁË¶à¸öCMD£¬Ö»ÓĞ×îºóÒ»¸ö»áÖ´ĞĞ
+- CMDï¼šè®¾ç½®å®¹å™¨å¯åŠ¨å**é»˜è®¤æ‰§è¡Œçš„å‘½ä»¤å’Œå‚æ•°**
+  - å®¹å™¨å¯åŠ¨æ—¶é»˜è®¤æ‰§è¡Œçš„å‘½ä»¤
+  - å¦‚æœdocker runæŒ‡å®šäº†å…¶ä»–å‘½ä»¤ï¼ŒCMDå‘½ä»¤è¢«å¿½ç•¥
+  - å¦‚æœå®šä¹‰äº†å¤šä¸ªCMDï¼Œåªæœ‰æœ€åä¸€ä¸ªä¼šæ‰§è¡Œ
 
-- ENTRYPOINT£ºÉèÖÃÈİÆ÷Æô¶¯Ê±ÔËĞĞµÄÃüÁî
+- ENTRYPOINTï¼šè®¾ç½®å®¹å™¨å¯åŠ¨æ—¶è¿è¡Œçš„å‘½ä»¤
 
-  - ÈÃÈİÆ÷ÒÔÓ¦ÓÃ³ÌĞò»òÕß·şÎñµÄĞÎÊ½ÔËĞĞ
-  - ²»»á±»ºöÂÔ£¬Ò»¶¨±»Ö´ĞĞ
-  - ×î¼ÑÊµ¼ù£ºĞ´Ò»¸öshell½Å±¾×÷Îªentrypoint
-
+  - å®šä¹‰å®¹å™¨å¯åŠ¨æ—¶çš„å…¥å£å‘½ä»¤ï¼ˆ`CMD` çš„å†…å®¹ä¼šä½œä¸ºå…¶å‚æ•°ï¼‰ã€‚
+  
+    ```dockerfile
+    ENTRYPOINT ["java", "-jar"]
+    CMD ["app.jar"]
+    ```
+  
+  - è®©å®¹å™¨ä»¥åº”ç”¨ç¨‹åºæˆ–è€…æœåŠ¡çš„å½¢å¼è¿è¡Œ
+  
+  - ä¸ä¼šè¢«å¿½ç•¥ï¼Œä¸€å®šè¢«æ‰§è¡Œ
+  
+  - æœ€ä½³å®è·µï¼šå†™ä¸€ä¸ªshellè„šæœ¬ä½œä¸ºentrypoint
+  
   ```dockerfile
   COPY docker-entrypoint.sh /usr/local/bin/
   ENTRYPOINT [ "docker-entrypoint.sh" ]
@@ -2109,9 +2125,7 @@ RUN apt-get install -y mysql-server="${MYSQL_VERSION}" \
   CMD [ "mongod" ]
   ```
 
-
-
-#### 1.8.1¡¢ENTRYPOINTÖ®Shell¸ñÊ½
+#### 1.8.1ã€ENTRYPOINTä¹‹Shellæ ¼å¼
 
 ```bash
 [emon@emon ~]$ mkdir -pv ~/dockerdata/entrypoint_shell
@@ -2131,7 +2145,7 @@ ENTRYPOINT echo "hello $name"
 hello Docker
 ```
 
-#### 1.8.2¡¢ENTRYPOINTÖ®Exec¸ñÊ½
+#### 1.8.2ã€ENTRYPOINTä¹‹Execæ ¼å¼
 
 ```bash
 [emon@emon ~]$ mkdir -pv ~/dockerdata/entrypoint_exec
@@ -2151,7 +2165,7 @@ ENTRYPOINT [ "bin/bash", "-c", "echo hello $name" ]
 hello Docker
 ```
 
-#### 1.8.3¡¢CMDÖ®Shell
+#### 1.8.3ã€CMDä¹‹Shell
 
 ```bash
 [emon@emon ~]$ mkdir -pv ~/dockerdata/cmd_shell
@@ -2169,11 +2183,11 @@ CMD echo "hello $name"
 [emon@emon cmd_shell]$ docker build -t rushing/centos-cmd-shell .
 [emon@emon cmd_shell]$ docker run rushing/centos-cmd-shell
 hello Docker
-# Èç¹ûÖ¸¶¨ /bin/bash Ê±£¬»á¸²¸ÇCMDÓï¾äÖ´ĞĞ
+# å¦‚æœæŒ‡å®š /bin/bash æ—¶ï¼Œä¼šè¦†ç›–CMDè¯­å¥æ‰§è¡Œ
 [emon@emon cmd_shell]$ docker run rushing/centos-cmd-shell /bin/bash
 ```
 
-#### 1.8.4¡¢CMDÖ®Exec
+#### 1.8.4ã€CMDä¹‹Exec
 
 ```bash
 [emon@emon ~]$ mkdir -pv ~/dockerdata/cmd_exec
@@ -2195,9 +2209,9 @@ hello Docker
 
 
 
-### 1.9¡¢ShellºÍExec¸ñÊ½
+### 1.9ã€Shellå’ŒExecæ ¼å¼
 
-- Shell¸ñÊ½
+- Shellæ ¼å¼
 
 ```dockerfile
 RUN apt-get install -y vim
@@ -2205,7 +2219,7 @@ CMD echo "hello docker"
 ENTRYPOINT echo "hello docker"
 ```
 
-- Exec¸ñÊ½
+- Execæ ¼å¼
 
 ```dockerfile
 RUN [ "apt-get", "install", "-y", "vim" ]
@@ -2213,24 +2227,53 @@ CMD [ "/bin/echo", "hello docker" ]
 ENTRYPOINT [ "/bin/echo", "hello docker" ]
 ```
 
+### 1.10 USER
+
+- ä½œç”¨ï¼šåˆ‡æ¢è¿è¡Œå‘½ä»¤çš„ç”¨æˆ·ï¼ˆæå‡å®‰å…¨æ€§ï¼‰ã€‚
+- ç¤ºä¾‹
+
+```do
+USER nobody
+```
+
+### 1.11 EXPOSE
+
+- å£°æ˜å®¹å™¨ç›‘å¬çš„ç«¯å£ï¼ˆéœ€é€šè¿‡ `docker run -p` å®é™…æ˜ å°„åˆ°å®¿ä¸»æœºï¼‰ã€‚
+- ç¤ºä¾‹
+
+```dockerfile
+EXPOSE 80/tcp
+```
+
+### 1.12 VOLUME
+
+- å®šä¹‰å®¹å™¨æ•°æ®å·æŒ‚è½½ç‚¹ï¼ˆç”¨äºæŒä¹…åŒ–æ•°æ®ï¼‰ã€‚
+- ç¤ºä¾‹
+
+```dockerfile
+VOLUME /var/lib/mysql
+```
 
 
-## 2¡¢°¸Àı
 
-²Î¿¼Ê¾Àı£ºhttps://github.com/docker-library/mysql
 
-### 2.1¡¢°¸Àı£ºflask-demo·şÎñ¾µÏñ
 
-1£º´´½¨Ä¿Â¼
+## 2ã€æ¡ˆä¾‹
+
+å‚è€ƒç¤ºä¾‹ï¼šhttps://github.com/docker-library/mysql
+
+### 2.1ã€æ¡ˆä¾‹ï¼šflask-demoæœåŠ¡é•œåƒ
+
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/flask-demo
 [emon@emon ~]$ cd dockerdata/flask-demo/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-- ´´½¨app.py
+- åˆ›å»ºapp.py
 
 ```bash
 [emon@emon flask-demo]$ vim app.py
@@ -2252,19 +2295,19 @@ if __name__ == '__main__':
     )
 ```
 
-- °²×°flask
+- å®‰è£…flask
 
 ```bash
 [emon@emon flask-demo]$ pip3 install flask
 ```
 
-- ÔËĞĞ
+- è¿è¡Œ
 
 ```bash
 [emon@emon flask-demo]$ python3 app.py
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon flask-demo]$ vim Dockerfile
@@ -2280,20 +2323,20 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-4£º´´½¨¾µÏñ
+4ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon flask-demo]$ docker build -t rushing/flask-hello-world .
-......Ê¡ÂÔ......
+......çœç•¥......
 Step 4/7 : COPY app.py /app
  ---> 5584b327f25d
 Step 5/7 : WORKDIR /app
 Cannot mkdir: /app is not a directory
 ```
 
-¿ÉÒÔ¿´µ½Step 5/7 Ê§°ÜÁË£¬ÈçºÎ´¦Àí£¿
+å¯ä»¥çœ‹åˆ°Step 5/7 å¤±è´¥äº†ï¼Œå¦‚ä½•å¤„ç†ï¼Ÿ
 
-½øÈëStep 4/7²úÉúµÄ¾µÏñ²ã£º
+è¿›å…¥Step 4/7äº§ç”Ÿçš„é•œåƒå±‚ï¼š
 
 ```bash
 [emon@emon flask-demo]$ docker run -it 5584b327f25d /bin/bash
@@ -2301,9 +2344,9 @@ root@7666f9b78e80:/# ls -l|grep app
 -rw-rw-r--.   1 root root 212 Mar 13 09:52 app
 ```
 
-·¢ÏÖapp²»ÊÇÒ»¸öÄ¿Â¼£¬¶øÊÇÒ»¸öÎÄ¼ş¡£
+å‘ç°appä¸æ˜¯ä¸€ä¸ªç›®å½•ï¼Œè€Œæ˜¯ä¸€ä¸ªæ–‡ä»¶ã€‚
 
-µ÷ÕûDockerfileÄÚÈİ£º
+è°ƒæ•´Dockerfileå†…å®¹ï¼š
 
 ```dockerfile
 FROM python:2.7
@@ -2315,17 +2358,17 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-ÔÙ´Î´´½¨¾µÏñ£º
+å†æ¬¡åˆ›å»ºé•œåƒï¼š
 
 ```bash
 [emon@emon flask-demo]$ docker build -t rushing/flask-hello-world .
 ```
 
-5£ºÔËĞĞ¾µÏñ
+5ï¼šè¿è¡Œé•œåƒ
 
 ```bash
 [emon@emon flask-demo]$ docker run rushing/flask-hello-world
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
  * Serving Flask app "app" (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
@@ -2337,16 +2380,16 @@ CMD ["python", "app.py"]
  * Debugger PIN: 471-935-875
 ```
 
-### 2.2¡¢°¸Àı£ºubuntu-stress¹¤¾ß¾µÏñ
+### 2.2ã€æ¡ˆä¾‹ï¼šubuntu-stresså·¥å…·é•œåƒ
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/ubuntu-stress
 [emon@emon ~]$ cd dockerdata/ubuntu-stress/
 ```
 
-2£º´´½¨Dockerfile
+2ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon ubuntu-stress]$ vim Dockerfile
@@ -2359,13 +2402,13 @@ ENTRYPOINT ["/usr/bin/stress"]
 CMD []
 ```
 
-3£º´´½¨¾µÏñ
+3ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon ubuntu-stress]$ docker build -t rushing/ubuntu-stress .
 ```
 
-4£ºÔËĞĞ¾µÏñ
+4ï¼šè¿è¡Œé•œåƒ
 
 ```bash
 [emon@emon ubuntu-stress]$ docker run -it rushing/ubuntu-stress --vm 1 --verbose
@@ -2373,62 +2416,62 @@ CMD []
 
 
 
-# Áù¡¢ÍøÂç£º¶Ë¿ÚÓ³ÉäÓëÈİÆ÷»¥Áª
+# å…­ã€ç½‘ç»œï¼šç«¯å£æ˜ å°„ä¸å®¹å™¨äº’è”
 
-## 1¡¢ÍøÂçµÄ»ù´¡ÖªÊ¶
+## 1ã€ç½‘ç»œçš„åŸºç¡€çŸ¥è¯†
 
-### 1.1¡¢ÍøÂçµÄ·ÖÀà
+### 1.1ã€ç½‘ç»œçš„åˆ†ç±»
 
-- µ¥»ú
+- å•æœº
   - Bridge Network
   - Host Network
   - None Network
-- ¶à»ú
+- å¤šæœº
   - Overlay Network
 
-### 1.2¡¢ÍøÂçµÄ·Ö²ã
+### 1.2ã€ç½‘ç»œçš„åˆ†å±‚
 
 ![image-20220314093103079](images/image-20220314093103079.png)
 
-### 1.3¡¢¹«ÓĞIPºÍË½ÓĞIP
+### 1.3ã€å…¬æœ‰IPå’Œç§æœ‰IP
 
-- Public IP£º»¥ÁªÍøÉÏµÄÎ¨Ò»±êÊ¶£¬¿ÉÒÔ·ÃÎÊinternet
-- Private IP£º²»¿ÉÔÚ»¥ÁªÍøÉÏÊ¹ÓÃ£¬½ö¹©»ú¹¹ÄÚ²¿Ê¹ÓÃ
+- Public IPï¼šäº’è”ç½‘ä¸Šçš„å”¯ä¸€æ ‡è¯†ï¼Œå¯ä»¥è®¿é—®internet
+- Private IPï¼šä¸å¯åœ¨äº’è”ç½‘ä¸Šä½¿ç”¨ï¼Œä»…ä¾›æœºæ„å†…éƒ¨ä½¿ç”¨
 
-| Àà±ğ | Íø¶Î                         | Ê¾Àı           |
+| ç±»åˆ« | ç½‘æ®µ                         | ç¤ºä¾‹           |
 | ---- | ---------------------------- | -------------- |
-| AÀà  | 10.0.0.0--10.255.255.255     | 10.0.0.0/8     |
-| BÀà  | 172.16.0.0--172.31.255.255   | 172.16.0.0/12  |
-| CÀà  | 192.168.0.0--192.168.255.255 | 192.168.0.0/16 |
+| Aç±»  | 10.0.0.0--10.255.255.255     | 10.0.0.0/8     |
+| Bç±»  | 172.16.0.0--172.31.255.255   | 172.16.0.0/12  |
+| Cç±»  | 192.168.0.0--192.168.255.255 | 192.168.0.0/16 |
 
-### 1.4¡¢ÍøÂçµØÖ·×ª»»NAT
+### 1.4ã€ç½‘ç»œåœ°å€è½¬æ¢NAT
 
 ![image-20220314124559772](images/image-20220314124559772.png)
 
-### 1.5¡¢pingºÍtelnetÒÔ¼°wireshark
+### 1.5ã€pingå’Œtelnetä»¥åŠwireshark
 
-- ping(ICMP)£ºÑéÖ¤IPµÄ¿É´ïĞÔ
-- telnet£ºÑéÖ¤·şÎñµÄ¿ÉÓÃĞÔ
-- wireshark£º×¥°ü¹¤¾ß
+- ping(ICMP)ï¼šéªŒè¯IPçš„å¯è¾¾æ€§
+- telnetï¼šéªŒè¯æœåŠ¡çš„å¯ç”¨æ€§
+- wiresharkï¼šæŠ“åŒ…å·¥å…·
 
 
 
-## 2¡¢LinuxÍøÂçÃüÃû¿Õ¼ä
+## 2ã€Linuxç½‘ç»œå‘½åç©ºé—´
 
-### 2.1¡¢dockerµÄÍøÂçÃüÃû¿Õ¼ä
+### 2.1ã€dockerçš„ç½‘ç»œå‘½åç©ºé—´
 
-Æô¶¯Ò»¸öÈİÆ÷×÷ÎªÑİÊ¾»·¾³£º
+å¯åŠ¨ä¸€ä¸ªå®¹å™¨ä½œä¸ºæ¼”ç¤ºç¯å¢ƒï¼š
 
 ```bash
-# ´´½¨²¢Æô¶¯ÈİÆ÷
+# åˆ›å»ºå¹¶å¯åŠ¨å®¹å™¨
 [emon@emon ~]$ docker run -d --name test1 busybox /bin/sh -c "while true; do sleep 3600; done"
-# ²é¿´ÈİÆ÷
+# æŸ¥çœ‹å®¹å™¨
 [emon@emon ~]$ docker ps 
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
-c77a3a22a9b8        busybox             "/bin/sh -c 'while t¡­"   49 seconds ago      Up 48 seconds                           test1
-# ½øÈëÈİÆ÷
+c77a3a22a9b8        busybox             "/bin/sh -c 'while tâ‹¯"   49 seconds ago      Up 48 seconds                           test1
+# è¿›å…¥å®¹å™¨
 [emon@emon ~]$ docker exec -it c77a3a22a9b8 /bin/sh
-# ÊäÈëÃüÁî ip a £¨µÈĞ§ip addr£©
+# è¾“å…¥å‘½ä»¤ ip a ï¼ˆç­‰æ•ˆip addrï¼‰
 / # ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -2440,49 +2483,49 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t¡­"   49 seconds ago
        valid_lft forever preferred_lft forever
 ```
 
-ÈçÉÏ£¬ip aÕ¹Ê¾µÄ½á¹û£¬¾ÍÊÇtest1Õâ¸öÈİÆ÷µÄÍøÂçÃüÃû¿Õ¼ä¡£
+å¦‚ä¸Šï¼Œip aå±•ç¤ºçš„ç»“æœï¼Œå°±æ˜¯test1è¿™ä¸ªå®¹å™¨çš„ç½‘ç»œå‘½åç©ºé—´ã€‚
 
 
 
-ÔÙÆô¶¯Ò»¸öÈİÆ÷£º
+å†å¯åŠ¨ä¸€ä¸ªå®¹å™¨ï¼š
 
 ```bash
 [emon@emon ~]$ docker run -d --name test2 busybox /bin/sh -c "while true; do sleep 3600; done"
-# ²é¿´test2ÈİÆ÷µÄÍøÂçÃüÃû¿Õ¼ä
+# æŸ¥çœ‹test2å®¹å™¨çš„ç½‘ç»œå‘½åç©ºé—´
 [emon@emon ~]$ docker exec -it b966b6ee1664 ip a
 ```
 
-### 2.2¡¢linuxµÄÍøÂçÃüÃû¿Õ¼ä
+### 2.2ã€linuxçš„ç½‘ç»œå‘½åç©ºé—´
 
-#### ÈçºÎÌí¼ÓÁ½¸öÃüÃû¿Õ¼ä£¿
+#### å¦‚ä½•æ·»åŠ ä¸¤ä¸ªå‘½åç©ºé—´ï¼Ÿ
 
-- ²é¿´ÍøÂçÃüÃû¿Õ¼äÁĞ±í
+- æŸ¥çœ‹ç½‘ç»œå‘½åç©ºé—´åˆ—è¡¨
 
 ```bash
 [emon@emon ~]$ sudo ip netns list
 ```
 
-- Ìí¼ÓÍøÂçÃüÃû¿Õ¼ä
+- æ·»åŠ ç½‘ç»œå‘½åç©ºé—´
 
 ```bash
 [emon@emon ~]$ sudo ip netns add test1
 [emon@emon ~]$ sudo ip netns add test2
 ```
 
-- ²é¿´Ä³¸öÍøÂçÃüÃû¿Õ¼äÏêÇé
+- æŸ¥çœ‹æŸä¸ªç½‘ç»œå‘½åç©ºé—´è¯¦æƒ…
 
 ```bash
 [emon@emon ~]$ sudo ip netns exec test1 ip a
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 [emon@emon ~]$ sudo ip netns exec test1 ip link
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 ```
 
-- »½ĞÑlo
+- å”¤é†’lo
 
 ```bash
 [emon@emon ~]$ sudo ip netns exec test1 ip link set dev lo up
@@ -2491,67 +2534,67 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t¡­"   49 seconds ago
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 ```
 
-#### ÈçºÎ´òÍ¨Á½¸öÃüÃû¿Õ¼ä£¿
+#### å¦‚ä½•æ‰“é€šä¸¤ä¸ªå‘½åç©ºé—´ï¼Ÿ
 
-- ËŞÖ÷»úÌí¼Óveth pair
+- å®¿ä¸»æœºæ·»åŠ veth pair
 
 ```bash
-# ÔÚËŞÖ÷»úÉú³Éveth pair
+# åœ¨å®¿ä¸»æœºç”Ÿæˆveth pair
 [emon@emon ~]$ sudo ip link add veth-test1 type veth peer name veth-test2
-# ²é¿´ËŞÖ÷»úip link£¬¿ÉÒÔ¿´µ½veth-test1ºÍveth-test2
+# æŸ¥çœ‹å®¿ä¸»æœºip linkï¼Œå¯ä»¥çœ‹åˆ°veth-test1å’Œveth-test2
 [emon@emon ~]$ sudo ip link
 
-# Ìí¼Óveth-test1µ½test1ÃüÃû¿Õ¼ä
+# æ·»åŠ veth-test1åˆ°test1å‘½åç©ºé—´
 [emon@emon ~]$ sudo ip link set veth-test1 netns test1
-# ²é¿´test1ÃüÃû¿Õ¼äÏÂµÄip link
+# æŸ¥çœ‹test1å‘½åç©ºé—´ä¸‹çš„ip link
 [emon@emon ~]$ sudo ip netns exec test1 ip link
 
-# Ìí¼Óveth-test2µ½test2ÃüÃû¿Õ¼ä
+# æ·»åŠ veth-test2åˆ°test2å‘½åç©ºé—´
 [emon@emon ~]$ sudo ip link set veth-test2 netns test2
-# ²é¿´test2ÃüÃû¿Õ¼äÏÂµÄip link
+# æŸ¥çœ‹test2å‘½åç©ºé—´ä¸‹çš„ip link
 [emon@emon ~]$ sudo ip netns exec test2 ip link
 
-# ÔÙ´Î²é¿´ËŞÖ÷»úip link£¬¿´²»µ½veth-test1ºÍveth-test2
+# å†æ¬¡æŸ¥çœ‹å®¿ä¸»æœºip linkï¼Œçœ‹ä¸åˆ°veth-test1å’Œveth-test2
 [emon@emon ~]$ sudo ip link
 ```
 
-Í¼½â£º
+å›¾è§£ï¼š
 
 ![image-20220314155521836](images/image-20220314155521836.png)
 
 
 
-- ÎªÃüÃû¿Õ¼ätest1ºÍtest2Ìí¼ÓIPµØÖ·
+- ä¸ºå‘½åç©ºé—´test1å’Œtest2æ·»åŠ IPåœ°å€
 
 ```bash
-# Îªtest1ÃüÃû¿Õ¼äÉÏµÄveth-test1Ìí¼ÓIPµØÖ·
+# ä¸ºtest1å‘½åç©ºé—´ä¸Šçš„veth-test1æ·»åŠ IPåœ°å€
 [emon@emon ~]$ sudo ip netns exec test1 ip addr add 192.168.1.1/24 dev veth-test1
-# Îªtest2ÃüÃû¿Õ¼äÉÏµÄveth-test2Ìí¼ÓIPµØÖ·
+# ä¸ºtest2å‘½åç©ºé—´ä¸Šçš„veth-test2æ·»åŠ IPåœ°å€
 [emon@emon ~]$ sudo ip netns exec test2 ip addr add 192.168.1.2/24 dev veth-test2
 
-# »½ĞÑtest1ÉÏµÄveth-test1
+# å”¤é†’test1ä¸Šçš„veth-test1
 [emon@emon ~]$ sudo ip netns exec test1 ip link set dev veth-test1 up
-# »½ĞÑtest2ÉÏµÄveth-test2
+# å”¤é†’test2ä¸Šçš„veth-test2
 [emon@emon ~]$ sudo ip netns exec test2 ip link set dev veth-test2 up
 
 # ==================================================
-# ²é¿´test1ºÍtest2µÄip link
+# æŸ¥çœ‹test1å’Œtest2çš„ip link
 [emon@emon ~]$ sudo ip netns exec test1 ip link
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 101: veth-test1@if100: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
     link/ether fa:6e:7e:58:57:03 brd ff:ff:ff:ff:ff:ff link-netnsid 1
 [emon@emon ~]$ sudo ip netns exec test2 ip link
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 100: veth-test2@if101: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
     link/ether fe:ca:9f:29:72:0b brd ff:ff:ff:ff:ff:ff link-netnsid 0
     
-# ²é¿´test1ºÍtest2µÄip a
+# æŸ¥çœ‹test1å’Œtest2çš„ip a
 [emon@emon ~]$ sudo ip netns exec test1 ip a
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -2565,7 +2608,7 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t¡­"   49 seconds ago
     inet6 fe80::f86e:7eff:fe58:5703/64 scope link 
        valid_lft forever preferred_lft forever
 [emon@emon ~]$ sudo ip netns exec test2 ip a
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 100: veth-test2@if101: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
@@ -2575,15 +2618,15 @@ c77a3a22a9b8        busybox             "/bin/sh -c 'while t¡­"   49 seconds ago
     inet6 fe80::fcca:9fff:fe29:720b/64 scope link 
        valid_lft forever preferred_lft forever
        
-# ´Ótest1Á¬Í¨test2ÑéÖ¤
+# ä»test1è¿é€štest2éªŒè¯
 [emon@emon ~]$ sudo ip netns exec test1 ping 192.168.1.2
 ```
 
-## 3¡¢DockerÍøÂç
+## 3ã€Dockerç½‘ç»œ
 
-### 3.1¡¢DockerÍøÂçÀàĞÍÁĞ±í
+### 3.1ã€Dockerç½‘ç»œç±»å‹åˆ—è¡¨
 
-- ²é¿´DockerÍøÂçÁĞ±í
+- æŸ¥çœ‹Dockerç½‘ç»œåˆ—è¡¨
 
 ```bash
 [emon@emon ~]$ sudo docker network ls
@@ -2591,11 +2634,11 @@ NETWORK ID          NAME                DRIVER              SCOPE
 4350d5c6e428        bridge              bridge              local
 4913d65f0331        host                host                local
 5dddd8fbaae8        none                null                local
-# ²é¿´bridgeÏêÏ¸ĞÅÏ¢ÖĞµÄ Containers ÊôĞÔ°üº¬µÄÈİÆ÷ĞÅÏ¢
+# æŸ¥çœ‹bridgeè¯¦ç»†ä¿¡æ¯ä¸­çš„ Containers å±æ€§åŒ…å«çš„å®¹å™¨ä¿¡æ¯
 [emon@emon ~]$ sudo docker network inspect bridge
 ```
 
-- °²×°ÍøÂç¹¤¾ß
+- å®‰è£…ç½‘ç»œå·¥å…·
 
 ```bash
 [emon@emon ~]$ sudo yum install -y bridge-utils
@@ -2605,17 +2648,17 @@ docker0		8000.02426f6e5033	no		veth3950c82
 										veth4b7c084
 ```
 
-ËµÃ÷£ºÓĞÁ½¶Ôveth£¬¶ÔÓ¦Á½¸öÈİÆ÷£¬Í¨¹ıdocker0Õâ¸öbridgeÁ¬½ÓÆğÀ´¡£ÍØÆËÍ¼ÈçÏÂ£º
+è¯´æ˜ï¼šæœ‰ä¸¤å¯¹vethï¼Œå¯¹åº”ä¸¤ä¸ªå®¹å™¨ï¼Œé€šè¿‡docker0è¿™ä¸ªbridgeè¿æ¥èµ·æ¥ã€‚æ‹“æ‰‘å›¾å¦‚ä¸‹ï¼š
 
-### 3.2¡¢DockerÍøÂçÖ®bridge
+### 3.2ã€Dockerç½‘ç»œä¹‹bridge
 
-#### ÈİÆ÷¼ä»¥Ïà·ÃÎÊÍØÆËÍ¼
+#### å®¹å™¨é—´äº’ç›¸è®¿é—®æ‹“æ‰‘å›¾
 
 ![image-20220314164344245](images/image-20220314164344245.png)
 
 
 
-#### ÈİÆ÷ÈçºÎ·ÃÎÊµÄÍâÍø£¿
+#### å®¹å™¨å¦‚ä½•è®¿é—®çš„å¤–ç½‘ï¼Ÿ
 
 ![image-20220314165401819](images/image-20220314165401819.png)
 
@@ -2623,60 +2666,60 @@ docker0		8000.02426f6e5033	no		veth3950c82
 
 
 
-#### ÈİÆ÷¼äÍ¨¹ıÄ¬ÈÏµÄbirdgeÀ´link
+#### å®¹å™¨é—´é€šè¿‡é»˜è®¤çš„birdgeæ¥link
 
-- É¾³ı²¢ÖØĞÂ´´½¨test2£¬°Ñtest2Í¨¹ılink·½Ê½Á¬½Óµ½test1ÈİÆ÷
+- åˆ é™¤å¹¶é‡æ–°åˆ›å»ºtest2ï¼ŒæŠŠtest2é€šè¿‡linkæ–¹å¼è¿æ¥åˆ°test1å®¹å™¨
 
 ```bash
 [emon@emon ~]$ docker rm -f test2
 [emon@emon ~]$ docker run -d --name test2 --link test1 busybox /bin/sh -c "while true; do sleep 3600; done"
-# ¿ÉÒÔÍ¨¹ıtest1µÄÃû³ÆÁ¬Í¨
+# å¯ä»¥é€šè¿‡test1çš„åç§°è¿é€š
 [emon@emon ~]$ docker exec -it test2 /bin/sh
 / # ping test1
 PING test1 (172.17.0.2): 56 data bytes
 64 bytes from 172.17.0.2: seq=0 ttl=64 time=0.056 ms
 ```
 
-- ¸´Ô­test2
+- å¤åŸtest2
 
 ```bash
 [emon@emon ~]$ docker rm -f test2
 [emon@emon ~]$ docker run -d --name test2 busybox /bin/sh -c "while true; do sleep 3600; done"
 ```
 
-#### ÈİÆ÷¼äÍ¨¹ı×Ô¶¨ÒåµÄbridgeÀ´link
+#### å®¹å™¨é—´é€šè¿‡è‡ªå®šä¹‰çš„bridgeæ¥link
 
-- ´´½¨ĞÂµÄbridge
+- åˆ›å»ºæ–°çš„bridge
 
 ```bash
 [emon@emon ~]$ docker network create -d bridge my-bridge
 ```
 
-- ´´½¨ÈİÆ÷²¢Ö¸¶¨µ½ĞÂ½¨µÄbridge
+- åˆ›å»ºå®¹å™¨å¹¶æŒ‡å®šåˆ°æ–°å»ºçš„bridge
 
 ```bash
 [emon@emon ~]$ docker run -d --name test3 --network my-bridge busybox /bin/sh -c "while true; do sleep 3600; done"
-# ²é¿´ÈİÆ÷Óëbridge°ó¶¨¹ØÏµ
+# æŸ¥çœ‹å®¹å™¨ä¸bridgeç»‘å®šå…³ç³»
 [emon@emon ~]$ brctl show
 bridge name	bridge id		STP enabled	interfaces
 br-1c371c5eabde		8000.02426de4ab41	no		veth911f9ea
 docker0		8000.02426f6e5033	no		veth3950c82
 										veth4b7c084
-# ²é¿´my-bridgeÏêÏ¸ĞÅÏ¢ÖĞµÄ Containers ÊôĞÔ°üº¬µÄÈİÆ÷ĞÅÏ¢
+# æŸ¥çœ‹my-bridgeè¯¦ç»†ä¿¡æ¯ä¸­çš„ Containers å±æ€§åŒ…å«çš„å®¹å™¨ä¿¡æ¯
 [emon@emon ~]$ sudo docker network inspect my-bridge
 ```
 
-- µ÷ÕûÒÑÓĞÈİÆ÷test2Á¬½Óµ½my-bridge
+- è°ƒæ•´å·²æœ‰å®¹å™¨test2è¿æ¥åˆ°my-bridge
 
 ```bash
 [emon@emon ~]$ docker network connect my-bridge test2
-# ²é¿´my-bridgeÏêÏ¸ĞÅÏ¢ÖĞµÄ Containers ÊôĞÔ°üº¬µÄÈİÆ÷ĞÅÏ¢£»·¢ÏÖtest2ÈÔ¾ÉºÍbridge±£³ÖÁ¬½Ó
+# æŸ¥çœ‹my-bridgeè¯¦ç»†ä¿¡æ¯ä¸­çš„ Containers å±æ€§åŒ…å«çš„å®¹å™¨ä¿¡æ¯ï¼›å‘ç°test2ä»æ—§å’Œbridgeä¿æŒè¿æ¥
 [emon@emon ~]$ sudo docker network inspect bridge
-# ²é¿´my-bridgeÏêÏ¸ĞÅÏ¢ÖĞµÄ Containers ÊôĞÔ°üº¬µÄÈİÆ÷ĞÅÏ¢£»·¢ÏÖtest2Ò²Á¬½Óµ½my-bridgeÁË
+# æŸ¥çœ‹my-bridgeè¯¦ç»†ä¿¡æ¯ä¸­çš„ Containers å±æ€§åŒ…å«çš„å®¹å™¨ä¿¡æ¯ï¼›å‘ç°test2ä¹Ÿè¿æ¥åˆ°my-bridgeäº†
 [emon@emon ~]$ sudo docker network inspect my-bridge
 ```
 
-- Èç¹ûÁ½¸öÈİÆ÷Á¬½Óµ½×Ô¶¨Òåbridge£¬¿ÉÒÔÍ¨¹ınameÀ´pingÍ¨¶Ô·½
+- å¦‚æœä¸¤ä¸ªå®¹å™¨è¿æ¥åˆ°è‡ªå®šä¹‰bridgeï¼Œå¯ä»¥é€šè¿‡nameæ¥pingé€šå¯¹æ–¹
 
 ```bash
 [emon@emon ~]$ docker exec -it test3 /bin/sh
@@ -2692,9 +2735,9 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-### 3.3¡¢ÈİÆ÷µÄ¶Ë¿ÚÓ³Éä
+### 3.3ã€å®¹å™¨çš„ç«¯å£æ˜ å°„
 
-- ´´½¨Ò»¸önginxµÄÈİÆ÷
+- åˆ›å»ºä¸€ä¸ªnginxçš„å®¹å™¨
 
 ```docker
 [emon@emon ~]$ docker run --name web -d -p 80:80 nginx
@@ -2702,14 +2745,14 @@ PING test3 (172.18.0.2): 56 data bytes
 
 
 
-### 3.4¡¢DockerÍøÂçÖ®none
+### 3.4ã€Dockerç½‘ç»œä¹‹none
 
-³õÊ¼»¯»·¾³£º
+åˆå§‹åŒ–ç¯å¢ƒï¼š
 
 ```bash
-# ÇåÀíÈİÆ÷
+# æ¸…ç†å®¹å™¨
 [emon@emon ~]$ docker rm -f $(docker ps -qa)
-# ÇåÀí×Ô¶¨Òåbridge
+# æ¸…ç†è‡ªå®šä¹‰bridge
 [emon@emon ~]$ docker network rm my-bridge
 
 [emon@emon ~]$ docker network ls
@@ -2721,27 +2764,27 @@ NETWORK ID          NAME                DRIVER              SCOPE
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
-- ´´½¨ÈİÆ÷»ùÓÚnone
+- åˆ›å»ºå®¹å™¨åŸºäºnone
 
 ```bash
 [emon@emon ~]$ docker run -d --name test1 --network none busybox /bin/sh -c "while true; do sleep 3600; done"
-# ²é¿´ÍøÂçnoneµÄÏêÇé
+# æŸ¥çœ‹ç½‘ç»œnoneçš„è¯¦æƒ…
 [emon@emon ~]$ docker network inspect none
-# ²é¿´test1µÄÍøÂçÃüÃû¿Õ¼ä
+# æŸ¥çœ‹test1çš„ç½‘ç»œå‘½åç©ºé—´
 [emon@emon ~]$ docker exec -it test1 /bin/sh
-/ # ip a ²é¿´µÃµ½£º¹ÂÁ¢µÄÈİÆ÷
+/ # ip a æŸ¥çœ‹å¾—åˆ°ï¼šå­¤ç«‹çš„å®¹å™¨
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
        valid_lft forever preferred_lft forever
 ```
 
-### 3.5¡¢DockerÍøÂçÖ®host
+### 3.5ã€Dockerç½‘ç»œä¹‹host
 
-³õÊ¼»¯»·¾³£º
+åˆå§‹åŒ–ç¯å¢ƒï¼š
 
 ```bash
-# ÇåÀíÈİÆ÷
+# æ¸…ç†å®¹å™¨
 [emon@emon ~]$ docker rm -f $(docker ps -qa)
 
 [emon@emon ~]$ docker network ls
@@ -2753,15 +2796,15 @@ NETWORK ID          NAME                DRIVER              SCOPE
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
-- ´´½¨ÈİÆ÷»ùÓÚhost
+- åˆ›å»ºå®¹å™¨åŸºäºhost
 
 ```bash
 [emon@emon ~]$ docker run -d --name test1 --network host busybox /bin/sh -c "while true; do sleep 3600; done"
-# ²é¿´ÍøÂçhostµÄÏêÇé
+# æŸ¥çœ‹ç½‘ç»œhostçš„è¯¦æƒ…
 [emon@emon ~]$ docker network inspect host
-# ²é¿´test1µÄÍøÂçÃüÃû¿Õ¼ä
+# æŸ¥çœ‹test1çš„ç½‘ç»œå‘½åç©ºé—´
 [emon@emon ~]$ docker exec -it test1 /bin/sh
-/ # ip a ¿ÉÒÔµÃÖª¹²ÏíÁËËŞÖ÷»úÆ÷µÄÍøÂçÃüÃû¿Õ¼ä
+/ # ip a å¯ä»¥å¾—çŸ¥å…±äº«äº†å®¿ä¸»æœºå™¨çš„ç½‘ç»œå‘½åç©ºé—´
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -2784,12 +2827,12 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
        valid_lft forever preferred_lft forever
 ```
 
-## 4¡¢°¸Àı£º¶àÈİÆ÷¸´ÔÓÓ¦ÓÃµÄ²¿ÊğÑİÊ¾£¨µ¥»ú¶àÈİÆ÷°æ£©
+## 4ã€æ¡ˆä¾‹ï¼šå¤šå®¹å™¨å¤æ‚åº”ç”¨çš„éƒ¨ç½²æ¼”ç¤ºï¼ˆå•æœºå¤šå®¹å™¨ç‰ˆï¼‰
 
-³õÊ¼»¯»·¾³£º
+åˆå§‹åŒ–ç¯å¢ƒï¼š
 
 ```bash
-# ÇåÀíÈİÆ÷
+# æ¸…ç†å®¹å™¨
 [emon@emon ~]$ docker rm -f $(docker ps -qa)
 
 [emon@emon ~]$ docker network ls
@@ -2801,16 +2844,16 @@ NETWORK ID          NAME                DRIVER              SCOPE
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/flask-redis
 [emon@emon ~]$ cd dockerdata/flask-redis/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-- ´´½¨app.py
+- åˆ›å»ºapp.py
 
 ```bash
 [emon@emon flask-redis]$ vim app.py
@@ -2836,7 +2879,7 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon flask-redis]$ vim Dockerfile
@@ -2852,300 +2895,300 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-4£º´´½¨redisÈİÆ÷
+4ï¼šåˆ›å»ºrediså®¹å™¨
 
 ```bash
 [emon@emon flask-redis]$ docker run -d --name redis redis
 ```
 
-5£º´´½¨¾µÏñ
+5ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon flask-redis]$ docker build -t rushing/flask-redis .
 ```
 
-6£ºÔËĞĞ¾µÏñ
+6ï¼šè¿è¡Œé•œåƒ
 
 ```bash
 [emon@emon flask-redis]$ docker run -d -p 5000:5000 --link redis --name flask-redis -e REDIS_HOST=redis rushing/flask-redis
-# ·ÃÎÊÈİÆ÷
+# è®¿é—®å®¹å™¨
 [emon@emon flask-redis]$ docker exec -it flask-redis /bin/bash
-# ²é¿´env
+# æŸ¥çœ‹env
 root@f37f93de0bcb:/app# env|grep REDIS_HOST
 REDIS_HOST=redis
-# ÔËĞĞ´úÂë
+# è¿è¡Œä»£ç 
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 Hello Container World! I have been seen 1 times and my hostname is f37f93de0bcb.
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 Hello Container World! I have been seen 2 times and my hostname is f37f93de0bcb.
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 
-# ÔÚËŞÖ÷»úÆ÷·ÃÎÊ
+# åœ¨å®¿ä¸»æœºå™¨è®¿é—®
 [emon@emon flask-redis]$ curl 127.0.0.1:5000
 Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 ```
 
 
 
-## 5¡¢OverlayºÍUnderlayµÄÍ¨Ë×½âÊÍ
+## 5ã€Overlayå’ŒUnderlayçš„é€šä¿—è§£é‡Š
 
-**»·¾³×¼±¸£ºemonºÍemon2»·¾³¡£Á½Ì¨»úÆ÷ÉÏdocker»Ö¸´µ½Ã»ÓĞÈİÆ÷ÔÚÔËĞĞµÄ×´Ì¬¡£²¢°²×°etcd¼¯Èº¡£**
+**ç¯å¢ƒå‡†å¤‡ï¼šemonå’Œemon2ç¯å¢ƒã€‚ä¸¤å°æœºå™¨ä¸Šdockeræ¢å¤åˆ°æ²¡æœ‰å®¹å™¨åœ¨è¿è¡Œçš„çŠ¶æ€ã€‚å¹¶å®‰è£…etcdé›†ç¾¤ã€‚**
 
-### 5.1¡¢¶à»úÆ÷Í¨ĞÅ£¨Vxlan£©
+### 5.1ã€å¤šæœºå™¨é€šä¿¡ï¼ˆVxlanï¼‰
 
 ![image-20220315081508907](images/image-20220315081508907.png)
 
-- underlay£º¿ÉÒÔÀí½âÎªËŞÖ÷»úÖ®¼äµÄÍ¨ĞÅ£»
-- overlay£º¿ÉÒÔÀí½âÎª²»Í¬ËŞÖ÷»úÖĞdockerÈİÆ÷Ö®¼äµÄÍ¨ĞÅ£»
+- underlayï¼šå¯ä»¥ç†è§£ä¸ºå®¿ä¸»æœºä¹‹é—´çš„é€šä¿¡ï¼›
+- overlayï¼šå¯ä»¥ç†è§£ä¸ºä¸åŒå®¿ä¸»æœºä¸­dockerå®¹å™¨ä¹‹é—´çš„é€šä¿¡ï¼›
 
-### 5.2¡¢°²×°etcd¼¯Èº
+### 5.2ã€å®‰è£…etcdé›†ç¾¤
 
-| »úÆ÷Ãû | IP1-¼ÒÍ¥      | IP2-¹«Ë¾   | ²¿ÊğÄÚÈİ     |
+| æœºå™¨å | IP1-å®¶åº­      | IP2-å…¬å¸   | éƒ¨ç½²å†…å®¹     |
 | ------ | ------------- | ---------- | ------------ |
 | emon   | 192.168.1.116 | 10.0.0.116 | docker-node1 |
 | emon2  | 192.168.1.117 | 10.0.0.117 | docker-node2 |
 
-1£º°²×°etcd
+1ï¼šå®‰è£…etcd
 
 ```bash
-# emonÖ÷»ú°²×°
+# emonä¸»æœºå®‰è£…
 [emon@emon ~]$ sudo yum install -y etcd
-# emon2Ö÷»ú°²×°
+# emon2ä¸»æœºå®‰è£…
 [emon@emon2 ~]$ sudo yum install -y etcd
 ```
 
-2£ºĞŞ¸ÄÅäÖÃ
+2ï¼šä¿®æ”¹é…ç½®
 
-- emonËŞÖ÷»ú£ºdocker-node1
+- emonå®¿ä¸»æœºï¼šdocker-node1
 
 ```bash
-# ±¸·İÔ­ÅäÖÃÎÄ¼ş²¢±à¼­
+# å¤‡ä»½åŸé…ç½®æ–‡ä»¶å¹¶ç¼–è¾‘
 [emon@emon ~]$ sudo cp /etc/etcd/etcd.conf /etc/etcd/etcd.conf.bak
 [emon@emon ~]$ sudo vim /etc/etcd/etcd.conf 
 ```
 
 ```properties
 #[Member]
-# ¼¯ÈºÊµÀıÃû³Æ£ºÃ¿¸ö»úÆ÷ÌîĞ´×Ô¼ºÖ÷»úÃû£¬È¡ hostname -s Öµ¼´¿É
+# é›†ç¾¤å®ä¾‹åç§°ï¼šæ¯ä¸ªæœºå™¨å¡«å†™è‡ªå·±ä¸»æœºåï¼Œå– hostname -s å€¼å³å¯
 ETCD_NAME="emon"
-# ·şÎñÔËĞĞÊı¾İ±£´æµÄÂ·¾¶£¬Ä¬ÈÏÎª `$name}.etcd`
+# æœåŠ¡è¿è¡Œæ•°æ®ä¿å­˜çš„è·¯å¾„ï¼Œé»˜è®¤ä¸º `$name}.etcd`
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 ETCD_WAL_DIR="/var/lib/etcd/default.etcd/wal"
-# ÓÃÓÚ¼àÌıÆäËû etcd member Á¬½Ó£ºÌØ±ğ×¢Òâ£¬ipµØÖ·²»ÄÜÊ¹ÓÃÖ÷»úÃûÌæ´ú
+# ç”¨äºç›‘å¬å…¶ä»– etcd member è¿æ¥ï¼šç‰¹åˆ«æ³¨æ„ï¼Œipåœ°å€ä¸èƒ½ä½¿ç”¨ä¸»æœºåæ›¿ä»£
 ETCD_LISTEN_PEER_URLS="http://10.0.0.116:2380"
-# ÓÃÓÚ etcdctl ÃüÁîÁ¬½Ó£¬ÆäÖĞ localhost ÓÃÓÚ±¾µØÁ¬½Ó
+# ç”¨äº etcdctl å‘½ä»¤è¿æ¥ï¼Œå…¶ä¸­ localhost ç”¨äºæœ¬åœ°è¿æ¥
 ETCD_LISTEN_CLIENT_URLS="http://10.0.0.116:2379,http://localhost:2379"
 
 #[Clustering]
-# ±¾µØÓÃÓÚ¼àÌı²¢Á¬½ÓÆäËû member µÄµØÖ·
+# æœ¬åœ°ç”¨äºç›‘å¬å¹¶è¿æ¥å…¶ä»– member çš„åœ°å€
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.116:2380"
 ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.116:2379,http://localhost:2379"
-# Æô¶¯¼¯ÈºÊ±£¬Ê¹ÓÃ¾²Ì¬Á¬½Ó·½·¨£¬¶¨ÒåÃ¿¸ö member Ö÷»úÃû endpoint
+# å¯åŠ¨é›†ç¾¤æ—¶ï¼Œä½¿ç”¨é™æ€è¿æ¥æ–¹æ³•ï¼Œå®šä¹‰æ¯ä¸ª member ä¸»æœºå endpoint
 ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
-# ¼¯ÈºÃû³Æ£ºÓÃÓÚ±ê¼Ç¼¯ÈºÎ¨Ò»ĞÔµÄtoken
+# é›†ç¾¤åç§°ï¼šç”¨äºæ ‡è®°é›†ç¾¤å”¯ä¸€æ€§çš„token
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
-# ±íÊ¾³õÊ¼»¯¼¯Èº
+# è¡¨ç¤ºåˆå§‹åŒ–é›†ç¾¤
 ETCD_INITIAL_CLUSTER_STATE="new"
 ```
 
-- emon2ËŞÖ÷»ú£ºdocker-node2
+- emon2å®¿ä¸»æœºï¼šdocker-node2
 
 ```bash
-# ±¸·İÔ­ÅäÖÃÎÄ¼ş²¢±à¼­
+# å¤‡ä»½åŸé…ç½®æ–‡ä»¶å¹¶ç¼–è¾‘
 [emon@emon2 ~]$ sudo cp /etc/etcd/etcd.conf /etc/etcd/etcd.conf.bak
 [emon@emon2 ~]$ sudo vim /etc/etcd/etcd.conf 
 ```
 
 ```properties
 #[Member]
-# ¼¯ÈºÊµÀıÃû³Æ£ºÃ¿¸ö»úÆ÷ÌîĞ´×Ô¼ºÖ÷»úÃû£¬È¡ hostname -s Öµ¼´¿É
+# é›†ç¾¤å®ä¾‹åç§°ï¼šæ¯ä¸ªæœºå™¨å¡«å†™è‡ªå·±ä¸»æœºåï¼Œå– hostname -s å€¼å³å¯
 ETCD_NAME="emon2"
-# ·şÎñÔËĞĞÊı¾İ±£´æµÄÂ·¾¶£¬Ä¬ÈÏÎª `$name}.etcd`
+# æœåŠ¡è¿è¡Œæ•°æ®ä¿å­˜çš„è·¯å¾„ï¼Œé»˜è®¤ä¸º `$name}.etcd`
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
 ETCD_WAL_DIR="/var/lib/etcd/default.etcd/wal"
-# ÓÃÓÚ¼àÌıÆäËû etcd member Á¬½Ó£ºÌØ±ğ×¢Òâ£¬ipµØÖ·²»ÄÜÊ¹ÓÃÖ÷»úÃûÌæ´ú
+# ç”¨äºç›‘å¬å…¶ä»– etcd member è¿æ¥ï¼šç‰¹åˆ«æ³¨æ„ï¼Œipåœ°å€ä¸èƒ½ä½¿ç”¨ä¸»æœºåæ›¿ä»£
 ETCD_LISTEN_PEER_URLS="http://10.0.0.117:2380"
-# ÓÃÓÚ etcdctl ÃüÁîÁ¬½Ó£¬ÆäÖĞ localhost ÓÃÓÚ±¾µØÁ¬½Ó
+# ç”¨äº etcdctl å‘½ä»¤è¿æ¥ï¼Œå…¶ä¸­ localhost ç”¨äºæœ¬åœ°è¿æ¥
 ETCD_LISTEN_CLIENT_URLS="http://10.0.0.117:2379,http://localhost:2379"
 
 #[Clustering]
-# ±¾µØÓÃÓÚ¼àÌı²¢Á¬½ÓÆäËû member µÄµØÖ·
+# æœ¬åœ°ç”¨äºç›‘å¬å¹¶è¿æ¥å…¶ä»– member çš„åœ°å€
 ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.117:2380"
 ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.117:2379,http://localhost:2379"
-# Æô¶¯¼¯ÈºÊ±£¬Ê¹ÓÃ¾²Ì¬Á¬½Ó·½·¨£¬¶¨ÒåÃ¿¸ö member Ö÷»úÃû endpoint
+# å¯åŠ¨é›†ç¾¤æ—¶ï¼Œä½¿ç”¨é™æ€è¿æ¥æ–¹æ³•ï¼Œå®šä¹‰æ¯ä¸ª member ä¸»æœºå endpoint
 ETCD_INITIAL_CLUSTER="emon=http://10.0.0.116:2380,emon2=http://10.0.0.117:2380"
-# ¼¯ÈºÃû³Æ£ºÓÃÓÚ±ê¼Ç¼¯ÈºÎ¨Ò»ĞÔµÄtoken
+# é›†ç¾¤åç§°ï¼šç”¨äºæ ‡è®°é›†ç¾¤å”¯ä¸€æ€§çš„token
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
-# ±íÊ¾³õÊ¼»¯¼¯Èº
+# è¡¨ç¤ºåˆå§‹åŒ–é›†ç¾¤
 ETCD_INITIAL_CLUSTER_STATE="new"
 ```
 
-3£ºÆô¶¯¼¯Èº
+3ï¼šå¯åŠ¨é›†ç¾¤
 
-È·±£emonºÍemon2»úÆ÷ÄÜ»¥Í¨£¬ÇÒ·À»ğÇ½Î´ÏŞÖÆ£¡
+ç¡®ä¿emonå’Œemon2æœºå™¨èƒ½äº’é€šï¼Œä¸”é˜²ç«å¢™æœªé™åˆ¶ï¼
 
 ```bash
-# Æô¶¯etcd·şÎñ
+# å¯åŠ¨etcdæœåŠ¡
 [emon@emon ~]$ sudo systemctl start etcd
 [emon@emon2 ~]$ sudo systemctl start etcd
 
-# ÉèÖÃ¿ª»úÆô¶¯
+# è®¾ç½®å¼€æœºå¯åŠ¨
 [emon@emon ~]$ sudo systemctl enable etcd
 [emon@emon2 ~]$ sudo systemctl enable etcd
 ```
 
-×¢Òâ , µÚÒ»Ì¨Æô¶¯µÄetcd(master½Úµã)(isLeader=true)»áµÈ´ıµÚ¶şÌ¨Æô¶¯Ö®ºó ,²Å»áÆô¶¯³É¹¦£»ÔÚ´ËÖ®Ç°»á¿¨Ö÷¡£
+æ³¨æ„ , ç¬¬ä¸€å°å¯åŠ¨çš„etcd(masterèŠ‚ç‚¹)(isLeader=true)ä¼šç­‰å¾…ç¬¬äºŒå°å¯åŠ¨ä¹‹å ,æ‰ä¼šå¯åŠ¨æˆåŠŸï¼›åœ¨æ­¤ä¹‹å‰ä¼šå¡ä¸»ã€‚
 
-- ²é¿´°æ±¾
+- æŸ¥çœ‹ç‰ˆæœ¬
 
 ```bash
 [emon@emon ~]$ etcd --version
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 etcd Version: 3.3.11
 Git SHA: 2cf9e51
 Go Version: go1.10.3
 Go OS/Arch: linux/amd64
 ```
 
-- ·şÎñ×´Ì¬¼ì²â
+- æœåŠ¡çŠ¶æ€æ£€æµ‹
 
 ```bash
 [emon@emon ~]$ sudo systemctl status etcd
 ```
 
-- ²é¿´¼¯Èº½¡¿µ¼ì²â
+- æŸ¥çœ‹é›†ç¾¤å¥åº·æ£€æµ‹
 
 ```bash
 [emon@emon ~]$ etcdctl cluster-health
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 member 122b032f3d6b6b6 is healthy: got healthy result from http://10.0.0.117:2379
 member 85cea699a6c68067 is healthy: got healthy result from http://10.0.0.116:2379
 ```
 
-- ²é¿´¼¯ÈºËùÓĞ½Úµã
+- æŸ¥çœ‹é›†ç¾¤æ‰€æœ‰èŠ‚ç‚¹
 
 ```bash
 [emon@emon ~]$ etcdctl member list
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 122b032f3d6b6b6: name=emon2 peerURLs=http://10.0.0.117:2380 clientURLs=http://10.0.0.117:2379,http://localhost:2379 isLeader=false
 85cea699a6c68067: name=emon peerURLs=http://10.0.0.116:2380 clientURLs=http://10.0.0.116:2379,http://localhost:2379 isLeader=true
 ```
 
-- °ÑÒ»Ì¨Éè±¸ÒÆ³ı³ö¼¯Èº£¬ºóÃæÊÇ¼¯Èº½ÚµãºÅ£¬Ê¹ÓÃlist¿ÉÒÔ²é¿´µ½
+- æŠŠä¸€å°è®¾å¤‡ç§»é™¤å‡ºé›†ç¾¤ï¼Œåé¢æ˜¯é›†ç¾¤èŠ‚ç‚¹å·ï¼Œä½¿ç”¨listå¯ä»¥æŸ¥çœ‹åˆ°
 
 ```bash
-# ÒÆ³ıÖ®ºó£¬¸Ã½ÚµãµÄetcd·şÎñ×Ô¶¯¹Ø±Õ
+# ç§»é™¤ä¹‹åï¼Œè¯¥èŠ‚ç‚¹çš„etcdæœåŠ¡è‡ªåŠ¨å…³é—­
 etcdctl member remove 122b032f3d6b6b6
 ```
 
-- ¸üĞÂÒ»¸ö½Úµã
+- æ›´æ–°ä¸€ä¸ªèŠ‚ç‚¹
 
 ```bash
 etcdctl member update 122b032f3d6b6b6
 ```
 
-- ÉèÖÃkey=hello,value=world
+- è®¾ç½®key=hello,value=world
 
 ```bash
 etcdctl set hello world
 ```
 
-- ²é¿´keyµÄÖµ
+- æŸ¥çœ‹keyçš„å€¼
 
 ```bash
 etcdctl get hello
 ```
 
-- ²é¿´keyÁĞ±í
+- æŸ¥çœ‹keyåˆ—è¡¨
 
 ```bash
 etcdctl ls /
 ```
 
-- ²é¿´etcdctl¸ü¶àÓÃ·¨
+- æŸ¥çœ‹etcdctlæ›´å¤šç”¨æ³•
 
 ```bash
 etcdctl help
 ```
 
-- ¹Ø±Õ¼¯Èº
+- å…³é—­é›†ç¾¤
 
 ```bash
-# ÈôĞèÒª¶Ôetcd¼¯Èº½øĞĞÖØÖÃ£¬×î¼òµ¥µÄ·½Ê½ÊÇ¹Ø±Õ¼¯Èººó£¬É¾³ıËùÓĞ etcd member ÖĞµÄ ETCD_DATA_DIR ÅäÖÃÖĞ¶¨ÒåµÄËùÓĞ×ÓÄ¿Â¼¡£
+# è‹¥éœ€è¦å¯¹etcdé›†ç¾¤è¿›è¡Œé‡ç½®ï¼Œæœ€ç®€å•çš„æ–¹å¼æ˜¯å…³é—­é›†ç¾¤åï¼Œåˆ é™¤æ‰€æœ‰ etcd member ä¸­çš„ ETCD_DATA_DIR é…ç½®ä¸­å®šä¹‰çš„æ‰€æœ‰å­ç›®å½•ã€‚
 [emon@emon ~]$ sudo systemctl stop etcd
 ```
 
-4£ºÇĞ»»IP»·¾³
+4ï¼šåˆ‡æ¢IPç¯å¢ƒ
 
-- companysÇĞ»»µ½houses
+- companysåˆ‡æ¢åˆ°houses
 
 ```bash
 [emon@emon ~]$ sudo sed -n 's/10.0.0/192.168.1/gp' /etc/etcd/etcd.conf
 [emon@emon ~]$ sudo sed -i 's/10.0.0/192.168.1/g' /etc/etcd/etcd.conf
 ```
 
-- housesÇĞ»»µ½companys
+- housesåˆ‡æ¢åˆ°companys
 
 ```bash
 [emon@emon ~]$ sudo sed -n 's/192.168.1/10.0.0/gp' /etc/etcd/etcd.conf
 [emon@emon ~]$ sudo sed -i 's/192.168.1/10.0.0/g' /etc/etcd/etcd.conf
 ```
 
-5£º¼¯ÈºĞÂÔö¶îÍâ½Úµã£¨ÁÙÊ±½Úµã£©
+5ï¼šé›†ç¾¤æ–°å¢é¢å¤–èŠ‚ç‚¹ï¼ˆä¸´æ—¶èŠ‚ç‚¹ï¼‰
 
-²½Öè1£º¼ÓÈë³ÉÔ±
+æ­¥éª¤1ï¼šåŠ å…¥æˆå‘˜
 
 ```bash
 etcdctl member add name=emon3 --peer-urls="http://10.0.0.118:2380"
 ```
 
-²½Öè2£ºÉ¾³ıĞÂ½ÚµãµÄdataÄ¿Â¼
+æ­¥éª¤2ï¼šåˆ é™¤æ–°èŠ‚ç‚¹çš„dataç›®å½•
 
 ```bash
-# ×¢Òâ£¬ÔÚĞÂ½Úµã·şÎñÆ÷²Ù×÷
+# æ³¨æ„ï¼Œåœ¨æ–°èŠ‚ç‚¹æœåŠ¡å™¨æ“ä½œ
 rm -rf /var/lib/etcd/default.etcd
 ```
 
-²½Öè3£ºĞÂ½ÚµãÔö¼ÓÅäÖÃetcd.conf
+æ­¥éª¤3ï¼šæ–°èŠ‚ç‚¹å¢åŠ é…ç½®etcd.conf
 
-×¢Òâ£¬ÀïÃæµÄ `ETCD_INITIAL_CLUSTER_STATE="existing"`´ú±íÒÑ´æÔÚ½Úµã¡£
+æ³¨æ„ï¼Œé‡Œé¢çš„ `ETCD_INITIAL_CLUSTER_STATE="existing"`ä»£è¡¨å·²å­˜åœ¨èŠ‚ç‚¹ã€‚
 
-²½Öè4£ºÆô¶¯ĞÂ½ÚµãµÄetcd·şÎñ
+æ­¥éª¤4ï¼šå¯åŠ¨æ–°èŠ‚ç‚¹çš„etcdæœåŠ¡
 
 ```bash
 systemctl start etcd
 ```
 
-PS : ²½Öè²»ÄÜ´í , ËùÒÔÈç¹ûÓĞ¿ÉÄÜ , ÇëĞÂ¼Ó½ÚµãÖ®ºó , ¼¯ÈºÖØÆôÒ»ÏÂ , ±È½Ï²»ÈİÒ×´í
+PS : æ­¥éª¤ä¸èƒ½é”™ , æ‰€ä»¥å¦‚æœæœ‰å¯èƒ½ , è¯·æ–°åŠ èŠ‚ç‚¹ä¹‹å , é›†ç¾¤é‡å¯ä¸€ä¸‹ , æ¯”è¾ƒä¸å®¹æ˜“é”™
 
 
 
-### 5.3¡¢´´½¨overlay network
+### 5.3ã€åˆ›å»ºoverlay network
 
-#### ÖØÆôdocker·şÎñ
+#### é‡å¯dockeræœåŠ¡
 
-**ÖØÒªÌáÊ¾**£º×îºÃemonºÍemon2·şÎñÆ÷µÄdocker°æ±¾Ò»ÖÂ£¡Èç¹û²»Ò»ÖÂ¿ÉÄÜµ¼ÖÂÁ½Ì¨»úÆ÷×÷Îªdocker¼¯ÈºÊ±Í¨Ñ¶¸ñÊ½ÎÊÌâ£¡
+**é‡è¦æç¤º**ï¼šæœ€å¥½emonå’Œemon2æœåŠ¡å™¨çš„dockerç‰ˆæœ¬ä¸€è‡´ï¼å¦‚æœä¸ä¸€è‡´å¯èƒ½å¯¼è‡´ä¸¤å°æœºå™¨ä½œä¸ºdockeré›†ç¾¤æ—¶é€šè®¯æ ¼å¼é—®é¢˜ï¼
 
 ```bash
-# emonËŞÖ÷»úÖØÆô
+# emonå®¿ä¸»æœºé‡å¯
 [emon@emon ~]$ sudo systemctl stop docker
-# ËµÃ÷£ºÈç¹ûµÚÒ»´ÎÖ´ĞĞÊ±£¬Êä³öÁËÀàËÆ [1] 31966 Ê±¾ÍÃ»ÓĞĞÅÏ¢ÁË£¬ÒªÔÙÊÔÒ»´Î
+# è¯´æ˜ï¼šå¦‚æœç¬¬ä¸€æ¬¡æ‰§è¡Œæ—¶ï¼Œè¾“å‡ºäº†ç±»ä¼¼ [1] 31966 æ—¶å°±æ²¡æœ‰ä¿¡æ¯äº†ï¼Œè¦å†è¯•ä¸€æ¬¡
 [emon@emon ~]$ sudo dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --cluster-store=etcd://10.0.0.116:2379 --cluster-advertise=10.0.0.116:2375&
 
-# emon2ËŞÖ÷»úÖØÆô
+# emon2å®¿ä¸»æœºé‡å¯
 [emon@emon2 ~]$ sudo systemctl stop docker
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Warning: Stopping docker.service, but it can still be activated by:
   docker.socket
-# Í£Ö¹docker.socket·şÎñ
+# åœæ­¢docker.socketæœåŠ¡
 [emon@emon2 ~]$ sudo systemctl stop docker.socket
-# ËµÃ÷£ºÈç¹ûµÚÒ»´ÎÖ´ĞĞÊ±£¬Êä³öÁËÀàËÆ [1] 31966 Ê±¾ÍÃ»ÓĞĞÅÏ¢ÁË£¬ÒªÔÙÊÔÒ»´Î
+# è¯´æ˜ï¼šå¦‚æœç¬¬ä¸€æ¬¡æ‰§è¡Œæ—¶ï¼Œè¾“å‡ºäº†ç±»ä¼¼ [1] 31966 æ—¶å°±æ²¡æœ‰ä¿¡æ¯äº†ï¼Œè¦å†è¯•ä¸€æ¬¡
 [emon@emon2 ~]$ sudo dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --cluster-store=etcd://10.0.0.117:2379 --cluster-advertise=10.0.0.117:2375&
 ```
 
-#### ´´½¨overlay network
+#### åˆ›å»ºoverlay network
 
-ÔÚemonËŞÖ÷»úÉÏ´´½¨Ò»¸ödemoµÄoverlay network
+åœ¨emonå®¿ä¸»æœºä¸Šåˆ›å»ºä¸€ä¸ªdemoçš„overlay network
 
 ```bash
 [emon@emon ~]$ sudo docker network ls 
@@ -3194,7 +3237,7 @@ a99463bedc7d        demo                overlay             global
 ]
 ```
 
-ÎÒÃÇ»á¿´µ½ÔÚemon2ÉÏ£¬Õâ¸ödemoµÄoverlay network»á±»Í¬²½´´½¨¡£
+æˆ‘ä»¬ä¼šçœ‹åˆ°åœ¨emon2ä¸Šï¼Œè¿™ä¸ªdemoçš„overlay networkä¼šè¢«åŒæ­¥åˆ›å»ºã€‚
 
 ```bash
 [emon@emon2 ~]$ sudo docker network ls
@@ -3236,7 +3279,7 @@ a99463bedc7d   demo      overlay   global
 ]
 ```
 
-Í¨¹ı²é¿´etcdµÄkey-value£¬ÎÒÃÇ»ñÈ¡µ½£¬Õâ¸ödemoµÄnetworkÊÇÍ¨¹ıetcd´ÓemonÍ¬²½µ½emon2µÄ¡£
+é€šè¿‡æŸ¥çœ‹etcdçš„key-valueï¼Œæˆ‘ä»¬è·å–åˆ°ï¼Œè¿™ä¸ªdemoçš„networkæ˜¯é€šè¿‡etcdä»emonåŒæ­¥åˆ°emon2çš„ã€‚
 
 ```bash
 [emon@emon2 ~]$ etcdctl ls /docker
@@ -3256,7 +3299,7 @@ a99463bedc7d   demo      overlay   global
 /docker/network/v1.0/endpoint
 [emon@emon2 ~]$ etcdctl ls /docker/network/v1.0/network
 /docker/network/v1.0/network/a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454
-# ÒÀÀµjqÊä³öÓÑºÃjson¸ñÊ½£¬°²×°jq£ºsudo yum install -y jq
+# ä¾èµ–jqè¾“å‡ºå‹å¥½jsonæ ¼å¼ï¼Œå®‰è£…jqï¼šsudo yum install -y jq
 [emon@emon2 ~]$ etcdctl get /docker/network/v1.0/network/a99463bedc7d7972ed5866607212d91b88e080e6ef56b87b2c21973146db7454|jq .
 {
   "addrSpace": "GlobalDefault",
@@ -3287,33 +3330,33 @@ a99463bedc7d   demo      overlay   global
 }
 ```
 
-### 5.4¡¢»ùÓÚoverlay´´½¨dockerÈİÆ÷
+### 5.4ã€åŸºäºoverlayåˆ›å»ºdockerå®¹å™¨
 
-- ÔÚemon·şÎñÆ÷´´½¨ÈİÆ÷
+- åœ¨emonæœåŠ¡å™¨åˆ›å»ºå®¹å™¨
 
 ```bash
 [emon@emon ~]$ docker run -d --name test1 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 0387344d96227605c6bf53376cc2db97fd345b9bc6a3f4bfe656d8d81c094c08
 ```
 
-- ÔÚemon2·şÎñÆ÷´´½¨ÈİÆ÷
+- åœ¨emon2æœåŠ¡å™¨åˆ›å»ºå®¹å™¨
 
-»áÌáÊ¾test1ÈİÆ÷ÒÑ´æÔÚ£¬ÕâÔÙ´Î±íÃ÷ÁËemonºÍemon2·şÎñÆ÷×éºÏ³ÉÁË¼¯Èº¡£
+ä¼šæç¤ºtest1å®¹å™¨å·²å­˜åœ¨ï¼Œè¿™å†æ¬¡è¡¨æ˜äº†emonå’Œemon2æœåŠ¡å™¨ç»„åˆæˆäº†é›†ç¾¤ã€‚
 
 ```bash
 [emon@emon2 ~]$ docker run -d --name test1 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 /usr/bin/docker: Error response from daemon: Conflict. The container name "/test1" is already in use by container "d3701896a1dc65d50d26ffddbbb947f7a2d70c22e0daa7aed885b0f7205ea5fa". You have to remove (or rename) that container to be able to reuse that name.
 See '/usr/bin/docker run --help'.
-# ´´½¨Ãû³ÆÎªtest2µÄÈİÆ÷
+# åˆ›å»ºåç§°ä¸ºtest2çš„å®¹å™¨
 [emon@emon2 ~]$ docker run -d --name test2 --network demo busybox /bin/sh -c "while true; do sleep 3600; done"
 ```
 
-- ¶Ô±ÈemonºÍemon2ÉÏÈİÆ÷µÄIPµØÖ·
+- å¯¹æ¯”emonå’Œemon2ä¸Šå®¹å™¨çš„IPåœ°å€
 
 ```bash
-# emonÉÏÈİÆ÷test1µÄipµØÖ·ÊÇ£º10.0.0.2
+# emonä¸Šå®¹å™¨test1çš„ipåœ°å€æ˜¯ï¼š10.0.0.2
 [emon@emon ~]$ docker exec test1 ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -3328,7 +3371,7 @@ See '/usr/bin/docker run --help'.
     inet 172.18.0.2/16 brd 172.18.255.255 scope global eth1
        valid_lft forever preferred_lft forever
 
-# emon2ÉÏÈİÆ÷test2µÄipµØÖ·ÊÇ£º10.0.0.3
+# emon2ä¸Šå®¹å™¨test2çš„ipåœ°å€æ˜¯ï¼š10.0.0.3
 [emon@emon2 ~]$ docker exec test2 ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -3343,9 +3386,9 @@ See '/usr/bin/docker run --help'.
     inet 172.18.0.2/16 brd 172.18.255.255 scope global eth1
        valid_lft forever preferred_lft forever
        
-# ²é¿´ÍøÂçÃüÃû¿Õ¼ädemoµÄÏêÏ¸ĞÅÏ¢
+# æŸ¥çœ‹ç½‘ç»œå‘½åç©ºé—´demoçš„è¯¦ç»†ä¿¡æ¯
 [emon@emon ~]$ sudo docker network inspect demo
-......Ê¡ÂÔ......
+......çœç•¥......
         "Containers": {
             "0387344d96227605c6bf53376cc2db97fd345b9bc6a3f4bfe656d8d81c094c08": {
                 "Name": "test1",
@@ -3362,9 +3405,9 @@ See '/usr/bin/docker run --help'.
                 "IPv6Address": ""
             }
         },
-......Ê¡ÂÔ......
+......çœç•¥......
 
-# emonÉÏÈİÆ÷test1ºÍemon2ÉÏÈİÆ÷test2ÒÑ´òÍ¨
+# emonä¸Šå®¹å™¨test1å’Œemon2ä¸Šå®¹å™¨test2å·²æ‰“é€š
 [emon@emon ~]$ docker exec test1 ping 10.0.0.3
 PING 10.0.0.3 (10.0.0.3): 56 data bytes
 64 bytes from 10.0.0.3: seq=0 ttl=64 time=1.018 ms
@@ -3374,12 +3417,12 @@ PING test2 (10.0.0.3): 56 data bytes
 64 bytes from 10.0.0.3: seq=0 ttl=64 time=0.328 ms
 ```
 
-### 5.5¡¢overlayÍøÂçÀ©Õ¹
+### 5.5ã€overlayç½‘ç»œæ‰©å±•
 
-ÔÚ´´½¨ÁËtest1ÈİÆ÷ºó£¬emonËŞÖ÷»ú²é¿´ÈçÏÂ£º
+åœ¨åˆ›å»ºäº†test1å®¹å™¨åï¼Œemonå®¿ä¸»æœºæŸ¥çœ‹å¦‚ä¸‹ï¼š
 
 ```bash
-# ¶àÁËÒ»¸ö docker_gwbridge
+# å¤šäº†ä¸€ä¸ª docker_gwbridge
 [emon@emon ~]$ docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
 1a1afc340c27        bridge              bridge              local
@@ -3387,7 +3430,7 @@ d92a2f5020c6        demo                overlay             global
 c735a7979dca        docker_gwbridge     bridge              local
 4913d65f0331        host                host                local
 5dddd8fbaae8        none                null                local
-# Ò»Ì½¾¿¾¹£º×¢Òâ eth0ºÍeth1
+# ä¸€æ¢ç©¶ç«Ÿï¼šæ³¨æ„ eth0å’Œeth1
 [emon@emon ~]$ docker exec test1 ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -3403,14 +3446,14 @@ c735a7979dca        docker_gwbridge     bridge              local
        valid_lft forever preferred_lft forever
 ```
 
-´óÌåÈçÏÂ£º
+å¤§ä½“å¦‚ä¸‹ï¼š
 
 ![image-20220315160025535](images/image-20220315160025535.png)
 
 
 
-## 6¡¢°¸Àı£º¶àÈİÆ÷¸´ÔÓÓ¦ÓÃµÄ²¿ÊğÑİÊ¾£¨¶à»ú¶àÈİÆ÷°æ£©
-### 6.1¡¢emon2ËŞÖ÷»ú´´½¨redisÈİÆ÷
+## 6ã€æ¡ˆä¾‹ï¼šå¤šå®¹å™¨å¤æ‚åº”ç”¨çš„éƒ¨ç½²æ¼”ç¤ºï¼ˆå¤šæœºå¤šå®¹å™¨ç‰ˆï¼‰
+### 6.1ã€emon2å®¿ä¸»æœºåˆ›å»ºrediså®¹å™¨
 
 ```bash
 [emon@emon2 ~]$ docker run -d --name redis --network demo redis
@@ -3418,18 +3461,18 @@ c735a7979dca        docker_gwbridge     bridge              local
 
 
 
-### 6.2¡¢emonËŞÖ÷»ú´´½¨flask-redisÈİÆ÷
+### 6.2ã€emonå®¿ä¸»æœºåˆ›å»ºflask-rediså®¹å™¨
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/flask-redis
 [emon@emon ~]$ cd dockerdata/flask-redis/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-- ´´½¨app.py
+- åˆ›å»ºapp.py
 
 ```bash
 [emon@emon flask-redis]$ vim app.py
@@ -3455,7 +3498,7 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon flask-redis]$ vim Dockerfile
@@ -3471,29 +3514,29 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-4£º´´½¨¾µÏñ
+4ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon flask-redis]$ docker build -t rushing/flask-redis .
 ```
 
-5£ºÔËĞĞ¾µÏñ
+5ï¼šè¿è¡Œé•œåƒ
 
 ```bash
 [emon@emon flask-redis]$ docker run -d -p 5000:5000 --link redis --name flask-redis --network demo -e REDIS_HOST=redis rushing/flask-redis
-# ·ÃÎÊÈİÆ÷
+# è®¿é—®å®¹å™¨
 [emon@emon flask-redis]$ docker exec -it flask-redis /bin/bash
-# ²é¿´env
+# æŸ¥çœ‹env
 root@f37f93de0bcb:/app# env|grep REDIS_HOST
 REDIS_HOST=redis
-# ÔËĞĞ´úÂë
+# è¿è¡Œä»£ç 
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 Hello Container World! I have been seen 1 times and my hostname is f37f93de0bcb.
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 Hello Container World! I have been seen 2 times and my hostname is f37f93de0bcb.
 root@f37f93de0bcb:/app# curl 127.0.0.1:5000
 
-# ÔÚËŞÖ÷»úÆ÷·ÃÎÊ
+# åœ¨å®¿ä¸»æœºå™¨è®¿é—®
 [emon@emon flask-redis]$ curl 127.0.0.1:5000
 Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 ```
@@ -3501,7 +3544,7 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 
 
-# Æß¡¢DockerµÄ³Ö¾Ã»¯´æ´¢ºÍÊı¾İ¹²Ïí
+# ä¸ƒã€Dockerçš„æŒä¹…åŒ–å­˜å‚¨å’Œæ•°æ®å…±äº«
 
 ![image-20220315164106453](images/image-20220315164106453.png)
 
@@ -3511,34 +3554,34 @@ Hello Container World! I have been seen 4 times and my hostname is 28bc2a8ace9e.
 
 
 
-## 1¡¢Docker³Ö¾Ã»¯Êı¾İµÄ·½°¸
+## 1ã€DockeræŒä¹…åŒ–æ•°æ®çš„æ–¹æ¡ˆ
 
-### 1.1¡¢Volume´æ´¢Î»ÖÃ
+### 1.1ã€Volumeå­˜å‚¨ä½ç½®
 
-- »ùÓÚ±¾µØÎÄ¼şÏµÍ³µÄVolume
+- åŸºäºæœ¬åœ°æ–‡ä»¶ç³»ç»Ÿçš„Volume
 
-¿ÉÒÔÔÚÖ´ĞĞDocker create»òDocker runÊ±£¬Í¨¹ı-v²ÎÊı½«Ö÷»úµÄÄ¿Â¼×÷ÎªÈİÆ÷µÄÊı¾İ¾í¡£Õâ²¿·Ö¹¦ÄÜ±ãÊÇ»ùÓÚ±¾µØÎÄ¼şÏµÍ³µÄvolume¹ÜÀí¡£
+å¯ä»¥åœ¨æ‰§è¡ŒDocker createæˆ–Docker runæ—¶ï¼Œé€šè¿‡-vå‚æ•°å°†ä¸»æœºçš„ç›®å½•ä½œä¸ºå®¹å™¨çš„æ•°æ®å·ã€‚è¿™éƒ¨åˆ†åŠŸèƒ½ä¾¿æ˜¯åŸºäºæœ¬åœ°æ–‡ä»¶ç³»ç»Ÿçš„volumeç®¡ç†ã€‚
 
-- »ùÓÚpluginµÄVolume
+- åŸºäºpluginçš„Volume
 
-Ö§³ÖµÚÈı·½´æ´¢·½°¸£¬±ÈÈçNAS£¬AWS£¬°¢ÀïÔÆµÈµÈ¡£
+æ”¯æŒç¬¬ä¸‰æ–¹å­˜å‚¨æ–¹æ¡ˆï¼Œæ¯”å¦‚NASï¼ŒAWSï¼Œé˜¿é‡Œäº‘ç­‰ç­‰ã€‚
 
-### 1.2¡¢VolumeµÄÀàĞÍ
+### 1.2ã€Volumeçš„ç±»å‹
 
-- ÊÜ¹ÜÀíµÄdata Volume£¬ÓÉdockerºóÌ¨×Ô¶¯´´½¨¡£
-- °ó¶¨¹ÒÔÚµÄVolume£¬¾ßÌå¹ÒÔÚÎ»ÖÃ¿ÉÒÔÓÉÓÃ»§Ö¸¶¨¡£
+- å—ç®¡ç†çš„data Volumeï¼Œç”±dockeråå°è‡ªåŠ¨åˆ›å»ºã€‚
+- ç»‘å®šæŒ‚åœ¨çš„Volumeï¼Œå…·ä½“æŒ‚åœ¨ä½ç½®å¯ä»¥ç”±ç”¨æˆ·æŒ‡å®šã€‚
 
-## 2¡¢Êı¾İ³Ö¾Ã»¯£ºData Volume
+## 2ã€æ•°æ®æŒä¹…åŒ–ï¼šData Volume
 
-### 2.1¡¢²»Ö¸¶¨volume
+### 2.1ã€ä¸æŒ‡å®švolume
 
-- ²é¿´volume
+- æŸ¥çœ‹volume
 
 ```bash
 [emon@emon ~]$ docker volume ls
 ```
 
-- ´´½¨mysqÈİÆ÷£¬²¢²é¿´volume
+- åˆ›å»ºmysqå®¹å™¨ï¼Œå¹¶æŸ¥çœ‹volume
 
 ```bash
 [emon@emon ~]$ docker run -d --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql
@@ -3559,27 +3602,27 @@ local               97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95d
 ]
 [emon@emon ~]$ docker stop mysql1
 [emon@emon ~]$ docker rm mysql1
-# ¿É¼ûvolume²¢²»»áËæ×ÅÈİÆ÷Í£Ö¹»òÉ¾³ı¶ø¶ªÊ§
+# å¯è§volumeå¹¶ä¸ä¼šéšç€å®¹å™¨åœæ­¢æˆ–åˆ é™¤è€Œä¸¢å¤±
 [emon@emon ~]$ docker volume ls
 DRIVER              VOLUME NAME
 local               97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95dd692
 ```
 
-- É¾³ıvolume
+- åˆ é™¤volume
 
 ```bash
 [emon@emon ~]$ docker volume rm 97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95dd692
 ```
 
-### 2.2¡¢Ö¸¶¨volume
+### 2.2ã€æŒ‡å®švolume
 
-- ´´½¨mysqlÈİÆ÷
+- åˆ›å»ºmysqlå®¹å™¨
 
 ```bash
 [emon@emon ~]$ docker run -d -v mysql:/var/lib/mysql --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql
 ```
 
-- ²é¿´volume
+- æŸ¥çœ‹volume
 
 ```bash
 [emon@emon ~]$ docker volume ls
@@ -3587,11 +3630,11 @@ DRIVER              VOLUME NAME
 local               mysql
 ```
 
-- ·ÃÎÊmysql·şÎñ²¢Éú³ÉÊı¾İ
+- è®¿é—®mysqlæœåŠ¡å¹¶ç”Ÿæˆæ•°æ®
 
 ```bash
 [emon@emon ~]$ sudo docker exec -it mysql1 /bin/bash
-# ²»ĞèÒªÊäÈëÃÜÂë£¬Ö±½Ó»Ø³µ
+# ä¸éœ€è¦è¾“å…¥å¯†ç ï¼Œç›´æ¥å›è½¦
 root@83fd8a3c376d:/# mysql -u root
 mysql> create database docker;
 Query OK, 1 row affected (0.01 sec)
@@ -3609,23 +3652,23 @@ mysql> show databases;
 5 rows in set (0.00 sec)
 ```
 
-- É¾³ıÈİÆ÷
+- åˆ é™¤å®¹å™¨
 
 ```bash
 [emon@emon ~]$ docker rm -f mysql1
 ```
 
-- ´´½¨ÈİÆ÷mysql2
+- åˆ›å»ºå®¹å™¨mysql2
 
 ```bash
 [emon@emon ~]$ docker run -d -v mysql:/var/lib/mysql --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql
 ```
 
-- ·ÃÎÊmysql·şÎñ²¢ÑéÖ¤dockerÊı¾İ¿âÈÔ¾É´æÔÚ
+- è®¿é—®mysqlæœåŠ¡å¹¶éªŒè¯dockeræ•°æ®åº“ä»æ—§å­˜åœ¨
 
 ```bash
 [emon@emon ~]$ sudo docker exec -it mysql2 /bin/bash
-# ²»ĞèÒªÊäÈëÃÜÂë£¬Ö±½Ó»Ø³µ
+# ä¸éœ€è¦è¾“å…¥å¯†ç ï¼Œç›´æ¥å›è½¦
 root@5559c6857e88:/# mysql -u root
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 8
@@ -3652,16 +3695,16 @@ mysql> show databases;
 5 rows in set (0.00 sec)
 ```
 
-## 3¡¢Êı¾İ³Ö¾Ã»¯£ºBind Mouting
+## 3ã€æ•°æ®æŒä¹…åŒ–ï¼šBind Mouting
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/docker-nginx
 [emon@emon ~]$ cd dockerdata/docker-nginx/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
 ```bash
 [emon@emon docker-nginx]$ vim index.html
@@ -3684,7 +3727,7 @@ mysql> show databases;
 
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon docker-nginx]$ vim Dockerfile 
@@ -3705,13 +3748,13 @@ COPY index.html index.html
 # I don't have to specify EXPOSE or CMD because they're in my FROM
 ```
 
-4£º´´½¨¾µÏñ
+4ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon docker-nginx]$ docker build -t rushing/my-nginx .
 ```
 
-5£ºÔËĞĞ¾µÏñ
+5ï¼šè¿è¡Œé•œåƒ
 
 ```bash
 [emon@emon docker-nginx]$ docker run -d -p 80:80 --name web rushing/my-nginx
@@ -3731,18 +3774,18 @@ COPY index.html index.html
 </html>
 ```
 
-- ÑéÖ¤
+- éªŒè¯
 
-·ÃÎÊ£ºhttp://emon/
+è®¿é—®ï¼šhttp://emon/
 
-6£ºÔËĞĞ¾µÏñ£ºÖ¸¶¨Íâ²¿volume
+6ï¼šè¿è¡Œé•œåƒï¼šæŒ‡å®šå¤–éƒ¨volume
 
 ```bash
-# É¾³ı¾ÉÈİÆ÷
+# åˆ é™¤æ—§å®¹å™¨
 [emon@emon docker-nginx]$ docker rm -f web
-# Ö¸¶¨Íâ²¿volumeÆô¶¯ÈİÆ÷
+# æŒ‡å®šå¤–éƒ¨volumeå¯åŠ¨å®¹å™¨
 [emon@emon docker-nginx]$ docker run -d -p 80:80 -v $(pwd):/usr/share/nginx/html --name web rushing/my-nginx
-# ½øÈëÈİÆ÷£¬·¢ÏÖºÍ$(pwd)Íâ²¿Ä¿Â¼Ò»Ñù£»ÔÚÈİÆ÷Ä¿Â¼´´½¨ÁËÎÄ¼ştouch test.txt£¬Íâ²¿Ò²ÄÜ²é¿´µ½¸ÃÎÄ¼ş¡£
+# è¿›å…¥å®¹å™¨ï¼Œå‘ç°å’Œ$(pwd)å¤–éƒ¨ç›®å½•ä¸€æ ·ï¼›åœ¨å®¹å™¨ç›®å½•åˆ›å»ºäº†æ–‡ä»¶touch test.txtï¼Œå¤–éƒ¨ä¹Ÿèƒ½æŸ¥çœ‹åˆ°è¯¥æ–‡ä»¶ã€‚
 [emon@emon docker-nginx]$ docker exec -it web /bin/bash
 root@694fca15eaa1:/usr/share/nginx/html# ls
 Dockerfile  index.html
@@ -3755,22 +3798,22 @@ Dockerfile  index.html  test.txt
 
 
 
-## 4¡¢¿ª·¢ÕßÀûÆ÷£ºDocker+Bind Mouting
+## 4ã€å¼€å‘è€…åˆ©å™¨ï¼šDocker+Bind Mouting
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/flask-skeleton
 [emon@emon ~]$ cd dockerdata/flask-skeleton/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-Ò»¸öPythonFlaskÏîÄ¿¡£
+ä¸€ä¸ªPythonFlaské¡¹ç›®ã€‚
 
 https://github.com/EmonCodingBackEnd/demo-docker-source01
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon flask-skeleton]$ vim Dockerfile 
@@ -3787,34 +3830,34 @@ EXPOSE 5000
 ENTRYPOINT ["scripts/dev.sh"]
 ```
 
-4£º´´½¨¾µÏñ
+4ï¼šåˆ›å»ºé•œåƒ
 
 ```bash
 [emon@emon flask-skeleton]$ docker build -t rushing/flask-skeleton .
 ```
 
-5£º´´½¨ÈİÆ÷
+5ï¼šåˆ›å»ºå®¹å™¨
 
 ```bash
 [emon@emon flask-skeleton]$ docker run -d -p 80:5000 -v $(pwd):/skeleton --name flask rushing/flask-skeleton
 ```
 
-## 5¡¢×ÛºÏÑİÁ·£ºWordPress²¿Êğ
+## 5ã€ç»¼åˆæ¼”ç»ƒï¼šWordPresséƒ¨ç½²
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir dockerdata/WordPress
 [emon@emon ~]$ cd dockerdata/WordPress/
 ```
 
-2£º´´½¨MySQLÈİÆ÷
+2ï¼šåˆ›å»ºMySQLå®¹å™¨
 
 ```bash
 [emon@emon WordPress]$ docker run -d --name mysql -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root123 -e MYSQL_DATABASE=wordpress mysql
 ```
 
-3£º´´½¨WordPressÈİÆ÷
+3ï¼šåˆ›å»ºWordPresså®¹å™¨
 
 ```bash
 [emon@emon WordPress]$ docker run -d --name wordpress -e WORDPRESS_DB_HOST=mysql:3306 -e WORDPRESS_DB_USER=root -e  WORDPRESS_DB_PASSWORD=root123 --link mysql -p 8080:80 wordpress
@@ -3822,81 +3865,81 @@ ENTRYPOINT ["scripts/dev.sh"]
 
 
 
-# °Ë¡¢Docker Compose£ºµ¥»ú±àÅÅ
+# å…«ã€Docker Composeï¼šå•æœºç¼–æ’
 
-## 1¡¢ÎªÊ²Ã´µ®ÉúDocker Compose
+## 1ã€ä¸ºä»€ä¹ˆè¯ç”ŸDocker Compose
 
-### 1.1¡¢¶à¸öÈİÆ÷µÄAPPºÃÄÑ¸ã£¡
+### 1.1ã€å¤šä¸ªå®¹å™¨çš„APPå¥½éš¾æï¼
 
-- Òª´ÓDockerfile build image»òÕßDockerhubÀ­È¡image
-- Òª´´½¨¶à¸öcontainer
-- Òª¹ÜÀíÕâĞ©container£¨Æô¶¯Í£Ö¹É¾³ı£©
+- è¦ä»Dockerfile build imageæˆ–è€…Dockerhubæ‹‰å–image
+- è¦åˆ›å»ºå¤šä¸ªcontainer
+- è¦ç®¡ç†è¿™äº›containerï¼ˆå¯åŠ¨åœæ­¢åˆ é™¤ï¼‰
 
-ËùÒÔ£¬Docker Composeµ®ÉúÁË£¡
+æ‰€ä»¥ï¼ŒDocker Composeè¯ç”Ÿäº†ï¼
 
-### 1.2¡¢Docker ComposeÊÇÊ²Ã´
+### 1.2ã€Docker Composeæ˜¯ä»€ä¹ˆ
 
-- Docker ComposeÊÇÒ»¸ö¹¤¾ß
-- Õâ¸ö¹¤¾ß¿ÉÒÔÍ¨¹ıÒ»¸öymlÎÄ¼ş¶¨Òå¶àÈİÆ÷µÄdockerÓ¦ÓÃ
-- Í¨¹ıÒ»ÌõÃüÁî¾Í¿ÉÒÔ¸ù¾İymlÎÄ¼şµÄ¶¨ÒåÈ¥´´½¨»òÕß¹ÜÀíÕâ¶à¸öÈİÆ÷
+- Docker Composeæ˜¯ä¸€ä¸ªå·¥å…·
+- è¿™ä¸ªå·¥å…·å¯ä»¥é€šè¿‡ä¸€ä¸ªymlæ–‡ä»¶å®šä¹‰å¤šå®¹å™¨çš„dockeråº”ç”¨
+- é€šè¿‡ä¸€æ¡å‘½ä»¤å°±å¯ä»¥æ ¹æ®ymlæ–‡ä»¶çš„å®šä¹‰å»åˆ›å»ºæˆ–è€…ç®¡ç†è¿™å¤šä¸ªå®¹å™¨
 
-## 2¡¢docker-composeÅäÖÃÎÄ¼ş
+## 2ã€docker-composeé…ç½®æ–‡ä»¶
 
 - docker-compose.yml
 
   - Services
-    - Ò»¸öService´ú±íÒ»¸öcontainer£¬Õâ¸öcontainer¿ÉÒÔ´ÓdockerhubµÄimageÀ´´´½¨£¬»òÕß´Ó±¾µØµÄDockerfile build³öÀ´µÄimageÀ´´´½¨¡£
-    - ServiceµÄÆô¶¯ÀàËÆdocker run£¬ÎÒÃÇ¿ÉÒÔ¸øÆäÖ¸¶¨networkºÍvolume£¬ËùÒÔ¿ÉÒÔ¸øserviceÖ¸¶¨networkºÍVolumeµÄÒıÓÃ¡£
+    - ä¸€ä¸ªServiceä»£è¡¨ä¸€ä¸ªcontainerï¼Œè¿™ä¸ªcontainerå¯ä»¥ä»dockerhubçš„imageæ¥åˆ›å»ºï¼Œæˆ–è€…ä»æœ¬åœ°çš„Dockerfile buildå‡ºæ¥çš„imageæ¥åˆ›å»ºã€‚
+    - Serviceçš„å¯åŠ¨ç±»ä¼¼docker runï¼Œæˆ‘ä»¬å¯ä»¥ç»™å…¶æŒ‡å®šnetworkå’Œvolumeï¼Œæ‰€ä»¥å¯ä»¥ç»™serviceæŒ‡å®šnetworkå’ŒVolumeçš„å¼•ç”¨ã€‚
   - Networks
   - Volumes
 
-## 3¡¢°²×°docker-compose
+## 3ã€å®‰è£…docker-compose
 
-1£ºÏÂÔØ
+1ï¼šä¸‹è½½
 
 ```bash
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 
-2£ºÌí¼Ó¿ÉÖ´ĞĞÈ¨ÏŞ
+2ï¼šæ·»åŠ å¯æ‰§è¡Œæƒé™
 
 ```bash
 [emon@emon ~]$ sudo chmod +x /usr/local/bin/docker-compose
-# ´´½¨ÈíÁ¬£¬±ÜÃâ°²×°HarborÊ±±¨´í£º? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
+# åˆ›å»ºè½¯è¿ï¼Œé¿å…å®‰è£…Harboræ—¶æŠ¥é”™ï¼š? Need to install docker-compose(1.18.0+) by yourself first and run this script again.
 [emon@emon ~]$ sudo ln -snf /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
-3£ºÅäÖÃalias
+3ï¼šé…ç½®alias
 
-- ÅäÖÃÓÀ¾ÃµÄalias
+- é…ç½®æ°¸ä¹…çš„alias
 
 ```bash
 alias docker-compose="sudo /usr/local/bin/docker-compose"
 ```
 
-- Ê¹Ö®ÉúĞ§
+- ä½¿ä¹‹ç”Ÿæ•ˆ
 
 ```bash
 [emon@emon ~]$ source .bashrc 
 ```
 
-4£º²âÊÔ
+4ï¼šæµ‹è¯•
 
 ```bash
 [emon@emon ~]$ docker-compose --version
 docker-compose version 1.29.2, build 5becea4c
 ```
 
-## 4¡¢°¸Àı£ºdocker-compose°æwordpress
+## 4ã€æ¡ˆä¾‹ï¼šdocker-composeç‰ˆwordpress
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir -p dockerdata/compose/wordpress
 [emon@emon ~]$ cd dockerdata/compose/wordpress/
 ```
 
-2£º±àĞ´`docker-compose.yml`ÎÄ¼ş
+2ï¼šç¼–å†™`docker-compose.yml`æ–‡ä»¶
 
 ```bash
 [emon@emon wordpress]$ vim docker-compose.yml
@@ -3937,15 +3980,15 @@ networks:
     driver: bridge
 ```
 
-3£ºÆô¶¯
+3ï¼šå¯åŠ¨
 
 ```bash
 [emon@emon wordpress]$ docker-compose -f docker-compose.yml up -d
-# »òÕß
+# æˆ–è€…
 [emon@emon wordpress]$ docker-compose up -d
 ```
 
-4£º²é¿´docker-composeÆô¶¯×´Ì¬
+4ï¼šæŸ¥çœ‹docker-composeå¯åŠ¨çŠ¶æ€
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml ps
@@ -3955,7 +3998,7 @@ wordpress_mysql_1       docker-entrypoint.sh mysqld      Up      3306/tcp, 33060
 wordpress_wordpress_1   docker-entrypoint.sh apach ...   Up      0.0.0.0:8080->80/tcp
 ```
 
-5£ºÍ£Ö¹²¢±£Áô·şÎñÊµÀı£¬È»ºó²é¿´×´Ì¬£¨×¢Òâ£ºdocker psÒÑ¾­ÎŞ·¨²é¿´µ½ÁË£©
+5ï¼šåœæ­¢å¹¶ä¿ç•™æœåŠ¡å®ä¾‹ï¼Œç„¶åæŸ¥çœ‹çŠ¶æ€ï¼ˆæ³¨æ„ï¼šdocker pså·²ç»æ— æ³•æŸ¥çœ‹åˆ°äº†ï¼‰
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml stop
@@ -3968,7 +4011,7 @@ wordpress_mysql_1       docker-entrypoint.sh mysqld      Exit 0
 wordpress_wordpress_1   docker-entrypoint.sh apach ...   Exit 0 
 ```
 
-6£ºÆô¶¯
+6ï¼šå¯åŠ¨
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml start
@@ -3976,7 +4019,7 @@ Starting mysql     ... done
 Starting wordpress ... done
 ```
 
-7£ºÍ£Ö¹²¢ÒÆ³ı·şÎñÊµÀı£¬È»ºó²é¿´×´Ì¬£¨×¢Òâ£ºdocker psÒÑ¾­ÎŞ·¨²é¿´µ½ÁË£©
+7ï¼šåœæ­¢å¹¶ç§»é™¤æœåŠ¡å®ä¾‹ï¼Œç„¶åæŸ¥çœ‹çŠ¶æ€ï¼ˆæ³¨æ„ï¼šdocker pså·²ç»æ— æ³•æŸ¥çœ‹åˆ°äº†ï¼‰
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml down
@@ -3990,9 +4033,9 @@ Name   Command   State   Ports
 ------------------------------
 ```
 
-8£ºÆäËûÃüÁî
+8ï¼šå…¶ä»–å‘½ä»¤
 
-- ²é¿´compose¶ÔÓ¦¾µÏñ
+- æŸ¥çœ‹composeå¯¹åº”é•œåƒ
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml images
@@ -4002,33 +4045,33 @@ wordpress_mysql_1       mysql        5.7      c20987f18b13   448.3 MB
 wordpress_wordpress_1   wordpress    latest   c3c92cc3dcb1   616 MB
 ```
 
-- ²é¿´ÈÕÖ¾
+- æŸ¥çœ‹æ—¥å¿—
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml logs
 ```
 
-- ½øÈëÄ³¸ö·şÎñ
+- è¿›å…¥æŸä¸ªæœåŠ¡
 
 ```bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml exec mysql bash
 [emon@emon ~]$ docker-compose -f /home/emon/dockerdata/compose/wordpress/docker-compose.yml exec wordpress bash
 ```
 
-## 5¡¢°¸Àı£ºdocker-compse°æflask-redis
+## 5ã€æ¡ˆä¾‹ï¼šdocker-compseç‰ˆflask-redis
 
-### 5.1¡¢µ¥¸öÊµÀı
+### 5.1ã€å•ä¸ªå®ä¾‹
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir -p dockerdata/compose/flask-redis
 [emon@emon ~]$ cd dockerdata/compose/flask-redis/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-- ´´½¨app.py
+- åˆ›å»ºapp.py
 
 ```bash
 [emon@emon flask-redis]$ vim app.py
@@ -4054,7 +4097,7 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon flask-redis]$ vim Dockerfile 
@@ -4070,7 +4113,7 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-4£º±àĞ´`docker-compose.yml`ÎÄ¼ş
+4ï¼šç¼–å†™`docker-compose.yml`æ–‡ä»¶
 
 ```bash
 [emon@emon flask-redis]$ vim docker-compose.yml
@@ -4094,7 +4137,7 @@ services:
       REDIS_HOST: redis      
 ```
 
-5£ºÆô¶¯
+5ï¼šå¯åŠ¨
 
 ```bash
 [emon@emon flask-redis]$ docker-compose up
@@ -4102,11 +4145,11 @@ services:
 
 
 
-### 5.2¡¢¶à¸öÊµÀı
+### 5.2ã€å¤šä¸ªå®ä¾‹
 
 ![image-20220317092852804](images/image-20220317092852804.png)
 
-- ĞŞ¸Ä`docker-compose.yml`
+- ä¿®æ”¹`docker-compose.yml`
 
 ```bash
 [emon@emon flask-redis]$ vim docker-compose.yml
@@ -4130,23 +4173,23 @@ services:
       REDIS_HOST: redis      
 ```
 
-- Æô¶¯3¸öwebÊµÀı
+- å¯åŠ¨3ä¸ªwebå®ä¾‹
 
 ```bash
 [emon@emon flask-redis]$ docker-compose up -d --scale web=3
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Starting flask-redis_redis_1 ... done
 Starting flask-redis_web_1   ... done
 Creating flask-redis_web_2   ... done
 Creating flask-redis_web_3   ... done
 ```
 
-- À©Õ¹µ½10¸öwebÊµÀı
+- æ‰©å±•åˆ°10ä¸ªwebå®ä¾‹
 
 ```bash
-# ²»ĞèÒªÍ£Ö¹£¬Ö±½ÓÖ´ĞĞÈçÏÂÃüÁî¼´¿É
+# ä¸éœ€è¦åœæ­¢ï¼Œç›´æ¥æ‰§è¡Œå¦‚ä¸‹å‘½ä»¤å³å¯
 [emon@emon flask-redis]$ docker-compose up -d --scale web=10
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 flask-redis_redis_1 is up-to-date
 Creating flask-redis_web_4  ... done
 Creating flask-redis_web_5  ... done
@@ -4157,18 +4200,18 @@ Creating flask-redis_web_9  ... done
 Creating flask-redis_web_10 ... done
 ```
 
-### 5.3¡¢HAProxyÄ£Ê½
+### 5.3ã€HAProxyæ¨¡å¼
 
-1£º´´½¨Ä¿Â¼
+1ï¼šåˆ›å»ºç›®å½•
 
 ```bash
 [emon@emon ~]$ mkdir -p dockerdata/compose/lb-scale
 [emon@emon ~]$ cd dockerdata/compose/lb-scale/
 ```
 
-2£º±àĞ´ÄÚÈİ
+2ï¼šç¼–å†™å†…å®¹
 
-- ´´½¨app.py
+- åˆ›å»ºapp.py
 
 ```bash
 [emon@emon lb-scale]$ vim app.py
@@ -4194,7 +4237,7 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80, debug=True)
 ```
 
-3£º´´½¨Dockerfile
+3ï¼šåˆ›å»ºDockerfile
 
 ```bash
 [emon@emon lb-scale]$ vim Dockerfile
@@ -4210,7 +4253,7 @@ EXPOSE 80
 CMD [ "python", "app.py" ]
 ```
 
-4£º±àĞ´`docker-compose.yml`ÎÄ¼ş
+4ï¼šç¼–å†™`docker-compose.yml`æ–‡ä»¶
 
 ```bash
 [emon@emon lb-scale]$ vim docker-compose.yml
@@ -4241,13 +4284,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 ```
 
-5£ºÆô¶¯
+5ï¼šå¯åŠ¨
 
 ```bash
 [emon@emon lb-scale]$ docker-compose up -d --scale web=3
 ```
 
-6£º·ÃÎÊ²¢²âÊÔ¸ºÔØ¾ùºâ
+6ï¼šè®¿é—®å¹¶æµ‹è¯•è´Ÿè½½å‡è¡¡
 
 ```bash
 [emon@emon lb-scale]$ curl 127.0.0.1:8080
@@ -4269,45 +4312,45 @@ Hello Container World! I have been seen 11 times and my hostname is 357f9f38876b
 
 
 
-## 6£º°¸Àı£º¸´ÔÓDocker ComposeÑİÊ¾
+## 6ï¼šæ¡ˆä¾‹ï¼šå¤æ‚Docker Composeæ¼”ç¤º
 
 ![image-20220317092852804](images/architecture.png)
 
 
 
-# ¾Å¡¢ÈİÆ÷±àÅÅSwarm£º¶à»ú±àÅÅ
+# ä¹ã€å®¹å™¨ç¼–æ’Swarmï¼šå¤šæœºç¼–æ’
 
-## 9.1¡¢Ê¹ÓÃDockerµÄÎÊÌâ
+## 9.1ã€ä½¿ç”¨Dockerçš„é—®é¢˜
 
-- ÔõÃ´È¥¹ÜÀíÕâÃ´¶àÈİÆ÷£¿
+- æ€ä¹ˆå»ç®¡ç†è¿™ä¹ˆå¤šå®¹å™¨ï¼Ÿ
 
-- ÔõÃ´ÄÜ¹»·½±ãµÄºáÏòÀ©Õ¹£¿
-- Èç¹ûÈİÆ÷downÁË£¬ÔõÃ´ÄÜ×Ô¶¯»Ö¸´£¿
-- ÈçºÎÈ¥¸üĞÂÈİÆ÷¶ø²»Ó°ÏìÒµÎñ£¿
-- ÈçºÎÈ¥¼à¿Ø×·×ÙÕâĞ©ÈİÆ÷£¿
-- ÔõÃ´È¥µ÷¶ÈÈİÆ÷µÄ´´½¨£¿
-- ±£»¤ÒşË½Êı¾İ£¿
+- æ€ä¹ˆèƒ½å¤Ÿæ–¹ä¾¿çš„æ¨ªå‘æ‰©å±•ï¼Ÿ
+- å¦‚æœå®¹å™¨downäº†ï¼Œæ€ä¹ˆèƒ½è‡ªåŠ¨æ¢å¤ï¼Ÿ
+- å¦‚ä½•å»æ›´æ–°å®¹å™¨è€Œä¸å½±å“ä¸šåŠ¡ï¼Ÿ
+- å¦‚ä½•å»ç›‘æ§è¿½è¸ªè¿™äº›å®¹å™¨ï¼Ÿ
+- æ€ä¹ˆå»è°ƒåº¦å®¹å™¨çš„åˆ›å»ºï¼Ÿ
+- ä¿æŠ¤éšç§æ•°æ®ï¼Ÿ
 
 
 
-## 9.2¡¢Docker Swarm Mode Architecture
+## 9.2ã€Docker Swarm Mode Architecture
 
 ![image-20220317162956598](images/image-20220317162956598.png)
 
-## 9.3¡¢ServiceºÍReplicas
+## 9.3ã€Serviceå’ŒReplicas
 
 ![image-20220317164111098](images/image-20220317164111098.png)
 
 ![image-20220317164304135](images/image-20220317164304135.png)
 
-## 9.3¡¢´´½¨Ò»¸öÈı½ÚµãSwarm
+## 9.3ã€åˆ›å»ºä¸€ä¸ªä¸‰èŠ‚ç‚¹Swarm
 
-- emon£º³õÊ¼»¯swarm
+- emonï¼šåˆå§‹åŒ–swarm
 
 ```bash
-# ¿ÉÒÔÊ¹ÓÃIPµØÖ·»òÕßÍøÂçinterface
+# å¯ä»¥ä½¿ç”¨IPåœ°å€æˆ–è€…ç½‘ç»œinterface
 [emon@emon ~]$ docker swarm init --advertise-addr=10.0.0.116
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 Swarm initialized: current node (p4p7wgokuibrd13f7g1aydfxi) is now a manager.
 
 To add a worker to this swarm, run the following command:
@@ -4317,31 +4360,31 @@ To add a worker to this swarm, run the following command:
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
 
-- emon2£º¼ÓÈëworker
+- emon2ï¼šåŠ å…¥worker
 
 ```bash
 [emon@emon2 ~]$ docker swarm join --token SWMTKN-1-3jk4rzfw8491m0zf9djo8n7c35ncl9u3b1byxavhq1ms81g083-9k6i7t40cffw59gtty6ad6yl4 10.0.0.116:2377
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 This node joined a swarm as a worker.
 ```
 
-- emon3£º¼ÓÈëworker
+- emon3ï¼šåŠ å…¥worker
 
 ```bash
 [emon@emon3 ~]$ docker swarm join --token SWMTKN-1-3jk4rzfw8491m0zf9djo8n7c35ncl9u3b1byxavhq1ms81g083-9k6i7t40cffw59gtty6ad6yl4 10.0.0.116:2377
-# mlhÊä³ö½á¹û
+# mlhè¾“å‡ºç»“æœ
 This node joined a swarm as a worker.
 ```
 
-- emon£ºÔÚswarmµÄmanager½ÚµãÉÏ²é¿´swarm½Úµã
+- emonï¼šåœ¨swarmçš„managerèŠ‚ç‚¹ä¸ŠæŸ¥çœ‹swarmèŠ‚ç‚¹
 
 ```bash
-# ²é¿´swarmµÄ½ÚµãĞÅÏ¢
+# æŸ¥çœ‹swarmçš„èŠ‚ç‚¹ä¿¡æ¯
 [emon@emon ~]$ docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
 p4p7wgokuibrd13f7g1aydfxi *   emon                Ready               Active              Leader              18.06.3-ce
 jn5d90oue9zmwq8l9csa2ihpc     emon2               Ready               Active                                  18.06.3-ce
-# ²é¿´ÍøÂçÁĞ±í£¬×¢Òâ²úÉúÁËdocker_gwbridgeºÍingressÁ½¸öÃüÃû¿Õ¼ä
+# æŸ¥çœ‹ç½‘ç»œåˆ—è¡¨ï¼Œæ³¨æ„äº§ç”Ÿäº†docker_gwbridgeå’Œingressä¸¤ä¸ªå‘½åç©ºé—´
 [emon@emon ~]$ docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
 68b3c334e418        bridge              bridge              local
@@ -4351,95 +4394,95 @@ zu0on261vwvj        ingress             overlay             swarm
 5dddd8fbaae8        none                null                local
 ```
 
-- ½âÉ¢swarm¼¯Èº
+- è§£æ•£swarmé›†ç¾¤
 
 ```bash
-# ½â³ıemon3½Úµã
+# è§£é™¤emon3èŠ‚ç‚¹
 [emon@emon3 ~]$ docker swarm leave
 Node left the swarm.
-# ½â³ıemon2½Úµã
+# è§£é™¤emon2èŠ‚ç‚¹
 [emon@emon2 ~]$ docker swarm leave
 Node left the swarm.
-# ²é¿´Ä¿Ç°Çé¿ö
+# æŸ¥çœ‹ç›®å‰æƒ…å†µ
 [emon@emon ~]$ docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
 p4p7wgokuibrd13f7g1aydfxi *   emon                Ready               Active              Leader              18.06.3-ce
 jn5d90oue9zmwq8l9csa2ihpc     emon2               Down                Active                                  18.06.3-ce
 r0xio3dgdcksegy5s7f8jaxjz     emon3               Down                Active                                  18.06.3-ce
-# ½âÉ¢emon¹ÜÀí½Úµã£¬½âÉ¢¼¯Èº
+# è§£æ•£emonç®¡ç†èŠ‚ç‚¹ï¼Œè§£æ•£é›†ç¾¤
 [emon@emon ~]$ docker swarm leave --force
 Node left the swarm.
 ```
 
 
 
-## 9.4¡¢ServiceµÄ´´½¨Î¬»¤ºÍË®Æ½À©Õ¹
+## 9.4ã€Serviceçš„åˆ›å»ºç»´æŠ¤å’Œæ°´å¹³æ‰©å±•
 
-- ´´½¨Ò»¸öservice
+- åˆ›å»ºä¸€ä¸ªservice
 
 ```bash
 [emon@emon ~]$ docker service create --name demo busybox sh -c "while true; do sleep 3600; done"
 ```
 
-- ²é¿´service
+- æŸ¥çœ‹service
 
 ```bash
-# ²é¿´serviceÁĞ±í
+# æŸ¥çœ‹serviceåˆ—è¡¨
 [emon@emon ~]$ docker service ls
-# ²é¿´serviceÏêÇé£¬ÆäÖĞdemo±íÊ¾serviceId»òserviceName
+# æŸ¥çœ‹serviceè¯¦æƒ…ï¼Œå…¶ä¸­demoè¡¨ç¤ºserviceIdæˆ–serviceName
 [emon@emon ~]$ docker service ps demo
 ```
 
-- ²é¿´logs
+- æŸ¥çœ‹logs
 
 ```bash
 [emon@emon ~]$ docker service logs demo
 ```
 
-- Ë®Æ½À©Õ¹
+- æ°´å¹³æ‰©å±•
 
 ```bash
-# ¿ÉÒÔÈ·±£5¸öÊµÀı
+# å¯ä»¥ç¡®ä¿5ä¸ªå®ä¾‹
 [emon@emon ~]$ docker service scale demo=5
 ```
 
-- É¾³ıservice
+- åˆ é™¤service
 
 ```bash
-# ÆäÖĞdemo±íÊ¾serviceId»òserviceName
+# å…¶ä¸­demoè¡¨ç¤ºserviceIdæˆ–serviceName
 [emon@emon ~]$ docker service rm demo
 ```
 
-## 9.5¡¢swarm°æwordpress
+## 9.5ã€swarmç‰ˆwordpress
 
-- ´´½¨overlay
+- åˆ›å»ºoverlay
 
 ```bash
-# wordpress·şÎñĞèÒªÒÀÀµmysql·şÎñ£¬ÇÒÊÇ¿ç»úÆ÷µÄ£¬ÏÈ´´½¨Ò»¸öoverlayµÄÍøÂçÃüÃû¿Õ¼ä
+# wordpressæœåŠ¡éœ€è¦ä¾èµ–mysqlæœåŠ¡ï¼Œä¸”æ˜¯è·¨æœºå™¨çš„ï¼Œå…ˆåˆ›å»ºä¸€ä¸ªoverlayçš„ç½‘ç»œå‘½åç©ºé—´
 [emon@emon ~]$ docker network create -d overlay demo
 ```
 
-- ´´½¨MySQLµÄService
+- åˆ›å»ºMySQLçš„Service
 
 ```bash
 [emon@emon ~]$ docker service create --name mysql --env MYSQL_ROOT_PASSWORD=root --env MYSQL_DATABASE=wordpress --network demo --mount type=volume,source=mysql-data,destination=/var/lib/mysql mysql
 ```
 
-- ´´½¨WordPressµÄService
+- åˆ›å»ºWordPressçš„Service
 
 ```bash
 [emon@emon ~]$ docker service create --name wordpress -p 80:80 --env WORDPRESS_DB_USER=root --env WORDPRESS_DB_PASSWORD=root --env WORDPRESS_DB_HOST=mysql --network demo wordpress
 ```
 
-- ·ÃÎÊ
+- è®¿é—®
 
-·ÃÎÊswarmµÄÈÎÒ»½Úµã¼´¿É·ÃÎÊ£¡
+è®¿é—®swarmçš„ä»»ä¸€èŠ‚ç‚¹å³å¯è®¿é—®ï¼
 
-- ²é¿´ÍøÂç
+- æŸ¥çœ‹ç½‘ç»œ
 
 ```bash
 [emon@emon ~]$ docker network ls
-# ÃüÁîĞĞÊä³ö
+# å‘½ä»¤è¡Œè¾“å‡º
 NETWORK ID          NAME                DRIVER              SCOPE
 68b3c334e418        bridge              bridge              local
 61p94kyce782        demo                overlay             swarm
@@ -4451,31 +4494,31 @@ zu0on261vwvj        ingress             overlay             swarm
 
 
 
-## 9.6¡¢¼¯Èº·şÎñ¼äÍ¨ĞÅÖ®Routing Mesh
+## 9.6ã€é›†ç¾¤æœåŠ¡é—´é€šä¿¡ä¹‹Routing Mesh
 
 ![image-20220318133418863](images/image-20220318133418863.png)
 
-- ´´½¨ÃûÎªwhoamiµÄService
+- åˆ›å»ºåä¸ºwhoamiçš„Service
 
 ```bash
 [emon@emon ~]$ docker service create --name whoami -p 8000:8000 --network demo -d jwilder/whoami
-# ·¢ÏÖÔÚemon»úÆ÷
+# å‘ç°åœ¨emonæœºå™¨
 [emon@emon ~]$ docker service ps whoami
 ID                  NAME                IMAGE                   NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
 wjm68kk7gdrk        whoami.1            jwilder/whoami:latest   emon                Running             Running 6 minutes ago                       
 ```
 
-- ´´½¨ÃûÎªclientµÄService
+- åˆ›å»ºåä¸ºclientçš„Service
 
 ```bash
 [emon@emon ~]$ docker service create --name client -d --network demo busybox sh -c "while true; do sleep 3600; done"
-# ·¢ÏÖÔÚemon2»úÆ÷
+# å‘ç°åœ¨emon2æœºå™¨
 [emon@emon ~]$ docker service ps client
 ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS
 pazc25bkf58y        client.1            busybox:latest      emon2               Running             Running 3 minutes ago
 ```
 
-- ÔÚclientÈ¥pingÒ»ÏÂwhoami·¢ÏÖ¿ÉÒÔÍ¨
+- åœ¨clientå»pingä¸€ä¸‹whoamiå‘ç°å¯ä»¥é€š
 
 ```bash
 [emon@emon2 ~]$ docker exec -it a671f0eb5e4c sh
@@ -4485,7 +4528,7 @@ PING whoami (10.0.0.19): 56 data bytes
 64 bytes from 10.0.0.19: seq=1 ttl=64 time=0.064 ms
 ```
 
-- Ôö¼Ówhoamiµ½2¸öÊµÀı
+- å¢åŠ whoamiåˆ°2ä¸ªå®ä¾‹
 
 ```bash
 [emon@emon ~]$ docker service scale whoami=2
@@ -4493,36 +4536,36 @@ PING whoami (10.0.0.19): 56 data bytes
 
 
 
-# ¾ÅÊ®¾Å¡¢ÆäËû
+# ä¹åä¹ã€å…¶ä»–
 
-- ²é¿´dockerÕ¼ÓÃ¿Õ¼ä
+- æŸ¥çœ‹dockerå ç”¨ç©ºé—´
 
 ```bash
 sudo du -sh /var/lib/docker
 ```
 
-- ÇåÀídockerµÄ`/var/lib/docker`Ä¿Â¼
+- æ¸…ç†dockerçš„`/var/lib/docker`ç›®å½•
 
-Èç¹ûÅöµ½ÎÊÌâ£ºno space left on device
+å¦‚æœç¢°åˆ°é—®é¢˜ï¼šno space left on device
 
 ```bash
 docker system prune -a -f
 ```
 
-- ÇåÀídockerµÄvolume
+- æ¸…ç†dockerçš„volume
 
 ```bash
-# ÇåÀíµ¥¸ö
+# æ¸…ç†å•ä¸ª
 docker volume rm < VOLUME NAME >
-# »òÕßÇåÀíºÜ¶à£ºÈç¹ûvolume²»ÔÙ±»ÈİÆ÷Õ¼ÓÃ£¬²Å»á±»ÇåÀí
+# æˆ–è€…æ¸…ç†å¾ˆå¤šï¼šå¦‚æœvolumeä¸å†è¢«å®¹å™¨å ç”¨ï¼Œæ‰ä¼šè¢«æ¸…ç†
 docker volume prune
 ```
 
-- ²é¿´docker´ÅÅÌÊ¹ÓÃÇé¿ö
+- æŸ¥çœ‹dockerç£ç›˜ä½¿ç”¨æƒ…å†µ
 
 ```bash
 [emon@emon ~]$ docker system df
-# ÃüÁîĞĞÊä³ö½á¹û
+# å‘½ä»¤è¡Œè¾“å‡ºç»“æœ
 TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
 Images              4                   4                   1.852GB             0B (0%)
 Containers          4                   1                   149.2MB             149.2MB (99%)
@@ -4530,24 +4573,24 @@ Local Volumes       4                   1                   2.584GB             
 Build Cache         0                   0                   0B                  0B
 ```
 
-- ÇåÀí
+- æ¸…ç†
 
 ```bash
-# ÇåÀídockerÎŞÓÃÊı¾İ£º»áÇåÀíÍ£Ö¹µÄÈİÆ÷£¬µ«²»»áÇåÀí¾µÏñ
+# æ¸…ç†dockeræ— ç”¨æ•°æ®ï¼šä¼šæ¸…ç†åœæ­¢çš„å®¹å™¨ï¼Œä½†ä¸ä¼šæ¸…ç†é•œåƒ
 [emon@emon ~]$ docker system prune
-# ÇåÀídockerÎŞÓÃÊı¾İ£º»áÇåÀíÍ£Ö¹µÄÈİÆ÷£¬Ò²»áÇåÀí¾µÏñ
+# æ¸…ç†dockeræ— ç”¨æ•°æ®ï¼šä¼šæ¸…ç†åœæ­¢çš„å®¹å™¨ï¼Œä¹Ÿä¼šæ¸…ç†é•œåƒ
 [emon@emon ~]$ docker system prune -a
 ```
 
-## 99.1¡¢²é¿´ÈİÆ÷µÄ×ÊÔ´Ê¹ÓÃÇé¿öÍ³¼Æ
+## 99.1ã€æŸ¥çœ‹å®¹å™¨çš„èµ„æºä½¿ç”¨æƒ…å†µç»Ÿè®¡
 
-- ²é¿´ËùÓĞÔËĞĞÖĞµÄÈİÆ÷
+- æŸ¥çœ‹æ‰€æœ‰è¿è¡Œä¸­çš„å®¹å™¨
 
 ```bash
 $ docker stats 
 ```
 
-- ²é¿´Ä³Ğ©¸öÔËĞĞÖĞµÄÈİÆ÷
+- æŸ¥çœ‹æŸäº›ä¸ªè¿è¡Œä¸­çš„å®¹å™¨
 
 ```bash
 $ docker stats nginx
