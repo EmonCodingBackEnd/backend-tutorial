@@ -2022,9 +2022,21 @@ RUN /bin/bash -c 'source $HOME/.bashrc;echo $HOME'
 
 ### 1.4、关键字：WORKDIR
 
+在 Dockerfile 中，`WORKDIR` 指令用于**设置容器内的工作目录**（用户登录容器后自动切换到该目录），后续的指令（如 `RUN`、`CMD`、`COPY`、`ADD`）默认在此目录下执行。以下是它的核心作用、用法及注意事项：
+
+**核心作用**
+
+1. **定义操作路径**
+   所有后续指令的**相对路径**均基于 `WORKDIR` 指定的目录。
+2. **简化路径管理**
+   避免在指令中频繁使用绝对路径，提高 Dockerfile 的可读性和可维护性。
+3. **自动创建目录**
+   如果目录不存在，Docker 会自动创建。
+
 ```dockerfile
 # 创建根目录下test文件夹
 WORKDIR /root
+WORKDIR <目录路径>
 ```
 
 ```dockerfile
@@ -2104,8 +2116,10 @@ RUN apt-get install -y mysql-server="${MYSQL_VERSION}" \
 
 - ENTRYPOINT：设置容器启动时运行的命令
 
-  - 定义容器启动时的入口命令（`CMD` 的内容会作为其参数）。
+  - `ENTRYPOINT` 定义固定命令，`CMD` 定义默认参数。
   
+  - 定义容器启动时的入口命令（`CMD` 的内容会作为其参数）。
+
     ```dockerfile
     ENTRYPOINT ["java", "-jar"]
     CMD ["app.jar"]
@@ -2247,7 +2261,7 @@ EXPOSE 80/tcp
 
 ### 1.12 VOLUME
 
-- 定义容器数据卷挂载点（用于持久化数据）。
+- 定义容器数据卷挂载点（用于持久化数据）。会自动创建目录。
 - 示例
 
 ```dockerfile
