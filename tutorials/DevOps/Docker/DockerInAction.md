@@ -2268,9 +2268,15 @@ EXPOSE 80/tcp
 VOLUME /var/lib/mysql
 ```
 
+### 1.13 ARG
 
+​	允许在 Dockerfile 中声明变量，为后续步骤（如 `RUN`、`COPY`）提供动态值。
 
+​	可以为变量设置默认值，当未通过 `--build-arg` 覆盖时生效。
 
+```dockerfile
+ARG <变量名>[=<默认值>]
+```
 
 ## 2、案例
 
@@ -3634,6 +3640,20 @@ local               97e57d5925b751eb3d8739722854a97f0e69d3370ae471a90af5e638e95d
 
 ```bash
 [emon@emon ~]$ docker run -d -v mysql:/var/lib/mysql --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql
+```
+
+​	**权限被拒绝（Permission Denied）？**
+
+- 添加权限标签（如 `:ro` 或 `:rw`）。
+
+```bash
+$ docker run -v /宿主机/data:/容器/data:rw nginx
+```
+
+- 对于 SELinux，使用 `:z` 或 `:Z`：
+
+```bash
+$ docker run -v /宿主机/data:/容器/data:z nginx
 ```
 
 - 查看volume
