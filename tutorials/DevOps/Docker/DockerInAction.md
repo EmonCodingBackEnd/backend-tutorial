@@ -6,79 +6,101 @@
 
 # 序一、Vagrant的安装与使用
 
-## 1、Vagrant是什么
+Vagrant官网： https://developer.hashicorp.com/vagrant/install
 
-Vagrant是构建在虚拟化技术之上的虚拟机运行环境管理工具。
+## 1 Vagrant 是什么？
 
-- 建立和删除虚拟机
-- 配置虚拟机运行参数
-- 管理虚拟机运行状态
-- 自动化配置和安装开发环境
-- 打包和分发虚拟机运行环境
+- **核心功能**：由 HashiCorp 开发的工具，用于快速创建和配置轻量级、可复用的虚拟开发环境。
+- **依赖技术**：基于 VirtualBox、VMware、Hyper-V 等虚拟机管理程序，或 Docker 容器。
+- **核心文件**：通过 `Vagrantfile` 定义虚拟机配置（如操作系统、网络、共享目录等）。
 
-- Vagrant的运行，需要依赖某项具体的虚拟化技术
-  - VirtualBox
-  - VMWare
+## 2 典型使用场景
 
+1. **统一开发环境**
+   - 团队共享相同的开发环境配置，避免“在我机器上能运行”的问题。
+   - 示例：通过 `vagrant up` 一键启动预装 Python/Node.js/数据库的虚拟机。
+2. **多环境测试**
+   - 快速创建不同操作系统（Ubuntu/CentOS/Windows）的实例，测试跨平台兼容性。
+3. **持续集成（CI）**
+   - 在 CI 流程中自动启动虚拟机运行测试任务。
+4. **快速原型开发**
+   - 结合 Provisioning（如 Ansible、Shell 脚本）自动部署应用依赖。
 
-
-### 1.1、个人角度优势
-
-- 跨平台
-- 可移动
-- 自动化部署无需人工参与
-- 面试加分项
-
-### 1.2公司角度
-
-- 减少人力培训成本
-- 统一开发环境
-
-VAGRANT+Virtualbox/VMWare+ubuntu/CentOS=目标环境
-
-## 2、Vagrant适用范围
-
-- 开发环境
-- 项目配置比较复杂
-
-
-
-## 3、Window安装Vagrant
-
-1. 下载
-
-下载地址：https://www.vagrantup.com/downloads
-
-2. 安装
-
-双击安装，安装后提示重启计算机，重启即可！
-
-3. 查看版本
+## 3 安装
 
 ```bash
-$ vagrant --version
-Vagrant 2.2.19
-$ vagrant -v
-Vagrant 2.2.19
+% brew tap hashicorp/tap
+% brew install hashicorp/tap/hashicorp-vagrant
 ```
 
-4. 修改Vagrant box保存路径
+## 4 常用命令
 
-add box的时候默认保存在用户文件夹下的`.vagrant.d`目录，通过设置VAGRANT_HOME环境变量可以改变默认位置。
+### 4.1 Vagrant的常用命令
 
-VAGRANT_HOME = `D:\SharedWorkspace\.vagrant.d`
+| 命令                               | 命令执行结果状态 | 解释                                     |
+| ---------------------------------- | ---------------- | ---------------------------------------- |
+| `vagrant --version/vagrant -v`     |                  | 查看当前版本                             |
+| `vagrant box list`                 |                  | 查看本地已下载的镜像列表                 |
+| `vagrant box add`                  |                  | 添加镜像到本地仓库（如 `rockylinux/9`）  |
+| `vagrant box remove < name >`      |                  | 删除本地镜像                             |
+| `vagrant box update`               |                  | 更新本地镜像到最新版本                   |
+| `vagrant init`                     |                  | 生成默认的 Vagrantfile（需手动指定镜像） |
+| `vagrant init < boxes >`           |                  | 生成 Vagrantfile 并指定默认镜像          |
+| `vagrant init <box名称> <镜像URL>` |                  | 指定镜像名称及下载地址                   |
+| `vagrant up`                       | running          | 启动虚拟机                               |
+| `vagrant ssh`                      |                  | ssh登录虚拟机                            |
+| `vagrant suspend`                  | saved            | 挂起虚拟机                               |
+| `vagrant resume`                   | running          | 唤醒虚拟机                               |
+| `vagrant halt`                     | poweroff         | 关闭虚拟机                               |
+| `vagrant reload`                   | running          | 重启虚拟机                               |
+| `vagratn status`                   | running          | 查看虚拟机状态                           |
+| `vagrant destroy [name\|id]`       |                  | 删除虚拟机，如果是default可以省略id      |
+| `vagrant provision`                |                  | 重新运行配置脚本（如 Ansible）           |
 
-## 4、Vagrant的使用
+特殊说明：vagrant up是一个万能命令，可以对saved/poweroff状态的虚拟机唤醒。
 
-### 4.1、使用VirtualBox创建虚拟机
+- vagrant box 示例
+
+```bash
+# 添加官方 Ubuntu 20.04 镜像
+vagrant box add ubuntu/focal64
+# 从本地文件添加镜像（如 centos.box）
+vagrant box add centos7 /path/to/centos.box
+# 列出所有本地镜像
+vagrant box list
+```
+
+- vagrant init 示例
+
+```bash
+# 初始化项目并指定镜像（本地已存在 ubuntu/focal64）
+vagrant init ubuntu/focal64
+# 初始化项目并指定镜像 URL（自动下载）
+vagrant init centos/7 https://example.com/centos7.box
+# 生成 Vagrantfile 并指定默认镜像
+vagrant init rockylinux/9 --box-version 5.0.0
+```
+
+### 4.2 Vagrant Plugin的常用命令
+
+| 命令                                  | 解释           |
+| ------------------------------------- | -------------- |
+| vagrant plugin install < pluginName > | 安装插件       |
+| vagrant plugin list                   | 查看安装的插件 |
+| vagrant plugin uninstall              | 卸载插件       |
+| vagrant plugin help                   | 查看命令用法   |
+
+## 5、Vagrant的使用
+
+### 5.1、使用VirtualBox创建虚拟机
 
 #### 第一步：启动virtualbox
 
 virtualbox安装后启动！
 
-#### 第二步：下载box
+#### 第二步：下载镜像box
 
-如何查询各种boxes：https://app.vagrantup.com/boxes/search
+如何查询各种boxes：https://portal.cloud.hashicorp.com/vagrant/discover
 
 下载地址：https://app.vagrantup.com/centos/boxes/7
 
@@ -87,20 +109,33 @@ virtualbox安装后启动！
 下载后本地安装：
 
 ```bash
-# 如果不是为了`vagrant add box boxesname boxespath`可以不下载。
-vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
+# 若是从本地加载，可以 vagrant box add CentOS/7 CentOS-7-x86_64-Vagrant-2004_01.VMwareFusion.box
+$ vagrant box add rockylinux/9 
+==> box: Loading metadata for box 'rockylinux/9'
+    box: URL: https://vagrantcloud.com/api/v2/vagrant/rockylinux/9
+This box can work with multiple providers! The providers that it
+can work with are listed below. Please review the list and choose
+the provider you will be working with.
+
+1) libvirt
+2) virtualbox
+3) vmware_desktop
+
+Enter your choice: vmware_desktop
+Invalid choice. Try again: 3 
+==> box: Adding box 'rockylinux/9' (v5.0.0) for provider: vmware_desktop (arm64)
+    box: Downloading: https://vagrantcloud.com/rockylinux/boxes/9/versions/5.0.0/providers/vmware_desktop/arm64/vagrant.box
+Progress: 4% (Rate: 1123k/s, Estimated time remaining: 0:13:42)
 ```
 
-#### 第三步：Vagrantfile
+#### 第三步：初始化项目Vagrantfile
 
 - 规划一个目录，作为Vagrant虚拟机目录，比如：Vagrant/centos7
 
 如果尚未看到Vagrantfile，初始化配置Vagrantfile
 
 ```bash
-vagrant init
-# 或者指定boxes【推荐】
-vagrant init centos/7
+$ vagrant init rockylinux/9 --box-version 5.0.0
 ```
 
 - 编辑Vagrantfile
@@ -115,7 +150,9 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-#### 第四步：初始化机器
+#### 第四步：启动虚拟机
+
+运行 `vagrant up`，Vagrant 会根据 `Vagrantfile` 中的配置创建虚拟机。
 
 ```bash
 $ vagrant up
@@ -125,7 +162,7 @@ $ vagrant up --provider virtualbox
 
 
 
-### 4.2、使用VMWare创建虚拟机
+### 5.2 使用VMWare创建虚拟机
 
 #### 第一步：安装VMWare provider插件vmware-desktop
 
@@ -196,9 +233,9 @@ vagrant up --provider vmware_desktop
 
 
 
-### 4.3、Vagrant虚拟机访问
+### 5.3 Vagrant虚拟机访问
 
-### 4.3.1、通过vagrant ssh命令
+### 5.3.1 通过vagrant ssh命令
 
 ```bash
 $ vagrant ssh
@@ -206,9 +243,7 @@ $ vagrant ssh
 /home/vagrant
 ```
 
-
-
-### 4.3.2、通过XShell工具
+### 5.3.2 通过XShell工具
 
 #### 1.查看vagrant的ssh配置
 
@@ -252,39 +287,6 @@ Password:
 Last login: Fri Mar 11 07:45:14 UTC 2022 on pts/0
 [root@localhost ~]# 
 ```
-
-
-
-## 5、Vagrant的常用命令
-
-| 命令                         | 命令执行结果状态 | 解释                                |
-| ---------------------------- | ---------------- | ----------------------------------- |
-| vagrant --version/vagrant -v |                  | 查看当前版本                        |
-| vagrant box list             |                  | 查看目前已有的box                   |
-| vagrant box add              |                  | 新增加一个box                       |
-| vagrant box remove < name >  |                  | 删除指定box                         |
-| vagrant init < boxes >       |                  | 初始化配置vagrantfile               |
-| vagrant up                   | running          | 启动虚拟机                          |
-| vagrant ssh                  |                  | ssh登录虚拟机                       |
-| vagrant suspend              | saved            | 挂起虚拟机                          |
-| vagrant resume               | running          | 唤醒虚拟机                          |
-| vagrant halt                 | poweroff         | 关闭虚拟机                          |
-| vagrant reload               | running          | 重启虚拟机                          |
-| vagratn status               | running          | 查看虚拟机状态                      |
-| vagrant destroy [name\|id]   |                  | 删除虚拟机，如果是default可以省略id |
-
-特殊说明：vagrant up是一个万能命令，可以对saved/poweroff状态的虚拟机唤醒。
-
-## 6、Vagrant Plugin命令
-
-| 命令                                  | 解释           |
-| ------------------------------------- | -------------- |
-| vagrant plugin install < pluginName > | 安装插件       |
-| vagrant plugin list                   | 查看安装的插件 |
-| vagrant plugin uninstall              | 卸载插件       |
-| vagrant plugin help                   | 查看命令用法   |
-
-
 
 # 序二、Docker Desktop的安装与使用【不推荐】
 
@@ -2434,7 +2436,81 @@ CMD []
 [emon@emon ubuntu-stress]$ docker run -it rushing/ubuntu-stress --vm 1 --verbose
 ```
 
+### 2.3、案例：SpringBoot执行脚本(sh)并启动服务(jar)
 
+- Dockerfile
+
+```dockerfile
+FROM openjdk:17-jdk-slim
+
+# 复制文件到容器
+COPY add-hosts.sh /add-hosts.sh
+COPY app.jar /app.jar
+
+# 确保脚本可执行
+RUN chmod +x /add-hosts.sh
+
+# 定义 ENTRYPOINT 执行固定逻辑（先运行脚本）
+ENTRYPOINT ["/bin/sh", "-c", "/add-hosts.sh && \"$@\"", "--"]
+
+# 定义 CMD 提供默认 Java 启动命令
+CMD ["java", "-jar", "/app.jar"]
+```
+
+**工作原理：**
+
+1. **ENTRYPOINT** 部分：
+   - 使用 `/bin/sh -c` 执行脚本
+   - `&& \"$@\"` 表示先执行脚本，然后执行传入的命令
+   - `--` 是占位符，确保 `$@` 能正确获取所有参数
+2. **CMD** 部分：
+   - 提供默认的 `java -jar /app.jar` 命令
+
+**测试用例：**
+
+1. **用户完全覆盖命令**：
+
+```
+docker run myapp java -jar -Dspring.profiles.active=test /app.jar
+```
+
+实际执行：
+
+```
+/add-hosts.sh && java -jar -Dspring.profiles.active=test /app.jar
+```
+
+1. **使用默认命令**：
+
+```
+docker run myapp
+```
+
+实际执行：
+
+```
+/add-hosts.sh && java -jar /app.jar
+```
+
+**关键点说明：**
+
+- `\"$@\"` 确保能正确处理带空格和特殊字符的参数
+- `--` 是 shell 的特殊参数，表示"选项结束"，后面的内容都视为参数
+- 这种写法既保证了脚本总是先执行，又允许用户完全覆盖 Java 命令
+
+**替代方案（更简洁）：**
+
+如果你不需要支持复杂的参数传递，可以简化成：
+
+```
+ENTRYPOINT ["/bin/sh", "-c", "/add-hosts.sh && exec java -jar /app.jar $@", "--"]
+CMD []
+```
+
+这样：
+
+- `docker run myapp` 会执行默认命令
+- `docker run myapp -Dspring.profiles.active=test` 会把参数附加到默认命令后
 
 # 六、网络：端口映射与容器互联
 

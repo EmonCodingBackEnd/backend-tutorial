@@ -848,6 +848,10 @@ grep [选项] 查找内容 源文件
 % grep -n yes hello.txt
 ```
 
+### 9.6.6 sed命令常用方式
+
+
+
 ## 9.7 压缩和解压类
 
 ### 9.7.1 gzip/gunzip 指令
@@ -1846,25 +1850,25 @@ nvme0n2            259:4    0    1G  0 disk
 **统计/opt文件夹下文件的个数**
 
 ```bash
-% ls -l /root/ | grep "^-" | wc -l
+% ls -l /opt/ | grep "^-" | wc -l
 ```
 
 **统计/opt文件夹下目录的个数**
 
 ```bash
-% ls -l /root/ | grep "^d" | wc -l
+% ls -l /opt/ | grep "^d" | wc -l
 ```
 
 **统计/opt文件夹下文件的个数，包括子文件夹里的**
 
 ```bash
-% ls -lR /root/ | grep "^-" | wc -l
+% ls -lR /opt/ | grep "^-" | wc -l
 ```
 
 **统计/opt文件夹下目录的个数，包括子文件夹里的**
 
 ```bash
-% ls -lR /root/ | grep "^d" | wc -l
+% ls -lR /opt/ | grep "^d" | wc -l
 ```
 
 **以树状显示目录结构**
