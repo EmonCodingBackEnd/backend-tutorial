@@ -880,7 +880,7 @@ git diff HEAD
 git checkout -- <file name>
 ```
 
-- 如何只回退某一个文件到指定<commit id>
+- 如何只回退某一个文件到指定`<commit id>`
 
 ```shell
 git checkout <commit id> <absolute_file_path>
@@ -1337,7 +1337,7 @@ git@github.com:EmonCodingFrontEnd/vue3-admin-template.git
 
 当我回到A项目并执行`git add`时得到提示：
 
->hint:   git submodule add <url> vue3-03-inaction/vue3-admin-template
+>hint:   git submodule add `<url>` vue3-03-inaction/vue3-admin-template
 >hint:
 >hint: If you added this path by mistake, you can remove it from the
 >hint: index with:
