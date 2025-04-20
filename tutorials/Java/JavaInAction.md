@@ -1006,7 +1006,7 @@ Error: telnet is not installed. Try to use java -jar arthas-boot.jar
 | id          | 线程id                                |
 | [n:]        | 指定最忙的前N个线程并打印堆栈         |
 | [b]         | 找出当前阻塞其他线程的线程            |
-| [i <value>] | 指定cpu占比统计的采样间隔，单位为毫秒 |
+| [i `<value>`] | 指定cpu占比统计的采样间隔，单位为毫秒 |
 
 示例1：查询当前最忙的N个线程把那个打印堆栈
 
